@@ -24,3 +24,5 @@ hs_err_pid*
 
 # Ignore IDE specific files
 .idea/
+
+AM38.iml
