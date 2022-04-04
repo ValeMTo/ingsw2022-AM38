@@ -5,12 +5,12 @@ import java.util.List;
 
 public class PlayerBoard {
     private final String nickName;
-    private final Tower towerColor;
-    private final int numTowersLimit;
-    private final SchoolBoard schoolBoard;
-    private final List<AssistantCard> deck;
+    private SchoolBoard schoolBoard;
+    private List<AssistantCard> deck;
     private int lastUsed;
     private int towers;
+    private final Tower towerColor;
+    private final int numTowersLimit;
     private int coin;
 
     /**
@@ -20,17 +20,17 @@ public class PlayerBoard {
      * Then, the schoolBoard and the AssistantCard deck is created.
      * There are no coin.
      *
-     * @param nickName   name of the player
+     * @param nickName name of the player
      * @param towerColor color of the player's tower in the game
      */
-    public PlayerBoard(String nickName, Tower towerColor, int numTowers) {
+    public PlayerBoard(String nickName, Tower towerColor, int numTowers){
         this.nickName = nickName;
         this.schoolBoard = new SchoolBoard();
         this.deck = new ArrayList<AssistantCard>();
-        for (int i = 0; i < 10; i++) {
-            int numCard = i + 1;
+        for(int i=0; i<10; i++){
+            int numCard = i+1;
             int numPriority = numCard;
-            if (i % 2 != 0) {
+            if( i%2 != 0 ){
                 numPriority += 1;
             }
             this.deck.add(new AssistantCard(numCard, numPriority));
@@ -48,18 +48,18 @@ public class PlayerBoard {
      * Then, the schoolBoard and the AssistantCard deck is created.
      * There are no coin.
      *
-     * @param nickName   name of the player
+     * @param nickName name of the player
      * @param towerColor color of the player's tower in the game
-     * @param coin       number of coins that are assigned to a player,it should be always two in the expert mode game.
+     * @param coin number of coins that are assigned to a player,it should be always two in the expert mode game.
      */
-    public PlayerBoard(String nickName, Tower towerColor, int numTowers, int coin) {
+    public PlayerBoard(String nickName, Tower towerColor, int numTowers, int coin){
         this.nickName = nickName;
         this.schoolBoard = new SchoolBoard();
         this.deck = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            int numCard = i + 1;
+        for(int i=0; i<10; i++){
+            int numCard = i+1;
             int numPriority = numCard;
-            if (i % 2 != 0) {
+            if( i%2 != 0 ){
                 numPriority += 1;
             }
             this.deck.add(new AssistantCard(numCard, numPriority));
@@ -77,8 +77,8 @@ public class PlayerBoard {
      * @param position the number of card that has to be used
      * @return the output of the legacy of the action
      */
-    public boolean useAssistantCard(int position) {
-        if (!deck.get(position).isUsed()) {
+    public boolean useAssistantCard(int position ){
+        if(!deck.get(position).isUsed()){
             deck.get(position).use();
             this.lastUsed = position;
             return true;
@@ -89,15 +89,15 @@ public class PlayerBoard {
     /**
      * Return the number of the last assistant card used by the player.
      */
-    public int getLastCard() {
+    public int getLastCard(){
         return lastUsed;
     }
 
-    public ArrayList<Integer> showUsableCards() {
+    public ArrayList<Integer> showUsableCards(){
         ArrayList<Integer> usableCards = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            if (!deck.get(i + 1).isUsed) {
-                usableCards.add(i + 1);
+        for(int i=0; i<10; i++){
+            if(!deck.get(i+1).isUsed){
+                usableCards.add(i+1);
             }
         }
         return usableCards;
@@ -110,7 +110,7 @@ public class PlayerBoard {
      * @param coin amount of coin to decrease
      * @return the outcome of the action. True if coin are decreised, otherwise false.
      */
-    public boolean pay(int coin) {
+    public boolean pay(int coin){
         if (this.coin > coin) {
             this.coin -= coin;
             return true;
@@ -121,8 +121,8 @@ public class PlayerBoard {
     /**
      * Increase of one the amount of coins
      */
-    public void increaseCoinBudget() {
-        this.coin += 1;
+    public void increaseCoinBudget(){
+        this.coin+=1;
     }
 
     /**
@@ -141,7 +141,7 @@ public class PlayerBoard {
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
-    public boolean addStudentDiningRoom(Color studentColor) {
+    public boolean addStudentDiningRoom(Color studentColor){
         return schoolBoard.addStudentDiningRoom(studentColor);
 
     }
@@ -153,7 +153,7 @@ public class PlayerBoard {
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
-    public boolean addStudentEntrance(Color studentColor) {
+    public boolean addStudentEntrance(Color studentColor){
         return schoolBoard.addStudentEntrance(studentColor);
 
     }
@@ -187,7 +187,7 @@ public class PlayerBoard {
      * @param numTower number of towers to increase
      * @return the outcome of the action
      */
-    public boolean addTower(int numTower) {
+    public boolean addTower(int numTower){
         if (this.towers + numTower <= numTowersLimit) {
             this.towers += numTower;
             return true;
@@ -202,7 +202,7 @@ public class PlayerBoard {
      * @param numTower number of towers to decrease
      * @return the outcome of the action
      */
-    public boolean removeTower(int numTower) {
+    public boolean removeTower(int numTower){
         if (this.towers - numTower >= 0) {
             this.towers -= numTower;
             return true;
@@ -215,7 +215,10 @@ public class PlayerBoard {
      *
      * @return number of available towers
      */
-    public int getAvailableTowers() {
+    public int getAvailableTowers(){
         return towers;
     }
+
+
+
 }
