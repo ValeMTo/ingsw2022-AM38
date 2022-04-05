@@ -58,7 +58,7 @@ public class TestIsland {
     }
 
     /**
-     * Method for adding the students using their parameters
+     * Adds the students using their parameters
      *
      * @param b for blue students
      * @param y for yellow students
