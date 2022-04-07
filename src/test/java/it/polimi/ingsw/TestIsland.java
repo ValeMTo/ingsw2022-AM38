@@ -1,11 +1,11 @@
 package it.polimi.ingsw;
 
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
 
@@ -15,12 +15,21 @@ public class TestIsland {
     Island island = new Island(1);
 
     /**
+     * Support class for have the Stream of possibles Tower's colors
+     *
+     * @return a stream of all the Tower's colors
+     */
+    public static Stream<Tower> supplyTowerColors() {
+        return Stream.of(Tower.GRAY, Tower.BLACK, Tower.WHITE);
+    }
+
+    /**
      * Test for assure the initialization of island is correct
      * and that isTaken() changes collocating a Tower
      */
     @Test
     @DisplayName("isTaken test initialize and then set")
-    public void testIsTaken(){
+    public void testIsTaken() {
         assertFalse(island.isTaken());
         island.setTower(Tower.GRAY);
         assertTrue(island.isTaken());
@@ -28,11 +37,11 @@ public class TestIsland {
 
     /**
      * Test for assure that the initialization of island is correct
-     *  and for testing isInfluenceEnabled() after trying to disable and then re-enable the influence
+     * and for testing isInfluenceEnabled() after trying to disable and then re-enable the influence
      */
     @Test
     @DisplayName("InfluenceEnable initial value and then disable and enable")
-    public void testInfluenceEnable(){
+    public void testInfluenceEnable() {
         assertTrue(island.isInfluenceEnabled());
         island.disableInfluence();
         assertFalse(island.isInfluenceEnabled());
@@ -46,7 +55,7 @@ public class TestIsland {
      */
     @DisplayName("InfluenceEnable with two enables and then disable")
     @Test
-    public void testInfluenceEnable2(){
+    public void testInfluenceEnable2() {
         island.enableInfluence();
         assertTrue(island.isInfluenceEnabled());
         island.enableInfluence();
@@ -67,20 +76,21 @@ public class TestIsland {
      * @param g for green students
      */
     public void adder(int b, int y, int r, int p, int g) {
-        for(int i=0;i<b;i++)
+        for (int i = 0; i < b; i++)
             island.addStudent(Color.BLUE);
-        for(int i=0;i<y;i++)
+        for (int i = 0; i < y; i++)
             island.addStudent(Color.YELLOW);
-        for(int i=0;i<r;i++)
+        for (int i = 0; i < r; i++)
             island.addStudent(Color.RED);
-        for(int i=0;i<p;i++)
+        for (int i = 0; i < p; i++)
             island.addStudent(Color.PINK);
-        for(int i=0;i<g;i++)
+        for (int i = 0; i < g; i++)
             island.addStudent(Color.GREEN);
     }
 
     /**
      * ParameterizedTest for the control of the addition of Student and verifying that their number is correct
+     *
      * @param b : BLUE students to add
      * @param y : YELLOW students to add
      * @param r : RED students to add
@@ -89,14 +99,14 @@ public class TestIsland {
      */
     @DisplayName("Add students and student number control")
     @ParameterizedTest
-    @CsvSource ({"0,1,2,3,4,5","1,0,0,0,0","0,0,0,0,0","15,14,13,13,12"})
-    public void adderAndGet(int b, int y, int r, int p, int g){
-        adder(b,y,r,p,g);
-        assertEquals(b,island.studentNumber(Color.BLUE));
-        assertEquals(y,island.studentNumber(Color.YELLOW));
-        assertEquals(r,island.studentNumber(Color.RED));
-        assertEquals(p,island.studentNumber(Color.PINK));
-        assertEquals(g,island.studentNumber(Color.GREEN));
+    @CsvSource({"0,1,2,3,4,5", "1,0,0,0,0", "0,0,0,0,0", "15,14,13,13,12"})
+    public void adderAndGet(int b, int y, int r, int p, int g) {
+        adder(b, y, r, p, g);
+        assertEquals(b, island.studentNumber(Color.BLUE));
+        assertEquals(y, island.studentNumber(Color.YELLOW));
+        assertEquals(r, island.studentNumber(Color.RED));
+        assertEquals(p, island.studentNumber(Color.PINK));
+        assertEquals(g, island.studentNumber(Color.GREEN));
     }
 
     /**
@@ -104,20 +114,30 @@ public class TestIsland {
      */
     @Test
     @DisplayName("Tower number test without set towers")
-    public void towerNumber(){
-        assertEquals(0,island.getTowerNumber());
+    public void towerNumber() {
+        assertEquals(0, island.getTowerNumber());
     }
 
     /**
      * Parameterized test for the set method of the towers number and verifying it is correctly set
+     *
      * @param towerNum : new tower number to set
      */
     @ParameterizedTest
-    @ValueSource(ints = {0,1,2,3,4,5})
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
     @DisplayName("Tower Number after set test")
-    public void towerNumber(int towerNum){
+    public void towerNumber(int towerNum) {
         island.setTowerNumber(towerNum);
-        assertEquals(towerNum,island.getTowerNumber());
+        assertEquals(towerNum, island.getTowerNumber());
+    }
+
+    @Test
+    public void towerSetting() {
+        Tower[] towers = Tower.values();
+        for (int i = 0; i < towers.length; i++) {
+            island.setTower(towers[i]);
+            assertEquals(towers[i], island.getTower());
+        }
     }
 
     /**
@@ -125,29 +145,49 @@ public class TestIsland {
      */
     @Test
     @DisplayName("Empty Tower Color Test")
-    public void tower(){
+    public void tower() {
         assertNull(island.getTower());
     }
 
     /**
-     * Support class for have the Stream of possibles Tower's colors
-     *
-     * @return a stream of all the Tower's colors
-     */
-    public static Stream<Tower> supplyTowerColors(){
-        return Stream.of(Tower.GRAY,Tower.BLACK,Tower.WHITE);
-    }
-
-    /**
      * ParameterizedTest for the set and get of the Towers color
+     *
      * @param towerColor
      */
     @DisplayName("All tower colors test")
     @ParameterizedTest
     @MethodSource("supplyTowerColors")
-    public void tower(Tower towerColor){
+    public void tower(Tower towerColor) {
         island.setTower(towerColor);
-        assertEquals(island.getTower(),towerColor);
+        assertEquals(island.getTower(), towerColor);
+    }
+
+    /**
+     * Test the various condition of the influence enable / disable and initialization
+     * of the flag to enable the influence computation
+     */
+    @Test
+    @DisplayName("Test disable and enable influence")
+    public void enableAndDisableInfluence() {
+        assertTrue(island.isInfluenceEnabled());
+        island.disableInfluence();
+        assertFalse(island.isInfluenceEnabled());
+        island.enableInfluence();
+        assertTrue(island.isInfluenceEnabled());
+    }
+
+    /**
+     * Verify that the position is initialization well and that the set and get work fine
+     *
+     * @param position
+     */
+    @ParameterizedTest
+    @DisplayName("Test the Island positioning set and get")
+    @ValueSource(ints = {0, 1, 2, 3, 12})
+    public void setAdnGetPositioning(int position) {
+        assertEquals(island.getPosition(), 1); //initialization
+        island.setPosition(position);
+        assertEquals(island.getPosition(), position);
     }
 
 

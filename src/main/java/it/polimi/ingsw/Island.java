@@ -110,7 +110,7 @@ public class Island {
     /**
      * Setter for the Number of towers on the Island (if Island groups are formed the nr. of Islands correspond to the nr. of towers)
      *
-     * @param num : number of towers
+     * @param towerNum : number of towers
      */
     public void setTowerNumber(int towerNum) {
         this.towerNumber = towerNum;
@@ -125,6 +125,11 @@ public class Island {
         this.position = pos;
     }
 
+    /**
+     * Getter for position of the island (same index if islands are grouped)
+     * @return the position of the island on the game-board (between 1 and 12)
+     */
+    public int getPosition(){ return this.position;}
 
 }
 
