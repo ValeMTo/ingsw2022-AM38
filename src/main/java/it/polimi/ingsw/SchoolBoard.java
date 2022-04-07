@@ -1,7 +1,7 @@
 package it.polimi.ingsw;
 // IMPLEMENTED CLASS
 
-import it.polimi.*;
+
 
 public class SchoolBoard {
     private SchoolEntrance entrance;
