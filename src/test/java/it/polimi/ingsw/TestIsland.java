@@ -177,14 +177,14 @@ public class TestIsland {
     }
 
     /**
-     * Verify that the position is initialization well and that the set and get work fine
+     * Verify that the position is initializated well and that the set and get work fine
      *
      * @param position
      */
     @ParameterizedTest
     @DisplayName("Test the Island positioning set and get")
     @ValueSource(ints = {0, 1, 2, 3, 12})
-    public void setAdnGetPositioning(int position) {
+    public void setAndGetPositioning(int position) {
         assertEquals(island.getPosition(), 1); //initialization
         island.setPosition(position);
         assertEquals(island.getPosition(), position);
