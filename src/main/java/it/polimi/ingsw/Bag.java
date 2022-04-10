@@ -1,6 +1,5 @@
 package it.polimi.ingsw;
 
-import it.polimi.*;
 
 import java.util.HashMap;
 
@@ -11,47 +10,53 @@ public class Bag {
 
     private HashMap<Color,Integer> counter;
     private int studentNumber;
-    private int colorLimit;
-
+    private final int maxTotalStudents = 130;
+    private final int maxInitStudents = 120;
+    private final int initStudentsPerColor = maxInitStudents/5 ;
 
     /**
-     * Constructor that creates the bag and its HashMap without specifying yet the initial amount of students.
+     * Constructor that creates the bag and its HashMap and fills it with 10 students, 2 for each color.
+     * This is the initial fill at the beginning of the game,
+     * before the students are taken from the Bag and placed on 10 islands.
      *
      */
 
     public Bag(){
         this.counter = new HashMap<Color,Integer>();
+
+        for (Color col : Color.values()) {
+            this.counter.put(col, 2);
+        }
+        this.studentNumber = 10;
     }
 
 
     /**
-     *   Initializes the initial number of students in the bag, at the beginning of the game.
-     *   Note that the initial number varies according to the number of players in the game
-     *   The initial amount of students for each color will be set by the Controller using the addStudent() method
-     *
-     * @param colorLimit  the maximum amount of Students allowed for that color as set by the Controller
+     *   Initialises the Bag, filling it with the 120 remaining students, 24 for each color, after the first 10
+     *   have been placed in the islands.
+     *   The attribute initStudentsPerColor is 24.
      */
 
-    public void initialise(int numStudent, int colorLimit) {
-        this.studentNumber = numStudent;
-        this.colorLimit = colorLimit;
+    public void initialise() {
+        for (Color col : counter.keySet()) {
+            this.counter.put(col, initStudentsPerColor);
+        }
+        studentNumber = maxInitStudents;
+
     }
 
 
     /**
      *  Draws a student from the bag,  picking a pseudo-random Color from the HashMap.
-     *
-     * @return Color of the student that has been drawn
+     *  If the last student has been drawn and the bag is left empty, nothing happens until the end of the round,
+     *  when the Controller will call the isEmpty() method.
+     * @return Color of the student that has been drawn.
      *
      */
 
     public Color drawStudent() {
 
-        if(this.isEmpty())
-            throw new EmptyBagException();
-
-        HashMap<Integer, Color> randIntToColor = new HashMap<Integer,Color>(); ;
-        boolean foundColor = false;
+        HashMap<Integer, Color> randIntToColor = new HashMap<Integer,Color>();
 
         // initializes the hashmap mapping each color to an int index ranging from 0 to 4
         int i = 0;
@@ -60,28 +65,28 @@ public class Bag {
             i+=1 ;
         }
 
-        // start of the random Color generator
+        /* The following random color generator picks a random index and checks if there are any students
+        *  of the corresponding color.
+        */
 
         Random random = new Random();
         int x = random.nextInt(5);
 
-        for (int j=0; j<5; j++) {
+        for (int j=0; j<5 ; j++) {
 
-            Color color = randIntToColor.get(x);
+            Color randColor = randIntToColor.get(x);
 
-            if(counter.get(color)  > 0) {           // found a non-empty color "c" from which to draw a student
-                Integer previousNumStudents = counter.get(c);
-                counter.put(color, previousNumStudents-1);
-
-                return color;
-
+            if(counter.get(randColor) > 0) {  // found a non-empty color "randColor" from which to draw a student
+                int previousNumStudents = counter.get(randColor);
+                counter.put(randColor, previousNumStudents-1);
+                this.studentNumber -= 1;
+                return randColor;
             }
-            else {                        // tries drawing from the next color in the hashmap
+            else {                        // tries drawing from the next color in the hashmap "randIntToColor"
                 x+=1 ;
                 if (x>4)
                     x = 0;
             }
-
         }
         return null;
     }
@@ -89,9 +94,9 @@ public class Bag {
 
     /**
      * Adds a student of the given color  in the Bag.
-     * Returns false if the limit was reached and adding the student was not added, otherwise returns true.
+     * Returns false if the limit was reached and the student cannot be added, otherwise returns true.
      *
-     * @param studentColor is the student to add in the Bag.
+     * @param studentColor is the color of the student to add in the Bag.
      * @return outcome of the adding attempt.
      */
     public boolean addStudent(Color studentColor) throws NullPointerException {
@@ -101,16 +106,19 @@ public class Bag {
         if (previousNumStudents == null) {
             counter.put(studentColor, 1);
         } else {
-            if (previousNumStudents >= colorLimit) return false;
+            if (previousNumStudents >= initStudentsPerColor)
+                // case in which the desired color already has the maximum amount allowed, which is 24.
+                return false;
             counter.put(studentColor, previousNumStudents + 1);
         }
+        studentNumber += 1;
         return true;
     }
 
 
     /**
-     * Returns true if there are no students left in the Bag, false if there is one student or more, whatever their color.
-     *
+     * Returns true if there are no students left in the Bag, false if there is at least one student, whatever its color.
+     * The cycle iterates through the values of the HashMap.
      * @return students shortage status in the bag.
      */
 
@@ -122,6 +130,26 @@ public class Bag {
         return true;
 
     }
+
+    /**
+     * returns the current total amount of students contained in the Bag.
+     * @return the number of students currently in the bag.
+     */
+
+    public int getStudentNumber() {
+        return this.studentNumber;
+    }
+
+    /**
+     * returns the current  amount of students of a certain color in the Bag.
+     * @param color : the color of the students to be counted
+     * @return the number of students currently in the bag.
+     */
+
+    public int countStudentByColor(Color color) {
+        return this.counter.get(color);
+    }
+
 
 
 }
