@@ -227,7 +227,6 @@ public class BagTest {
                 () -> testedBag.addStudent(null),
                 "Expected addStudent() to throw NullPointerException, but it didn't"
         );
-
     }
 
 
