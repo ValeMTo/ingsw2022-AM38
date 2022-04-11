@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static java.lang.Math.min;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestSchoolBoard {
+public class SchoolBoardTest {
     private final int maxStudentDiningRoomColor = 10;
     private final int maxStudentEntranceColor = 7;
 

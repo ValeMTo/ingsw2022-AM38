@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestIsland {
+public class IslandTest {
     Island island = new Island(1);
 
     /**
