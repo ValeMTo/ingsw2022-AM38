@@ -45,7 +45,7 @@ abstract class Room {
      */
     public boolean removeStudent(Color studentColor) {
         Integer previousNumStudents = guests.get(studentColor);
-        if (previousNumStudents == null) return false;
+        if (previousNumStudents == null || this.countStudents(studentColor) <= 0) return false;
         guests.put(studentColor, previousNumStudents - 1);
         return true;
     }
