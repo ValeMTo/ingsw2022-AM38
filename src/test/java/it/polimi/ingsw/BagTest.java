@@ -1,11 +1,9 @@
-
 package it.polimi.ingsw;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +19,6 @@ public class BagTest {
      */
 
     private final int maxTotalStudents = 130;
-    private final int TotalStudentsPerColor = 26;
     private final int maxInitStudents = 120;
     private final int initStudentsPerColor = 24;
 
@@ -40,16 +37,16 @@ public class BagTest {
     // some handy methods to quickly fill and empty the bag for the various tests
 
     private void emptyBag(Bag b) {
-       int previousNum = b.getStudentNumber();
-       for(int i=0; i<previousNum; i++) {
-           b.drawStudent();
-       }
+        int previousNum = b.getStudentNumber();
+        for (int i = 0; i < previousNum; i++) {
+            b.drawStudent();
+        }
 
     }
 
     private void addMultipleStudents(Bag b, Color color, int amount) {
-        for(int i=0; i<amount; i++ ){
-           b.addStudent(color);                // adds multiple students of only one given color
+        for (int i = 0; i < amount; i++) {
+            b.addStudent(color);                // adds multiple students of only one given color
         }
     }
 
@@ -64,7 +61,7 @@ public class BagTest {
         Bag bag = new Bag();
         assertEquals(10, bag.getStudentNumber());
 
-        for(Color c : Color.values()) {
+        for (Color c : Color.values()) {
             assertEquals(2, bag.countStudentByColor(c));
         }
     }
@@ -80,7 +77,7 @@ public class BagTest {
         testedBag.initialise();
         assertEquals(maxInitStudents, testedBag.getStudentNumber());
 
-        for(Color c : Color.values()) {
+        for (Color c : Color.values()) {
             assertEquals(initStudentsPerColor, testedBag.countStudentByColor(c));
         }
     }
@@ -89,8 +86,6 @@ public class BagTest {
      * Tests the special case in which all the students are drawn from the bag, including the last student left,
      * and then the bag is empty.
      * The test is executed for different initial amounts of students
-
-     * @param amount: the previous amount of student before the bag is emptied.
      */
 
     @Test
@@ -104,10 +99,23 @@ public class BagTest {
 
 
     /**
+     * Checks the case in which the bag is full and someone tries to add a new student. False is expected to be
+     * returned by the addStudent() method.
+     */
+    @Test
+    @DisplayName("Check bag overflow")
+    public void checkBagOverflowTest() {
+        testedBag.initialise();   // the bag is already full at the beginning of the game
+        assertFalse(testedBag.addStudent(Color.BLUE));
+
+    }
+
+
+    /**
      * Tests the color of the student drawn by the drawStudent() method, considering the scenario in which the bag
      * contains only one student of a given color.
      * The test is repeated for each color and checks if the returned color is correct.
-
+     *
      * @param col: the color of the only student drawn from the bag, which is expected to be returned.
      */
 
@@ -125,10 +133,11 @@ public class BagTest {
     }
 
 
-
-    /** Tests if the current total number of students in the bag is correctly updated after adding multiple students
+    /**
+     * Tests if the current total number of students in the bag is correctly updated after adding multiple students
+     *
      * @param studentsToAdd: the number of students to be added
-     * @param col : the color of the students to be added
+     * @param col            : the color of the students to be added
      */
     @ParameterizedTest
     @CsvSource({"12,PINK", "4,BLUE", "0,RED", "12,YELLOW", "8,GREEN"})
@@ -145,8 +154,9 @@ public class BagTest {
     }
 
 
-
-    /** Tests if the current total number of students in the bag is correctly updated after drawing multiple students
+    /**
+     * Tests if the current total number of students in the bag is correctly updated after drawing multiple students
+     *
      * @param studentsToDraw: the number of students to be drawn
      */
     @ParameterizedTest
@@ -156,13 +166,69 @@ public class BagTest {
 
         testedBag.initialise();    // initialises the bag with 120 students, 24 per color
         int previousStudNumber = testedBag.getStudentNumber();
-        for(int i = 0; i < studentsToDraw; i++) {
+        for (int i = 0; i < studentsToDraw; i++) {
             testedBag.drawStudent();
         }
         assertEquals(previousStudNumber - studentsToDraw, testedBag.getStudentNumber());
     }
 
 
+    /**
+     * Tests if the number of students for each color is correctly updated after adding different amounts of student
+     * and makes sure the amounts of the colors that are not added remain unchanged.
+     *
+     * @param studentsToAdd: the number of students to be added
+     * @param col            : the color of the students to be added
+     */
+    @ParameterizedTest
+    @CsvSource({"12,PINK", "4,BLUE", "0,RED", "24,YELLOW", "29,GREEN"})
+    @DisplayName("Check students per color after addStudent")
+    public void checkStudentsPerColorAfterAdding(int studentsToAdd, String col) {
+        Color color = getEnumParameter(col);
+        Color[] colorSet = Color.values();
+        int[] previousAmounts = new int[colorSet.length];
+
+        emptyBag(testedBag);
+
+        for (int i = 0; i < colorSet.length; i++) {            // counts the amounts of students per color before adding
+            previousAmounts[i] = testedBag.countStudentByColor(colorSet[i]);
+        }
+
+        if (color == null) {
+            System.out.println("Null exception test");
+            return;
+        }
+        for (int i = 0; i < studentsToAdd; i++) {
+            if (i < initStudentsPerColor) {
+                assertTrue(testedBag.addStudent(color));
+            } else
+                assertFalse(testedBag.addStudent(color));
+        }
+        if (studentsToAdd < initStudentsPerColor) {
+            for (int i = 0; i < colorSet.length; i++) {
+                if (colorSet[i].equals(color))     // checks that only the added color has its amount correctly increased
+                    assertEquals(previousAmounts[i] + studentsToAdd, testedBag.countStudentByColor(color));
+                else
+                    assertEquals(previousAmounts[i], testedBag.countStudentByColor(colorSet[i]));
+            }
+        } else
+            assertEquals(initStudentsPerColor, testedBag.countStudentByColor(color));
+    }
+
+
+    /**
+     * Checks if the NullPointerException is thrown when addStudent receives a null parameter instead of a Color.
+     */
+    @Test
+    @DisplayName("Check NullPointer exception in addStudent")
+    void nullPointerExceptionTesting() {
+        NullPointerException thrown = assertThrows(
+                NullPointerException.class,
+                () -> testedBag.addStudent(null),
+                "Expected addStudent() to throw NullPointerException, but it didn't"
+        );
+
+    }
 
 
 }
