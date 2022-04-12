@@ -15,13 +15,15 @@ public class PlayerBoardTest {
      * Use only one assistant card.
      * Check the no-usability.
      * Use Easy Constructor.
+     *
+     * @param numCard : number of assistant card
      */
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
     public void useAssistantCardTest(int numCard) {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8);
-        assertEquals(player.useAssistantCard(numCard), true);
-        assertEquals(player.useAssistantCard(numCard), false);
+        assertTrue(player.useAssistantCard(numCard));
+        assertFalse(player.useAssistantCard(numCard));
 
     }
 
@@ -29,6 +31,8 @@ public class PlayerBoardTest {
      * Use all assistant card.
      * Check the no-usability.
      * Use Expert Constructor.
+     *
+     * @param numCard : number of assistant card
      */
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
@@ -45,23 +49,31 @@ public class PlayerBoardTest {
     @Test
     public void getLastCardNotTakenTest() {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8, 2);
-        assertEquals(player.getLastCard(), -1);
+        NotLastCardUsedException thrown = assertThrows(NotLastCardUsedException.class, () -> player.getLastCard(), "It is the first round. No card can be take before");
     }
 
     /**
      * Get the last Assistant Card number used.
+     *
+     * @param numCard : number of assistant card
      */
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
     public void getLastCardTest(int numCard) {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8, 2);
         player.useAssistantCard(numCard);
-        assertEquals(player.getLastCard(), numCard);
+        try {
+            assertEquals(numCard, player.getLastCard());
+        } catch (NotLastCardUsedException e) {
+            e.printStackTrace();
+        }
 
     }
 
     /**
      * Show all cards available after using one
+     *
+     * @param numCard : number of assistant card
      */
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
@@ -83,7 +95,7 @@ public class PlayerBoardTest {
     @Test
     public void getNoUsableCardTest() {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8, 2);
-        for (int i=1; i<=10; i++){
+        for (int i = 1; i <= 10; i++) {
             player.useAssistantCard(i);
         }
         assertEquals(0, player.showUsableCards().size());
@@ -122,6 +134,8 @@ public class PlayerBoardTest {
 
     /**
      * Increase the amount of money of a certain amount
+     *
+     * @param coin : amount of coin
      */
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9})

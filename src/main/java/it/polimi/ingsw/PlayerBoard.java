@@ -31,13 +31,15 @@ public class PlayerBoard {
             this.schoolBoard = new SchoolBoard( 9,10);
         }
         this.deck = new ArrayList<AssistantCard>();
+        int numCard;
+        int numSteps;
         for (int i =0; i < 10; i++) {
-            int numCard = i + 1;
-            int numPriority = numCard;
+            numCard = i + 1;
+            numSteps = numCard/2;
             if (i % 2 != 0) {
-                numPriority += 1;
+                numSteps += 1;
             }
-            this.deck.add(new AssistantCard(numCard, numPriority));
+            this.deck.add(new AssistantCard(numCard, numSteps));
         }
         this.towers = numTowers;
         this.numTowersLimit = numTowers;
@@ -64,13 +66,15 @@ public class PlayerBoard {
             this.schoolBoard = new SchoolBoard( 9,10);
         }
         this.deck = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            int numCard = i + 1;
-            int numPriority = numCard;
+        int numCard;
+        int numSteps;
+        for (int i =0; i < 10; i++) {
+            numCard = i + 1;
+            numSteps = numCard/2;
             if (i % 2 != 0) {
-                numPriority += 1;
+                numSteps += 1;
             }
-            this.deck.add(new AssistantCard(numCard, numPriority));
+            this.deck.add(new AssistantCard(numCard, numSteps));
         }
         this.towers = numTowers;
         this.numTowersLimit = numTowers;
@@ -79,7 +83,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Make the assistant card at the position number passed unusable.
+     * Makes the assistant card at the position number passed unusable.
      * If the card was already use return false, otherwise true.
      *
      * @param position the number of card that has to be used
@@ -95,11 +99,11 @@ public class PlayerBoard {
     }
 
     /**
-     * Return the number of the last assistant card used by the player.
+     * Returns the number of the last assistant card used by the player.
      */
-    public int getLastCard() {
+    public int getLastCard() throws NotLastCardUsedException{
         if(lastUsed == null) {
-            return -1;
+            throw new NotLastCardUsedException("It is the first round. No card can be take before");
         }
         return lastUsed;
     }
@@ -115,7 +119,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Decrease the coin reserve of a certain amount.
+     * Decreases the coin reserve of a certain amount.
      * If the reserve is not enough returns false, otherwise returns true.
      *
      * @param coin amount of coin to decrease
@@ -130,7 +134,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Increase of one the amount of coins
+     * Increases of one the amount of coins
      */
     public void increaseCoinBudget() {
         this.coin += 1;
@@ -199,7 +203,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Count all students in Dining room
+     * Counts all students in Dining room
      *
      * @return number of all students in dining room
      */
@@ -208,7 +212,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Count all students in entrance
+     * Counts all students in entrance
      *
      * @return number of all students in the entrance
      */
@@ -217,7 +221,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Count students of certain color in dining room
+     * Counts students of certain color in dining room
      *
      * @return number students of certain color in dining room
      */
@@ -226,7 +230,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Count students of certain color in entrance
+     * Counts students of certain color in entrance
      *
      * @return number students of certain color in entrance
      */
@@ -235,7 +239,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Increase of the parameter the amount of towers.
+     * Increases of the parameter the amount of towers.
      * Returns true if the final number of towers is not above the limit, otherwise false.
      *
      * @param numTower number of towers to increase
@@ -250,7 +254,7 @@ public class PlayerBoard {
     }
 
     /**
-     * Decrease of the parameter the amount of towers.
+     * Decreases the amount of towers.
      * Returns true if the final number of towers is above or equal zero, otherwise false.
      *
      * @param numTower number of towers to decrease
