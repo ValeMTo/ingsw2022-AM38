@@ -8,8 +8,8 @@ public class PlayerBoard {
     private final Tower towerColor;
     private final int numTowersLimit;
     private final SchoolBoard schoolBoard;
-    private final List<AssistantCard> deck;
-    private int lastUsed;
+    private List<AssistantCard> deck;
+    private Integer lastUsed;
     private int towers;
     private int coin;
 
@@ -25,9 +25,13 @@ public class PlayerBoard {
      */
     public PlayerBoard(String nickName, Tower towerColor, int numTowers) {
         this.nickName = nickName;
-        this.schoolBoard = new SchoolBoard();
+        if( numTowers == 8){
+            this.schoolBoard = new SchoolBoard(7 ,10);
+        }else {
+            this.schoolBoard = new SchoolBoard( 9,10);
+        }
         this.deck = new ArrayList<AssistantCard>();
-        for (int i = 0; i < 10; i++) {
+        for (int i =0; i < 10; i++) {
             int numCard = i + 1;
             int numPriority = numCard;
             if (i % 2 != 0) {
@@ -54,7 +58,11 @@ public class PlayerBoard {
      */
     public PlayerBoard(String nickName, Tower towerColor, int numTowers, int coin) {
         this.nickName = nickName;
-        this.schoolBoard = new SchoolBoard();
+        if( numTowers == 8){
+            this.schoolBoard = new SchoolBoard(7 ,10);
+        }else{
+            this.schoolBoard = new SchoolBoard( 9,10);
+        }
         this.deck = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int numCard = i + 1;
@@ -78,8 +86,8 @@ public class PlayerBoard {
      * @return the output of the legacy of the action
      */
     public boolean useAssistantCard(int position) {
-        if (!deck.get(position).isUsed()) {
-            deck.get(position).use();
+        if (!deck.get(position-1).isUsed()) {
+            deck.get(position-1).use();
             this.lastUsed = position;
             return true;
         }
@@ -90,14 +98,17 @@ public class PlayerBoard {
      * Return the number of the last assistant card used by the player.
      */
     public int getLastCard() {
+        if(lastUsed == null) {
+            return -1;
+        }
         return lastUsed;
     }
 
     public ArrayList<Integer> showUsableCards() {
-        ArrayList<Integer> usableCards = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            if (!deck.get(i + 1).isUsed) {
-                usableCards.add(i + 1);
+        ArrayList<Integer> usableCards = new ArrayList<Integer>();
+        for (int i = 0; i < deck.size(); i++) {
+            if (!deck.get(i).isUsed()) {
+                usableCards.add(deck.get(i).getPriority());
             }
         }
         return usableCards;
@@ -111,7 +122,7 @@ public class PlayerBoard {
      * @return the outcome of the action. True if coin are decreised, otherwise false.
      */
     public boolean pay(int coin) {
-        if (this.coin > coin) {
+        if (this.coin >= coin) {
             this.coin -= coin;
             return true;
         }
@@ -123,6 +134,13 @@ public class PlayerBoard {
      */
     public void increaseCoinBudget() {
         this.coin += 1;
+    }
+
+    /**
+     * Coin getter
+     */
+    public int getCoin() {
+        return coin;
     }
 
     /**
@@ -181,6 +199,42 @@ public class PlayerBoard {
     }
 
     /**
+     * Count all students in Dining room
+     *
+     * @return number of all students in dining room
+     */
+    public int countStudentsDiningRoom(){
+        return schoolBoard.countStudentsDiningRoom();
+    }
+
+    /**
+     * Count all students in entrance
+     *
+     * @return number of all students in the entrance
+     */
+    public int countStudentsEntrance(){
+        return schoolBoard.countStudentsEntrance();
+    }
+
+    /**
+     * Count students of certain color in dining room
+     *
+     * @return number students of certain color in dining room
+     */
+    public int countStudentsDiningRoom(Color color){
+        return schoolBoard.countStudentsDiningRoom(color);
+    }
+
+    /**
+     * Count students of certain color in entrance
+     *
+     * @return number students of certain color in entrance
+     */
+    public int countStudentsEntrance(Color color){
+        return schoolBoard.countStudentsEntrance(color);
+    }
+
+    /**
      * Increase of the parameter the amount of towers.
      * Returns true if the final number of towers is not above the limit, otherwise false.
      *
@@ -188,7 +242,7 @@ public class PlayerBoard {
      * @return the outcome of the action
      */
     public boolean addTower(int numTower) {
-        if (this.towers + numTower <= numTowersLimit) {
+        if (this.towers + numTower < numTowersLimit && numTower>0){
             this.towers += numTower;
             return true;
         }
