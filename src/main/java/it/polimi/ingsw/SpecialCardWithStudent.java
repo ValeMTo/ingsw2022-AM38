@@ -3,7 +3,7 @@ package it.polimi.ingsw;
 import java.util.HashMap;
 
 public class SpecialCardWithStudent extends SpecialCard{
-    private HashMap<Color, Integer> guests:
+    private HashMap<Color, Integer> guests;
     private int guestsLimit;
     private int guestsChangeLimit;
 
@@ -33,9 +33,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
-    public boolean addStudent(Color studentColor) throws NullPointerException {
-        if (studentColor == null) throw new NullPointerException();
-
+    public boolean addStudent(Color studentColor) {
         if (this.countStudents() < guestsLimit) {
             Integer previousNumStudents = guests.get(studentColor);
             if (previousNumStudents == null) {
