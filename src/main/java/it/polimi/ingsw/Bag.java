@@ -7,7 +7,6 @@ import java.util.Random;
 
 public class Bag {
 
-    private final int maxTotalStudents = 130;
     private final int maxInitStudents = 120;
     private final int initStudentsPerColor = maxInitStudents / 5;
     private final HashMap<Color, Integer> counter;
@@ -99,7 +98,7 @@ public class Bag {
         if (studentColor == null) throw new NullPointerException();
 
         Integer previousNumStudents = counter.get(studentColor);
-        if (previousNumStudents == null) {
+        if (!counter.containsKey(studentColor)) {
             counter.put(studentColor, 1);
         } else {
             if (previousNumStudents >= initStudentsPerColor)

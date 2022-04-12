@@ -13,12 +13,10 @@ public class BagTest {
 
 
     /**
-     * The following first two amounts refer to the total students in game "physical" components, whereas
-     * the last two amounts refer to the number of students placed in the bag right before the first round of the game,
-     * after the 10 students have been placed on the islands.
+     * The following two numbers refer to the number of students placed in the bag right before the first round
+     * of the game, after the initial 10 students have been placed on the islands.
      */
 
-    private final int maxTotalStudents = 130;
     private final int maxInitStudents = 120;
     private final int initStudentsPerColor = 24;
 
