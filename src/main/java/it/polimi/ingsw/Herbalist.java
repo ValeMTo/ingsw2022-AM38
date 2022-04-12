@@ -43,7 +43,7 @@ public class Herbalist extends SpecialCard{
      *
      * @return true if there are no tails available, otherwise false
      */
-    public boolean isEmpty(){
+    public boolean isEmptyOfTails(){
         if(noEntryTiles == 0){
             return true;
         }
