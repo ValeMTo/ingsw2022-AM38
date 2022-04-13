@@ -22,6 +22,7 @@ public class PlayerBoard {
      *
      * @param nickName   name of the player
      * @param towerColor color of the player's tower in the game
+     * @param numTowers number of towers of the player
      */
     public PlayerBoard(String nickName, Tower towerColor, int numTowers) {
         this.nickName = nickName;
