@@ -2,13 +2,14 @@ package it.polimi.ingsw;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
+import java.util.Set;
 
 
 public class Bag {
 
-    private final int maxInitStudents = 120;
-    private final int initStudentsPerColor = maxInitStudents / 5;
+    private final int initStudentsPerColor = 24;
     private final HashMap<Color, Integer> counter;
     private int studentNumber;
 
@@ -24,7 +25,10 @@ public class Bag {
         for (Color col : Color.values()) {
             this.counter.put(col, 2);
         }
-        this.studentNumber = 10;
+        int count = 0;
+        for (Integer value : counter.values())
+            count = count + value;
+        this.studentNumber = count;
     }
 
 
@@ -38,7 +42,10 @@ public class Bag {
         for (Color col : counter.keySet()) {
             this.counter.put(col, initStudentsPerColor);
         }
-        studentNumber = maxInitStudents;
+        int count = 0;
+        for (Integer value : counter.values())
+            count = count + value;
+        this.studentNumber = count;
     }
 
 
@@ -47,40 +54,53 @@ public class Bag {
      * If the last student has been drawn and the bag is left empty, nothing happens until the end of the round,
      * when the Controller will call the isEmpty() method.
      *
-     * @return Color of the student that has been drawn.
+     * @return the color of the student that has been drawn.
+     * <p>
+     * Notes on the algorithm for random picking:
+     * It creates a new linked hashmap that associates each color with a range, marked by a threshold.
+     * The values of the thresholds are incremental and increase with the number of students.
+     * Example: the bag contains the following students: (BLUE,10), (YELLOW, 15), (PINK, 16), (GREEN, 19), (RED, 22)
+     * The thresholds (threshold, COLOR) will be :  (10, BLUE), (25,YELLOW), (41,PINK), (60,GREEN), (82,RED)
+     * If we associate every single student in the bag is associated with a number
+     * (ranging from 1 to the current total number of students in the bag), which represents its "position" in the bag,
+     * it is possible to determine in which range/color that student falls.
+     * Then it is generated a pseudo-random integer and it is checked in which color range it falls.
+     * That integer and color represent the random student that is drawn.
+     * The linked hashmap is used to maintain the thresholds in order.
      */
 
     public Color drawStudent() {
 
-        HashMap<Integer, Color> randIntToColor = new HashMap<Integer, Color>();
+        LinkedHashMap<Integer, Color> colorRange = new LinkedHashMap<Integer, Color>();   //  < threshold, COLOR >
 
-        // initializes the hashmap mapping each color to an int index ranging from 0 to 4
-        int i = 0;
-        for (Color c : Color.values()) {
-            randIntToColor.put(i, c);
-            i += 1;
+        if (this.isEmpty()) return null;
+
+        // the following cycle fills the linked hashmap with the upper threshold for each color range
+        int offset = 0;
+        for (Color col : Color.values()) {
+            if (countStudentByColor(col) != 0) {
+                offset += countStudentByColor(col);
+                colorRange.put(offset, col);
+            }
         }
 
-        /* The following random color generator picks a random index and checks if there are any students
-         *  of the corresponding color.
-         */
-
         Random random = new Random();
-        int x = random.nextInt(5);
+        int randPos = 0;
+        do {
+            randPos = random.nextInt(this.studentNumber + 1);   // picks a random position in the bag
+        } while (randPos == 0);
 
-        for (int j = 0; j < 5; j++) {
+        Set<Integer> thresholds = colorRange.keySet();
+        // the keySet yields the thresholds in the order they were inserted
 
-            Color randColor = randIntToColor.get(x);
-
-            if (counter.get(randColor) > 0) {  // found a non-empty color "randColor" from which to draw a student
-                int previousNumStudents = counter.get(randColor);
-                counter.put(randColor, previousNumStudents - 1);
+        for (Integer t : thresholds) {
+            if (t >= randPos) {
+                Color foundColor = colorRange.get(t);
+                int previousNumStudents = counter.get(foundColor);
+                counter.put(foundColor, previousNumStudents - 1);
                 this.studentNumber -= 1;
-                return randColor;
-            } else {                        // tries drawing from the next color in the hashmap "randIntToColor"
-                x += 1;
-                if (x > 4)
-                    x = 0;
+
+                return foundColor;
             }
         }
         return null;
