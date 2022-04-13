@@ -102,7 +102,7 @@ public class CloudTest {
 
     /**
      * Checks that the method to empty the cloud correctly removes all the students currently in the cloud.
-     * The tests is run with different fillings of the cloud.
+     * The tests are run with different fillings of the cloud.
      * Note that a newly-created cloud is always empty at first.
      *
      * @param studentsToAdd : the number of students to add before the emptying attempt
@@ -116,8 +116,7 @@ public class CloudTest {
         assertFalse(testedCloud.emptyCloud());    // the cloud is initially empty, so it cannot be emptied
 
         addMultipleStudents(testedCloud, color, studentsToAdd);
-        if (studentsToAdd <= 0)
-            assertFalse(testedCloud.emptyCloud());
+        if (studentsToAdd <= 0) assertFalse(testedCloud.emptyCloud());
         else {
             assertTrue(testedCloud.emptyCloud());
             assertTrue(testedCloud.isEmpty());
@@ -130,8 +129,7 @@ public class CloudTest {
         assertFalse(testedCloud3Players.emptyCloud());    // the cloud is initially empty, so it cannot be emptied
 
         addMultipleStudents(testedCloud3Players, color, studentsToAdd);
-        if (studentsToAdd <= 0)
-            assertFalse(testedCloud3Players.emptyCloud());
+        if (studentsToAdd <= 0) assertFalse(testedCloud3Players.emptyCloud());
         else {
             assertTrue(testedCloud3Players.emptyCloud());
             assertTrue(testedCloud3Players.isEmpty());
@@ -203,19 +201,16 @@ public class CloudTest {
         for (int i = 0; i < studentsToAdd; i++) {
             if (i < studentLimit2or4Players) {
                 assertTrue(testedCloud.addStudent(color));
-            } else
-                assertFalse(testedCloud.addStudent(color));
+            } else assertFalse(testedCloud.addStudent(color));
         }
         if (studentsToAdd < studentLimit2or4Players) {
             for (int i = 0; i < colorSet.length; i++) {
                 if (colorSet[i].equals(color))
                     // checks that only the added color had its amount correctly increased
                     assertEquals(previousAmounts[i] + studentsToAdd, testedCloud.countStudentByColor(color));
-                else
-                    assertEquals(previousAmounts[i], testedCloud.countStudentByColor(colorSet[i]));
+                else assertEquals(previousAmounts[i], testedCloud.countStudentByColor(colorSet[i]));
             }
-        } else
-            assertEquals(studentLimit2or4Players, testedCloud.countStudentByColor(color));
+        } else assertEquals(studentLimit2or4Players, testedCloud.countStudentByColor(color));
     }
 
 
@@ -248,21 +243,17 @@ public class CloudTest {
         }
 
         for (int i = 0; i < studentsToRemove; i++) {
-            if (i < studentLimit2or4Players)
-                assertTrue(testedCloud.removeStudent(color));
-            else
-                assertFalse(testedCloud.removeStudent(color));
+            if (i < studentLimit2or4Players) assertTrue(testedCloud.removeStudent(color));
+            else assertFalse(testedCloud.removeStudent(color));
         }
         if (studentsToRemove < studentLimit2or4Players) {
             for (int i = 0; i < colorSet.length; i++) {
                 if (colorSet[i].equals(color))
                     // checks that only the removed color had its amount correctly decreased
                     assertEquals(previousAmounts[i] - studentsToRemove, testedCloud.countStudentByColor(color));
-                else
-                    assertEquals(previousAmounts[i], testedCloud.countStudentByColor(colorSet[i]));
+                else assertEquals(previousAmounts[i], testedCloud.countStudentByColor(colorSet[i]));
             }
-        } else
-            assertEquals(0, testedCloud.countStudentByColor(color));
+        } else assertEquals(0, testedCloud.countStudentByColor(color));
     }
 
 
@@ -271,12 +262,17 @@ public class CloudTest {
      */
     @Test
     @DisplayName("Check NullPointer exception in addStudent")
-    void nullPointerExceptionTest() {
-        NullPointerException thrown = assertThrows(
-                NullPointerException.class,
-                () -> testedCloud.addStudent(null),
-                "Expected addStudent() to throw NullPointerException, but it didn't"
-        );
+    void nullPointerExceptionInAddTest() {
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> testedCloud.addStudent(null), "Expected addStudent() to throw NullPointerException, but it didn't");
+    }
+
+    /**
+     * Checks if the NullPointerException is thrown when removeStudent receives a null parameter instead of a Color.
+     */
+    @Test
+    @DisplayName("Check NullPointer exception in removeStudent")
+    void nullPointerExceptionInRemoveTest() {
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> testedCloud.removeStudent(null), "Expected addStudent() to throw NullPointerException, but it didn't");
     }
 
 }
