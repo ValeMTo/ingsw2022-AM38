@@ -83,4 +83,18 @@ class SchoolEntranceTest {
 
         assertFalse(room.removeStudent(Color.BLUE));
     }
+
+    @Test
+    public void addNullPointerTest() {
+        Room room = new SchoolEntrance(7);
+
+        assertThrows(NullPointerException.class, () -> room.addStudent(null));
+    }
+
+    @Test
+    public void removeNullPointerTest() {
+        Room room = new SchoolEntrance(7);
+
+        assertThrows(NullPointerException.class, () -> room.removeStudent(null));
+    }
 }
