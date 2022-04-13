@@ -44,6 +44,8 @@ abstract class Room {
      * @return outcome of the removal
      */
     public boolean removeStudent(Color studentColor) {
+        if (studentColor == null) throw new NullPointerException();
+
         Integer previousNumStudents = guests.get(studentColor);
         if (previousNumStudents == null || this.countStudents(studentColor) <= 0) return false;
         guests.put(studentColor, previousNumStudents - 1);
