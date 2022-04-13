@@ -11,7 +11,8 @@ public class Cloud {
     /**
      * Cloud constructor sets the maximum amount of total students allowed on the cloud, according to the
      * number of players in the game.
-     * It initialises the hashmap with zero students for each color. The cloud will be filled further on in the game.
+     * It initialises the hashmap with zero students for each color. The cloud will be filled further on in the game,
+     * as regulated by the Controller.
      *
      * @param studentLimit : the maximum number of total students on that cloud.
      */
@@ -59,8 +60,7 @@ public class Cloud {
      * @return the outcome of the emptying : false is the cloud is already empty and cannot be emptied; true otherwise.
      */
     public boolean emptyCloud() {
-        if (this.isEmpty())
-            return false;
+        if (this.isEmpty()) return false;
         counter.replaceAll((key, value) -> 0);
         return true;
     }
@@ -76,12 +76,11 @@ public class Cloud {
         if (studentColor == null) throw new NullPointerException();
 
         Integer previousNumStud = counter.get(studentColor);
-
+        if (!counter.containsKey(studentColor)) counter.put(studentColor, 1);
         if (this.isEmpty()) {
             counter.put(studentColor, 1);
         } else {
-            if (this.isFull())
-                return false;
+            if (this.isFull()) return false;
             counter.put(studentColor, previousNumStud + 1);
         }
         return true;
@@ -100,8 +99,7 @@ public class Cloud {
 
         Integer previousNumStudents = counter.get(studentColor);
 
-        if (previousNumStudents == null || this.countStudentByColor(studentColor) <= 0)
-            return false;
+        if (!counter.containsKey(studentColor) || this.countStudentByColor(studentColor) <= 0) return false;
         counter.put(studentColor, previousNumStudents - 1);
         return true;
     }
