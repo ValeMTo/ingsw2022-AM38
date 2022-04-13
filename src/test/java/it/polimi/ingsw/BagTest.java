@@ -93,6 +93,8 @@ public class BagTest {
         emptyBag(testedBag);
         assertEquals(0, testedBag.getStudentNumber());
         assertTrue(testedBag.isEmpty());
+
+        assertNull(testedBag.drawStudent());   // checks the drawStudent returns null if the bag is empty
     }
 
 
@@ -140,7 +142,7 @@ public class BagTest {
     @ParameterizedTest
     @CsvSource({"12,PINK", "4,BLUE", "0,RED", "12,YELLOW", "8,GREEN"})
     @DisplayName("Check current studentNumber after addStudent")
-    public void updateStudentNumberAfterAdd(int studentsToAdd, String col) {
+    public void updateStudentNumberAfterAddTest(int studentsToAdd, String col) {
         Color color = getEnumParameter(col);
         int previousStudNumber = testedBag.getStudentNumber();
         if (color == null) {
@@ -160,7 +162,7 @@ public class BagTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 10, 34})
     @DisplayName("Check current studentNumber after multiple drawStudents")
-    public void updateStudentNumberAfterDraw(int studentsToDraw) {
+    public void updateStudentNumberAfterDrawTest(int studentsToDraw) {
 
         testedBag.initialise();    // initialises the bag with 120 students, 24 per color
         int previousStudNumber = testedBag.getStudentNumber();
@@ -181,7 +183,7 @@ public class BagTest {
     @ParameterizedTest
     @CsvSource({"12,PINK", "4,BLUE", "0,RED", "24,YELLOW", "29,GREEN"})
     @DisplayName("Check students per color after addStudent")
-    public void checkStudentsPerColorAfterAdding(int studentsToAdd, String col) {
+    public void checkStudentsPerColorAfterAddingTest(int studentsToAdd, String col) {
         Color color = getEnumParameter(col);
         Color[] colorSet = Color.values();
         int[] previousAmounts = new int[colorSet.length];
@@ -199,18 +201,42 @@ public class BagTest {
         for (int i = 0; i < studentsToAdd; i++) {
             if (i < initStudentsPerColor) {
                 assertTrue(testedBag.addStudent(color));
-            } else
-                assertFalse(testedBag.addStudent(color));
+            } else assertFalse(testedBag.addStudent(color));
         }
         if (studentsToAdd < initStudentsPerColor) {
             for (int i = 0; i < colorSet.length; i++) {
                 if (colorSet[i].equals(color))     // checks that only the added color has its amount correctly increased
                     assertEquals(previousAmounts[i] + studentsToAdd, testedBag.countStudentByColor(color));
-                else
-                    assertEquals(previousAmounts[i], testedBag.countStudentByColor(colorSet[i]));
+                else assertEquals(previousAmounts[i], testedBag.countStudentByColor(colorSet[i]));
             }
-        } else
-            assertEquals(initStudentsPerColor, testedBag.countStudentByColor(color));
+        } else assertEquals(initStudentsPerColor, testedBag.countStudentByColor(color));
+    }
+
+    /**
+     * Tests drawStudent with different initial distributions of colors in the bag
+     *
+     * @param initB : the initial number of blue students
+     * @param initY : the initial number of yellow students
+     * @param initP : the initial number of pink students
+     * @param initG : the initial number of green students
+     * @param initR : the initial number of red students
+     */
+    @ParameterizedTest
+    @CsvSource({"0,0,0,0,0", "0,1,0,1,1", "1,2,0,0,0", "1,1,1,1,1", "10,15,16,19,22"})
+    @DisplayName("Checks drawStudent with mixed distributions of colors")
+    public void drawStudentsWithDifferentDistributionsTest(int initB, int initY, int initP, int initG, int initR) {
+        emptyBag(testedBag);
+
+        addMultipleStudents(testedBag, Color.BLUE, initB);
+        addMultipleStudents(testedBag, Color.YELLOW, initY);
+        addMultipleStudents(testedBag, Color.PINK, initP);
+        addMultipleStudents(testedBag, Color.GREEN, initG);
+        addMultipleStudents(testedBag, Color.RED, initR);
+        int totalStud = testedBag.getStudentNumber();
+        for (int i = 0; i < totalStud; i++) {
+            testedBag.drawStudent();
+        }
+        assertTrue(testedBag.isEmpty());
     }
 
 
@@ -219,12 +245,8 @@ public class BagTest {
      */
     @Test
     @DisplayName("Check NullPointer exception in addStudent")
-    void nullPointerExceptionTesting() {
-        NullPointerException thrown = assertThrows(
-                NullPointerException.class,
-                () -> testedBag.addStudent(null),
-                "Expected addStudent() to throw NullPointerException, but it didn't"
-        );
+    void nullPointerExceptionTest() {
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> testedBag.addStudent(null), "Expected addStudent() to throw NullPointerException, but it didn't");
     }
 
 
