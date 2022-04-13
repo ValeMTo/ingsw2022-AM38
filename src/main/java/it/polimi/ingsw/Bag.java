@@ -55,16 +55,18 @@ public class Bag {
      * when the Controller will call the isEmpty() method.
      *
      * @return the color of the student that has been drawn.
-     * <p>
+     *
      * Notes on the algorithm for random picking:
      * It creates a new linked hashmap that associates each color with a range, marked by a threshold.
-     * The values of the thresholds are incremental and increase with the number of students.
+     * The values of the thresholds must be >= 1, are incremental and increase with the number of students contained
+     * in the bag.
      * Example: the bag contains the following students: (BLUE,10), (YELLOW, 15), (PINK, 16), (GREEN, 19), (RED, 22)
      * The thresholds (threshold, COLOR) will be :  (10, BLUE), (25,YELLOW), (41,PINK), (60,GREEN), (82,RED)
-     * If we associate every single student in the bag is associated with a number
+     * Since every single student in the bag is associated with a number
      * (ranging from 1 to the current total number of students in the bag), which represents its "position" in the bag,
      * it is possible to determine in which range/color that student falls.
-     * Then it is generated a pseudo-random integer and it is checked in which color range it falls.
+     * Then it is generated a pseudo-random integer ranging from 1 to studentNumber, and it is checked in which
+     * color range it is contained.
      * That integer and color represent the random student that is drawn.
      * The linked hashmap is used to maintain the thresholds in order.
      */
@@ -83,12 +85,9 @@ public class Bag {
                 colorRange.put(offset, col);
             }
         }
-
         Random random = new Random();
-        int randPos = 0;
-        do {
-            randPos = random.nextInt(this.studentNumber + 1);   // picks a random position in the bag
-        } while (randPos == 0);
+        int randPos = random.nextInt(this.studentNumber);   // picks a random position in the bag
+        randPos += 1;
 
         Set<Integer> thresholds = colorRange.keySet();
         // the keySet yields the thresholds in the order they were inserted
