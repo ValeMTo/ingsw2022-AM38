@@ -11,6 +11,15 @@ public class Herbalist extends SpecialCard{
     }
 
     /**
+     * Returns the number of tiles available.
+     *
+     * @return the number of tiles
+     */
+    public int getTile(){
+        return noEntryTiles;
+    }
+
+    /**
      * Decreases of one the number of tails available.
      * Returns false if the action is not possible, otherwise true.
      *
@@ -43,7 +52,7 @@ public class Herbalist extends SpecialCard{
      *
      * @return true if there are no tails available, otherwise false
      */
-    public boolean isEmptyOfTails(){
+    public boolean isEmptyOfTiles(){
         if(noEntryTiles == 0){
             return true;
         }

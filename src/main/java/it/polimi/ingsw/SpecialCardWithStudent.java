@@ -89,4 +89,22 @@ public class SpecialCardWithStudent extends SpecialCard{
         return numStudents;
 
     }
+
+    /**
+     * Getter guestLimit
+     *
+     * @return guestLimit
+     */
+    public int getGuestsLimit(){
+        return guestsLimit;
+    }
+
+    /**
+     * Getter guestChangeLimit
+     *
+     * @return guestChangeLimit
+     */
+    public int getGuestsChangeLimit(){
+        return guestsChangeLimit;
+    }
 }

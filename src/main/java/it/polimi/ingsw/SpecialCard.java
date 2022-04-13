@@ -20,12 +20,13 @@ public class SpecialCard {
 
     }
 
+
     /**
      * Increase the cost of the card of one.
      * It can be used only once: the price will not be increased with two calls of the method.
      */
-    public void increasePrice(){
-        if (firstUse) {
+    public void use(){
+        if(!firstUse) {
             this.cost += 1;
             firstUse = true;
         }
@@ -40,73 +41,61 @@ public class SpecialCard {
     }
 
     /**
-     * Remove a tail when the card is Herbalist, otherwise is useless.
+     * Remove a Tile when the card is Herbalist, otherwise is useless.
      */
-    public boolean removeTail() throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return false;
+    public boolean removeTile() throws NotCallableMethodException {
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
-     * Adds a tail when the card is Herbalist, otherwise is useless.
+     * Adds a Tile when the card is Herbalist, otherwise is useless.
      */
-    public boolean returnTail() throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return false;
+    public boolean returnTile() throws NotCallableMethodException {
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
-     * Check if there are tails when the card is Herbalist, otherwise is useless.
+     * Check if there are Tiles when the card is Herbalist, otherwise is useless.
      */
-    public boolean isEmptyOfTails() throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
+    public boolean isEmptyOfTiles() throws NotCallableMethodException {
             throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return false;
+    }
+
+    /**
+     * Returns the number of tiles available.
+     *
+     * @return the number of tiles
+     */
+    public int getTile() throws NotCallableMethodException{
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Adds a student in the card room if it is a card with students, otherwise the method is useless.
      */
     public boolean addStudent(Color studentColor) throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return false;
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Removes a student from the card room if it is a card with students, otherwise the method is useless.
      */
     public boolean removeStudent(Color studentColor) throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return false;
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Count the number of students of a specific color if it is a card with students, otherwise the method is useless.
      */
     public int countStudents(Color studentColor) throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return -1;
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Count the number of all students in the room if it is a card with students, otherwise the method is useless.
      */
     public int countStudents() throws NotCallableMethodException {
-        if (!name.equals(SpecialCardName.HERBALIST)){
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
-        }
-        return -1;
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
 
     }
 
