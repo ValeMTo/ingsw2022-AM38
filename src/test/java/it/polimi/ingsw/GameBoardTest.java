@@ -3,10 +3,11 @@ package it.polimi.ingsw;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,9 +22,10 @@ public class GameBoardTest {
 
     /**
      * Adds a specified amount of students of a given color to the players in their dining rooms
-     * @param student : color of the student
+     *
+     * @param student         : color of the student
      * @param playersStudents : array of integers that specifies the number of students to add in the position of the player
-     * @param gameBoard : gameBoard in which we want to add the students
+     * @param gameBoard       : gameBoard in which we want to add the students
      * @return : true if every add was successful, otherwise returns false
      */
     public boolean studentAdderToPlayers(Color student, Integer[] playersStudents, GameBoard gameBoard) {
@@ -41,9 +43,10 @@ public class GameBoardTest {
 
     /**
      * Adds a specified amount of students of a given color to the players in their dining rooms
-     * @param student : color of the student
+     *
+     * @param student        : color of the student
      * @param islandStudents : students to add to the island
-     * @param gameBoard : gameBoard in which we want to add the students
+     * @param gameBoard      : gameBoard in which we want to add the students
      * @return : true if every add was successful, otherwise returns false
      */
     public boolean studentAdderToIsland(Color student, Integer islandStudents, Integer islandPosition, GameBoard gameBoard) {
@@ -61,6 +64,7 @@ public class GameBoardTest {
 
     /**
      * Tests that the roundCounter is increased fine in both 2 or 3 players mode
+     *
      * @param playersNum : number of players
      */
     @ParameterizedTest
@@ -77,24 +81,23 @@ public class GameBoardTest {
      * Tests that an AssistantCard cannot be used twice
      */
     @Test
-    public void noMultipleUsesAssistantCard(){
+    public void noMultipleUsesAssistantCard() {
         GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
-        assertTrue(gameboard.useAssistantCard(Tower.WHITE,1));
-        assertFalse(gameboard.useAssistantCard(Tower.WHITE,1));
+        assertTrue(gameboard.useAssistantCard(Tower.WHITE, 1));
+        assertFalse(gameboard.useAssistantCard(Tower.WHITE, 1));
     }
 
     /**
      * Tests that all the AssistantCards returned by the getUsableAssistantCard method can be used
      */
     @Test
-    public void usableAssistantCard(){
+    public void usableAssistantCard() {
         GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
         try {
-            List<Integer> usableCardsPriority = gameboard.getUsableAssistantCard(Tower.WHITE);
-            for(Integer i:usableCardsPriority)
-                assertTrue(gameboard.useAssistantCard(Tower.WHITE,i));
-        }
-        catch(Exception exc){
+            Map<Integer, Integer> usableCardsPriority = gameboard.getUsableAssistantCard(Tower.WHITE);
+            for (Integer i : usableCardsPriority.keySet())
+                assertTrue(gameboard.useAssistantCard(Tower.WHITE, i));
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }
@@ -103,38 +106,38 @@ public class GameBoardTest {
      * Tests that the values of card priority are only the integer between 1 and 10, no more, no less
      */
     @Test
-    public void usableAssistantCardValues(){
+    public void usableAssistantCardValues() {
         GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
-        List<Integer> controlList = new ArrayList<Integer>();
-        for(int i=1;i<=10;i++)
-            controlList.add(i);
+        Map<Integer, Integer> controlMap = new HashMap<Integer, Integer>();
+        for (int i = 1; i <= 10; i++)
+            controlMap.put(i, i / 2 + i % 2);
         try {
-            assertTrue(controlList.containsAll(gameboard.getUsableAssistantCard(Tower.WHITE)));
-            assertTrue(gameboard.getUsableAssistantCard(Tower.WHITE).containsAll(controlList));
-        }
-        catch(Exception exc)
-        {
+            for (Integer priority : gameboard.getUsableAssistantCard(Tower.WHITE).keySet())
+                assertTrue(controlMap.containsKey(priority));
+
+            for (Integer priority : controlMap.keySet())
+                assertTrue(gameboard.getUsableAssistantCard(Tower.WHITE).containsKey(priority));
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }
 
     /**
      * Tests that the boundary numbers (0 and 11) of the ones allowed to be use for assistantCard returns false
+     *
      * @param cardNum : priority of the AssistantCard
      */
     @ParameterizedTest
-    @ValueSource(ints={0,11})
-    public void boundaryAssistantCardIndexes(int cardNum){
+    @ValueSource(ints = {0, 11})
+    public void boundaryAssistantCardIndexes(int cardNum) {
         GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
         try {
-            List<Integer> usableCardsPriority = gameboard.getUsableAssistantCard(Tower.BLACK);
-            assertFalse(gameboard.useAssistantCard(Tower.BLACK,cardNum));
-        }
-        catch(Exception exc){
+            Map<Integer, Integer> usableCardsPriority = gameboard.getUsableAssistantCard(Tower.BLACK);
+            assertThrows(IndexOutOfBoundsException.class, () -> gameboard.useAssistantCard(Tower.BLACK, cardNum));
+        } catch (Exception exc) {
             exc.printStackTrace();
         }
     }
-
 
 
 }

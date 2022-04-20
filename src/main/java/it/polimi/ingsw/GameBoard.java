@@ -26,8 +26,14 @@ public abstract class GameBoard {
             professors.put(color, null);
         players = new PlayerBoard[playerNumber];
         int numTowersPerPlayer;
-        if (playerNumber == 3) numTowersPerPlayer = 6;
-        else numTowersPerPlayer = 8;
+        int cloudStudentsLimit;
+        if (playerNumber == 3) {
+            numTowersPerPlayer = 6;
+            cloudStudentsLimit = 4;
+        } else {
+            numTowersPerPlayer = 8;
+            cloudStudentsLimit = 3;
+        }
         players[0] = new PlayerBoard(playersNicknames.get(0), Tower.WHITE, numTowersPerPlayer);
         players[1] = new PlayerBoard(playersNicknames.get(1), Tower.BLACK, numTowersPerPlayer);
         if (playerNumber >= 3) players[2] = new PlayerBoard(playersNicknames.get(2), Tower.GRAY, numTowersPerPlayer);
@@ -36,7 +42,7 @@ public abstract class GameBoard {
             islands[i] = new Island(i + 1);
         clouds = new Cloud[playerNumber];
         for (int i = 0; i < playerNumber; i++)
-            clouds[i] = new Cloud();
+            clouds[i] = new Cloud(cloudStudentsLimit);
         numRound = 1;
         motherNature = 1;
     }
@@ -49,7 +55,7 @@ public abstract class GameBoard {
      * @param islandGiver    : The Island that give the students and the tower(s)
      * @return : true if the transfer is done, false if the transfer is not done so the two islands are not grouped into one
      */
-    private boolean transferIslandPossessionsIfSameTower(Island islandReceiver, Island islandGiver) {
+    protected boolean transferIslandPossessionsIfSameTower(Island islandReceiver, Island islandGiver) {
         if (islandReceiver != null && islandGiver != null && islandGiver.getTower() != null && islandReceiver.getTower().equals(islandGiver.getTower())) {
             int towersNumber = islandReceiver.getTowerNumber() + islandGiver.getTowerNumber();
             // We update the number of tower on the island adding the Towers of the island merging
@@ -70,7 +76,7 @@ public abstract class GameBoard {
      *
      * @param island : is the position of the island we want to verify the adjacent islands for grouping them if needed
      */
-    private void groupIslands(int island) {
+    protected void groupIslands(int island) {
         Tower islandTower = islands[island - 1].getTower();
         Island currentIsland = islands[island - 1];
         Island islandGiver = null, islandReceiver = null;
@@ -129,7 +135,7 @@ public abstract class GameBoard {
         if (bag.isEmpty()) return EndOfMatchCondition.DelayedEndOfMatch;
         // Player has used all his towers
         for (PlayerBoard player : players) {
-            if (player.getAvaiableTowers() == 0) return EndOfMatchCondition.InstantEndOfMatch;
+            if (player.getAvailableTowers() == 0) return EndOfMatchCondition.InstantEndOfMatch;
         }
         // No more assistant card (all 10 cards used)
         if (numRound == 11) return EndOfMatchCondition.InstantEndOfMatch;
@@ -148,17 +154,32 @@ public abstract class GameBoard {
      */
 
     //TODO: implement the case that motherNature cannot move more than a certain amount given by the assistant card..
+
+    /**
+     * Moves motherNature if the movement is allowed (the last played card has steps > distance to cover)
+     *
+     * @param destinationIsland : Island where we want to move motherNature
+     * @return : true if the movement was allowed and motherNature has been moved, false if the destinationIsland is unreachable with the steps of the last card
+     * @throws IslandOutOfBoundException : if in the destinationIsland's position there is not an island
+     */
     public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException {
+        int cardSteps, cardPriority;
         try {
-            int maxMovement = players[currentPlayer].getLastCard().steps();
+            cardPriority = players[currentPlayer].getLastCard();
+            cardSteps = players[currentPlayer].getLastCardSteps();
         } catch (Exception exc) {
             exc.printStackTrace();
+            return false;
         }
-        for (Island island : islands)
-            if (island.getPosition() == destinationIsland) {
-                motherNature = destinationIsland;
-                return true;
-            }
+
+        if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
+            throw new IslandOutOfBoundException(1, islands.length);
+
+        if ((motherNature <= destinationIsland && motherNature - destinationIsland <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland < cardSteps)) {
+            motherNature = destinationIsland;
+            return true;
+        }
+
         throw new IslandOutOfBoundException(1, islands[islands.length].getPosition());
     }
 
@@ -181,13 +202,13 @@ public abstract class GameBoard {
      */
     public boolean addStudent(StudentCounter location, Color student) throws LocationNotAllowedException, FunctionNotImplementedException {
         switch (location) {
-            case StudentCounter.BAG:
+            case BAG:
                 return bag.addStudent(student);
-            case StudentCounter.DININGROOM:
+            case DININGROOM:
                 return players[currentPlayer].addStudentDiningRoom(student);
-            case StudentCounter.ENTRANCE:
+            case SCHOOLENTRANCE:
                 return players[currentPlayer].addStudentEntrance(student);
-            case StudentCounter.CARD:
+            case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
                 throw new LocationNotAllowedException("the island and clouds are not allowed since this method does not have a position value");
@@ -205,19 +226,19 @@ public abstract class GameBoard {
      */
     public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
         switch (location) {
-            case StudentCounter.BAG:
+            case BAG:
                 return bag.addStudent(student);
-            case StudentCounter.DININGROOM:
+            case DININGROOM:
                 return players[currentPlayer].addStudentDiningRoom(student);
-            case StudentCounter.ENTRANCE:
+            case SCHOOLENTRANCE:
                 return players[currentPlayer].addStudentEntrance(student);
-            case StudentCounter.ISLAND:
+            case ISLAND:
                 if (position - 1 <= islands.length) return islands[position - 1].addStudent(student);
                 return false;
-            case StudentCounter.CLOUD:
+            case CLOUD:
                 if (position - 1 <= clouds.length) return clouds[position - 1].addStudent(student);
                 return false;
-            case StudentCounter.CARD:
+            case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
                 return false;
@@ -234,11 +255,11 @@ public abstract class GameBoard {
      */
     public boolean removeStudent(StudentCounter location, Color student) throws LocationNotAllowedException, FunctionNotImplementedException {
         switch (location) {
-            case StudentCounter.DININGROOM:
+            case DININGROOM:
                 return players[currentPlayer].removeStudentDiningRoom(student);
-            case StudentCounter.ENTRANCE:
+            case SCHOOLENTRANCE:
                 return players[currentPlayer].removeStudentEntrance(student);
-            case StudentCounter.CARD:
+            case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
 
             default:
@@ -258,14 +279,14 @@ public abstract class GameBoard {
      */
     public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
         switch (location) {
-            case StudentCounter.DININGROOM:
+            case DININGROOM:
                 return players[currentPlayer].removeStudentDiningRoom(student);
-            case StudentCounter.ENTRANCE:
-                return players[currentPlayer].removetudentEntrance(student);
-            case StudentCounter.CLOUD:
+            case SCHOOLENTRANCE:
+                return players[currentPlayer].removeStudentEntrance(student);
+            case CLOUD:
                 if (position - 1 <= clouds.length) return clouds[position - 1].removeStudent(student);
                 return false;
-            case StudentCounter.CARD:
+            case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
                 throw new LocationNotAllowedException("removeStudent with position cannot be applied with island and bag since no remove is allowed in island and no remove from bag knowing the color to draw.");
@@ -305,13 +326,13 @@ public abstract class GameBoard {
         return false;
     }
 
-    //TODO: in PlayerBoard a getUsableAssistantCard method is required to go further...
-    public List<Integer> getUsableAssistantCard(Tower playerTower) throws NoSuchTowerException {
+    public Map<Integer, Integer> getUsableAssistantCard(Tower playerTower) throws NoSuchTowerException {
         if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
-        List<Integer> list = new ArrayList<Integer>();
+        Map<Integer, Integer> list = new HashMap<Integer, Integer>();
         for (PlayerBoard player : players) {
-            if (player.getTowerColor() == playerTower) return player.
-        } throw new NoSuchTowerException("Tower value is not possessed by any player or incorrect");
+            if (player.getTowerColor() == playerTower) return player.getAvailableCards();
+        }
+        throw new NoSuchTowerException("Tower value is not possessed by any player or incorrect");
     }
 
     /**
@@ -322,7 +343,6 @@ public abstract class GameBoard {
      * @throws NotLastCardUsedException : The player has not yet used a card, so there is no last card
      * @throws NoSuchTowerException     : the Tower's color specified is null, does not exist or is not possessed by any player
      */
-    //TODO: should we have a method to retrieve the steps of the Card since we only give the priority?
     public int getLastAssistantCard(Tower playerTower) throws NotLastCardUsedException, NoSuchTowerException {
         if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
         for (PlayerBoard player : players) {

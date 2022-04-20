@@ -1,10 +1,12 @@
 package it.polimi.ingsw;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ExpertGameBoard extends GameBoard {
+    protected SpecialCard[] specialCards;
     //protected final int playerNumber;
     private boolean towerInfluence = true;
     private List<Color> noInfluenceByColor = null;
@@ -12,16 +14,14 @@ public class ExpertGameBoard extends GameBoard {
     private boolean motherNatureIncreasedMove = false;
     private int increasedMovement = 0;
 
-    protected SpecialCard[] specialCards;
-
 
     /**
      * Constructor for the expert GameBoard
      *
      * @param numPlayer : number of players of the match
      */
-    public ExpertGameBoard(int numPlayer,List<String> playersNicknames) {
-        super(numPlayer,playersNicknames);
+    public ExpertGameBoard(int numPlayer, List<String> playersNicknames) {
+        super(numPlayer, playersNicknames);
     }
 
 
@@ -79,8 +79,7 @@ public class ExpertGameBoard extends GameBoard {
                 playerWithMoreInfluence = players[i].getTowerColor();
                 tie = false;
                 maxValue = computationValue;
-            } else if (computationValue == maxValue)
-                tie = true;
+            } else if (computationValue == maxValue) tie = true;
         }
         //Remove the old Towers from the player
         int towerToChange = islands[island].getTowerNumber();
@@ -147,11 +146,11 @@ public class ExpertGameBoard extends GameBoard {
      * @param position : position of the Island we want to disable the influence computation
      * @return : true island is successfully disabled, false if not or if the island was already disabled
      */
-     @Override
+    @Override
     public boolean disableInfluence(int position) throws IslandOutOfBoundException {
-        if (position > islands[islands.length-1].getPosition())
-            throw new IslandOutOfBoundException(1,islands[islands.length-1].getPosition());
-        if(islands[position].isInfluenceEnabled()) {
+        if (position > islands[islands.length - 1].getPosition())
+            throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
+        if (islands[position].isInfluenceEnabled()) {
             islands[position].disableInfluence();
             return true;
         }
@@ -160,7 +159,6 @@ public class ExpertGameBoard extends GameBoard {
 
     /**
      * Set the flag that increase the influence score for a particular player during the influence computation
-     *
      */
     public void increaseInfluence() {
         moreInfluenceQuantity = 2;
@@ -179,8 +177,7 @@ public class ExpertGameBoard extends GameBoard {
      * @param color : color that does not give points in the influence computation
      */
     public void disableColorInfluence(Color color) {
-        if (noInfluenceByColor == null)
-            noInfluenceByColor = new ArrayList<Color>();
+        if (noInfluenceByColor == null) noInfluenceByColor = new ArrayList<Color>();
         noInfluenceByColor.add(color);
     }
 
@@ -204,7 +201,7 @@ public class ExpertGameBoard extends GameBoard {
      * @return : true if the SpecialCard has been pay, false if the cost is too much and the expense could not be pay.
      */
     public boolean paySpecialCard(int cost) {
-        return currentPlayer.pay(cost);
+        return players[currentPlayer].pay(cost);
     }
 
     /**
@@ -215,8 +212,10 @@ public class ExpertGameBoard extends GameBoard {
     }
 
     //TODO: needed a getStep method to have the steps given an assistant card or maybe a static method of the AssistantCard to give the steps value given the priority
+
     /**
      * Move motherNature considering the increased movement
+     *
      * @param destinationIsland : Position of the island where the motherNature should be moved
      * @return
      */
@@ -224,20 +223,16 @@ public class ExpertGameBoard extends GameBoard {
     public boolean moveMotherNature(int destinationIsland) {
         int maxMovement = 0;
         try {
-            maxMovement += players[currentPlayer].getLastCard().getSteps();
-        }
-        catch(NotLastCardUsedException exc)
-        {
+            maxMovement += players[currentPlayer].getLastCardSteps();
+        } catch (NotLastCardUsedException exc) {
             exc.printStackTrace();
             return false;
         }
-        if (this.motherNatureIncreasedMove)
-            maxMovement += increasedMovement;
+        if (this.motherNatureIncreasedMove) maxMovement += increasedMovement;
         if (destinationIsland <= motherNature && destinationIsland - motherNature <= maxMovement) {
             motherNature = destinationIsland;
             return true;
-        }
-        else if (destinationIsland > motherNature && islands[islands.length].getPosition() - destinationIsland + motherNature <= maxMovement){
+        } else if (destinationIsland > motherNature && islands[islands.length].getPosition() - destinationIsland + motherNature <= maxMovement) {
             motherNature = destinationIsland;
             return true;
         }
