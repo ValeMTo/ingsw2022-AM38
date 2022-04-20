@@ -16,10 +16,10 @@ public class CloudTest {
      * From here onwards the cloud for 2 or 4 players will be considered the default test case.
      */
 
-    private final int studentLimit2or4Players = 3;
+    private final int studentLimit2Players = 3;
     private final int studentLimit3Players = 4;
 
-    Cloud testedCloud = new Cloud(studentLimit2or4Players);
+    Cloud testedCloud = new Cloud(studentLimit2Players);
     Cloud testedCloud3Players = new Cloud(studentLimit3Players);
 
     private void addMultipleStudents(Cloud cloud, Color color, int amount) {
@@ -39,6 +39,7 @@ public class CloudTest {
     }
 
 
+
     /**
      * Checks that the constructor correctly creates a cloud, with the correct initial amount of students
      * (initially zero students for each color).
@@ -46,16 +47,16 @@ public class CloudTest {
     @Test
     @DisplayName("Cloud construction test")
     public void CloudConstructorTest() {
-        Cloud cloud = new Cloud(studentLimit2or4Players);
+        Cloud cloud = new Cloud(studentLimit2Players);
 
         for (Color col : Color.values()) {
-            assertEquals(0, cloud.countStudentByColor(col));
+            assertEquals(0, cloud.countStudent(col));
         }
         int totalStud = 0;
         for (Color col : Color.values()) {
-            totalStud += cloud.countStudentByColor(col);
+            totalStud += cloud.countStudent(col);
         }
-        assertTrue(totalStud <= studentLimit2or4Players);
+        assertTrue(totalStud <= studentLimit2Players);
     }
 
 
@@ -72,37 +73,54 @@ public class CloudTest {
 
 
     /**
-     * Checks that the method isFull correctly returns true if the cloud already contains the maximum amount
-     * of allowed students; false otherwise.
+     * Checks that the method isFull correctly returns true if the cloud for 2 players already contains
+     * the maximum amount of allowed students; false otherwise.
      */
     @ParameterizedTest
     @CsvSource({"PINK", "BLUE", "RED", "YELLOW", "GREEN"})
-    @DisplayName("Check isFull method on cloud")
-    public void checkCloudIsFullTest(String col) {
+    @DisplayName("Check isFull method on cloud for 2 players")
+    public void checkCloud2PlayersIsFullTest(String col) {
         Color color = getEnumParameter(col);
         assertFalse(testedCloud.isFull());
-        addMultipleStudents(testedCloud, color, studentLimit2or4Players);
+        addMultipleStudents(testedCloud, color, studentLimit2Players);
         assertTrue(testedCloud.isFull());
+    }
 
-        // also tests the cloud for 3 players with a student limit of 4 students
+    /**
+     * Checks that the method isFull correctly returns true if the cloud for 3 players already contains
+     * the maximum amount of allowed students; false otherwise.
+     */
+    @ParameterizedTest
+    @CsvSource({"PINK", "BLUE", "RED", "YELLOW", "GREEN"})
+    @DisplayName("Check isFull method on cloud for 3 players")
+    public void checkCloud3PlayersIsFullTest(String col) {
+        Color color = getEnumParameter(col);
         assertFalse(testedCloud3Players.isFull());
         addMultipleStudents(testedCloud3Players, color, studentLimit3Players);
         assertTrue(testedCloud3Players.isFull());
+    }
 
-        // tests a new cloud with a mixed distribution of students per color
-        Cloud mixedCloud = new Cloud(studentLimit2or4Players);
+    /**
+     * Checks that the method isFull correctly returns true if the cloud  already contains
+     * the maximum amount of allowed students, but with a "mixed" distribution; false otherwise.
+     */
+    @ParameterizedTest
+    @CsvSource({"PINK", "BLUE", "RED", "YELLOW", "GREEN"})
+    @DisplayName("Check isFull method on cloud with mixed initial distribution")
+    public void checkMixedCloudIsFullTest(String col) {
+        Color color = getEnumParameter(col);
+        Cloud mixedCloud = new Cloud(studentLimit2Players);
         assertFalse(mixedCloud.isFull());
         addMultipleStudents(mixedCloud, Color.PINK, 0);
         addMultipleStudents(mixedCloud, Color.BLUE, 1);
         addMultipleStudents(mixedCloud, Color.RED, 2);
         assertTrue(mixedCloud.isFull());
-
     }
 
 
     /**
      * Checks that the method to empty the cloud correctly removes all the students currently in the cloud.
-     * The tests are run with different fillings of the cloud.
+     * The tests are run with different fillings of the cloud, using a cloud for 2 players.
      * Note that a newly-created cloud is always empty at first.
      *
      * @param studentsToAdd : the number of students to add before the emptying attempt
@@ -110,8 +128,8 @@ public class CloudTest {
      */
     @ParameterizedTest
     @CsvSource({"0,PINK", "0,BLUE", "1,RED", "2,YELLOW", "3,GREEN"})
-    @DisplayName("Check cloud emptying method")
-    public void emptyTheCloudTest(int studentsToAdd, String col) {
+    @DisplayName("Check 2-players-cloud emptying method")
+    public void emptyTheCloudFor2PlayersTest(int studentsToAdd, String col) {
         Color color = getEnumParameter(col);
         assertFalse(testedCloud.emptyCloud());    // the cloud is initially empty, so it cannot be emptied
 
@@ -121,11 +139,23 @@ public class CloudTest {
             assertTrue(testedCloud.emptyCloud());
             assertTrue(testedCloud.isEmpty());
             for (Color c : Color.values()) {
-                assertEquals(0, testedCloud.countStudentByColor(c));
+                assertEquals(0, testedCloud.countStudent(c));
             }
         }
+    }
 
-        // testing the cloud for 3 players
+    /**
+     * Checks that the method to empty the cloud correctly removes all the students currently in the cloud.
+     * The tests are run with different fillings of the cloud, using a cloud for 3 players.
+     *
+     * @param studentsToAdd : the number of students to add before the emptying attempt
+     * @param col           :  the color of the students to add before the emptying attempt
+     */
+    @ParameterizedTest
+    @CsvSource({"0,PINK", "0,BLUE", "1,RED", "2,YELLOW", "3,GREEN"})
+    @DisplayName("Check 3-players-cloud emptying method")
+    public void emptyTheCloudFor3PlayersTest(int studentsToAdd, String col) {
+        Color color = getEnumParameter(col);
         assertFalse(testedCloud3Players.emptyCloud());    // the cloud is initially empty, so it cannot be emptied
 
         addMultipleStudents(testedCloud3Players, color, studentsToAdd);
@@ -134,12 +164,10 @@ public class CloudTest {
             assertTrue(testedCloud3Players.emptyCloud());
             assertTrue(testedCloud3Players.isEmpty());
             for (Color c : Color.values()) {
-                assertEquals(0, testedCloud3Players.countStudentByColor(c));
+                assertEquals(0, testedCloud3Players.countStudent(c));
             }
         }
-
     }
-
 
     /**
      * Checks that the addStudent returns false if it is attempted to add students to a cloud that is already full.
@@ -149,7 +177,7 @@ public class CloudTest {
     @DisplayName("Check adding beyond student limit")
     public void addingBeyondLimitTest(String col) {
         Color color = getEnumParameter(col);
-        addMultipleStudents(testedCloud, Color.BLUE, studentLimit2or4Players);
+        addMultipleStudents(testedCloud, Color.BLUE, studentLimit2Players);
         assertTrue(testedCloud.isFull());
         assertFalse(testedCloud.addStudent(color));
 
@@ -181,7 +209,7 @@ public class CloudTest {
      * @param col            : the color of the students to be added
      */
     @ParameterizedTest
-    @CsvSource({"1,PINK", "3,BLUE", "0,RED", "2,YELLOW", "7,GREEN", "1,null"})
+    @CsvSource({"1,PINK", "3,BLUE", "0,RED", "2,YELLOW", "7,GREEN"})
     @DisplayName("Check students per color after addStudent")
     public void checkAmountsPerColorAfterAddingTest(int studentsToAdd, String col) {
         Color color = getEnumParameter(col);
@@ -191,26 +219,27 @@ public class CloudTest {
         assertTrue(testedCloud.isEmpty());
 
         for (int i = 0; i < colorSet.length; i++) {         // counts the amounts of students per color before adding
-            previousAmounts[i] = testedCloud.countStudentByColor(colorSet[i]);
+            previousAmounts[i] = testedCloud.countStudent(colorSet[i]);
         }
 
-        if (color == null) {
-            System.out.println("Null exception test");
-            return;
-        }
         for (int i = 0; i < studentsToAdd; i++) {
-            if (i < studentLimit2or4Players) {
+            if (i < studentLimit2Players) {
                 assertTrue(testedCloud.addStudent(color));
-            } else assertFalse(testedCloud.addStudent(color));
+            }
+            else {
+                assertFalse(testedCloud.addStudent(color));
+            }
         }
-        if (studentsToAdd < studentLimit2or4Players) {
+        if (studentsToAdd < studentLimit2Players) {
             for (int i = 0; i < colorSet.length; i++) {
                 if (colorSet[i].equals(color))
                     // checks that only the added color had its amount correctly increased
-                    assertEquals(previousAmounts[i] + studentsToAdd, testedCloud.countStudentByColor(color));
-                else assertEquals(previousAmounts[i], testedCloud.countStudentByColor(colorSet[i]));
+                    assertEquals(previousAmounts[i] + studentsToAdd, testedCloud.countStudent(color));
+                else
+                    assertEquals(previousAmounts[i], testedCloud.countStudent(colorSet[i]));
             }
-        } else assertEquals(studentLimit2or4Players, testedCloud.countStudentByColor(color));
+        } else
+            assertEquals(studentLimit2Players, testedCloud.countStudent(color));
     }
 
 
@@ -222,38 +251,42 @@ public class CloudTest {
      * @param col               : the color of the students to be removed
      */
     @ParameterizedTest
-    @CsvSource({"1,PINK", "3,BLUE", "0,RED", "2,YELLOW", "7,GREEN", "1,null"})
+    @CsvSource({"1,PINK", "3,BLUE", "0,RED", "2,YELLOW", "7,GREEN"})
     @DisplayName("Check students per color after removeStudent")
     public void checkAmountsPerColorAfterRemovalTest(int studentsToRemove, String col) {
         Color color = getEnumParameter(col);
         Color[] colorSet = Color.values();
         int[] previousAmounts = new int[colorSet.length];
 
-        if (color == null) {
-            System.out.println("Null exception test");
-            return;
-        }
         assertTrue(testedCloud.isEmpty());
         assertFalse(testedCloud.removeStudent(color));
 
-        addMultipleStudents(testedCloud, color, studentLimit2or4Players);
+        addMultipleStudents(testedCloud, color, studentLimit2Players);
 
         for (int i = 0; i < colorSet.length; i++) {         // counts the amounts of students per color before removing
-            previousAmounts[i] = testedCloud.countStudentByColor(colorSet[i]);
+            previousAmounts[i] = testedCloud.countStudent(colorSet[i]);
         }
 
         for (int i = 0; i < studentsToRemove; i++) {
-            if (i < studentLimit2or4Players) assertTrue(testedCloud.removeStudent(color));
-            else assertFalse(testedCloud.removeStudent(color));
-        }
-        if (studentsToRemove < studentLimit2or4Players) {
-            for (int i = 0; i < colorSet.length; i++) {
-                if (colorSet[i].equals(color))
-                    // checks that only the removed color had its amount correctly decreased
-                    assertEquals(previousAmounts[i] - studentsToRemove, testedCloud.countStudentByColor(color));
-                else assertEquals(previousAmounts[i], testedCloud.countStudentByColor(colorSet[i]));
+            if (i < studentLimit2Players) {
+                assertTrue(testedCloud.removeStudent(color));
             }
-        } else assertEquals(0, testedCloud.countStudentByColor(color));
+            else {
+                assertFalse(testedCloud.removeStudent(color));
+            }
+        }
+        if (studentsToRemove < studentLimit2Players) {
+            for (int i = 0; i < colorSet.length; i++) {
+                if (colorSet[i].equals(color)) {
+                    // checks that only the removed color had its amount correctly decreased
+                    assertEquals(previousAmounts[i] - studentsToRemove, testedCloud.countStudent(color));
+                }
+                else {
+                    assertEquals(previousAmounts[i], testedCloud.countStudent(colorSet[i]));
+                }
+            }
+        } else
+            assertEquals(0, testedCloud.countStudent(color));
     }
 
 
