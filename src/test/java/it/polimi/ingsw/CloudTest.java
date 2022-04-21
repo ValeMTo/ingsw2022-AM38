@@ -20,6 +20,7 @@ public class CloudTest {
     private final int studentLimit3Players = 4;
 
     Cloud testedCloud = new Cloud(studentLimit2Players);
+
     Cloud testedCloud3Players = new Cloud(studentLimit3Players);
 
     private void addMultipleStudents(Cloud cloud, Color color, int amount) {
@@ -38,8 +39,6 @@ public class CloudTest {
         return null;
     }
 
-
-
     /**
      * Checks that the constructor correctly creates a cloud, with the correct initial amount of students
      * (initially zero students for each color).
@@ -57,6 +56,7 @@ public class CloudTest {
             totalStud += cloud.countStudent(col);
         }
         assertTrue(totalStud <= studentLimit2Players);
+
     }
 
 
@@ -110,6 +110,7 @@ public class CloudTest {
     public void checkMixedCloudIsFullTest(String col) {
         Color color = getEnumParameter(col);
         Cloud mixedCloud = new Cloud(studentLimit2Players);
+
         assertFalse(mixedCloud.isFull());
         addMultipleStudents(mixedCloud, Color.PINK, 0);
         addMultipleStudents(mixedCloud, Color.BLUE, 1);

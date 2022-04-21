@@ -1,11 +1,8 @@
 package it.polimi.ingsw;
-// IMPLEMENTED CLASS
-
-
 
 public class SchoolBoard {
-    private SchoolEntrance entrance;
-    private DiningRoom house;
+    private final SchoolEntrance entrance;
+    private final DiningRoom house;
 
     /**
      * SchoolBoard constructor
@@ -26,7 +23,13 @@ public class SchoolBoard {
      * false if it cannot add a student in the DiningRoom house
      */
     public boolean addStudentDiningRoom(Color student) {
-        return house.addStudent(student);
+        try {
+            return house.addStudent(student);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
+
     }
 
     /**
@@ -37,7 +40,12 @@ public class SchoolBoard {
      * false if it cannot add a student in the entrance
      */
     public boolean addStudentEntrance(Color student) {
-        return entrance.addStudent(student);
+        try {
+            return entrance.addStudent(student);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -48,7 +56,12 @@ public class SchoolBoard {
      * false if it cannot remove students in the DiningRoom house
      */
     public boolean removeStudentDiningRoom(Color student) {
-        return house.removeStudent(student);
+        try {
+            return house.removeStudent(student);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -59,7 +72,12 @@ public class SchoolBoard {
      * false if it cannot remove students in the entrance
      */
     public boolean removeStudentEntrance(Color student) {
-        return entrance.removeStudent(student);
+        try {
+            return entrance.removeStudent(student);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**

@@ -89,4 +89,18 @@ class DiningRoomTest {
 
     }
 
+    @Test
+    public void addNullPointerTest() {
+        DiningRoom room = new DiningRoom();
+
+        assertThrows(NullPointerException.class, () -> room.addStudent(null));
+    }
+
+    @Test
+    public void removeNullPointerTest() {
+        DiningRoom room = new DiningRoom();
+
+        assertThrows(NullPointerException.class, () -> room.removeStudent(null));
+    }
+
 }
