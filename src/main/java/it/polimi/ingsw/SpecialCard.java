@@ -8,11 +8,9 @@ public class SpecialCard {
     public SpecialCard(SpecialCardName name) {
         this.name = name;
         this.firstUse = false;
-        if (name == SpecialCardName.PRIEST || name == SpecialCardName.POSTMAN ||
-                name == SpecialCardName.JUGGLER || name == SpecialCardName.BARD) {
+        if (name == SpecialCardName.PRIEST || name == SpecialCardName.POSTMAN || name == SpecialCardName.JUGGLER || name == SpecialCardName.BARD) {
             this.cost = 1;
-        } else if (name == SpecialCardName.HERBALIST || name == SpecialCardName.KNIGHT
-                || name == SpecialCardName.PRINCESS || name == SpecialCardName.CHEESEMAKER) {
+        } else if (name == SpecialCardName.HERBALIST || name == SpecialCardName.KNIGHT || name == SpecialCardName.PRINCESS || name == SpecialCardName.CHEESEMAKER) {
             this.cost = 2;
         } else {
             this.cost = 3;
@@ -25,8 +23,8 @@ public class SpecialCard {
      * Increase the cost of the card of one.
      * It can be used only once: the price will not be increased with two calls of the method.
      */
-    public void use(){
-        if(!firstUse) {
+    public void use() {
+        if (!firstUse) {
             this.cost += 1;
             firstUse = true;
         }
@@ -34,9 +32,10 @@ public class SpecialCard {
 
     /**
      * Returns the cost of the card
+     *
      * @return an int which is the cost of the card
      */
-    public int getCostCoin(){
+    public int getCostCoin() {
         return this.cost;
     }
 
@@ -58,7 +57,7 @@ public class SpecialCard {
      * Check if there are Tiles when the card is Herbalist, otherwise is useless.
      */
     public boolean isEmptyOfTiles() throws NotCallableMethodException {
-            throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
     /**
@@ -66,7 +65,7 @@ public class SpecialCard {
      *
      * @return the number of tiles
      */
-    public int getTile() throws NotCallableMethodException{
+    public int getTile() throws NotCallableMethodException {
         throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
     }
 
@@ -92,14 +91,30 @@ public class SpecialCard {
     }
 
     /**
-     * Count the number of all students in the room if it is a card with students, otherwise the method is useless.
+     * Count the number of all students on the card if it is a card with students, otherwise the method is useless.
      */
     public int countStudents() throws NotCallableMethodException {
         throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
 
     }
 
+    /**
+     * Getter guestLimit of the card if it is a card with students, otherwise the method is useless.
+     *
+     * @return guestLimit
+     */
+    public int getGuestsLimit() throws NotCallableMethodException {
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    }
 
+    /**
+     * Getter guestChangeLimit of the card if it is a card with students, otherwise the method is useless.
+     *
+     * @return guestChangeLimit
+     */
+    public int getGuestsChangeLimit() throws NotCallableMethodException {
+        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    }
 
 
 }

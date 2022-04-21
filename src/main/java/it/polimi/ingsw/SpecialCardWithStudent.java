@@ -8,8 +8,14 @@ public class SpecialCardWithStudent extends SpecialCard{
     private int guestsChangeLimit;
 
 
+    /**
+     * Imposes the limit of students that the card can contain and its change limit.
+     *
+     * @param name name of the special Card
+     */
     public SpecialCardWithStudent(SpecialCardName name) {
         super(name);
+        this.guests = new HashMap<Color, Integer>();
         this.guestsChangeLimit = 0;
         this.guestsLimit = 0;
         if (name == SpecialCardName.PRIEST ) {
@@ -23,7 +29,8 @@ public class SpecialCardWithStudent extends SpecialCard{
             this.guestsChangeLimit = 1;
         }
 
-        /*ADD STUDENTS*/
+
+
     }
 
     /**
@@ -35,12 +42,10 @@ public class SpecialCardWithStudent extends SpecialCard{
      */
     public boolean addStudent(Color studentColor) {
         if (this.countStudents() < guestsLimit) {
-            Integer previousNumStudents = guests.get(studentColor);
-            if (previousNumStudents == null) {
+            if (!guests.containsKey(studentColor)) {
                 guests.put(studentColor, 1);
             } else {
-                if (guestsLimit < previousNumStudents) return false;
-                guests.put(studentColor, previousNumStudents + 1);
+                guests.put(studentColor, this.countStudents(studentColor) + 1);
             }
             return true;
         }
