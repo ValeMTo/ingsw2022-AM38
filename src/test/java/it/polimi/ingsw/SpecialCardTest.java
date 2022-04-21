@@ -56,6 +56,8 @@ public class SpecialCardTest {
         assertThrows(NotCallableMethodException.class, () -> priest.removeStudent(Color.BLUE), "Not usable method for this card: ");
         assertThrows(NotCallableMethodException.class, () -> priest.countStudents(Color.BLUE), "Not usable method for this card: ");
         assertThrows(NotCallableMethodException.class, () -> priest.countStudents(), "Not usable method for this card: ");
+        assertThrows(NotCallableMethodException.class, () -> priest.getGuestsChangeLimit(), "Not usable method for this card: ");
+        assertThrows(NotCallableMethodException.class, () -> priest.getGuestsLimit(), "Not usable method for this card: ");
     }
 
 
