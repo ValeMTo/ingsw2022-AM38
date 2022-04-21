@@ -42,22 +42,22 @@ public class SpecialCard {
     /**
      * Remove a Tile when the card is Herbalist, otherwise is useless.
      */
-    public boolean removeTile() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public boolean removeTile() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Adds a Tile when the card is Herbalist, otherwise is useless.
      */
-    public boolean returnTile() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public boolean returnTile() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Check if there are Tiles when the card is Herbalist, otherwise is useless.
      */
-    public boolean isEmptyOfTiles() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public boolean isEmptyOfTiles() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
@@ -65,36 +65,36 @@ public class SpecialCard {
      *
      * @return the number of tiles
      */
-    public int getTile() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public int getTile() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Adds a student in the card room if it is a card with students, otherwise the method is useless.
      */
-    public boolean addStudent(Color studentColor) throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public boolean addStudent(Color studentColor) throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Removes a student from the card room if it is a card with students, otherwise the method is useless.
      */
-    public boolean removeStudent(Color studentColor) throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public boolean removeStudent(Color studentColor) throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Count the number of students of a specific color if it is a card with students, otherwise the method is useless.
      */
-    public int countStudents(Color studentColor) throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public int countStudents(Color studentColor) throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
      * Count the number of all students on the card if it is a card with students, otherwise the method is useless.
      */
-    public int countStudents() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public int countStudents() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
 
     }
 
@@ -103,8 +103,8 @@ public class SpecialCard {
      *
      * @return guestLimit
      */
-    public int getGuestsLimit() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public int getGuestsLimit() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
     /**
@@ -112,8 +112,8 @@ public class SpecialCard {
      *
      * @return guestChangeLimit
      */
-    public int getGuestsChangeLimit() throws NotCallableMethodException {
-        throw new NotCallableMethodException("Not usable method for this card: " + name.toString());
+    public int getGuestsChangeLimit() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 
 
