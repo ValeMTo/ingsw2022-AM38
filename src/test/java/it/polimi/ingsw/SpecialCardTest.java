@@ -41,10 +41,10 @@ public class SpecialCardTest {
      */
     @Test
     public void herbalistExceptionMethodTest() {
-        assertThrows(NotCallableMethodException.class, () -> priest.returnTile(), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.removeTile(), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.getTile(), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.isEmptyOfTiles(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.returnTile(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.removeTile(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.getTile(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.isEmptyOfTiles(), "Not usable method for this card: ");
     }
 
     /**
@@ -52,12 +52,12 @@ public class SpecialCardTest {
      */
     @Test
     public void studentsExceptionMethodTest() {
-        assertThrows(NotCallableMethodException.class, () -> priest.addStudent(Color.BLUE), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.removeStudent(Color.BLUE), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.countStudents(Color.BLUE), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.countStudents(), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.getGuestsChangeLimit(), "Not usable method for this card: ");
-        assertThrows(NotCallableMethodException.class, () -> priest.getGuestsLimit(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.addStudent(Color.BLUE), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.removeStudent(Color.BLUE), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.countStudents(Color.BLUE), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.countStudents(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.getGuestsChangeLimit(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> priest.getGuestsLimit(), "Not usable method for this card: ");
     }
 
 
