@@ -28,7 +28,7 @@ public class SpecialCardWithStudentTest {
                     assertTrue(princess.addStudent(student));
                 }
                 count += 1;
-            } catch (NotCallableMethodException e) {
+            } catch (FunctionNotImplementedException e) {
                 e.printStackTrace();
             }
         }
@@ -53,7 +53,7 @@ public class SpecialCardWithStudentTest {
             assertFalse(priest.addStudent(Color.BLUE));
             assertFalse(juggler.addStudent(Color.BLUE));
 
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
     }
@@ -72,7 +72,7 @@ public class SpecialCardWithStudentTest {
             assertTrue(priest.removeStudent(Color.PINK));
             assertTrue(juggler.removeStudent(Color.PINK));
             assertTrue(princess.removeStudent(Color.PINK));
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
     }
@@ -88,7 +88,7 @@ public class SpecialCardWithStudentTest {
                 assertFalse(priest.removeStudent(student));
                 assertFalse(juggler.removeStudent(student));
             }
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
     }
@@ -103,13 +103,13 @@ public class SpecialCardWithStudentTest {
                 juggler.addStudent(student);
                 priest.addStudent(student);
                 princess.addStudent(student);
-            } catch (NotCallableMethodException e) {
+            } catch (FunctionNotImplementedException e) {
                 e.printStackTrace();
             }
         }
         try {
             juggler.addStudent(Color.RED);
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
 
@@ -117,7 +117,7 @@ public class SpecialCardWithStudentTest {
             assertEquals(priest.getGuestsLimit(), priest.countStudents());
             assertEquals(princess.getGuestsLimit(), princess.countStudents());
             assertEquals(juggler.getGuestsLimit(), juggler.countStudents());
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
 
@@ -148,7 +148,7 @@ public class SpecialCardWithStudentTest {
             juggler.addStudent(Color.PINK);
             juggler.addStudent(Color.PINK);
 
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
 
@@ -170,7 +170,7 @@ public class SpecialCardWithStudentTest {
             assertEquals(1, princess.countStudents(Color.RED));
 
             assertEquals(2, juggler.countStudents(Color.PINK));
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
 
@@ -186,7 +186,7 @@ public class SpecialCardWithStudentTest {
             assertEquals(4, priest.getGuestsLimit());
             assertEquals(4, princess.getGuestsLimit());
             assertEquals(6, juggler.getGuestsLimit());
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
     }
@@ -201,7 +201,7 @@ public class SpecialCardWithStudentTest {
             assertEquals(1, priest.getGuestsChangeLimit());
             assertEquals(1, princess.getGuestsChangeLimit());
             assertEquals(3, juggler.getGuestsChangeLimit());
-        } catch (NotCallableMethodException e) {
+        } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
     }
