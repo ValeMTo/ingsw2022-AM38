@@ -180,7 +180,7 @@ public abstract class GameBoard {
             return true;
         }
 
-        throw new IslandOutOfBoundException(1, islands[islands.length].getPosition());
+        throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
     }
 
     /**
@@ -221,7 +221,7 @@ public abstract class GameBoard {
      *
      * @param location : where the student will end
      * @param student  : student's color
-     * @param position : island position or nr. of player or nr. of island
+     * @param position : island position or nr. of player or nr. of island (for island 1-12)
      * @return : the result of the add (true if correctly added, false if not)
      */
     public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
@@ -229,14 +229,14 @@ public abstract class GameBoard {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                return players[currentPlayer].addStudentDiningRoom(student);
+                return players[position].addStudentDiningRoom(student);
             case SCHOOLENTRANCE:
-                return players[currentPlayer].addStudentEntrance(student);
+                return players[position].addStudentEntrance(student);
             case ISLAND:
-                if (position - 1 <= islands.length) return islands[position - 1].addStudent(student);
+                if (position <= islands.length) return islands[position - 1].addStudent(student);
                 return false;
             case CLOUD:
-                if (position - 1 <= clouds.length) return clouds[position - 1].addStudent(student);
+                if (position < clouds.length) return clouds[position].addStudent(student);
                 return false;
             case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
@@ -376,7 +376,7 @@ public abstract class GameBoard {
     public void updateProfessorOwnership() {
         int maxStudent;
         boolean tie;
-        Tower playerTowerWithMaxValue;
+        Tower playerTowerWithMaxValue = null;
         for (Color color : Color.values()) {
             maxStudent = 0;
             tie = true;
@@ -388,8 +388,13 @@ public abstract class GameBoard {
                     playerTowerWithMaxValue = player.getTowerColor();
                 } else if (player.countStudentsDiningRoom(color) == maxStudent) tie = true;
             }
-            if (tie) professors.put(color, null);
-            else professors.put(color, playerTowerWithMaxValue);
+            if (tie) {
+                professors.remove(color);
+                professors.put(color, null);
+            } else {
+                professors.remove(color);
+                professors.put(color, playerTowerWithMaxValue);
+            }
         }
     }
 

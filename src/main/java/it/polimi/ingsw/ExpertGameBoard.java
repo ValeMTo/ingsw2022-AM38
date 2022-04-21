@@ -9,7 +9,7 @@ public class ExpertGameBoard extends GameBoard {
     protected SpecialCard[] specialCards;
     //protected final int playerNumber;
     private boolean towerInfluence = true;
-    private List<Color> noInfluenceByColor = null;
+    private Color noInfluenceByColor;
     private int moreInfluenceQuantity = 0;
     private boolean motherNatureIncreasedMove = false;
     private int increasedMovement = 0;
@@ -22,6 +22,7 @@ public class ExpertGameBoard extends GameBoard {
      */
     public ExpertGameBoard(int numPlayer, List<String> playersNicknames) {
         super(numPlayer, playersNicknames);
+
     }
 
 
@@ -32,36 +33,41 @@ public class ExpertGameBoard extends GameBoard {
      * @param island : Island's position where the influence must be computed
      * @return : return the Tower of the Player who has more influence
      */
-    public Tower computeInfluence(int island) { //It could be returning a Tower... but player nickname is also ok...
-        Tower islandTower = islands[island].getTower();
+    public Tower computeInfluence(int island) throws IslandOutOfBoundException { //It could be returning a Tower... but player nickname is also ok...
+        if (island < 1 || island > islands[islands.length - 1].getPosition())
+            throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
+
+        Tower islandTower = islands[island - 1].getTower();
         // If the Island we want to compute the influence is disabled, we re-enable it and do not compute influence, just return the old TowerColor
-        if (!this.islands[island].isInfluenceEnabled()) {
-            islands[island].enableInfluence();
+        if (!this.islands[island - 1].isInfluenceEnabled()) {
+            islands[island - 1].enableInfluence();
             return islandTower;
         }
 
         //Otherwise, if the influence computation is enabled, first we create a support HashMap for the influence
         Map<Tower, Integer> computationMap = new HashMap<Tower, Integer>();
-        Tower professorTower;
-        Color professorColor;
-        //Initialize to 0 the support HashMap
-        for (int i = 0; i < players.length; i++) {
-            computationMap.put(players[i].getTowerColor(), 0);
+        Tower professorTower = null;
+        Tower playerWithMoreInfluence = null;
+
+        //Initialize to 0 the support HashMap for players score
+        for (PlayerBoard player : players) {
+            computationMap.put(player.getTowerColor(), 0);
         }
 
         //Compute the influence given by the professors controlled if the Color is enabled
-        for (int i = 0; i < professors.values().size(); i++) {
-            professorTower = (Tower) professors.values().toArray()[i];
-            professorColor = (Color) professors.keySet().toArray()[i];
-            if (professorTower != null && !noInfluenceByColor.contains(professorColor)) {
+        for (Color professorColor : Color.values()) {
+            professorTower = professors.get(professorColor);
+            if (professorTower != null && professorColor != noInfluenceByColor) {
                 //professorColor = (Color)professors.keySet().toArray()[i];
-                computationMap.put(professorTower, computationMap.get(professorTower) + islands[island].studentNumber(professorColor));
+                computationMap.put(professorTower, computationMap.get(professorTower) + islands[island - 1].studentNumber(professorColor));
             }
         }
 
         //Compute the influence given by the Towers in the Islands if the Tower Influence is enabled
-        if (islandTower != null && towerInfluence)
-            computationMap.put(islandTower, computationMap.get(islandTower) + islands[island].getTowerNumber());
+        if (islandTower != null && towerInfluence) {
+            computationMap.put(islandTower, computationMap.get(islandTower) + islands[island - 1].getTowerNumber());
+
+        }
 
         //Finally, increase the influence if the player has bonuses
         if (moreInfluenceQuantity != 0) {
@@ -71,38 +77,41 @@ public class ExpertGameBoard extends GameBoard {
         boolean tie = false;
         int maxValue = 0;
         int computationValue;
-        Tower playerWithMoreInfluence = null;
         //Compute the Tower Color, the player who has the maximum value of influence or if we have a tie between players.
-        for (int i = 0; i < players.length; i++) {
-            computationValue = computationMap.get(players[i].getTowerColor());
+        for (PlayerBoard player : players) {
+            computationValue = computationMap.get(player.getTowerColor());
             if (computationValue > maxValue) {
-                playerWithMoreInfluence = players[i].getTowerColor();
+                playerWithMoreInfluence = player.getTowerColor();
                 tie = false;
                 maxValue = computationValue;
             } else if (computationValue == maxValue) tie = true;
         }
-        //Remove the old Towers from the player
-        int towerToChange = islands[island].getTowerNumber();
-        if (!tie && playerWithMoreInfluence != null) {
-            islandTower = islands[island].getTower();
+
+        //If tie nothing changes
+        if (tie) return islands[island - 1].getTower();
+
+        //Remove the old Towers from the player and add to the player that had the towers
+        int towerToChange = islands[island - 1].getTowerNumber();
+        if (playerWithMoreInfluence != null) {
+            islandTower = islands[island - 1].getTower();
             if (islandTower != null) {
-                for (int i = 0; i < players.length; i++) {
-                    if (players[i].getTowerColor() == islandTower) {
-                        players[i].addTower(towerToChange);
+                for (PlayerBoard player : players) {
+                    if (player.getTowerColor() == islandTower) {
+                        player.addTower(towerToChange);
+                    }
+                    //Set the new number of tower of the player with maximum influence on the island
+                    if (player.getTowerColor() == playerWithMoreInfluence) {
+                        player.removeTower(towerToChange);
                     }
                 }
-                //Set the new Tower Color in Island
-                islands[island].setTower(playerWithMoreInfluence);
-                //Set the new number of tower of the player with maximum influence on the island
-                for (int i = 0; i < players.length; i++) {
-                    if (players[i].getTowerColor() == playerWithMoreInfluence) {
-                        players[i].removeTower(towerToChange);
-                    }
-                }
+                //Set the new Tower Color in Island and the tower number to 1 if its first tower is added
 
             }
+            islands[island - 1].setTower(playerWithMoreInfluence);
+
+            if (islands[island - 1].getTowerNumber() == 0) islands[island - 1].setTowerNumber(1);
         }
-        return playerWithMoreInfluence; //return tower name...
+        return islands[island - 1].getTower(); //return tower name...
 
     }
 
@@ -117,14 +126,12 @@ public class ExpertGameBoard extends GameBoard {
         int tieValue, playerStudentsByColor;
         //Search the player by its TowerColor
         if (playerUpdate != null) {
-            Color professorColor;
             Tower professorTower;
             // For each Professor's Color, we compute if there is a tie (professorTower is null)
             // and then compute if the player has the same students as at least another player
-            for (int i = 0; i < Color.values().length; i++) {
-                professorTower = (Tower) professors.values().toArray()[i];
+            for (Color professorColor : Color.values()) {
+                professorTower = professors.get(professorColor);
                 if (professorTower == null) {
-                    professorColor = (Color) professors.keySet().toArray()[i];
                     tieValue = 0;
                     for (int j = 0; j < players.length; j++) {
                         playerStudentsByColor = players[j].countStudentsDiningRoom(professorColor);
@@ -143,7 +150,7 @@ public class ExpertGameBoard extends GameBoard {
     /**
      * Disable the influence enable flag of a specified Island to prevent the normal influence computation changes
      *
-     * @param position : position of the Island we want to disable the influence computation
+     * @param position : position of the Island we want to disable the influence computation (1 up to 12)
      * @return : true island is successfully disabled, false if not or if the island was already disabled
      */
     @Override
@@ -177,8 +184,7 @@ public class ExpertGameBoard extends GameBoard {
      * @param color : color that does not give points in the influence computation
      */
     public void disableColorInfluence(Color color) {
-        if (noInfluenceByColor == null) noInfluenceByColor = new ArrayList<Color>();
-        noInfluenceByColor.add(color);
+        noInfluenceByColor = color;
     }
 
     /**
@@ -186,11 +192,10 @@ public class ExpertGameBoard extends GameBoard {
      */
     public void resetAllTurnFlags() {
         ArrayList<Color> temporaryNoInfluenceColor = new ArrayList<Color>();
-        temporaryNoInfluenceColor.addAll(noInfluenceByColor);
         towerInfluence = true;
         moreInfluenceQuantity = 0;
         motherNatureIncreasedMove = false;
-        noInfluenceByColor.removeAll(temporaryNoInfluenceColor);
+        noInfluenceByColor = null;
         increasedMovement = 0;
     }
 
@@ -209,9 +214,9 @@ public class ExpertGameBoard extends GameBoard {
      */
     public void increaseMovementMotherNature() {
         increasedMovement = 2;
+        motherNatureIncreasedMove = true;
     }
 
-    //TODO: needed a getStep method to have the steps given an assistant card or maybe a static method of the AssistantCard to give the steps value given the priority
 
     /**
      * Move motherNature considering the increased movement
@@ -220,7 +225,9 @@ public class ExpertGameBoard extends GameBoard {
      * @return
      */
     @Override
-    public boolean moveMotherNature(int destinationIsland) {
+    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException {
+        if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
+            throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
         int maxMovement = 0;
         try {
             maxMovement += players[currentPlayer].getLastCardSteps();
@@ -229,14 +236,22 @@ public class ExpertGameBoard extends GameBoard {
             return false;
         }
         if (this.motherNatureIncreasedMove) maxMovement += increasedMovement;
-        if (destinationIsland <= motherNature && destinationIsland - motherNature <= maxMovement) {
+        if (destinationIsland >= motherNature && (destinationIsland - motherNature) <= maxMovement) {
             motherNature = destinationIsland;
             return true;
-        } else if (destinationIsland > motherNature && islands[islands.length].getPosition() - destinationIsland + motherNature <= maxMovement) {
+        } else if (destinationIsland <= motherNature && (islands[islands.length - 1].getPosition() - destinationIsland + motherNature) <= maxMovement) {
             motherNature = destinationIsland;
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
+        if (location == StudentCounter.CARD) {
+            //TODO
+        }
+        return super.addStudent(location, student, position);
     }
 
 }

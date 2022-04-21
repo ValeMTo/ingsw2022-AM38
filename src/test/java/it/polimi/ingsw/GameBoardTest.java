@@ -52,8 +52,7 @@ public class GameBoardTest {
     public boolean studentAdderToIsland(Color student, Integer islandStudents, Integer islandPosition, GameBoard gameBoard) {
         for (int i = 0; i < islandStudents; i++) {
             try {
-                if (!gameBoard.addStudent(StudentCounter.ISLAND, student, islandPosition))
-                    return false;
+                if (!gameBoard.addStudent(StudentCounter.ISLAND, student, islandPosition)) return false;
             } catch (Exception exc) {
                 exc.printStackTrace();
                 return false;
