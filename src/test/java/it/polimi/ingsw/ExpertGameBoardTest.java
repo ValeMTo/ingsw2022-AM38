@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -8,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +31,81 @@ public class ExpertGameBoardTest {
 
 
     }**/
+
+    /**
+     * Tests that the received Set of SpecialCardNames is always composed by 3 cards
+     */
+    @RepeatedTest(10)
+    @DisplayName("Get special card names test")
+    public void getSpecialCardNamesTest() {
+        ExpertGameBoard expertGameBoard = new ExpertGameBoard(2, nameString);
+        assertEquals(3, expertGameBoard.getSetOfSpecialCardNames().size());
+    }
+
+    /**
+     * Tests that the received Map of SpecialCardNames is always composed by 3 cards and with 3 values in [0,2]
+     */
+    @RepeatedTest(10)
+    @DisplayName("Get special card names Map test")
+    public void getSpecialCardNamesMapTest() {
+        ExpertGameBoard expertGameBoard = new ExpertGameBoard(2, nameString);
+        assertEquals(3, expertGameBoard.getMapOfSpecialCardNames().size());
+        assertTrue(expertGameBoard.getMapOfSpecialCardNames().containsValue(0));
+        assertTrue(expertGameBoard.getMapOfSpecialCardNames().containsValue(1));
+        assertTrue(expertGameBoard.getMapOfSpecialCardNames().containsValue(2));
+
+    }
+
+    /**
+     * Adds a student to the special cards that support this function
+     *
+     * @param color : Color of the student to add
+     */
+    @ParameterizedTest
+    @EnumSource(Color.class)
+    public void addStudentToCard(Color color) {
+        nameString.add("Nick");
+        ExpertGameBoard expertGameBoard = new ExpertGameBoard(3, nameString);
+        Set<SpecialCardName> specialCards = expertGameBoard.getSetOfSpecialCardNames();
+        int i = 0;
+        for (SpecialCardName specialCard : specialCards) {
+            if (specialCard.equals(SpecialCardName.PRIEST) || specialCard.equals(SpecialCardName.JUGGLER) || specialCard.equals(SpecialCardName.PRINCESS)) {
+                try {
+                    assertTrue(expertGameBoard.addStudent(StudentCounter.CARD, color, expertGameBoard.getMapOfSpecialCardNames().get(specialCard)));
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                    return;
+                }
+            }
+            i++;
+        }
+    }
+
+    /**
+     * Remove a student to the special cards that support this function
+     *
+     * @param color : Color of the student to remove
+     */
+    @ParameterizedTest
+    @EnumSource(Color.class)
+    public void removeStudentToCard(Color color) {
+        nameString.add("Nick");
+        ExpertGameBoard expertGameBoard = new ExpertGameBoard(3, nameString);
+        Set<SpecialCardName> specialCards = expertGameBoard.getSetOfSpecialCardNames();
+        int i = 0;
+        for (SpecialCardName specialCard : specialCards) {
+            if (specialCard.equals(SpecialCardName.PRIEST) || specialCard.equals(SpecialCardName.JUGGLER) || specialCard.equals(SpecialCardName.PRINCESS)) {
+                try {
+                    assertTrue(expertGameBoard.addStudent(StudentCounter.CARD, color, expertGameBoard.getMapOfSpecialCardNames().get(specialCard)));
+                    assertTrue(expertGameBoard.removeStudent(StudentCounter.CARD, color, expertGameBoard.getMapOfSpecialCardNames().get(specialCard)));
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                    return;
+                }
+            }
+            i++;
+        }
+    }
 
     /**
      * Compute simply the computation since no towers are present the influence computation changes the Tower of the most influence player

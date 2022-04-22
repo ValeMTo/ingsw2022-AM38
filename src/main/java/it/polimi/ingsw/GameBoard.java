@@ -264,8 +264,6 @@ public abstract class GameBoard {
 
             default:
                 throw new LocationNotAllowedException("removeStudent without position can be done only with the DiningRoom and Entrance of the current player.");
-                //return false; //Students cannot be removed from bag selectively!
-                //TODO: CARD case should be done overriding and then calling super...
         }
     }
 
@@ -290,9 +288,6 @@ public abstract class GameBoard {
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
                 throw new LocationNotAllowedException("removeStudent with position cannot be applied with island and bag since no remove is allowed in island and no remove from bag knowing the color to draw.");
-
-                //return false; //Students cannot be removed from bag selectively! Students cannot be removed from islands!
-                //TODO: CARD case should be done overriding and then calling super...
         }
     }
 

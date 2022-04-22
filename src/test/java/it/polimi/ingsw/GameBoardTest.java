@@ -2,6 +2,7 @@ package it.polimi.ingsw;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
@@ -121,6 +122,7 @@ public class GameBoardTest {
         }
     }
 
+
     /**
      * Tests that the boundary numbers (0 and 11) of the ones allowed to be use for assistantCard returns false
      *
@@ -138,5 +140,76 @@ public class GameBoardTest {
         }
     }
 
+    /**
+     * Tests the immediate end of the match due to the end of usable assistant cards (10 rounds have been played)
+     */
+    @Test
+    public void endOfMatchTestEndOfCards() {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        for (int i = 0; i < 10; i++) {
+            assertEquals(EndOfMatchCondition.NoEndOfMatch, gameboard.isEndOfMatch());
+            gameboard.increaseRound();
+        }
+        assertEquals(EndOfMatchCondition.InstantEndOfMatch, gameboard.isEndOfMatch());
+    }
+
+    /**
+     * Tests the delayed end of the match due to the end of students in the bag
+     */
+    @Test
+    public void endOfMatchTestEndOfStudents() {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+
+        assertEquals(EndOfMatchCondition.NoEndOfMatch, gameboard.isEndOfMatch());
+        for (Color color : Color.values()) {
+            try {
+                while (!gameboard.bag.isEmpty()) gameboard.bag.drawStudent();
+            } //While there are student to remove from bag of that color
+            catch (Exception exc) {
+                exc.printStackTrace();
+                return;
+            }
+        }
+        assertEquals(EndOfMatchCondition.DelayedEndOfMatch, gameboard.isEndOfMatch());
+    }
+
+    /**
+     * Tests the instant end of the match due to the end of towers in a particular player
+     */
+    @Test
+    public void endOfMatchTestEndOfTowers() {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        assertEquals(EndOfMatchCondition.NoEndOfMatch, gameboard.isEndOfMatch());
+        int towerNum = gameboard.players[0].getAvailableTowers();
+        for (int i = 0; i < towerNum; i++) {
+            assertEquals(EndOfMatchCondition.NoEndOfMatch, gameboard.isEndOfMatch());
+            gameboard.players[0].removeTower(1);
+        }
+        assertEquals(EndOfMatchCondition.InstantEndOfMatch, gameboard.isEndOfMatch());
+    }
+
+    @ParameterizedTest
+    @EnumSource(StudentCounter.class)
+    public void addStudentTest(StudentCounter location) {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        for (Color color : Color.values()) {
+
+            try {
+                switch (location) {
+                    case BAG:
+                        assertTrue(gameboard.addStudent(StudentCounter.BAG, color));
+                        break;
+                    case CARD:
+                        assertTrue(gameboard.addStudent(StudentCounter.CARD, color));
+                        break;
+                    case SCHOOLENTRANCE: //IF CURRENT PLAYER SEE NUM STUDENTS IN SCHOOLENTRANCE... assertTrue(gameboard.addStudent(StudentCounter.SCHOOLENTRANCE,color)); break;
+
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+
+            }
+        }
+    }
 
 }

@@ -3,8 +3,8 @@ package it.polimi.ingsw;
 import java.util.*;
 
 public class ExpertGameBoard extends GameBoard {
-    protected SpecialCard[] specialCards;
     private final int specialCardsNum = 3;
+    protected SpecialCard[] specialCards;
     private boolean towerInfluence = true;
     private Color noInfluenceByColor;
     private int moreInfluenceQuantity = 0;
@@ -22,105 +22,122 @@ public class ExpertGameBoard extends GameBoard {
         specialCards = new SpecialCard[specialCardsNum];
         Random random = new Random();
         int i = 0, cardNum;
-        Set<Integer> alreadyUsedCardNum  = new TreeSet<Integer>();
-        while(i<specialCardsNum){
-            cardNum = random.nextInt(specialCardsNum-1);
+        Set<Integer> alreadyUsedCardNum = new TreeSet<Integer>();
+        while (i < specialCardsNum) {
+            cardNum = random.nextInt(12);
             // TODO: maybe with functional better
             //
             //int final int card = cardNum;
             //SpecialCard s = SpecialCardName.values().stream.filter((x)->x.ordinal()==card);
-            switch (cardNum){
-                case 0: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.PRIEST);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
-                break;
-                case 1: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.HERALD);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+            switch (cardNum) {
+                case 0:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCardWithStudent(SpecialCardName.PRIEST);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 2: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.POSTMAN);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 1:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.HERALD);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 3: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.HERBALIST);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 2:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.POSTMAN);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 4: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.ARCHER);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 3:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new Herbalist();
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 5: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.JUGGLER);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 4:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.ARCHER);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 6: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.KNIGHT);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 5:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCardWithStudent(SpecialCardName.JUGGLER);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 7: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.COOKER);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 6:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.KNIGHT);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 8: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.BARD);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 7:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.COOKER);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 9: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.PRINCESS);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 8:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.BARD);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 10: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.GAMBLER);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 9:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCardWithStudent(SpecialCardName.PRINCESS);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
-                case 11: if(!alreadyUsedCardNum.contains(cardNum))
-                {
-                    specialCards[i] = new SpecialCard(SpecialCardName.CHEESEMAKER);
-                    alreadyUsedCardNum.add(cardNum);
-                    i++;
-                }
+                case 10:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.GAMBLER);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
+                    break;
+                case 11:
+                    if (!alreadyUsedCardNum.contains(cardNum)) {
+                        specialCards[i] = new SpecialCard(SpecialCardName.CHEESEMAKER);
+                        alreadyUsedCardNum.add(cardNum);
+                        i++;
+                    }
                     break;
             }
         }
     }
 
-    public Set<SpecialCardName>getSetOfSpecialCardNames(){
+    /**
+     * Returns a Map with the position of each special card
+     *
+     * @return : a Map with the SpecialCardName and the position of the instantiated special cards
+     */
+    public Map<SpecialCardName, Integer> getMapOfSpecialCardNames() {
+        Map<SpecialCardName, Integer> returnMap = new HashMap<SpecialCardName, Integer>();
+        for (int i = 0; i < specialCards.length; i++)
+            returnMap.put(specialCards[i].getName(), i);
+        return returnMap;
+    }
+
+    /**
+     * Returns a Set with the specialCardNames
+     *
+     * @return : a Set with the SpecialCardNames of the instantiated special cards
+     */
+    public Set<SpecialCardName> getSetOfSpecialCardNames() {
         Set<SpecialCardName> returnSet = new TreeSet<SpecialCardName>();
-        for(SpecialCard specialCard : specialCards)
+        for (SpecialCard specialCard : specialCards)
             returnSet.add(specialCard.getName());
         return returnSet;
     }
@@ -360,13 +377,9 @@ public class ExpertGameBoard extends GameBoard {
     @Override
     public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
         if (location == StudentCounter.CARD) {
-            if (position < 0 || position > (specialCards.length - 1))
-                return false;
-
+            if (position < 0 || position > (specialCards.length - 1)) return false;
             return specialCards[position].addStudent(student);
-
         }
-
         return super.addStudent(location, student, position);
 
     }
@@ -386,8 +399,7 @@ public class ExpertGameBoard extends GameBoard {
     @Override
     public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
         if (location == StudentCounter.CARD) {
-            if (position < 0 || position > (specialCards.length - 1))
-                return false;
+            if (position < 0 || position > (specialCards.length - 1)) return false;
 
             return specialCards[position].removeStudent(student);
 

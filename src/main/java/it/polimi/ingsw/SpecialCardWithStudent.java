@@ -40,6 +40,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
+    @Override
     public boolean addStudent(Color studentColor) {
         if (this.countStudents() < guestsLimit) {
             if (!guests.containsKey(studentColor)) {
@@ -59,6 +60,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      * @param studentColor is the student to remove from the room.
      * @return outcome of the removal
      */
+    @Override
     public boolean removeStudent(Color studentColor) {
         Integer previousNumStudents = guests.get(studentColor);
         if (previousNumStudents == null || this.countStudents(studentColor) <= 0) return false;
@@ -72,6 +74,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      * @param studentColor the color of students to count.
      * @return the number of student of that color.
      */
+    @Override
     public int countStudents(Color studentColor) {
         if (guests.containsKey(studentColor)) {
             return guests.get(studentColor);
@@ -84,6 +87,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      *
      * @return number of all students in the room
      */
+    @Override
     public int countStudents() {
         int numStudents = 0;
         for (Color color : Color.values()) {
@@ -100,6 +104,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      *
      * @return guestLimit
      */
+    @Override
     public int getGuestsLimit(){
         return guestsLimit;
     }
@@ -109,6 +114,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      *
      * @return guestChangeLimit
      */
+    @Override
     public int getGuestsChangeLimit(){
         return guestsChangeLimit;
     }
