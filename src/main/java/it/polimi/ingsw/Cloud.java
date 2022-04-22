@@ -1,11 +1,13 @@
 package it.polimi.ingsw;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class Cloud {
-    final int studentLimit;
-    private final HashMap<Color, Integer> counter;
+    private final int studentLimit;
+    private Map<Color, Integer> counter;
+
 
 
     /**
@@ -76,12 +78,14 @@ public class Cloud {
         if (studentColor == null) throw new NullPointerException();
 
         Integer previousNumStud = counter.get(studentColor);
-        if (!counter.containsKey(studentColor)) counter.put(studentColor, 1);
-        if (this.isEmpty()) {
+
+        if(this.isFull()){
+            return false;
+        }
+        if (!counter.containsKey(studentColor)){
             counter.put(studentColor, 1);
         } else {
-            if (this.isFull()) return false;
-            counter.put(studentColor, previousNumStud + 1);
+            counter.put(studentColor, counter.get(studentColor) + 1);
         }
         return true;
     }
@@ -99,7 +103,8 @@ public class Cloud {
 
         Integer previousNumStudents = counter.get(studentColor);
 
-        if (!counter.containsKey(studentColor) || this.countStudentByColor(studentColor) <= 0) return false;
+
+        if (!counter.containsKey(studentColor) || this.countStudent(studentColor) <= 0) return false;
         counter.put(studentColor, previousNumStudents - 1);
         return true;
     }
@@ -111,7 +116,8 @@ public class Cloud {
      * @param color : the color of the students to be counted
      * @return the number of students of that given color that are currently contained in the cloud.
      */
-    public int countStudentByColor(Color color) {
+
+    public int countStudent(Color color) {
         return this.counter.get(color);
     }
 
