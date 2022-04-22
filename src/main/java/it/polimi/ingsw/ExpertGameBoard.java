@@ -1,13 +1,10 @@
 package it.polimi.ingsw;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExpertGameBoard extends GameBoard {
     protected SpecialCard[] specialCards;
-    //protected final int playerNumber;
+    private final int specialCardsNum = 3;
     private boolean towerInfluence = true;
     private Color noInfluenceByColor;
     private int moreInfluenceQuantity = 0;
@@ -22,7 +19,110 @@ public class ExpertGameBoard extends GameBoard {
      */
     public ExpertGameBoard(int numPlayer, List<String> playersNicknames) {
         super(numPlayer, playersNicknames);
+        specialCards = new SpecialCard[specialCardsNum];
+        Random random = new Random();
+        int i = 0, cardNum;
+        Set<Integer> alreadyUsedCardNum  = new TreeSet<Integer>();
+        while(i<specialCardsNum){
+            cardNum = random.nextInt(specialCardsNum-1);
+            // TODO: maybe with functional better
+            //
+            //int final int card = cardNum;
+            //SpecialCard s = SpecialCardName.values().stream.filter((x)->x.ordinal()==card);
+            switch (cardNum){
+                case 0: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.PRIEST);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                break;
+                case 1: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.HERALD);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 2: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.POSTMAN);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 3: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.HERBALIST);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 4: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.ARCHER);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 5: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.JUGGLER);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 6: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.KNIGHT);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 7: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.COOKER);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 8: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.BARD);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 9: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.PRINCESS);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 10: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.GAMBLER);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+                case 11: if(!alreadyUsedCardNum.contains(cardNum))
+                {
+                    specialCards[i] = new SpecialCard(SpecialCardName.CHEESEMAKER);
+                    alreadyUsedCardNum.add(cardNum);
+                    i++;
+                }
+                    break;
+            }
+        }
+    }
 
+    public Set<SpecialCardName>getSetOfSpecialCardNames(){
+        Set<SpecialCardName> returnSet = new TreeSet<SpecialCardName>();
+        for(SpecialCard specialCard : specialCards)
+            returnSet.add(specialCard.getName());
+        return returnSet;
     }
 
 
@@ -246,12 +346,53 @@ public class ExpertGameBoard extends GameBoard {
         return false;
     }
 
+    /**
+     * Add a student to a specific location using a position value to choose the right player/island/specialCard/cloud.
+     * Override the method in GameBoard to support the specialCard add and use the super method for the rest
+     *
+     * @param location : where the student will end
+     * @param student  : student's color
+     * @param position : island position or nr. of player or nr. of island (for island 1-12) or nr. of specialCard(0-3)
+     * @return : the outcome of the add (true if correctly add, false if not possible)
+     * @throws LocationNotAllowedException     : if Location field is incorrect
+     * @throws FunctionNotImplementedException : if the specialCard does not implement the add student
+     */
     @Override
     public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
         if (location == StudentCounter.CARD) {
-            //TODO
+            if (position < 0 || position > (specialCards.length - 1))
+                return false;
+
+            return specialCards[position].addStudent(student);
+
         }
+
         return super.addStudent(location, student, position);
+
     }
 
+    /**
+     * Remove a student to a specific location using a position value to choose the right player/specialCard/cloud.
+     * Override the method in GameBoard to support the specialCard remove and use the super method for the rest
+     *
+     * @param location : where the student will end
+     * @param student  : student's color
+     * @param position : player nr. or nr. of specialCard(0-3) or cloud nr. [0; (numPlayers-1)]
+     * @return : the outcome of the remove (true if correctly removed, false if not possible)
+     * @throws LocationNotAllowedException     : if Location field is incorrect
+     * @throws FunctionNotImplementedException : if the specialCard does not implement the remove student
+     */
+
+    @Override
+    public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
+        if (location == StudentCounter.CARD) {
+            if (position < 0 || position > (specialCards.length - 1))
+                return false;
+
+            return specialCards[position].removeStudent(student);
+
+        }
+        return super.removeStudent(location, student, position);
+
+    }
 }

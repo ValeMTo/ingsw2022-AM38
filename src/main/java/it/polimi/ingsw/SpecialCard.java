@@ -18,6 +18,14 @@ public class SpecialCard {
 
     }
 
+    /**
+     * Getter of the card name
+     * @return : card name
+     */
+    public SpecialCardName getName(){
+        return this.name;
+    }
+
 
     /**
      * Increase the cost of the card of one.
