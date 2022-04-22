@@ -1,10 +1,12 @@
 package it.polimi.ingsw;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class Cloud {
     private final int studentLimit;
+    private Map<Color, Integer> counter;
 
 
 
