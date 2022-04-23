@@ -20,9 +20,10 @@ public class SpecialCard {
 
     /**
      * Getter of the card name
+     *
      * @return : card name
      */
-    public SpecialCardName getName(){
+    public SpecialCardName getName() {
         return this.name;
     }
 

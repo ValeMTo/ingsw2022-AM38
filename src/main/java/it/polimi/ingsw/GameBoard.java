@@ -56,7 +56,8 @@ public abstract class GameBoard {
      * @return : true if the transfer is done, false if the transfer is not done so the two islands are not grouped into one
      */
     protected boolean transferIslandPossessionsIfSameTower(Island islandReceiver, Island islandGiver) {
-        if (islandReceiver != null && islandGiver != null && islandGiver.getTower() != null && islandReceiver.getTower().equals(islandGiver.getTower())) {
+        if (islandGiver == null || islandReceiver == null) return false;
+        if (islandGiver.getTower() != null && islandReceiver.getTower() != null && islandReceiver.getTower().equals(islandGiver.getTower())) {
             int towersNumber = islandReceiver.getTowerNumber() + islandGiver.getTowerNumber();
             // We update the number of tower on the island adding the Towers of the island merging
             islandReceiver.setTowerNumber(towersNumber);
@@ -65,6 +66,7 @@ public abstract class GameBoard {
                 for (int i = 0; i < islandGiver.studentNumber(color); i++)
                     islandReceiver.addStudent(color);
             }
+            if (motherNature == islandGiver.getPosition()) motherNature = islandReceiver.getPosition();
             return true;
         }
         return false;
@@ -284,7 +286,10 @@ public abstract class GameBoard {
      */
     public boolean setCurrentPlayer(Tower tower) throws NoSuchTowerException {
         for (PlayerBoard player : players)
-            if (tower == player.getTowerColor()) currentPlayer = this.getPlayerPosition(tower);
+            if (tower == player.getTowerColor()) {
+                currentPlayer = this.getPlayerPosition(tower);
+                return true;
+            }
         throw new NoSuchTowerException("The tower " + tower + " cannot be found");
 
     }

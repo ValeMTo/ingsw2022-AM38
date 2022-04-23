@@ -247,8 +247,7 @@ public class GameBoardTest {
                     case SCHOOLENTRANCE:
                         if (gameboard.getSchoolEntranceOccupation(Tower.WHITE) < 9)
                             assertTrue(gameboard.addStudent(StudentCounter.SCHOOLENTRANCE, color, 0));
-                        else
-                            assertFalse(gameboard.addStudent(StudentCounter.DININGROOM, color));
+                        else assertFalse(gameboard.addStudent(StudentCounter.DININGROOM, color));
 
                         assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(StudentCounter.SCHOOLENTRANCE, color, 20));
                         break;
@@ -261,11 +260,15 @@ public class GameBoardTest {
                     case DININGROOM:
                         if (gameboard.getDiningRoomOccupation(Tower.WHITE) < 10)
                             assertTrue(gameboard.addStudent(StudentCounter.DININGROOM, color));
-                        else
-                            assertFalse(gameboard.addStudent(StudentCounter.DININGROOM, color));
+                        else assertFalse(gameboard.addStudent(StudentCounter.DININGROOM, color));
 
                         assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(StudentCounter.DININGROOM, color, 20));
                         break;
+                    case ISLAND:
+                        assertTrue(gameboard.addStudent(location, color, 1));
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(location, color, 0));
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(location, color, 13));
+
                     default:
                         assertThrows(LocationNotAllowedException.class, () -> gameboard.addStudent(location, Color.BLUE));
                 }
@@ -299,8 +302,7 @@ public class GameBoardTest {
                     case SCHOOLENTRANCE, DININGROOM:
                         if (gameboard.getDiningRoomOccupation(Tower.WHITE) > 0)
                             assertTrue(gameboard.removeStudent(location, color));
-                        else
-                            assertFalse(gameboard.removeStudent(location, color));
+                        else assertFalse(gameboard.removeStudent(location, color));
                         gameboard.addStudent(location, color, gameboard.getPlayerPosition(Tower.WHITE));
                         assertTrue(gameboard.removeStudent(location, color));
                         assertThrows(IndexOutOfBoundsException.class, () -> gameboard.removeStudent(location, color, 20));
@@ -337,8 +339,7 @@ public class GameBoardTest {
                     case SCHOOLENTRANCE, DININGROOM:
                         if (gameboard.getDiningRoomOccupation(Tower.WHITE) > 0)
                             assertTrue(gameboard.removeStudent(location, color));
-                        else
-                            assertFalse(gameboard.removeStudent(location, color));
+                        else assertFalse(gameboard.removeStudent(location, color));
                         gameboard.addStudent(location, color, gameboard.getPlayerPosition(Tower.WHITE));
                         assertTrue(gameboard.removeStudent(location, color));
                         assertThrows(IndexOutOfBoundsException.class, () -> gameboard.removeStudent(location, color, 20));
@@ -400,6 +401,25 @@ public class GameBoardTest {
             gameboard.updateProfessorOwnership();
             assertEquals(Tower.GRAY, gameboard.computeInfluence(1));
             assertEquals(Tower.GRAY, gameboard.computeInfluence(2));
+            assertEquals(11, gameboard.getIslandNumber());
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Test the merge between two islands after the influence computation but now the island are differents
+     */
+    @Test
+    public void islandMergeReverse() {
+        try {
+            GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+            gameboard.addStudent(StudentCounter.DININGROOM, Color.BLUE, 1);
+            gameboard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
+            gameboard.addStudent(StudentCounter.ISLAND, Color.BLUE, 12);
+            gameboard.updateProfessorOwnership();
+            assertEquals(Tower.BLACK, gameboard.computeInfluence(12));
+            assertEquals(Tower.BLACK, gameboard.computeInfluence(1));
             assertEquals(11, gameboard.getIslandNumber());
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -566,10 +586,8 @@ public class GameBoardTest {
         try {
             assertEquals(0, gameboard.getPlayerPosition(Tower.WHITE));
             assertEquals(1, gameboard.getPlayerPosition(Tower.BLACK));
-            if (playerNum == 3)
-                assertEquals(2, gameboard.getPlayerPosition(Tower.GRAY));
-            else
-                assertThrows(NoSuchTowerException.class, () -> gameboard.getPlayerPosition(Tower.GRAY));
+            if (playerNum == 3) assertEquals(2, gameboard.getPlayerPosition(Tower.GRAY));
+            else assertThrows(NoSuchTowerException.class, () -> gameboard.getPlayerPosition(Tower.GRAY));
         } catch (Exception exc) {
             exc.printStackTrace();
         }
@@ -592,8 +610,88 @@ public class GameBoardTest {
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
-        } else
-            assertThrows(IndexOutOfBoundsException.class, () -> gameboard.useAssistantCard(Tower.WHITE, priority));
+        } else assertThrows(IndexOutOfBoundsException.class, () -> gameboard.useAssistantCard(Tower.WHITE, priority));
 
     }
+
+    /**
+     * Tests that the first player is initialized as the one with White towers and not others
+     *
+     * @param playerNum : number of players
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void getCurrentPlayerInitialization(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        assertEquals(Tower.WHITE, gameboard.getCurrentPlayer());
+    }
+
+    /**
+     * Tests the set and get of the currentPlayer
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void setAndGetCurrentPlayer(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        try {
+            assertTrue(gameboard.setCurrentPlayer(Tower.WHITE));
+            assertEquals(Tower.WHITE, gameboard.getCurrentPlayer());
+            assertTrue(gameboard.setCurrentPlayer(Tower.BLACK));
+            assertEquals(Tower.BLACK, gameboard.getCurrentPlayer());
+            if (playerNum == 3) {
+                assertTrue(gameboard.setCurrentPlayer(Tower.GRAY));
+                assertEquals(Tower.GRAY, gameboard.getCurrentPlayer());
+            } else {
+                assertThrows(NoSuchTowerException.class, () -> gameboard.setCurrentPlayer(Tower.GRAY));
+                assertNotEquals(Tower.GRAY, gameboard.getCurrentPlayer());
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Verifies that the Clouds are initially void
+     *
+     * @param playerNum : num of players
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void cloudInitialState(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        try {
+            for (Color color : Color.values()) {
+                assertFalse(gameboard.removeStudent(StudentCounter.CLOUD, color, 1));
+                assertFalse(gameboard.removeStudent(StudentCounter.CLOUD, color, 2));
+                if (playerNum == 3) assertFalse(gameboard.removeStudent(StudentCounter.CLOUD, color, 3));
+            }
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Tests the fill cloud and count that the nr. of students added is correct
+     *
+     * @param playerNum : num of player
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void fillCloud(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        int counter = 0;
+        gameboard.fillClouds();
+        try {
+            for (Color color : Color.values()) {
+                while (gameboard.removeStudent(StudentCounter.CLOUD, color, 1)) counter++;
+            }
+            if (playerNum == 2) assertEquals(3, counter);
+            else if (playerNum == 3) assertEquals(4, counter);
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+
+    }
+
 }

@@ -164,12 +164,17 @@ public class PlayerBoard {
     /**
      * Adds a student in the DiningRoom.
      * Returns false if the limit was reached and adding the student was not added, otherwise returns true.
+     * Automatically increase its coins if
      *
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
     public boolean addStudentDiningRoom(Color studentColor) {
-        return schoolBoard.addStudentDiningRoom(studentColor);
+        boolean addResult = false;
+        addResult = schoolBoard.addStudentDiningRoom(studentColor);
+        if (addResult && countStudentsDiningRoom(studentColor) % 3 == 0 && countStudentsDiningRoom(studentColor) != 0)
+            increaseCoinBudget();
+        return addResult;
 
     }
 

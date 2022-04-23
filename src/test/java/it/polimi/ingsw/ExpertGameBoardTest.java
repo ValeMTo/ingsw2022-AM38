@@ -352,8 +352,7 @@ public class ExpertGameBoardTest {
     public void motherNatureMovement() {
         ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
         expert.increaseMovementMotherNature();
-        if (!expert.useAssistantCard(Tower.WHITE, 2))
-            System.out.println("CARD NOT USABLE");
+        if (!expert.useAssistantCard(Tower.WHITE, 2)) System.out.println("CARD NOT USABLE");
         try {
             System.out.println("Card used, num " + expert.getLastAssistantCard(Tower.WHITE));
             assertTrue(expert.moveMotherNature(3));
@@ -379,6 +378,30 @@ public class ExpertGameBoardTest {
             exc.printStackTrace();
         }
         assertThrows(IslandOutOfBoundException.class, () -> expert.moveMotherNature(islandPosition));
+    }
+
+    /**
+     * Pay for a special card successfully, after adding a sufficient amount of students
+     */
+    @Test
+    public void paySpecialCardSuccessfully() {
+        ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
+        try {
+            for (int i = 0; i < 8; i++)
+                expert.addStudent(StudentCounter.DININGROOM, Color.BLUE);
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        assertTrue(expert.paySpecialCard(2));
+    }
+
+    /**
+     * Pay for a special card unsuccessfully, after adding a sufficient amount of students
+     */
+    @Test
+    public void paySpecialCardUnsuccessfully() {
+        ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
+        assertFalse(expert.paySpecialCard(2));
     }
 
 
@@ -449,4 +472,6 @@ public class ExpertGameBoardTest {
         System.out.printf("Player1: %d BLUE; %d GREEN; %d YELLOW; %d PINK; %d RED\n", playerStudents1[0], playerStudents1[1], playerStudents1[2], playerStudents1[3], playerStudents1[4]);
         System.out.printf("Island: %d BLUE; %d GREEN; %d YELLOW; %d PINK; %d RED\n", islandStudents[0], islandStudents[1], islandStudents[2], islandStudents[3], islandStudents[4]);
     }
+
+
 }
