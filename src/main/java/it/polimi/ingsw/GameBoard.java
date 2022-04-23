@@ -155,7 +155,6 @@ public abstract class GameBoard {
      * @throws IslandOutOfBoundException if the island position is not contained in any of the current Islands/Islands groups
      */
 
-    //TODO: implement the case that motherNature cannot move more than a certain amount given by the assistant card..
 
     /**
      * Moves motherNature if the movement is allowed (the last played card has steps > distance to cover)
@@ -165,9 +164,8 @@ public abstract class GameBoard {
      * @throws IslandOutOfBoundException : if in the destinationIsland's position there is not an island
      */
     public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException {
-        int cardSteps, cardPriority;
+        int cardSteps;
         try {
-            cardPriority = players[currentPlayer].getLastCard();
             cardSteps = players[currentPlayer].getLastCardSteps();
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -177,12 +175,11 @@ public abstract class GameBoard {
         if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands.length);
 
-        if ((motherNature <= destinationIsland && motherNature - destinationIsland <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland < cardSteps)) {
+        if ((motherNature <= destinationIsland && destinationIsland - motherNature <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland <= cardSteps)) {
             motherNature = destinationIsland;
             return true;
         }
-
-        throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
+        return false;
     }
 
     /**

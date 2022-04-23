@@ -25,7 +25,6 @@ public class ExpertGameBoard extends GameBoard {
         Set<Integer> alreadyUsedCardNum = new TreeSet<Integer>();
         while (i < specialCardsNum) {
             cardNum = random.nextInt(12);
-            // TODO: maybe with functional better
             //
             //int final int card = cardNum;
             //SpecialCard s = SpecialCardName.values().stream.filter((x)->x.ordinal()==card);

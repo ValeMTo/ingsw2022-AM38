@@ -440,17 +440,17 @@ public class GameBoardTest {
         }
     }
 
-    //TODO: To test with the easyGameBoard since it has the not override method
 
     /**
      * Tests the movement of motherNature if the steps are incoherent to the movement we want to do
      */
     @Test
     public void moveMotherNatureBeyondLimit() {
-        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        GameBoard gameboard = new EasyGameBoard(3, getNicknames(3));
         gameboard.useAssistantCard(Tower.WHITE, 1);
         gameboard.useAssistantCard(Tower.BLACK, 2);
         gameboard.useAssistantCard(Tower.GRAY, 3);
+        System.out.println(gameboard);
         try {
             assertFalse(gameboard.moveMotherNature(12));
         } catch (Exception exc) {
