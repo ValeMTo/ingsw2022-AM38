@@ -230,11 +230,10 @@ public class GameBoardTest {
      *
      * @param location : enumeration that say where we want to add the student
      */
-    //TODO: substitute with easyGameboard since with card the method is overrided
     @ParameterizedTest
     @EnumSource(StudentCounter.class)
     public void addStudentWithPositionTest(StudentCounter location) {
-        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        GameBoard gameboard = new EasyGameBoard(3, getNicknames(3));
         for (Color color : Color.values()) {
 
             try {
@@ -322,11 +321,10 @@ public class GameBoardTest {
      *
      * @param location : enumeration that say where we want to remove the student
      */
-    //TODO: substitute with easyGameboard since with card the method is overrided
     @ParameterizedTest
     @EnumSource(StudentCounter.class)
     public void removeStudentWithPositionTest(StudentCounter location) {
-        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        GameBoard gameboard = new EasyGameBoard(3, getNicknames(3));
         for (Color color : Color.values()) {
 
             try {
@@ -426,14 +424,12 @@ public class GameBoardTest {
         }
     }
 
-    //TODO: To test with the easyGameBoard since it has the not override method
-
     /**
      * Tests the movement of motherNature if the steps are coherent to the movement we want to do
      */
     @Test
     public void moveMotherNatureCorrectly() {
-        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        GameBoard gameboard = new EasyGameBoard(3, getNicknames(3));
         gameboard.useAssistantCard(Tower.WHITE, 1);
         gameboard.useAssistantCard(Tower.BLACK, 2);
         gameboard.useAssistantCard(Tower.GRAY, 3);
