@@ -92,7 +92,9 @@ public class PlayerBoard {
      * @param position the number of card that has to be used
      * @return the output of the legacy of the action
      */
-    public boolean useAssistantCard(int position) {
+    public boolean useAssistantCard(int position) throws IndexOutOfBoundsException {
+        if (position < 1 || position > deck.size())
+            throw new IndexOutOfBoundsException("AssistantCardValues are from " + 1 + " to " + 12);
         if (!deck.get(position - 1).isUsed()) {
             deck.get(position - 1).use();
             this.lastUsed = position;

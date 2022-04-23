@@ -146,6 +146,7 @@ public class ExpertGameBoard extends GameBoard {
     /**
      * Compute the influence on a specific Island.
      * This method is called if motherNature is moved on this Island or if special card trigger the influence computation
+     * Also call if the Tower has changed the protected method to merge the islands if more islands with same tower color are adjacent
      *
      * @param island : Island's position where the influence must be computed
      * @return : return the Tower of the Player who has more influence
@@ -228,7 +229,8 @@ public class ExpertGameBoard extends GameBoard {
 
             if (islands[island - 1].getTowerNumber() == 0) islands[island - 1].setTowerNumber(1);
         }
-        return islands[island - 1].getTower(); //return tower name...
+        groupIslands(island);
+        return playerWithMoreInfluence; //return tower name...
 
     }
 
@@ -375,7 +377,7 @@ public class ExpertGameBoard extends GameBoard {
      * @throws FunctionNotImplementedException : if the specialCard does not implement the add student
      */
     @Override
-    public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
+    public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException, IndexOutOfBoundsException {
         if (location == StudentCounter.CARD) {
             if (position < 0 || position > (specialCards.length - 1)) return false;
             return specialCards[position].addStudent(student);
@@ -397,7 +399,7 @@ public class ExpertGameBoard extends GameBoard {
      */
 
     @Override
-    public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
+    public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException, IndexOutOfBoundsException {
         if (location == StudentCounter.CARD) {
             if (position < 0 || position > (specialCards.length - 1)) return false;
 

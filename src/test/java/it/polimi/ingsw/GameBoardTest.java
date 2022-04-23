@@ -188,6 +188,11 @@ public class GameBoardTest {
         assertEquals(EndOfMatchCondition.InstantEndOfMatch, gameboard.isEndOfMatch());
     }
 
+    /**
+     * Tests the add student with all the possible locations, with nominal and exceptional conditions
+     *
+     * @param location : enumeration that say where we want to add the student
+     */
     @ParameterizedTest
     @EnumSource(StudentCounter.class)
     public void addStudentTest(StudentCounter location) {
@@ -200,10 +205,18 @@ public class GameBoardTest {
                         assertTrue(gameboard.addStudent(StudentCounter.BAG, color));
                         break;
                     case CARD:
-                        assertTrue(gameboard.addStudent(StudentCounter.CARD, color));
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.addStudent(StudentCounter.CARD, color));
                         break;
-                    case SCHOOLENTRANCE: //IF CURRENT PLAYER SEE NUM STUDENTS IN SCHOOLENTRANCE... assertTrue(gameboard.addStudent(StudentCounter.SCHOOLENTRANCE,color)); break;
-
+                    case SCHOOLENTRANCE:
+                        if (gameboard.getSchoolEntranceOccupation(Tower.WHITE) < 9)
+                            assertTrue(gameboard.addStudent(StudentCounter.SCHOOLENTRANCE, color));
+                        break;
+                    case DININGROOM:
+                        if (gameboard.getDiningRoomOccupation(Tower.WHITE) < 10)
+                            assertTrue(gameboard.addStudent(StudentCounter.DININGROOM, color));
+                        break;
+                    default:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.addStudent(location, Color.BLUE));
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -212,4 +225,375 @@ public class GameBoardTest {
         }
     }
 
+    /**
+     * Tests the add student with all the possible locations and using the position, with nominal and exceptional conditions
+     *
+     * @param location : enumeration that say where we want to add the student
+     */
+    //TODO: substitute with easyGameboard since with card the method is overrided
+    @ParameterizedTest
+    @EnumSource(StudentCounter.class)
+    public void addStudentWithPositionTest(StudentCounter location) {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        for (Color color : Color.values()) {
+
+            try {
+                switch (location) {
+                    case BAG:
+                        assertTrue(gameboard.addStudent(StudentCounter.BAG, color, 0));
+                        break;
+                    case CARD:
+                        break;
+                    case SCHOOLENTRANCE:
+                        if (gameboard.getSchoolEntranceOccupation(Tower.WHITE) < 9)
+                            assertTrue(gameboard.addStudent(StudentCounter.SCHOOLENTRANCE, color, 0));
+                        else
+                            assertFalse(gameboard.addStudent(StudentCounter.DININGROOM, color));
+
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(StudentCounter.SCHOOLENTRANCE, color, 20));
+                        break;
+                    case CLOUD:
+                        for (Color col : Color.values())
+                            gameboard.removeStudent(StudentCounter.CLOUD, col, 1);
+                        assertTrue(gameboard.addStudent(StudentCounter.CLOUD, color, 1));
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(StudentCounter.CLOUD, color, 20));
+                        break;
+                    case DININGROOM:
+                        if (gameboard.getDiningRoomOccupation(Tower.WHITE) < 10)
+                            assertTrue(gameboard.addStudent(StudentCounter.DININGROOM, color));
+                        else
+                            assertFalse(gameboard.addStudent(StudentCounter.DININGROOM, color));
+
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(StudentCounter.DININGROOM, color, 20));
+                        break;
+                    default:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.addStudent(location, Color.BLUE));
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+
+            }
+        }
+    }
+
+    /**
+     * Tests the remove student with all the possible locations, with nominal and exceptional conditions
+     *
+     * @param location : enumeration that say where we want to remove the student
+     */
+
+    @ParameterizedTest
+    @EnumSource(StudentCounter.class)
+    public void removeStudentTest(StudentCounter location) {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        for (Color color : Color.values()) {
+
+            try {
+                switch (location) {
+                    case BAG, ISLAND:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.removeStudent(location, color));
+                        break;
+                    case CARD:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.addStudent(StudentCounter.CARD, color));
+                        break;
+                    case SCHOOLENTRANCE, DININGROOM:
+                        if (gameboard.getDiningRoomOccupation(Tower.WHITE) > 0)
+                            assertTrue(gameboard.removeStudent(location, color));
+                        else
+                            assertFalse(gameboard.removeStudent(location, color));
+                        gameboard.addStudent(location, color, gameboard.getPlayerPosition(Tower.WHITE));
+                        assertTrue(gameboard.removeStudent(location, color));
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.removeStudent(location, color, 20));
+                        break;
+                    default:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.addStudent(location, Color.BLUE));
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+
+            }
+        }
+    }
+
+    /**
+     * Tests the remove student with all the possible locations and using the position, with nominal and exceptional conditions
+     *
+     * @param location : enumeration that say where we want to remove the student
+     */
+    //TODO: substitute with easyGameboard since with card the method is overrided
+    @ParameterizedTest
+    @EnumSource(StudentCounter.class)
+    public void removeStudentWithPositionTest(StudentCounter location) {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        for (Color color : Color.values()) {
+
+            try {
+                switch (location) {
+                    case BAG, ISLAND:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.removeStudent(location, color, 20));
+
+                    case CARD:
+                        break;
+                    case SCHOOLENTRANCE, DININGROOM:
+                        if (gameboard.getDiningRoomOccupation(Tower.WHITE) > 0)
+                            assertTrue(gameboard.removeStudent(location, color));
+                        else
+                            assertFalse(gameboard.removeStudent(location, color));
+                        gameboard.addStudent(location, color, gameboard.getPlayerPosition(Tower.WHITE));
+                        assertTrue(gameboard.removeStudent(location, color));
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.removeStudent(location, color, 20));
+                        break;
+                    case CLOUD:
+                        for (Color col : Color.values())
+                            gameboard.removeStudent(StudentCounter.CLOUD, col, 1);
+                        assertFalse(gameboard.removeStudent(StudentCounter.CLOUD, color, 1));
+                        gameboard.addStudent(StudentCounter.CLOUD, color, 1);
+                        assertTrue(gameboard.removeStudent(StudentCounter.CLOUD, color, 1));
+                        assertThrows(IndexOutOfBoundsException.class, () -> gameboard.addStudent(StudentCounter.CLOUD, color, 20));
+                        break;
+                    default:
+                        assertThrows(LocationNotAllowedException.class, () -> gameboard.removeStudent(location, Color.BLUE, 20));
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+
+            }
+        }
+    }
+
+    /**
+     * Tests that the influence is correctly computed for an Island, doing so tests that the professors are correctly updated
+     */
+    @Test
+    public void simpleInfluence() {
+        try {
+            GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+            gameboard.addStudent(StudentCounter.DININGROOM, Color.BLUE, 0);
+            gameboard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
+            assertNull(gameboard.computeInfluence(1));
+            gameboard.updateProfessorOwnership();
+            assertEquals(gameboard.computeInfluence(1), Tower.WHITE);
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Test that the initial number of Islands is correctly configured
+     */
+    @Test
+    public void initialIslandNumber() {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        assertEquals(12, gameboard.getIslandNumber());
+    }
+
+    /**
+     * Test the merge between two islands after the influence computation
+     */
+    @Test
+    public void islandMerge() {
+        try {
+            GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+            gameboard.addStudent(StudentCounter.DININGROOM, Color.BLUE, 2);
+            gameboard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
+            gameboard.addStudent(StudentCounter.ISLAND, Color.BLUE, 2);
+            gameboard.updateProfessorOwnership();
+            assertEquals(Tower.GRAY, gameboard.computeInfluence(1));
+            assertEquals(Tower.GRAY, gameboard.computeInfluence(2));
+            assertEquals(11, gameboard.getIslandNumber());
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    //TODO: To test with the easyGameBoard since it has the not override method
+
+    /**
+     * Tests the movement of motherNature if the steps are coherent to the movement we want to do
+     */
+    @Test
+    public void moveMotherNatureCorrectly() {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        gameboard.useAssistantCard(Tower.WHITE, 1);
+        gameboard.useAssistantCard(Tower.BLACK, 2);
+        gameboard.useAssistantCard(Tower.GRAY, 3);
+        try {
+            assertTrue(gameboard.moveMotherNature(2));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    //TODO: To test with the easyGameBoard since it has the not override method
+
+    /**
+     * Tests the movement of motherNature if the steps are incoherent to the movement we want to do
+     */
+    @Test
+    public void moveMotherNatureBeyondLimit() {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        gameboard.useAssistantCard(Tower.WHITE, 1);
+        gameboard.useAssistantCard(Tower.BLACK, 2);
+        gameboard.useAssistantCard(Tower.GRAY, 3);
+        try {
+            assertFalse(gameboard.moveMotherNature(12));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Tests that the diningRoomOccupation is correctly initialized and coherent with add
+     *
+     * @param student : color of the student we want to add
+     */
+    @ParameterizedTest
+    @EnumSource(Color.class)
+    public void getDiningRoomOccupation(Color student) {
+        GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
+        try {
+            assertEquals(0, gameboard.getDiningRoomOccupation(Tower.WHITE, student));
+            gameboard.addStudent(StudentCounter.DININGROOM, student, 0);
+            gameboard.addStudent(StudentCounter.DININGROOM, student, 1);
+            gameboard.addStudent(StudentCounter.DININGROOM, student, 2);
+            assertEquals(1, gameboard.getDiningRoomOccupation(Tower.WHITE, student));
+            for (Color notSameColor : Color.values())
+                if (notSameColor != student)
+                    assertEquals(0, gameboard.getDiningRoomOccupation(Tower.WHITE, notSameColor));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Verifies that the initial occupation of SchoolEntrance is correctly configured and take into account the number of players instanced
+     *
+     * @param playerNum : number of players
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void getInitialEntranceOccupation(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        try {
+            assertEquals(0, gameboard.getSchoolEntranceOccupation(Tower.WHITE));
+            assertEquals(0, gameboard.getSchoolEntranceOccupation(Tower.BLACK));
+            if (playerNum != 3)
+                assertThrows(NoSuchTowerException.class, () -> gameboard.getSchoolEntranceOccupation(Tower.GRAY));
+            else assertEquals(0, gameboard.getSchoolEntranceOccupation(Tower.GRAY));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Verifies that the number of students per color in SchoolEntrance is correct when instanced
+     *
+     * @param playerNum: number of players
+     */
+
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void getInitialEntranceOccupationForColors(int playerNum) {
+        for (Color color : Color.values()) {
+            GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+            try {
+                assertEquals(0, gameboard.getSchoolEntranceOccupation(Tower.WHITE, color));
+                assertEquals(0, gameboard.getSchoolEntranceOccupation(Tower.BLACK, color));
+                if (playerNum != 3)
+                    assertThrows(NoSuchTowerException.class, () -> gameboard.getSchoolEntranceOccupation(Tower.GRAY, color));
+                else assertEquals(0, gameboard.getSchoolEntranceOccupation(Tower.GRAY, color));
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Verifies that the initial occupation of DiningRoom is correctly configured and take into account the number of players instanced
+     *
+     * @param playerNum : number of players
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void getInitialDiningRoomOccupation(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        try {
+            assertEquals(0, gameboard.getDiningRoomOccupation(Tower.WHITE));
+            assertEquals(0, gameboard.getDiningRoomOccupation(Tower.BLACK));
+            if (playerNum != 3)
+                assertThrows(NoSuchTowerException.class, () -> gameboard.getDiningRoomOccupation(Tower.GRAY));
+            else assertEquals(0, gameboard.getDiningRoomOccupation(Tower.GRAY));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Verifies that the number of students per color in DiningRoom is correct when instanced
+     *
+     * @param playerNum: number of players
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void getInitialDiningRoomOccupationForColors(int playerNum) {
+        for (Color color : Color.values()) {
+            GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+            try {
+                assertEquals(0, gameboard.getDiningRoomOccupation(Tower.WHITE, color));
+                assertEquals(0, gameboard.getDiningRoomOccupation(Tower.BLACK, color));
+                if (playerNum != 3)
+                    assertThrows(NoSuchTowerException.class, () -> gameboard.getDiningRoomOccupation(Tower.GRAY, color));
+                else assertEquals(0, gameboard.getDiningRoomOccupation(Tower.GRAY, color));
+
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Verifies that the player are correctly instanced in order, having a certain tower for a certain position of player
+     *
+     * @param playerNum : number of players
+     */
+
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
+    public void getPlayerPosition(int playerNum) {
+        GameBoard gameboard = new ExpertGameBoard(playerNum, getNicknames(playerNum));
+        try {
+            assertEquals(0, gameboard.getPlayerPosition(Tower.WHITE));
+            assertEquals(1, gameboard.getPlayerPosition(Tower.BLACK));
+            if (playerNum == 3)
+                assertEquals(2, gameboard.getPlayerPosition(Tower.GRAY));
+            else
+                assertThrows(NoSuchTowerException.class, () -> gameboard.getPlayerPosition(Tower.GRAY));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Test the use and get of the last assistant card in nominal and exceptional conditions
+     *
+     * @param priority : priority of the card we use
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 0, 1, 5, 10, 11})
+    public void useAndGetLastAssistantCard(int priority) {
+        GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
+        assertThrows(NotLastCardUsedException.class, () -> gameboard.getLastAssistantCard(Tower.WHITE));
+        if (priority >= 1 && priority <= 10) {
+            assertTrue(gameboard.useAssistantCard(Tower.WHITE, priority));
+            try {
+                assertEquals(priority, gameboard.getLastAssistantCard(Tower.WHITE));
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        } else
+            assertThrows(IndexOutOfBoundsException.class, () -> gameboard.useAssistantCard(Tower.WHITE, priority));
+
+    }
 }

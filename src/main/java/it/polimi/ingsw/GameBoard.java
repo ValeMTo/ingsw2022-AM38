@@ -84,7 +84,7 @@ public abstract class GameBoard {
         // Search the island after the island considered, set the island with min position as the receiver
         if (island < islands.length - 1) {
             islandReceiver = currentIsland;
-            islandGiver = islands[island - 2];
+            islandGiver = islands[island + 1];
         } else if (island == islands.length - 1 && islands.length >= 2) {
             islandReceiver = islands[0];
             islandGiver = currentIsland;
@@ -208,10 +208,8 @@ public abstract class GameBoard {
                 return players[currentPlayer].addStudentDiningRoom(student);
             case SCHOOLENTRANCE:
                 return players[currentPlayer].addStudentEntrance(student);
-            case CARD:
-                throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
-                throw new LocationNotAllowedException("the island and clouds are not allowed since this method does not have a position value");
+                throw new LocationNotAllowedException("Islands, clouds and special cards are not allowed since this add method does not have a position value");
                 //CARD case should be done overriding and then calling super...
         }
     }
@@ -224,20 +222,25 @@ public abstract class GameBoard {
      * @param position : island position or nr. of player or nr. of island (for island 1-12)
      * @return : the result of the add (true if correctly added, false if not)
      */
-    public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
+    public boolean addStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException, IndexOutOfBoundsException {
         switch (location) {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                return players[position].addStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber)
+
+                    return players[position].addStudentDiningRoom(student);
+                throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
+
             case SCHOOLENTRANCE:
-                return players[position].addStudentEntrance(student);
+                if (position >= 0 && position < playerNumber) return players[position].addStudentEntrance(student);
+                throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
             case ISLAND:
-                if (position <= islands.length) return islands[position - 1].addStudent(student);
-                return false;
+                if (position <= islands.length && position > 0) return islands[position - 1].addStudent(student);
+                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length].getPosition());
             case CLOUD:
-                if (position < clouds.length) return clouds[position].addStudent(student);
-                return false;
+                if (position <= clouds.length && position >= 1) return clouds[position - 1].addStudent(student);
+                throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
             case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
@@ -259,12 +262,31 @@ public abstract class GameBoard {
                 return players[currentPlayer].removeStudentDiningRoom(student);
             case SCHOOLENTRANCE:
                 return players[currentPlayer].removeStudentEntrance(student);
-            case CARD:
-                throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
 
             default:
-                throw new LocationNotAllowedException("removeStudent without position can be done only with the DiningRoom and Entrance of the current player.");
+                throw new LocationNotAllowedException("Islands, clouds and special cards are not allowed since this remove method does not have a position value");
         }
+    }
+
+    /**
+     * Getter for the current player
+     *
+     * @return : the current player tower color
+     */
+    public Tower getCurrentPlayer() {
+        return players[currentPlayer].getTowerColor();
+    }
+
+    /**
+     * Getter for the current player
+     *
+     * @return : the current player tower color
+     */
+    public boolean setCurrentPlayer(Tower tower) throws NoSuchTowerException {
+        for (PlayerBoard player : players)
+            if (tower == player.getTowerColor()) currentPlayer = this.getPlayerPosition(tower);
+        throw new NoSuchTowerException("The tower " + tower + " cannot be found");
+
     }
 
     /**
@@ -275,15 +297,23 @@ public abstract class GameBoard {
      * @param position : island position or nr. of player or nr. of island
      * @return : the result of the remove (true if correctly removed, false if not)
      */
-    public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException {
+    public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException, IndexOutOfBoundsException {
         switch (location) {
             case DININGROOM:
-                return players[currentPlayer].removeStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber)
+
+                    return players[currentPlayer].removeStudentDiningRoom(student);
+                throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
+
             case SCHOOLENTRANCE:
-                return players[currentPlayer].removeStudentEntrance(student);
+                if (position >= 0 && position < playerNumber)
+
+                    return players[currentPlayer].removeStudentEntrance(student);
+                throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
+
             case CLOUD:
-                if (position - 1 <= clouds.length) return clouds[position - 1].removeStudent(student);
-                return false;
+                if (position <= clouds.length && position >= 1) return clouds[position - 1].removeStudent(student);
+                throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
             case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");
             default:
@@ -314,7 +344,7 @@ public abstract class GameBoard {
      * @param numCard     : number of the card we want to use (=priority of the AssistantCard)
      * @return : true if the card is correctly used, false if it cannot be used
      */
-    public boolean useAssistantCard(Tower playerTower, int numCard) {
+    public boolean useAssistantCard(Tower playerTower, int numCard) throws IndexOutOfBoundsException {
         for (PlayerBoard player : players) {
             if (player.getTowerColor() == playerTower) return player.useAssistantCard(numCard);
         }
@@ -364,6 +394,57 @@ public abstract class GameBoard {
         throw new NoSuchTowerException("Tower value is not possessed by any player or incorrect");
     }
 
+    /**
+     * Returns the number of students in the DiningRoom of a particular player
+     *
+     * @param playerTower : tower color of the player we consider
+     * @return : the number of students in the DiningRoom of the Player
+     * @throws NoSuchTowerException : the Tower's color specified is null, does not exist or is not possessed by any player
+     */
+    public int getDiningRoomOccupation(Tower playerTower) throws NoSuchTowerException {
+        if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
+        for (PlayerBoard player : players) {
+            if (player.getTowerColor() == playerTower) return player.countStudentsDiningRoom();
+        }
+        throw new NoSuchTowerException("Tower value is not possessed by any player or incorrect");
+    }
+
+    /**
+     * Returns the number of students of a given color in the SchoolBoard of a particular player
+     *
+     * @param playerTower : tower color of the player we consider
+     * @param color       : color of the students we want to count in the DiningRoom
+     * @return : the number of students in the SchoolBoard of the Player of that color
+     * @throws NoSuchTowerException : the Tower's color specified is null, does not exist or is not possessed by any player
+     */
+    public int getSchoolEntranceOccupation(Tower playerTower, Color color) throws NoSuchTowerException {
+        if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
+        for (PlayerBoard player : players) {
+            if (player.getTowerColor() == playerTower) return player.countStudentsEntrance(color);
+        }
+        throw new NoSuchTowerException("Tower value is not possessed by any player or incorrect");
+    }
+
+    /**
+     * Returns the number of students in the SchoolBoard of a particular player
+     *
+     * @param playerTower : tower color of the player we consider
+     * @return : the number of students in the SchoolBoard of the Player of that color
+     * @throws NoSuchTowerException : the Tower's color specified is null, does not exist or is not possessed by any player
+     */
+    public int getSchoolEntranceOccupation(Tower playerTower) throws NoSuchTowerException {
+        if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
+        for (PlayerBoard player : players) {
+            if (player.getTowerColor() == playerTower) return player.countStudentsEntrance();
+        }
+        throw new NoSuchTowerException("Tower value is not possessed by any player or incorrect");
+    }
+
+    public int getPlayerPosition(Tower towerColor) throws NoSuchTowerException {
+        for (int i = 0; i < playerNumber; i++)
+            if (players[i].getTowerColor() == towerColor) return i;
+        throw new NoSuchTowerException(" no player with this tower");
+    }
 
     /**
      * Updates the professor ownership in order to compute the influence. It considers the students in the PlayerBoard's DiningRooms to update the professors.
@@ -383,11 +464,10 @@ public abstract class GameBoard {
                     playerTowerWithMaxValue = player.getTowerColor();
                 } else if (player.countStudentsDiningRoom(color) == maxStudent) tie = true;
             }
+            professors.remove(color);
             if (tie) {
-                professors.remove(color);
                 professors.put(color, null);
             } else {
-                professors.remove(color);
                 professors.put(color, playerTowerWithMaxValue);
             }
         }
