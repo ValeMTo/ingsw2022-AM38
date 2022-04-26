@@ -19,7 +19,7 @@ public class EasyGameBoard extends GameBoard {
      */
     @Override
     public Tower computeInfluence(int island) throws IslandOutOfBoundException {
-        Island currentIsland = islands[island-1];
+        Island currentIsland = islands[island - 1];
         Tower playerTower = null;
 
         //Otherwise, if the influence computation is enabled, first we create a support HashMap for the influence
@@ -34,6 +34,7 @@ public class EasyGameBoard extends GameBoard {
             computationMap.put(currentIsland.getTower(), currentIsland.getTowerNumber());
         }
 
+        //Add the score given by the students
         for (Color color : Color.values()) {
             if (professors.get(color) != null) { //if the professor belongs to someone
                 //adds the amount of students of that color to the ownership of that person
@@ -42,43 +43,38 @@ public class EasyGameBoard extends GameBoard {
         }
 
 
-
         //Calculate the maximum influence
         int max = 0;
         boolean tie = false;
         for (Tower player : computationMap.keySet()) {
-            if (computationMap.get(player)>max){
-                 max = computationMap.get(player);
-                 playerTower = player;
-                 tie = false;
-            }
-            else if (computationMap.get(player)==max)
-                tie = true;
+            if (computationMap.get(player) > max) {
+                max = computationMap.get(player);
+                playerTower = player;
+                tie = false;
+            } else if (computationMap.get(player) == max) tie = true;
         }
 
         //if the current player has a major influence return it, otherwise it can conquer the island.
-        if(tie){
-            return islands[island-1].getTower();
+        if (tie) {
+            return islands[island - 1].getTower();
         }
 
-
-
-        if(islands[island-1].getTower()!=null) {
+        if (islands[island - 1].getTower() != null) {
             for (Tower player : computationMap.keySet())
                 computationMap.put(player, computationMap.get(player) + islands[island - 1].getTowerNumber());
         }
 
-        if(islands[island-1].getTower()!=null)
-        {
-            for(PlayerBoard player : players)
-            player.addTower(islands[island-1].getTowerNumber()); //Give back the towers to the player
+        if (islands[island - 1].getTower() != null) {
+            for (PlayerBoard player : players)
+                player.addTower(islands[island - 1].getTowerNumber()); //Give back the towers to the player
         }
-        islands[island-1].setTower(playerTower);
-        for(PlayerBoard player : players)
-            if(player.getTowerColor()==playerTower)
-                player.removeTower(islands[island-1].getTowerNumber());
+        islands[island - 1].setTower(playerTower);
+        if (islands[island - 1].getTowerNumber() == 0) islands[island - 1].setTowerNumber(1);
+        for (PlayerBoard player : players)
+            if (player.getTowerColor() == playerTower) player.removeTower(islands[island - 1].getTowerNumber());
+        Tower islandTowerToReturn = islands[island - 1].getTower();
         groupIslands(island);
-        return playerTower;
+        return islandTowerToReturn;
     }
 
     @Override

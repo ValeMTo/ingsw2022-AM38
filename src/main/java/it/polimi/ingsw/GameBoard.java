@@ -226,12 +226,11 @@ public abstract class GameBoard {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                if (position >= 0 && position < playerNumber)
-
-                    return players[position].addStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber) return players[position].addStudentDiningRoom(student);
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case SCHOOLENTRANCE:
+
                 if (position >= 0 && position < playerNumber) return players[position].addStudentEntrance(student);
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
             case ISLAND:

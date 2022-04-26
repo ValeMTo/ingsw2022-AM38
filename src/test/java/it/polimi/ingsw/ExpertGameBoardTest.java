@@ -473,5 +473,34 @@ public class ExpertGameBoardTest {
         System.out.printf("Island: %d BLUE; %d GREEN; %d YELLOW; %d PINK; %d RED\n", islandStudents[0], islandStudents[1], islandStudents[2], islandStudents[3], islandStudents[4]);
     }
 
+    /**
+     * Tests that the influence is correctly computed with three players and more complex scenario
+     */
+    @Test
+    public void influenceComputationThreePlayers() {
+        nameString.add("Nick");
+        ExpertGameBoard expertGameBoard = new ExpertGameBoard(3, nameString);
+        try {
+            assertNull(expertGameBoard.computeInfluence(1));
+            //P0 : 1 BLUE
+            expertGameBoard.addStudent(StudentCounter.DININGROOM, Color.BLUE, expertGameBoard.getPlayerPosition(Tower.WHITE));
+            //P1 : 1 BLUE + 1 PINK
+            expertGameBoard.addStudent(StudentCounter.DININGROOM, Color.BLUE, expertGameBoard.getPlayerPosition(Tower.BLACK));
+            expertGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, expertGameBoard.getPlayerPosition(Tower.BLACK));
+            //P2 : 2 PINK
+            for (int i = 0; i < 2; i++)
+                expertGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, expertGameBoard.getPlayerPosition(Tower.GRAY));
 
+            //Island : 5 BLUE + 2 PINK
+            for (int i = 0; i < 5; i++)
+                expertGameBoard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
+            for (int i = 0; i < 2; i++)
+                expertGameBoard.addStudent(StudentCounter.ISLAND, Color.PINK, 1);
+            assertNull(expertGameBoard.computeInfluence(1));
+            expertGameBoard.updateProfessorOwnership();
+            assertEquals(Tower.GRAY, expertGameBoard.computeInfluence(1));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
 }

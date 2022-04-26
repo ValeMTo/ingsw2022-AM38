@@ -88,4 +88,77 @@ public class EasyGameBoardTest {
         }
     }
 
+
+    /**
+     * Tests that the influence is correctly computed with three players and more complex scenario
+     */
+    @Test
+    public void influenceComputationThreePlayers() {
+        nameString.add("Nick");
+        EasyGameBoard easyGameBoard = new EasyGameBoard(3, nameString);
+        try {
+            assertNull(easyGameBoard.computeInfluence(1));
+            //P0 : 1 BLUE
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.BLUE, easyGameBoard.getPlayerPosition(Tower.WHITE)));
+            //P1 : 1 BLUE + 1 PINK
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.BLUE, easyGameBoard.getPlayerPosition(Tower.BLACK)));
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, easyGameBoard.getPlayerPosition(Tower.BLACK)));
+            //P2 : 2 PINK
+            for (int i = 0; i < 2; i++)
+                assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, easyGameBoard.getPlayerPosition(Tower.GRAY)));
+
+            //Island : 5 BLUE + 2 PINK
+            for (int i = 0; i < 5; i++)
+                assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1));
+            for (int i = 0; i < 2; i++)
+                assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.PINK, 1));
+            assertNull(easyGameBoard.computeInfluence(1));
+            easyGameBoard.updateProfessorOwnership();
+            assertEquals(Tower.GRAY, easyGameBoard.computeInfluence(1));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Tests that the influence is correctly computed with three players and more complex scenario
+     */
+    @Test
+    public void influenceComputationTower() {
+        nameString.add("Nick");
+        EasyGameBoard easyGameBoard = new EasyGameBoard(3, nameString);
+        try {
+            assertNull(easyGameBoard.computeInfluence(1));
+            //P0 : 1 BLUE
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.BLUE, easyGameBoard.getPlayerPosition(Tower.WHITE)));
+            //P1 : 1 BLUE + 1 PINK
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.BLUE, easyGameBoard.getPlayerPosition(Tower.BLACK)));
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, easyGameBoard.getPlayerPosition(Tower.BLACK)));
+            //P2 : 2 PINK
+            for (int i = 0; i < 2; i++)
+                assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, easyGameBoard.getPlayerPosition(Tower.GRAY)));
+
+            //Island : 5 BLUE + 1 PINK
+            for (int i = 0; i < 5; i++)
+                assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1));
+            assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.PINK, 1));
+            assertNull(easyGameBoard.computeInfluence(1));
+            easyGameBoard.updateProfessorOwnership();
+            assertEquals(Tower.GRAY, easyGameBoard.computeInfluence(1));
+            //P1 now 3 PINK
+            assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, easyGameBoard.getPlayerPosition(Tower.BLACK)));
+            easyGameBoard.updateProfessorOwnership();
+            assertEquals(Tower.GRAY, easyGameBoard.computeInfluence(1));
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    public List<String> getNicknames(int playerNum) {
+        List<String> list = new ArrayList<String>();
+        for (int i = 1; i <= playerNum; i++)
+            list.add("Player" + i);
+        return list;
+    }
 }
