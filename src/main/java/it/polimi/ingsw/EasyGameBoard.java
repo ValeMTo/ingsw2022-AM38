@@ -19,8 +19,8 @@ public class EasyGameBoard extends GameBoard {
      */
     @Override
     public Tower computeInfluence(int island) throws IslandOutOfBoundException {
-        Island currentIsland = islands[island];
-        Tower currentPlayerTower = players[currentPlayer].getTowerColor();
+        Island currentIsland = islands[island-1];
+        Tower playerTower = null;
 
         //Otherwise, if the influence computation is enabled, first we create a support HashMap for the influence
         Map<Tower, Integer> computationMap = new HashMap<Tower, Integer>();
@@ -40,21 +40,45 @@ public class EasyGameBoard extends GameBoard {
                 computationMap.put(professors.get(color), computationMap.get(professors.get(color)) + currentIsland.studentNumber(color));
             }
         }
-        
-        //Calculate the against influence
-        int otherStudents = 0;
+
+
+
+        //Calculate the maximum influence
+        int max = 0;
+        boolean tie = false;
         for (Tower player : computationMap.keySet()) {
-            if (!player.equals(currentPlayerTower)){
-                otherStudents += computationMap.get(player);
+            if (computationMap.get(player)>max){
+                 max = computationMap.get(player);
+                 playerTower = player;
+                 tie = false;
             }
+            else if (computationMap.get(player)==max)
+                tie = true;
         }
 
         //if the current player has a major influence return it, otherwise it can conquer the island.
-        if(computationMap.get(currentPlayerTower)>otherStudents){
-            return currentPlayerTower;
+        if(tie){
+            return islands[island-1].getTower();
         }
 
-        return null;
+
+
+        if(islands[island-1].getTower()!=null) {
+            for (Tower player : computationMap.keySet())
+                computationMap.put(player, computationMap.get(player) + islands[island - 1].getTowerNumber());
+        }
+
+        if(islands[island-1].getTower()!=null)
+        {
+            for(PlayerBoard player : players)
+            player.addTower(islands[island-1].getTowerNumber()); //Give back the towers to the player
+        }
+        islands[island-1].setTower(playerTower);
+        for(PlayerBoard player : players)
+            if(player.getTowerColor()==playerTower)
+                player.removeTower(islands[island-1].getTowerNumber());
+        groupIslands(island);
+        return playerTower;
     }
 
     @Override
