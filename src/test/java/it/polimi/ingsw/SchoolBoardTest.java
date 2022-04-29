@@ -2,6 +2,7 @@ package it.polimi.ingsw;
 
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -42,8 +43,7 @@ public class SchoolBoardTest {
         for (int i = 0; i < studentsToAdd; i++) {
             if (i < maxStudentDiningRoomColor) {
                 assertTrue(schoolBoard.addStudentDiningRoom(color));
-            } else
-                assertFalse(schoolBoard.addStudentDiningRoom(color));
+            } else assertFalse(schoolBoard.addStudentDiningRoom(color));
         }
     }
 
@@ -65,8 +65,7 @@ public class SchoolBoardTest {
         for (int i = 0; i < studentsToAdd; i++) {
             if (i < maxStudentEntranceColor) {
                 assertTrue(schoolBoard.addStudentEntrance(color));
-            } else
-                assertFalse(schoolBoard.addStudentEntrance(color));
+            } else assertFalse(schoolBoard.addStudentEntrance(color));
         }
     }
 
@@ -88,13 +87,11 @@ public class SchoolBoardTest {
         for (int i = 0; i < studentsToAdd; i++) {
             if (i < maxStudentDiningRoomColor) {
                 assertTrue(schoolBoard.addStudentDiningRoom(color));
-            } else
-                assertFalse(schoolBoard.addStudentDiningRoom(color));
+            } else assertFalse(schoolBoard.addStudentDiningRoom(color));
         }
         if (studentsToAdd < maxStudentDiningRoomColor)
             assertEquals(studentsToAdd, schoolBoard.countStudentsDiningRoom(color));
-        else
-            assertEquals(maxStudentDiningRoomColor, schoolBoard.countStudentsDiningRoom(color));
+        else assertEquals(maxStudentDiningRoomColor, schoolBoard.countStudentsDiningRoom(color));
     }
 
     /**
@@ -115,13 +112,11 @@ public class SchoolBoardTest {
         for (int i = 0; i < studentsToAdd; i++) {
             if (i < maxStudentEntranceColor) {
                 assertTrue(schoolBoard.addStudentEntrance(color));
-            } else
-                assertFalse(schoolBoard.addStudentEntrance(color));
+            } else assertFalse(schoolBoard.addStudentEntrance(color));
         }
         if (studentsToAdd < maxStudentEntranceColor)
             assertEquals(studentsToAdd, schoolBoard.countStudentsEntrance(color));
-        else
-            assertEquals(maxStudentEntranceColor, schoolBoard.countStudentsEntrance(color));
+        else assertEquals(maxStudentEntranceColor, schoolBoard.countStudentsEntrance(color));
     }
 
     /**
@@ -236,8 +231,7 @@ public class SchoolBoardTest {
         Color[] color = Color.values();
         int addCounter = 0;
         if (diningRoom) assertEquals(0, schoolBoard.countStudentsDiningRoom());
-        else
-            assertEquals(0, schoolBoard.countStudentsEntrance());
+        else assertEquals(0, schoolBoard.countStudentsEntrance());
         for (int i = 0; i < color.length; i++) {
             if (diningRoom) {
                 schoolBoard.addStudentDiningRoom(color[i]);
@@ -249,6 +243,38 @@ public class SchoolBoardTest {
                 assertEquals(addCounter, schoolBoard.countStudentsEntrance());
             }
         }
+    }
+
+    /**
+     * Tests the catch of the NullPointerException by schoolEntrance and return false
+     */
+    @Test
+    public void addDiningException() {
+        assertFalse(schoolBoard.addStudentDiningRoom(null));
+    }
+
+    /**
+     * Tests the catch of the NullPointerException by schoolEntrance and return false
+     */
+    @Test
+    public void addEntranceException() {
+        assertFalse(schoolBoard.addStudentEntrance(null));
+    }
+
+    /**
+     * Tests the catch of the NullPointerException by schoolEntrance and return false
+     */
+    @Test
+    public void removeDiningException() {
+        assertFalse(schoolBoard.removeStudentDiningRoom(null));
+    }
+
+    /**
+     * Tests the catch of the NullPointerException by schoolEntrance and return false
+     */
+    @Test
+    public void removeEntranceException() {
+        assertFalse(schoolBoard.removeStudentEntrance(null));
     }
 
 }

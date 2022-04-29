@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -379,6 +380,42 @@ public class PlayerBoardTest {
         assertTrue(player.addTower(1));
     }
 
+    /**
+     * Tests that the available cards at the beginning are with priority between 1 and 10 and are all in the getAvailableCards returned map
+     */
+    @Test
+    public void availableInitialAssistantCardTest() {
+        PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 6);
+        assertEquals(player.getAvailableCards().size(), 10);
+        Map<Integer, Integer> availableAssistantCards = player.getAvailableCards();
+        for (Integer i : availableAssistantCards.keySet())
+            assertTrue(i >= 1 && i <= 10);
+    }
+
+    /**
+     * Tests that if we use a card the size of the map decrement if the card was usable and the card does not appear in the map of usable cards
+     *
+     * @param cardToRemove : card to remove from the set
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {0, 3, 6, 19})
+    public void availableAssistantCardUseTest(int cardToRemove) {
+        PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 6);
+        if (cardToRemove < 1 || cardToRemove > 10)
+            assertThrows(IndexOutOfBoundsException.class, () -> player.useAssistantCard(cardToRemove));
+        else {
+            try {
+                player.useAssistantCard(cardToRemove);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
+        if (cardToRemove >= 1 && cardToRemove <= 10) assertEquals(9, player.getAvailableCards().size());
+        else assertEquals(10, player.getAvailableCards().size());
+        Map<Integer, Integer> availableAssistantCards = player.getAvailableCards();
+        for (Integer i : availableAssistantCards.keySet())
+            assertTrue(i != cardToRemove);
+    }
 
 }
 

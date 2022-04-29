@@ -1,14 +1,16 @@
 package it.polimi.ingsw;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerBoard {
     private final String nickName;
     private final Tower towerColor;
     private final int numTowersLimit;
     private final SchoolBoard schoolBoard;
-    private List<AssistantCard> deck;
+    private final List<AssistantCard> deck;
     private Integer lastUsed;
     private int towers;
     private int coin;
@@ -22,21 +24,21 @@ public class PlayerBoard {
      *
      * @param nickName   name of the player
      * @param towerColor color of the player's tower in the game
-     * @param numTowers number of towers of the player
+     * @param numTowers  number of towers of the player
      */
     public PlayerBoard(String nickName, Tower towerColor, int numTowers) {
         this.nickName = nickName;
-        if( numTowers == 8){
-            this.schoolBoard = new SchoolBoard(7 ,10);
-        }else {
-            this.schoolBoard = new SchoolBoard( 9,10);
+        if (numTowers == 8) {
+            this.schoolBoard = new SchoolBoard(7, 10);
+        } else {
+            this.schoolBoard = new SchoolBoard(9, 10);
         }
         this.deck = new ArrayList<AssistantCard>();
         int numCard;
         int numSteps;
-        for (int i =0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             numCard = i + 1;
-            numSteps = numCard/2;
+            numSteps = numCard / 2;
             if (i % 2 != 0) {
                 numSteps += 1;
             }
@@ -61,17 +63,17 @@ public class PlayerBoard {
      */
     public PlayerBoard(String nickName, Tower towerColor, int numTowers, int coin) {
         this.nickName = nickName;
-        if( numTowers == 8){
-            this.schoolBoard = new SchoolBoard(7 ,10);
-        }else{
-            this.schoolBoard = new SchoolBoard( 9,10);
+        if (numTowers == 8) {
+            this.schoolBoard = new SchoolBoard(7, 10);
+        } else {
+            this.schoolBoard = new SchoolBoard(9, 10);
         }
         this.deck = new ArrayList<>();
         int numCard;
         int numSteps;
-        for (int i =0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             numCard = i + 1;
-            numSteps = numCard/2;
+            numSteps = numCard / 2;
             if (i % 2 != 0) {
                 numSteps += 1;
             }
@@ -90,9 +92,11 @@ public class PlayerBoard {
      * @param position the number of card that has to be used
      * @return the output of the legacy of the action
      */
-    public boolean useAssistantCard(int position) {
-        if (!deck.get(position-1).isUsed()) {
-            deck.get(position-1).use();
+    public boolean useAssistantCard(int position) throws IndexOutOfBoundsException {
+        if (position < 1 || position > deck.size())
+            throw new IndexOutOfBoundsException("AssistantCardValues are from " + 1 + " to " + 12);
+        if (!deck.get(position - 1).isUsed()) {
+            deck.get(position - 1).use();
             this.lastUsed = position;
             return true;
         }
@@ -102,8 +106,8 @@ public class PlayerBoard {
     /**
      * Returns the number of the last assistant card used by the player.
      */
-    public int getLastCard() throws NotLastCardUsedException{
-        if(lastUsed == null) {
+    public int getLastCard() throws NotLastCardUsedException {
+        if (lastUsed == null) {
             throw new NotLastCardUsedException("It is the first round. No card can be take before");
         }
         return lastUsed;
@@ -160,12 +164,17 @@ public class PlayerBoard {
     /**
      * Adds a student in the DiningRoom.
      * Returns false if the limit was reached and adding the student was not added, otherwise returns true.
+     * Automatically increase its coins if
      *
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
     public boolean addStudentDiningRoom(Color studentColor) {
-        return schoolBoard.addStudentDiningRoom(studentColor);
+        boolean addResult = false;
+        addResult = schoolBoard.addStudentDiningRoom(studentColor);
+        if (addResult && countStudentsDiningRoom(studentColor) % 3 == 0 && countStudentsDiningRoom(studentColor) != 0)
+            increaseCoinBudget();
+        return addResult;
 
     }
 
@@ -208,7 +217,7 @@ public class PlayerBoard {
      *
      * @return number of all students in dining room
      */
-    public int countStudentsDiningRoom(){
+    public int countStudentsDiningRoom() {
         return schoolBoard.countStudentsDiningRoom();
     }
 
@@ -217,7 +226,7 @@ public class PlayerBoard {
      *
      * @return number of all students in the entrance
      */
-    public int countStudentsEntrance(){
+    public int countStudentsEntrance() {
         return schoolBoard.countStudentsEntrance();
     }
 
@@ -226,7 +235,7 @@ public class PlayerBoard {
      *
      * @return number students of certain color in dining room
      */
-    public int countStudentsDiningRoom(Color color){
+    public int countStudentsDiningRoom(Color color) {
         return schoolBoard.countStudentsDiningRoom(color);
     }
 
@@ -235,7 +244,7 @@ public class PlayerBoard {
      *
      * @return number students of certain color in entrance
      */
-    public int countStudentsEntrance(Color color){
+    public int countStudentsEntrance(Color color) {
         return schoolBoard.countStudentsEntrance(color);
     }
 
@@ -247,7 +256,7 @@ public class PlayerBoard {
      * @return the outcome of the action
      */
     public boolean addTower(int numTower) {
-        if (this.towers + numTower < numTowersLimit && numTower>0){
+        if (this.towers + numTower < numTowersLimit && numTower > 0) {
             this.towers += numTower;
             return true;
         }
@@ -276,5 +285,31 @@ public class PlayerBoard {
      */
     public int getAvailableTowers() {
         return towers;
+    }
+
+
+    /**
+     * Returns the available Assistant cards in a map with the Priority as Key and Steps as Value
+     *
+     * @return : a Map with the priority and steps of the assistant card if the card has not been used
+     */
+    public Map<Integer, Integer> getAvailableCards() {
+        Map<Integer, Integer> availableCardsMap = new <Integer, Integer>HashMap();
+        for (AssistantCard card : deck)
+            if (!card.isUsed()) availableCardsMap.put(card.getPriority(), card.getSteps());
+        return availableCardsMap;
+    }
+
+    /**
+     * Returns the last card steps
+     *
+     * @return : the steps of the last card used
+     * @throws NotLastCardUsedException : if the Last card does not exist since there is no card already used
+     */
+    public int getLastCardSteps() throws NotLastCardUsedException {
+        for (AssistantCard card : deck)
+            if (card.isUsed()) return deck.get(lastUsed).getSteps();
+        throw new NotLastCardUsedException("No card used! Steps cannot be determined");
+
     }
 }
