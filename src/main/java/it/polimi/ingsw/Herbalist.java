@@ -15,7 +15,7 @@ public class Herbalist extends SpecialCard{
      *
      * @return the number of tiles
      */
-    public int getTile(){
+    public int getNumberOfEntryTiles(){
         return noEntryTiles;
     }
 
