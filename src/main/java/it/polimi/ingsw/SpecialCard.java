@@ -50,6 +50,7 @@ public class SpecialCard {
 
     /**
      * Remove a Tile when the card is Herbalist, otherwise is useless.
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public boolean removeTile() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -57,6 +58,8 @@ public class SpecialCard {
 
     /**
      * Adds a Tile when the card is Herbalist, otherwise is useless.
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public boolean returnTile() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -64,6 +67,8 @@ public class SpecialCard {
 
     /**
      * Check if there are Tiles when the card is Herbalist, otherwise is useless.
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public boolean isEmptyOfTiles() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -73,6 +78,8 @@ public class SpecialCard {
      * Returns the number of tiles available.
      *
      * @return the number of tiles
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public int getTile() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -80,6 +87,8 @@ public class SpecialCard {
 
     /**
      * Adds a student in the card room if it is a card with students, otherwise the method is useless.
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public boolean addStudent(Color studentColor) throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -87,6 +96,8 @@ public class SpecialCard {
 
     /**
      * Removes a student from the card room if it is a card with students, otherwise the method is useless.
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public boolean removeStudent(Color studentColor) throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -94,6 +105,8 @@ public class SpecialCard {
 
     /**
      * Count the number of students of a specific color if it is a card with students, otherwise the method is useless.
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public int countStudents(Color studentColor) throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -101,6 +114,8 @@ public class SpecialCard {
 
     /**
      * Count the number of all students on the card if it is a card with students, otherwise the method is useless.
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public int countStudents() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -111,6 +126,8 @@ public class SpecialCard {
      * Getter guestLimit of the card if it is a card with students, otherwise the method is useless.
      *
      * @return guestLimit
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public int getGuestsLimit() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
@@ -120,6 +137,8 @@ public class SpecialCard {
      * Getter guestChangeLimit of the card if it is a card with students, otherwise the method is useless.
      *
      * @return guestChangeLimit
+     *
+     * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
     public int getGuestsChangeLimit() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());

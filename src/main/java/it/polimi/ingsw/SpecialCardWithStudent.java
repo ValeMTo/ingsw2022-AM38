@@ -40,6 +40,7 @@ public class SpecialCardWithStudent extends SpecialCard{
      * @param studentColor is the student to add in the room.
      * @return outcome of the addition.
      */
+
     @Override
     public boolean addStudent(Color studentColor) {
         if (this.countStudents() < guestsLimit) {
