@@ -81,7 +81,7 @@ public class SpecialCard {
      *
      * @throws FunctionNotImplementedException method not implemented, this method cannot be used by any specialCard
      */
-    public int getTile() throws FunctionNotImplementedException {
+    public int getNumberOfEntryTiles() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
     }
 

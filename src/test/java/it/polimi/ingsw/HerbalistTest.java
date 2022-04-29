@@ -40,7 +40,7 @@ public class HerbalistTest {
     @Test
     public void getTileTest() {
         try {
-            assertEquals(4, herbalist.getTile());
+            assertEquals(4, herbalist.getNumberOfEntryTiles());
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
@@ -74,7 +74,7 @@ public class HerbalistTest {
             for (int i = 0; i < 4; i++) {
                 assertTrue(herbalist.removeTile());
             }
-            assertEquals(0, herbalist.getTile());
+            assertEquals(0, herbalist.getNumberOfEntryTiles());
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
@@ -111,7 +111,7 @@ public class HerbalistTest {
             for (int i=0; i<4; i++){
                 assertTrue(herbalist.returnTile());
             }
-            assertEquals(4, herbalist.getTile());
+            assertEquals(4, herbalist.getNumberOfEntryTiles());
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
@@ -139,7 +139,7 @@ public class HerbalistTest {
     public void herbalistExceptionMethodTest() {
         assertThrows(FunctionNotImplementedException.class, () -> noHerbalist.returnTile(), "Not usable method for this card: ");
         assertThrows(FunctionNotImplementedException.class, () -> noHerbalist.removeTile(), "Not usable method for this card: ");
-        assertThrows(FunctionNotImplementedException.class, () -> noHerbalist.getTile(), "Not usable method for this card: ");
+        assertThrows(FunctionNotImplementedException.class, () -> noHerbalist.getNumberOfEntryTiles(), "Not usable method for this card: ");
         assertThrows(FunctionNotImplementedException.class, () -> noHerbalist.isEmptyOfTiles(), "Not usable method for this card: ");
     }
 
