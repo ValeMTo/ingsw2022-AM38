@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.ServerSocket;
-public class ServerMain {
+public class Server {
 
     private static int port;
     
