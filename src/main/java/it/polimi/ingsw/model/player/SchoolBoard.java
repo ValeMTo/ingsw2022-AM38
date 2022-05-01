@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.player;
 
 import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.DiningRoom;
 
 public class SchoolBoard {
     private final SchoolEntrance entrance;
