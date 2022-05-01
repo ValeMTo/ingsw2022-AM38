@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.exceptions.NoSuchTowerException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

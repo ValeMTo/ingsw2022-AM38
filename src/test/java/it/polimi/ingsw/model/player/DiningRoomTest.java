@@ -1,7 +1,7 @@
-package it.polimi.ingsw.model.board;
+package it.polimi.ingsw.model.player;
 
 import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.DiningRoom;
+import it.polimi.ingsw.model.player.DiningRoom;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
