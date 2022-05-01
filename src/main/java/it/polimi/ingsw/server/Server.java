@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.ServerSocket;
+import com.google.gson.Gson;
+import java.io.*;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.json.*;
 public class Server {
 
     private static int port;
@@ -13,7 +19,19 @@ public class Server {
             port =  Integer.parseInt(args[1]);
         }
         else
-            port = 1234;
+        {
+            JsonParser parser = new JsonParser();
+            try {
+                JsonObject json = (JsonObject) parser.parse(new FileReader("src/main/resources/json/ConnectionConfiguration.json"));
+                port = json.get("port").getAsInt();
+                System.out.println("Get from config file port "+port);
+            }
+            catch(Exception exc)
+            {
+                exc.printStackTrace();
+                port = 2345;
+            }
+        }
     }
 
     public static void main(String[]args){
