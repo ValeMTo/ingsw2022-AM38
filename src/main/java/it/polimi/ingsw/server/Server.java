@@ -29,7 +29,7 @@ public class Server {
                 System.out.println("Get from config file port " + port);
             } catch (Exception exc) {
                 exc.printStackTrace();
-                port = 2345;
+                port = 1234;
             }
         }
         return port;

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.SimpleTextMessage;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class ConnectionSocket {
      */
     //@throws NicknameAlreadyTakenException when the nickname is already in use.
     public boolean setup(String nickname){
+        String jsonFromServer = null;
         System.out.println("Trying to connect with the socket...");
         System.out.println("Opening a socket server communication on port " + serverPort);
 
@@ -41,10 +43,11 @@ public class ConnectionSocket {
         Scanner socketIn = createScanner(socket);
         PrintWriter socketOut = createWriter(socket);
 
-        socketOut.print(gson.toJson(new SimpleTextMessage(nickname)));
+        socketOut.print(MessageGenerator.nickNameMessageGenerate(nickname));
         socketOut.flush();
 
-        socketIn.nextLine();
+        jsonFromServer = socketIn.nextLine();
+
         //TODO: leggere la risposta con gson
 
         return false;
