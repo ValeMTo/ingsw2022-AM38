@@ -37,7 +37,6 @@ public class ConnectionSocket {
     /**
      * Method setup initializes a new socket connection and handles the nickname-choice response.
      *
-     * @param nickname      of type String - the username chosen by the user.
      */
     //@throws NicknameAlreadyTakenException when the nickname is already in use.
     public boolean setup() throws FunctionNotImplementedException {
@@ -59,7 +58,9 @@ public class ConnectionSocket {
         socketOut.flush();
         System.out.println("Sending: "+MessageGenerator.nickNameMessageGenerate(nickname));
         String jsonFromServer = null;
+        System.out.println("waiting for message");
         jsonFromServer = socketIn.nextLine();
+        System.out.println("Got message "+jsonFromServer);
         JsonObject json = new Gson().fromJson(jsonFromServer, JsonObject.class);
         if(json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal())
             return true;

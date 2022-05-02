@@ -17,7 +17,7 @@ public class MessageGenerator {
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SET_NICKNAME.ordinal());
         json.addProperty("SetNickName", nickName);
-        return gson.toJson(json+"\n");
+        return gson.toJson(json)+"\n";
     }
 
     /**
@@ -28,7 +28,7 @@ public class MessageGenerator {
     public static String okGenerate() {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.OK.ordinal());
-        return gson.toJson(json+"\n");
+        return gson.toJson(json)+"\n";
     }
 
     /**
@@ -43,7 +43,7 @@ public class MessageGenerator {
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.addProperty("ErrorType", error.ordinal());
         json.addProperty("errorString", error.ordinal());
-        return gson.toJson(json+"\n");
+        return gson.toJson(json)+"\n";
     }
 
 

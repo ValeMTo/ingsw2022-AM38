@@ -77,6 +77,8 @@ public class Server {
         } while (error);
         System.out.println("Player name" + player + "has been set");
         writer.println(MessageGenerator.okGenerate());
+        writer.flush();
+        System.out.println("Sending message "+MessageGenerator.okGenerate());
         do {
             error = true;
             System.out.println("Waiting for a message ");
