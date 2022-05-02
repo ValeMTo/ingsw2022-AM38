@@ -1,7 +1,11 @@
 package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import it.polimi.ingsw.exceptions.ErrorMessage;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.MessageGenerator;
+import it.polimi.ingsw.messages.MessageTypeEnum;
 import it.polimi.ingsw.messages.SimpleTextMessage;
 
 import java.io.IOException;
@@ -12,12 +16,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConnectionSocket {
+    private static Socket socket=null;
     private final Logger logger = Logger.getLogger(getClass().getName());
     private String serverIP;
     private int serverPort;
     private Scanner stdin;
-    private Gson gson;
 
+    private Gson gson;
+    private Scanner socketIn;
+    private PrintWriter socketOut;
     public ConnectionSocket(String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
@@ -33,23 +40,29 @@ public class ConnectionSocket {
      * @param nickname      of type String - the username chosen by the user.
      */
     //@throws NicknameAlreadyTakenException when the nickname is already in use.
-    public boolean setup(String nickname){
-        String jsonFromServer = null;
+    public boolean setup() throws FunctionNotImplementedException {
+
         System.out.println("Trying to connect with the socket...");
         System.out.println("Opening a socket server communication on port " + serverPort);
 
-        Socket socket = establishConnection(serverIP, serverPort);
+        if(socket==null)
+            socket = establishConnection(serverIP, serverPort);
+        if(socket==null)
+            return false;
+        socketIn = createScanner(socket);
+        socketOut = createWriter(socket);
+        return true;
+    }
 
-        Scanner socketIn = createScanner(socket);
-        PrintWriter socketOut = createWriter(socket);
-
+    public boolean sendNickname(String nickname){
         socketOut.print(MessageGenerator.nickNameMessageGenerate(nickname));
         socketOut.flush();
-
+        System.out.println("Sending: "+MessageGenerator.nickNameMessageGenerate(nickname));
+        String jsonFromServer = null;
         jsonFromServer = socketIn.nextLine();
-
-        //TODO: leggere la risposta con gson
-
+        JsonObject json = new Gson().fromJson(jsonFromServer, JsonObject.class);
+        if(json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal())
+            return true;
         return false;
     }
 

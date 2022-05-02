@@ -2,18 +2,18 @@ package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 
-import java.io.*;
+import java.io.PrintStream;
 import java.util.Scanner;
 
 public class ClientCLI {
-    private String hostName;
-    private int portNumber;
+    private static String hostName;
+    private static int portNumber;
     private final Scanner in;
     private final PrintStream out;
-    private boolean isRunning;
     ConnectionSocket connectionSocket;
+    private final boolean isRunning;
 
-    public ClientCLI(){
+    public ClientCLI() {
 
         this.in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
@@ -21,21 +21,33 @@ public class ClientCLI {
 
     }
 
-    public static void main(String args[]){
+    public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Insert the server IP address:");
-        String ip = scanner.nextLine();
+        hostName = scanner.nextLine();
         System.out.println("Insert the server port");
-        int port = scanner.nextInt();
+        portNumber = scanner.nextInt();
         ClientCLI cli = new ClientCLI();
+        System.out.println("Information set: IP " + hostName + " port " + portNumber);
         cli.login();
 
     }
 
-    public void login(){
+    public void login() {
         String nickname = null;
         boolean confirmation = false;
+        boolean error = false;
+        connectionSocket = new ConnectionSocket(hostName, portNumber);
+        try {
+            if (!connectionSocket.setup()) {
+                System.err.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
+                System.err.println("Please try again!");
+            }
+            System.out.println("Socket Connection setup completed!");
+        } catch (FunctionNotImplementedException e) {
+
+        }
         while (!confirmation) {
             System.out.println(">Insert your nickname: ");
             nickname = in.nextLine();
@@ -47,25 +59,17 @@ public class ClientCLI {
                 nickname = null;
             }
         }
-        connectionSocket = new ConnectionSocket(hostName, portNumber);
-        try {
-            if(!connectionSocket.setup(nickname)) {
-                System.err.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
-                System.err.println("Please try again!");
-            }
-            System.out.println("Socket Connection setup completed!");
-        } catch (FunctionNotImplementedException e) {
+
+        if (!connectionSocket.sendNickname(nickname)) {
             System.err.println("ERROR - You have chosen a nickname that has been already taken.");
             login();
-        }
-
+        } else
+            System.out.println("Nickname set up correctly");
     }
 
-    public boolean isRunning(){
+    public boolean isRunning() {
         return isRunning;
     }
-
-
 
 
 }
