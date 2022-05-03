@@ -1,6 +1,8 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.exceptions.GameModeAlreadySetException;
+import it.polimi.ingsw.exceptions.NumberOfPlayersAlreadySetException;
 
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -38,6 +40,8 @@ public class ClientCLI {
         String nickname = null;
         boolean confirmation = false;
         boolean error = false;
+        int numOfPlayers = 0;
+        boolean isExpert = false;
         connectionSocket = new ConnectionSocket(hostName, portNumber);
         try {
             if (!connectionSocket.setup()) {
@@ -67,7 +71,8 @@ public class ClientCLI {
         confirmation = false;
         boolean ok = false;
         do {
-            int numOfPlayers = 0;
+            confirmation = false;
+            numOfPlayers = 0;
             while (!confirmation) {
                 System.out.println(">Choose the number of player of your game (2 or 3): ");
                 numOfPlayers = in.nextInt();
@@ -75,12 +80,48 @@ public class ClientCLI {
                 System.out.println(">You choose " + numOfPlayers + " players is it correct? [Y/N]: ");
                 if (in.nextLine().equalsIgnoreCase("Y")) {
                     confirmation = true;
-                    ok = connectionSocket.sendNumberOfPlayers(numOfPlayers);
+                    try {
+                        ok = connectionSocket.sendNumberOfPlayers(numOfPlayers);
+                    }
+                    catch(NumberOfPlayersAlreadySetException exc){
+                        System.out.println("Number of player already set");
+                    }
                 } else numOfPlayers = 0;
             }
         } while (!ok);
+
+        confirmation = false;
+        ok = false;
+        do {
+            confirmation = false;
+            while (!confirmation) {
+                System.out.println(">Choose the gameMode Simple or Expert (S or E): ");
+                String input = in.nextLine();
+                System.out.println(">You choose " + input + " as gameMode is it correct? [Y/N]: ");
+                if (input.equalsIgnoreCase("S")) {
+                    confirmation = true;
+                    isExpert = false;
+                } else if (input.equalsIgnoreCase("E")) {
+                    confirmation = true;
+                    isExpert = true;
+                } else {
+                    System.out.println("Error in the input");
+                    confirmation = false;
+                }
+            }
+                    try {
+                        ok = connectionSocket.setGameMode(isExpert);
+                    }
+                    catch(GameModeAlreadySetException exc){
+                        System.out.println("GameMode already set");
+                    }
+
+        } while (!ok);
         System.out.println("Enter something to exit");
         in.nextLine();
+
+
+
     }
 
     public boolean isRunning() {

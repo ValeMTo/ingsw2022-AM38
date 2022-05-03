@@ -3,6 +3,9 @@ package it.polimi.ingsw.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.exceptions.GameModeAlreadySetException;
+import it.polimi.ingsw.exceptions.NumberOfPlayersAlreadySetException;
+import it.polimi.ingsw.messages.ErrorTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.MessageTypeEnum;
 
@@ -59,24 +62,33 @@ public class ConnectionSocket {
     }
 
     public boolean sendNickname(String nickname) {
-        socketOut.print(MessageGenerator.nickNameMessageGenerate(nickname));
+        socketOut.print(MessageGenerator.nickNameMessage(nickname));
         socketOut.flush();
-        System.out.println("Sending: " + MessageGenerator.nickNameMessageGenerate(nickname));
-        String jsonFromServer = null;
+        System.out.println("SEND NICKNAME - Sending: " + MessageGenerator.nickNameMessage(nickname));
         JsonObject json = getMessage();
         if (json == null)
             return false;
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 
-    public boolean sendNumberOfPlayers(int numOfPlayers) {
-        //TODO: use the setNumberOfPlayersGenerate() method or equivalent in MessageGenerate
-        socketOut.print(MessageGenerator.okGenerate());
+    public boolean sendNumberOfPlayers(int numOfPlayers) throws NumberOfPlayersAlreadySetException{
+        socketOut.print(MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         socketOut.flush();
-        //TODO: use the setNumberOfPlayersGenerate() method or equivalent in MessageGenerate
-        System.out.println("Sending: " + MessageGenerator.okGenerate());
-        String jsonFromServer = null;
+        System.out.println("SET NUM PLAYER - Sending: " + MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         JsonObject json = getMessage();
+        if (json == null) return false;
+        if(json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() && json.get("MessageType").getAsInt() == ErrorTypeEnum.NUMBER_OF_PLAYERS_ALREADY_SET.ordinal())
+            throw new NumberOfPlayersAlreadySetException();
+        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
+    public boolean setGameMode(boolean isExpert) throws GameModeAlreadySetException {
+        socketOut.print(MessageGenerator.setGameModeMessage(isExpert));
+        socketOut.flush();
+        System.out.println("SET GAME MODE - Sending: " + MessageGenerator.setGameModeMessage(isExpert));
+        JsonObject json = getMessage();
+        if (json == null) return false;
+        if(json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() && json.get("MessageType").getAsInt() == ErrorTypeEnum.GAME_MODE_ALREADY_SET.ordinal())
+            throw new GameModeAlreadySetException();
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 

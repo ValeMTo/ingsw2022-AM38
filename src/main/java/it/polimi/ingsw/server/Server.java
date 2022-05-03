@@ -24,6 +24,8 @@ public class Server {
     private static Scanner inputReader;
     private static PrintWriter writer;
     private static int numOfPlayers = 0;
+    private static boolean isExpert = false;
+    private static boolean gameModeAlreadySet = false;
 
     public static int getPort(String[] args) {
         if (args.length > 1) {
@@ -45,13 +47,10 @@ public class Server {
         }
         return port;
     }
-
     public static void main(String[] args) {
 
         boolean error = false;
-
         ServerSocket serverSocket = createServerSocket(args);
-
         Socket clientSocket = establishConnection(serverSocket);
         List<String> players = new ArrayList<String>();
         String player = null;
@@ -60,12 +59,20 @@ public class Server {
 
         String jsonInput = null;
         do {
-            error = addPlayer(players);
+            error = !addPlayer(players);
         } while (error);
 
         do {
             try {
                 error = !choosePlayerNum();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        } while (error);
+
+        do {
+            try {
+                error = !chooseGameMode();
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
@@ -86,28 +93,30 @@ public class Server {
 
     public static boolean addPlayer(List<String> players) {
         boolean error = true;
-        System.out.println("Waiting for a message ");
+        System.out.println("ADD PLAYER - Waiting for a message ");
         String jsonInput = inputReader.nextLine();
-        System.out.println("I got a message " + jsonInput);
+        System.out.println("ADD PLAYER - I got a message " + jsonInput);
         JsonObject json = new Gson().fromJson(jsonInput, JsonObject.class);
+        if(json == null)
+            return false;
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal() && json.get("SetType").getAsInt() == SetTypeEnum.SET_NICKNAME.ordinal()) {
             String player = json.get("nickname").getAsString();
             if (players.contains(player)) {
                 error = true;
-                writer.println(MessageGenerator.errorWithStringGenerate(ErrorTypeEnum.NICKNAME_ALREADY_TAKEN, "The nickname has been already taken"));
+                writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NICKNAME_ALREADY_TAKEN, "The nickname has been already taken"));
             } else {
                 error = false;
                 players.add(player);
-                System.out.println("Player name" + player + "has been set");
-                writer.println(MessageGenerator.okGenerate());
+                System.out.println("ADD PLAYER - Player name" + player + "has been set");
+                writer.println(MessageGenerator.okMessage());
                 writer.flush();
-                System.out.println("Sending message " + MessageGenerator.okGenerate());
+                System.out.println("ADD PLAYER - Sending message " + MessageGenerator.okMessage());
             }
         } else {
-            writer.println(MessageGenerator.errorWithStringGenerate(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
+            writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
             error = true;
             writer.flush();
-            System.out.println("Sending message " + MessageGenerator.errorWithStringGenerate(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
+            System.out.println("ADD PLAYER - Sending message " + MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
         }
         return !error;
     }
@@ -115,22 +124,63 @@ public class Server {
     public static boolean choosePlayerNum() throws Exception {
         boolean ok = false;
         int numOfPlayers = 0;
-        System.out.println("Waiting for a message ");
+        System.out.println("PLAYER NUM - Waiting for a message ");
         String jsonInput = inputReader.nextLine();
-        System.out.println("I got a message " + jsonInput);
+        System.out.println("PLAYER NUM - I got a message " + jsonInput);
         JsonObject json = new Gson().fromJson(jsonInput, JsonObject.class);
+        if(json == null)
+            return false;
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal() && json.get("SetType").getAsInt() == SetTypeEnum.SELECT_NUMBER_OF_PLAYERS.ordinal()) {
-            numOfPlayers = json.get("numOfPlayers").getAsInt();
+            numOfPlayers = json.get("SetNumberOfPlayers").getAsInt();
             if ((numOfPlayers == 2 || numOfPlayers == 3) && Server.numOfPlayers == 0) {
                 ok = true;
                 Server.numOfPlayers = numOfPlayers;
-                writer.print(MessageGenerator.okGenerate());
+                writer.print(MessageGenerator.okMessage());
+                System.out.println("PLAYER NUM - Sending message " + MessageGenerator.okMessage());
+
+            } else if(Server.numOfPlayers == 0) {
+                ok = false;
+                writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "The input is invalid or out of bound 2 or 3 players allowed"));
+                System.out.println("PLAYER NUM - Sending message " + MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "The input is invalid or out of bound 2 or 3 players allowed"));
+
+            }
+            else
+                throw new Exception();
+        } else {
+            writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
+            System.out.println("PLAYER NUM - Sending message " +MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
+
+        }
+        writer.flush();
+        return ok;
+    }
+
+    public static boolean chooseGameMode(){
+        boolean ok = false;
+        boolean isExpert = false;
+        System.out.println("GAME MODE -Waiting for a message ");
+        String jsonInput = inputReader.nextLine();
+        System.out.println("GAME MODE - I got a message " + jsonInput);
+        JsonObject json = new Gson().fromJson(jsonInput, JsonObject.class);
+        if(json == null)
+            return false;
+        if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal() && json.get("SetType").getAsInt() == SetTypeEnum.SET_GAME_MODE.ordinal()) {
+            isExpert = json.get("SetExpertGameMode").getAsBoolean();
+            if (!gameModeAlreadySet) {
+                ok = true;
+                writer.print(MessageGenerator.okMessage());
+                System.out.println("GAME MODE -Sending message " + MessageGenerator.okMessage());
+                gameModeAlreadySet = true;
+                Server.isExpert = isExpert;
             } else {
                 ok = false;
-                writer.println(MessageGenerator.errorWithStringGenerate(ErrorTypeEnum.INVALID_INPUT, "The input is invalid or out of bound 2 or 3 players allowed"));
+                writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GAME_MODE_ALREADY_SET, "The gameMode is already set"));
+                System.out.println("GAME MODE -Sending message " + MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GAME_MODE_ALREADY_SET, "The gameMode is already set"));
+
             }
         } else {
-            writer.println(MessageGenerator.errorWithStringGenerate(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
+            writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
+            System.out.println("GAME MODE -Sending message " + MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
         }
         writer.flush();
         return ok;
