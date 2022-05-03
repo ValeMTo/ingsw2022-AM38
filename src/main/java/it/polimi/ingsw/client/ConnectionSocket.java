@@ -2,11 +2,9 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.exceptions.ErrorMessage;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.MessageTypeEnum;
-import it.polimi.ingsw.messages.SimpleTextMessage;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,15 +14,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConnectionSocket {
-    private static Socket socket=null;
+    private static Socket socket = null;
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private String serverIP;
-    private int serverPort;
-    private Scanner stdin;
+    private final String serverIP;
+    private final int serverPort;
+    private final Scanner stdin;
 
-    private Gson gson;
+    private final Gson gson;
     private Scanner socketIn;
     private PrintWriter socketOut;
+
     public ConnectionSocket(String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
@@ -36,7 +35,6 @@ public class ConnectionSocket {
 
     /**
      * Method setup initializes a new socket connection and handles the nickname-choice response.
-     *
      */
     //@throws NicknameAlreadyTakenException when the nickname is already in use.
     public boolean setup() throws FunctionNotImplementedException {
@@ -44,30 +42,46 @@ public class ConnectionSocket {
         System.out.println("Trying to connect with the socket...");
         System.out.println("Opening a socket server communication on port " + serverPort);
 
-        if(socket==null)
+        if (socket == null)
             socket = establishConnection(serverIP, serverPort);
-        if(socket==null)
+        if (socket == null)
             return false;
         socketIn = createScanner(socket);
         socketOut = createWriter(socket);
         return true;
     }
 
-    public boolean sendNickname(String nickname){
-        socketOut.print(MessageGenerator.nickNameMessageGenerate(nickname));
-        socketOut.flush();
-        System.out.println("Sending: "+MessageGenerator.nickNameMessageGenerate(nickname));
-        String jsonFromServer = null;
+    private JsonObject getMessage() {
         System.out.println("waiting for message");
-        jsonFromServer = socketIn.nextLine();
-        System.out.println("Got message "+jsonFromServer);
-        JsonObject json = new Gson().fromJson(jsonFromServer, JsonObject.class);
-        if(json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal())
-            return true;
-        return false;
+        String jsonFromServer = socketIn.nextLine();
+        System.out.println("Got message " + jsonFromServer);
+        return new Gson().fromJson(jsonFromServer, JsonObject.class);
     }
 
-    private Socket establishConnection(String serverIP, int serverPort){
+    public boolean sendNickname(String nickname) {
+        socketOut.print(MessageGenerator.nickNameMessageGenerate(nickname));
+        socketOut.flush();
+        System.out.println("Sending: " + MessageGenerator.nickNameMessageGenerate(nickname));
+        String jsonFromServer = null;
+        JsonObject json = getMessage();
+        if (json == null)
+            return false;
+        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
+
+    public boolean sendNumberOfPlayers(int numOfPlayers) {
+        //TODO: use the setNumberOfPlayersGenerate() method or equivalent in MessageGenerate
+        socketOut.print(MessageGenerator.okGenerate());
+        socketOut.flush();
+        //TODO: use the setNumberOfPlayersGenerate() method or equivalent in MessageGenerate
+        System.out.println("Sending: " + MessageGenerator.okGenerate());
+        String jsonFromServer = null;
+        JsonObject json = getMessage();
+        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
+
+
+    private Socket establishConnection(String serverIP, int serverPort) {
         Socket socket = null;
         try {
             socket = new Socket(serverIP, serverPort);
@@ -79,8 +93,8 @@ public class ConnectionSocket {
         return socket;
     }
 
-    private Scanner createScanner(Socket socket){
-        Scanner scanner=null;
+    private Scanner createScanner(Socket socket) {
+        Scanner scanner = null;
         try {
             scanner = new Scanner(socket.getInputStream());
         } catch (IOException e) {
@@ -90,8 +104,8 @@ public class ConnectionSocket {
         return scanner;
     }
 
-    private PrintWriter createWriter(Socket socket){
-        PrintWriter scanner=null;
+    private PrintWriter createWriter(Socket socket) {
+        PrintWriter scanner = null;
         try {
             scanner = new PrintWriter(socket.getOutputStream());
         } catch (IOException e) {

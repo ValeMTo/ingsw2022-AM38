@@ -10,8 +10,8 @@ public class ClientCLI {
     private static int portNumber;
     private final Scanner in;
     private final PrintStream out;
-    ConnectionSocket connectionSocket;
     private final boolean isRunning;
+    ConnectionSocket connectionSocket;
 
     public ClientCLI() {
 
@@ -63,8 +63,24 @@ public class ClientCLI {
         if (!connectionSocket.sendNickname(nickname)) {
             System.err.println("ERROR - You have chosen a nickname that has been already taken.");
             login();
-        } else
-            System.out.println("Nickname set up correctly");
+        } else System.out.println("Nickname set up correctly");
+        confirmation = false;
+        boolean ok = false;
+        do {
+            int numOfPlayers = 0;
+            while (!confirmation) {
+                System.out.println(">Choose the number of player of your game (2 or 3): ");
+                numOfPlayers = in.nextInt();
+                in.nextLine();
+                System.out.println(">You choose " + numOfPlayers + " players is it correct? [Y/N]: ");
+                if (in.nextLine().equalsIgnoreCase("Y")) {
+                    confirmation = true;
+                    ok = connectionSocket.sendNumberOfPlayers(numOfPlayers);
+                } else numOfPlayers = 0;
+            }
+        } while (!ok);
+        System.out.println("Enter something to exit");
+        in.nextLine();
     }
 
     public boolean isRunning() {

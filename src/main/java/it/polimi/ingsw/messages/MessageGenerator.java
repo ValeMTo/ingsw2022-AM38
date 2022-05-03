@@ -16,7 +16,7 @@ public class MessageGenerator {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SET_NICKNAME.ordinal());
-        json.addProperty("SetNickName", nickName);
+        json.addProperty("nickname", nickName);
         return gson.toJson(json)+"\n";
     }
 
