@@ -109,15 +109,14 @@ public class Server {
                 players.add(player);
                 System.out.println("ADD PLAYER - Player name" + player + "has been set");
                 writer.println(MessageGenerator.okMessage());
-                writer.flush();
                 System.out.println("ADD PLAYER - Sending message " + MessageGenerator.okMessage());
             }
         } else {
             writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
             error = true;
-            writer.flush();
             System.out.println("ADD PLAYER - Sending message " + MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
         }
+        writer.flush();
         return !error;
     }
 
@@ -144,12 +143,15 @@ public class Server {
                 System.out.println("PLAYER NUM - Sending message " + MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "The input is invalid or out of bound 2 or 3 players allowed"));
 
             }
-            else
+            else {
+                writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NUMBER_OF_PLAYERS_ALREADY_SET, "Already set num players"));
+                System.out.println("Error - Exception");
+                writer.flush();
                 throw new Exception();
+            }
         } else {
             writer.println(MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
             System.out.println("PLAYER NUM - Sending message " +MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "Invalid move or bad formatted message"));
-
         }
         writer.flush();
         return ok;

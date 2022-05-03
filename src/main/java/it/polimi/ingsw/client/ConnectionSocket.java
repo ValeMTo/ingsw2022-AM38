@@ -55,10 +55,21 @@ public class ConnectionSocket {
     }
 
     private JsonObject getMessage() {
-        System.out.println("waiting for message");
-        String jsonFromServer = socketIn.nextLine();
-        System.out.println("Got message " + jsonFromServer);
-        return new Gson().fromJson(jsonFromServer, JsonObject.class);
+        boolean error = false;
+        Gson gson = new Gson();
+        JsonObject json;
+        do {
+            System.out.println("waiting for message");
+            String jsonFromServer = socketIn.nextLine();
+            if (jsonFromServer == null)
+                System.out.println("Got message " + jsonFromServer);
+            json = new Gson().fromJson(jsonFromServer, JsonObject.class);
+            if(json == null || !json.has("MessageType"))
+                error = true;
+            else
+                error = false;
+        }while(error);
+        return json;
     }
 
     public boolean sendNickname(String nickname) {
