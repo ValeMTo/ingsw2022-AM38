@@ -14,7 +14,7 @@ public class MessageGenerator {
      *
      * @return : json String of the message OK
      */
-    public static String okGenerate() {
+    public static String okMessage() {    //renamed
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.OK.ordinal());
         return gson.toJson(json)+"\n";
@@ -25,7 +25,7 @@ public class MessageGenerator {
      *
      * @return : json String of the message NACK
      */
-    public static String nackGenerate() {
+    public static String nackMessage() {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.NACK.ordinal());
         return gson.toJson(json)+"\n";
@@ -38,7 +38,7 @@ public class MessageGenerator {
      * @param errorString : String of the particular error to send
      * @return : json String of the error message
      */
-    public static String errorWithStringGenerate(ErrorTypeEnum error, String errorString) {
+    public static String errorWithStringMessage(ErrorTypeEnum error, String errorString) {   // renamed
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.addProperty("ErrorType", error.ordinal());
@@ -50,13 +50,13 @@ public class MessageGenerator {
     /**
      * Generates the error message for InvalidInput with the additional fields that informs on the allowed range
      * of values for the input.
-     * Works like {@link #errorWithStringGenerate(ErrorTypeEnum, String)} but overloads it with the following
+     * Works like {@link #errorWithStringMessage(ErrorTypeEnum, String)} but overloads it with the following
      * additional parameters:
      * @param minVal : the minimum allowed value for the input
      * @param maxVal : the maximum allowed value for the input
      * @return : json String of the error message
      */
-    public static String errorWithStringGenerate(ErrorTypeEnum error, String errorString, int minVal, int maxVal) {
+    public static String errorWithStringMessage(ErrorTypeEnum error, String errorString, int minVal, int maxVal) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.addProperty("ErrorType", error.ordinal());
@@ -67,13 +67,29 @@ public class MessageGenerator {
         return gson.toJson(json)+"\n";
     }
 
+    /**
+     * Generates the error message for InvalidInput with the additional fields that shows the already set NumberOfPlayers
+     * Works like {@link #errorWithStringMessage(ErrorTypeEnum, String)}  but overloads it with the following
+     * additional parameters:
+     * @param actualNumOfPlayers : the current number of player that is already set
+     * @return : json String of the error message
+     */
+    public static String errorWithStringMessage(ErrorTypeEnum error, int actualNumOfPlayers) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
+        json.addProperty("ErrorType", error.ordinal());
+        json.addProperty("errorString", error.ordinal());
+        json.addProperty("ActualNumOfPlayers", actualNumOfPlayers);
+
+        return gson.toJson(json)+"\n";
+    }
 
     /**
      * Generates the message Ping
      *
      * @return : json String of the Ping message
      */
-    public static String pingGenerate() {
+    public static String pingMessage() {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.PING.ordinal());
         return gson.toJson(json)+"\n";
@@ -85,7 +101,7 @@ public class MessageGenerator {
      *
      * @return : json String of the Pong message
      */
-    public static String pongGenerate() {
+    public static String pongMessage() {
         JsonObject json = new JsonObject();
         json.put("key", value);
         json.addProperty("MessageType", MessageTypeEnum.PONG.ordinal());
@@ -97,7 +113,7 @@ public class MessageGenerator {
      * @param connectionType : the subtype of the Connection message
      * @return : json String of the Connection message
      */
-    public static String connectionMessageGenerate(ConnectionTypeEnum connectionType) {
+    public static String connectionMessage(ConnectionTypeEnum connectionType) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.CONNECTION.ordinal());
         json.addProperty("ConnectionType", connectionType.ordinal());
@@ -120,7 +136,7 @@ public class MessageGenerator {
      * @param position: the index representing the specific destination (e.g.: the specific island of destination)
      * @return : json String of the Action MoveStudent message
      */
-    public static String moveStudentMessageGenerate(ActionTypeEnum action, Color color, StudentCounter fromLoc, StudentCounter toLoc, int position) {
+    public static String moveStudentMessage(ActionTypeEnum action, Color color, StudentCounter fromLoc, StudentCounter toLoc, int position) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", action.ordinal());
@@ -139,7 +155,7 @@ public class MessageGenerator {
      *
      * @return : json String of the Action message MoveMotherNature
      */
-    public static String moveMotherNatureMessageGenerate(int islandPosition) {
+    public static String moveMotherNatureMessage(int islandPosition) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", ActionTypeEnum.MOVE_MOTHER_NATURE.ordinal());
@@ -154,7 +170,7 @@ public class MessageGenerator {
      *
      * @return : json String of the Action message ChooseCloud
      */
-    public static String chooseCloudMessageGenerate(int cloudPosition) {
+    public static String chooseCloudMessage(int cloudPosition) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", ActionTypeEnum.CHOOSE_CLOUD.ordinal());
@@ -170,7 +186,7 @@ public class MessageGenerator {
      * @see it.polimi.ingsw.model.specialCards.Herbalist
      * @return : json String of the Action message ChooseCloud
      */
-    public static String chooseTilePosition(int islandPosition) {
+    public static String chooseTilePositionMessage(int islandPosition) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal());
@@ -185,7 +201,7 @@ public class MessageGenerator {
      *
      * @return : json String of the Action message ChooseColor
      */
-    public static String chooseColorMessageGenerate(Color color) {
+    public static String chooseColorMessage(Color color) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", ActionTypeEnum.CHOOSE_COLOR.ordinal());
@@ -201,7 +217,7 @@ public class MessageGenerator {
      * @param nickName : nickname we want to send
      * @return : json string of the set nickname message
      */
-    public static String nickNameMessageGenerate(String nickName) {
+    public static String nickNameMessage(String nickName) {    //renamed
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SET_NICKNAME.ordinal());
@@ -215,7 +231,7 @@ public class MessageGenerator {
      * @param numOfPlayers : the number of players we want to set
      * @return : json string of the SelectNumberOfPlayers message
      */
-    public static String SelectNumberOfPlayersMessageGenerate(int numOfPlayers) {
+    public static String SelectNumberOfPlayersMessage(int numOfPlayers) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SELECT_NUMBER_OF_PLAYERS.ordinal());
@@ -229,7 +245,7 @@ public class MessageGenerator {
      * @param isExpertMode : the boolean indicating the preferred GameMode : "False" -> "Easy" ;  "True"-> "Expert"
      * @return : json string of the SetGameMode message
      */
-    public static String SetGameModeMessageGenerate(boolean isExpertMode) {
+    public static String SetGameModeMessage(boolean isExpertMode) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SET_GAME_MODE.ordinal());
