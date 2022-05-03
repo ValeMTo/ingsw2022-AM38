@@ -42,7 +42,7 @@ public class MessageGenerator {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.addProperty("ErrorType", error.ordinal());
-        json.addProperty("errorString", error.ordinal());
+        json.addProperty("errorString", errorString);
 
         return gson.toJson(json)+"\n";
     }
@@ -50,17 +50,16 @@ public class MessageGenerator {
     /**
      * Generates the error message for InvalidInput with the additional fields that informs on the allowed range
      * of values for the input.
-     * Works like {@link #errorWithStringMessage(ErrorTypeEnum, String)} but overloads it with the following
-     * additional parameters:
+     * @param errorString : String of the particular error to send
      * @param minVal : the minimum allowed value for the input
      * @param maxVal : the maximum allowed value for the input
      * @return : json String of the error message
      */
-    public static String errorWithStringMessage(ErrorTypeEnum error, String errorString, int minVal, int maxVal) {
+    public static String errorInvalidInputMessage(String errorString, int minVal, int maxVal) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
-        json.addProperty("ErrorType", error.ordinal());
-        json.addProperty("errorString", error.ordinal());
+        json.addProperty("ErrorType", ErrorTypeEnum.INVALID_INPUT.ordinal());
+        json.addProperty("errorString", errorString);
         json.addProperty("minVal", minVal);
         json.addProperty("maxVal", maxVal);
 
@@ -69,16 +68,15 @@ public class MessageGenerator {
 
     /**
      * Generates the error message for InvalidInput with the additional fields that shows the already set NumberOfPlayers
-     * Works like {@link #errorWithStringMessage(ErrorTypeEnum, String)}  but overloads it with the following
-     * additional parameters:
+     * @param errorString : String of the particular error to send
      * @param actualNumOfPlayers : the current number of player that is already set
      * @return : json String of the error message
      */
-    public static String errorWithStringMessage(ErrorTypeEnum error, int actualNumOfPlayers) {
+    public static String errorNumOfPlayersAlreadySetMessage(String errorString, int actualNumOfPlayers) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
-        json.addProperty("ErrorType", error.ordinal());
-        json.addProperty("errorString", error.ordinal());
+        json.addProperty("ErrorType", ErrorTypeEnum.NUMBER_OF_PLAYERS_ALREADY_SET.ordinal());
+        json.addProperty("errorString", errorString);
         json.addProperty("ActualNumOfPlayers", actualNumOfPlayers);
 
         return gson.toJson(json)+"\n";
@@ -231,7 +229,7 @@ public class MessageGenerator {
      * @param numOfPlayers : the number of players we want to set
      * @return : json string of the SelectNumberOfPlayers message
      */
-    public static String SelectNumberOfPlayersMessage(int numOfPlayers) {
+    public static String selectNumberOfPlayersMessage(int numOfPlayers) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SELECT_NUMBER_OF_PLAYERS.ordinal());
@@ -245,7 +243,7 @@ public class MessageGenerator {
      * @param isExpertMode : the boolean indicating the preferred GameMode : "False" -> "Easy" ;  "True"-> "Expert"
      * @return : json string of the SetGameMode message
      */
-    public static String SetGameModeMessage(boolean isExpertMode) {
+    public static String setGameModeMessage(boolean isExpertMode) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.SET.ordinal());
         json.addProperty("SetType", SetTypeEnum.SET_GAME_MODE.ordinal());
