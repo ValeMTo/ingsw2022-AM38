@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.GameModeAlreadySetException;
 import it.polimi.ingsw.exceptions.NumberOfPlayersAlreadySetException;
+import it.polimi.ingsw.messages.ConnectionTypeEnum;
 import it.polimi.ingsw.messages.ErrorTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.MessageTypeEnum;
@@ -45,10 +46,8 @@ public class ConnectionSocket {
         System.out.println("Trying to connect with the socket...");
         System.out.println("Opening a socket server communication on port " + serverPort);
 
-        if (socket == null)
-            socket = establishConnection(serverIP, serverPort);
-        if (socket == null)
-            return false;
+        if (socket == null) socket = establishConnection(serverIP, serverPort);
+        if (socket == null) return false;
         socketIn = createScanner(socket);
         socketOut = createWriter(socket);
         return true;
@@ -61,14 +60,10 @@ public class ConnectionSocket {
         do {
             System.out.println("waiting for message");
             String jsonFromServer = socketIn.nextLine();
-            if (jsonFromServer == null)
-                System.out.println("Got message " + jsonFromServer);
+            if (jsonFromServer != null) System.out.println("Got message " + jsonFromServer);
             json = new Gson().fromJson(jsonFromServer, JsonObject.class);
-            if(json == null || !json.has("MessageType"))
-                error = true;
-            else
-                error = false;
-        }while(error);
+            error = json == null || !json.has("MessageType");
+        } while (error);
         return json;
     }
 
@@ -77,33 +72,57 @@ public class ConnectionSocket {
         socketOut.flush();
         System.out.println("SEND NICKNAME - Sending: " + MessageGenerator.nickNameMessage(nickname));
         JsonObject json = getMessage();
-        if (json == null)
-            return false;
+        if (json == null) return false;
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 
-    public boolean sendNumberOfPlayers(int numOfPlayers) throws NumberOfPlayersAlreadySetException{
+    public boolean sendNumberOfPlayers(int numOfPlayers) throws NumberOfPlayersAlreadySetException {
         socketOut.print(MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         socketOut.flush();
         System.out.println("SET NUM PLAYER - Sending: " + MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         JsonObject json = getMessage();
         if (json == null) return false;
-        if(json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() && json.get("MessageType").getAsInt() == ErrorTypeEnum.NUMBER_OF_PLAYERS_ALREADY_SET.ordinal())
+        if (json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() && json.get("ErrorType").getAsInt() == ErrorTypeEnum.NUMBER_OF_PLAYERS_ALREADY_SET.ordinal())
             throw new NumberOfPlayersAlreadySetException();
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
+
     public boolean setGameMode(boolean isExpert) throws GameModeAlreadySetException {
         socketOut.print(MessageGenerator.setGameModeMessage(isExpert));
         socketOut.flush();
         System.out.println("SET GAME MODE - Sending: " + MessageGenerator.setGameModeMessage(isExpert));
         JsonObject json = getMessage();
         if (json == null) return false;
-        if(json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() && json.get("MessageType").getAsInt() == ErrorTypeEnum.GAME_MODE_ALREADY_SET.ordinal())
+        if (json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() && json.get("ErrorType").getAsInt() == ErrorTypeEnum.GAME_MODE_ALREADY_SET.ordinal())
             throw new GameModeAlreadySetException();
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 
+    /**
+     * Used to confirm a choice to the server such as continue with an already set parameter
+     */
+    public void sendOk() {
+        socketOut.print(MessageGenerator.okMessage());
+        socketOut.flush();
+        System.out.println("OK/Confirm message send " + MessageGenerator.okMessage());
+    }
 
+    /**
+     * Send a disconnect message to disconnect from the server gracefully
+     */
+    public void disconnect() {
+        socketOut.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
+        socketOut.flush();
+        System.out.println("DISCONNECTION " + MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
+    }
+
+    /**
+     * Establishes the connection between the server
+     *
+     * @param serverIP   : Ip of the server
+     * @param serverPort : server port
+     * @return : the Socket of the connection with the Server
+     */
     private Socket establishConnection(String serverIP, int serverPort) {
         Socket socket = null;
         try {
@@ -111,6 +130,7 @@ public class ConnectionSocket {
         } catch (IOException e) {
             System.out.println("ERROR - Connection NOT established");
             logger.log(Level.SEVERE, e.getMessage(), e);
+
         }
         System.out.println("Connection established");
         return socket;
@@ -137,4 +157,6 @@ public class ConnectionSocket {
         }
         return scanner;
     }
+
+
 }

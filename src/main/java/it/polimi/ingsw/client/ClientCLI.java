@@ -82,9 +82,16 @@ public class ClientCLI {
                     confirmation = true;
                     try {
                         ok = connectionSocket.sendNumberOfPlayers(numOfPlayers);
-                    }
-                    catch(NumberOfPlayersAlreadySetException exc){
-                        System.out.println("Number of player already set");
+                    } catch (NumberOfPlayersAlreadySetException exc) {
+                        System.out.println("Number of player already set do you want to continue (Y) or disconnect (N)?");
+                        String input = in.nextLine();
+                        if (input.equalsIgnoreCase("Y")) {
+                            ok = true;
+                            connectionSocket.sendOk();
+                        } else {
+                            connectionSocket.disconnect();
+                            System.exit(1);
+                        }
                     }
                 } else numOfPlayers = 0;
             }
@@ -109,17 +116,23 @@ public class ClientCLI {
                     confirmation = false;
                 }
             }
-                    try {
-                        ok = connectionSocket.setGameMode(isExpert);
-                    }
-                    catch(GameModeAlreadySetException exc){
-                        System.out.println("GameMode already set");
-                    }
+            try {
+                ok = connectionSocket.setGameMode(isExpert);
+            } catch (GameModeAlreadySetException exc) {
+                System.out.println("GameMode already set do you want to continue (Y) or disconnect (N)?");
+                String input = in.nextLine();
+                if (input.equalsIgnoreCase("Y")) {
+                    ok = true;
+                    connectionSocket.sendOk();
+                } else {
+                    connectionSocket.disconnect();
+                    System.exit(1);
+                }
+            }
 
         } while (!ok);
         System.out.println("Enter something to exit");
         in.nextLine();
-
 
 
     }
