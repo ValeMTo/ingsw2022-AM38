@@ -25,10 +25,9 @@ public class Server {
     private Lobby lobby3Expert;
 
     public static int getPort(String[] args) {
-        if (args.length > 1) {
+        if (args != null && args.length > 1 ) {
             port = Integer.parseInt(args[1]);
         } else {
-            JsonParser parser = new JsonParser();
             try {
                 JsonObject json = new Gson().fromJson(new FileReader("src/main/resources/json/ConnectionConfiguration.json"), JsonObject.class);
                 if (json != null) {

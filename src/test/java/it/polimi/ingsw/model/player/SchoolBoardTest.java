@@ -256,7 +256,8 @@ public class SchoolBoardTest {
 
     /**
      * Tests the catch of the NullPointerException by schoolEntrance and return false
-     */
+    // */
+    //TODO
     @Test
     public void addEntranceException() {
         assertFalse(schoolBoard.addStudentEntrance(null));
