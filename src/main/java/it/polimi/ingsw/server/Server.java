@@ -20,25 +20,20 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 
 public class Server {
-
-    private static final Gson gson = new Gson();
     private static final Object blockerPlayer = new Object();
     private static final Object blockerGameMode = new Object();
     private static final boolean isNumOfPlayersSet = false;
     private static final Executor threadPool = new ScheduledThreadPoolExecutor(4);
     private static final List<String> players = new ArrayList<String>();
     private static int port;
-    private static Scanner inputReader;
-    private static PrintWriter writer;
     private static int numOfPlayers = 0;
     private static boolean isExpert = false;
     private static boolean gameModeAlreadySet = false;
 
     public static int getPort(String[] args) {
-        if (args.length > 1) {
+        if (args != null && args.length > 1 ) {
             port = Integer.parseInt(args[1]);
         } else {
-            JsonParser parser = new JsonParser();
             try {
                 JsonObject json = new Gson().fromJson(new FileReader("src/main/resources/json/ConnectionConfiguration.json"), JsonObject.class);
                 if (json != null) {
