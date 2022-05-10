@@ -12,12 +12,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ServerConnection implements Runnable {
+public class ClientHandler implements Runnable {
     private final Socket inSocket;
     private Scanner inputReader;
     private PrintWriter writer;
 
-    public ServerConnection(Socket clientSocket) {
+    public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
         try {
             inputReader = new Scanner(inSocket.getInputStream());
@@ -37,19 +37,14 @@ public class ServerConnection implements Runnable {
     @Override
     public void run() {
         boolean error;
-        String jsonInput = null;
-        do {
-            error = !addPlayer();
-        } while (error);
-
         do {
             error = !choosePlayerNum();
-
-
         } while (error);
-
         do {
             error = !chooseGameMode();
+        } while (error);
+        do {
+            error = !addPlayer();
         } while (error);
     }
 
@@ -67,6 +62,7 @@ public class ServerConnection implements Runnable {
 
     /**
      * Wait for a message from the client to add the player, then calls the Server addPlayer method
+     * [nome, num, mode]
      *
      * @return true if it could add the player correctly, otherwise false
      */

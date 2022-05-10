@@ -3,36 +3,26 @@ package it.polimi.ingsw.server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import it.polimi.ingsw.controller.Game;
+import it.polimi.ingsw.controller.Lobby;
 import it.polimi.ingsw.exceptions.GameModeAlreadySetException;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 import it.polimi.ingsw.exceptions.NumberOfPlayersAlreadySetException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
 
 public class Server {
 
-    private static final Gson gson = new Gson();
-    private static final Object blockerPlayer = new Object();
-    private static final Object blockerGameMode = new Object();
-    private static final boolean isNumOfPlayersSet = false;
-    private static final Executor threadPool = new ScheduledThreadPoolExecutor(4);
-    private static final List<String> players = new ArrayList<String>();
     private static int port;
-    private static Scanner inputReader;
-    private static PrintWriter writer;
-    private static int numOfPlayers = 0;
-    private static boolean isExpert = false;
-    private static boolean gameModeAlreadySet = false;
+    private List<Game> games;
+    private Lobby lobby2Easy;
+    private Lobby lobby3Easy;
+    private Lobby lobby2Expert;
+    private Lobby lobby3Expert;
 
     public static int getPort(String[] args) {
         if (args.length > 1) {
@@ -57,7 +47,7 @@ public class Server {
     public static void main(String[] args) {
         ServerSocket serverSocket = createServerSocket(args);
         while (true) {
-            threadPool.execute(new ServerConnection(establishConnection(serverSocket)));
+            threadPool.execute(new ClientHandler(establishConnection(serverSocket)));
         }
     }
 
