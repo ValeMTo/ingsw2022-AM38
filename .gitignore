@@ -24,9 +24,12 @@ hs_err_pid*
 
 # Ignore IDE specific files
 .idea/
+.target/
 
 AM38.iml
 
 Deliveries/PeerReviewAM11.synctex.gz
 
 Deliveries/PeerReviewAM11.tex
+
+target/
