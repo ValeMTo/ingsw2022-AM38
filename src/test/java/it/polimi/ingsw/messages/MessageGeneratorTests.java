@@ -87,6 +87,25 @@ public class MessageGeneratorTests {
 
     }
 
+    @Test
+    @DisplayName("AssistantCardUpdate message test")
+    public void assistantCardUpdateMessageTest() {
+        String generatedMessage;
+        ArrayList<Integer> testDeck = new ArrayList<Integer>();
+        for(int i=10; i>0; i--) {
+            testDeck.add(i);
+        }
+        System.out.println("Initial array deck: "+"\n");
+        for(int c : testDeck)
+            System.out.println(c);
+        System.out.println("\n");
+
+        System.out.println("AssistantCardUpdate message : "+ "\n");
+        generatedMessage = MessageGenerator.assistantCardUpdateMessage(Tower.WHITE, testDeck);
+        System.out.println(generatedMessage);
+
+    }
+
 
 
 }
