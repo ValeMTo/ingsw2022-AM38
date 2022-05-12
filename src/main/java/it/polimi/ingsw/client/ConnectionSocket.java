@@ -104,7 +104,6 @@ public class ConnectionSocket {
         socketOut.flush();
         System.out.println("SEND NICKNAME - Sending: " + MessageGenerator.nickNameMessage(nickname));
         JsonObject json = getMessage();
-        if (json == null) return false;
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 

@@ -95,7 +95,7 @@ public class ClientCLI {
         if (!connectionSocket.sendNickname(nickname)) {
             System.err.println("ERROR - You have chosen a nickname that has been already taken.");
             sendNickname();
-        } else System.out.println("Nicknme set up correctly");
+        } else System.out.println("Nickname set up correctly");
     }
 
     /**
