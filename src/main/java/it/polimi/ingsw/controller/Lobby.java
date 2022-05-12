@@ -31,4 +31,8 @@ public class Lobby {
         queue.add(client);
         numOfPlayers+=1;
     }
+
+    public boolean getGamemode(){
+        return isExpert;
+    }
 }

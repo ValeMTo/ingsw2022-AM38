@@ -94,7 +94,7 @@ public class ConnectionSocket {
     }
 
     public void refuse(){
-        System.out.println("ACCEPT - Sending: " + MessageGenerator.nackMessage());
+        System.out.println("REFUSE - Sending: " + MessageGenerator.nackMessage());
         socketOut.print(MessageGenerator.nackMessage());
         socketOut.flush();
     }

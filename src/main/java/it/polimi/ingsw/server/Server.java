@@ -108,4 +108,16 @@ public class Server {
             lobby.addPlayer(client);
         }
     }
+
+    public static int getNumOfPlayerGame(){
+        synchronized (lobby) {
+            return lobby.getNumOfPlayers();
+        }
+    }
+
+    public static boolean getGamemode(){
+        synchronized (lobby){
+            return lobby.getGamemode();
+        }
+    }
 }

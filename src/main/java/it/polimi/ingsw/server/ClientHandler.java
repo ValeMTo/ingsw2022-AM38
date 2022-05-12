@@ -82,6 +82,8 @@ public class ClientHandler implements Runnable {
         if(Server.getLobbyNumberOfActivePlayers() == 0){
             Server.setLobbySettings(receiveGamemode(), receiveNumOfPlayers());
         }else{
+            sendNumberOfPlayers(Server.getNumOfPlayerGame());
+            sendGameMode(Server.getGamemode());
             if(!getQuickAnswer()){
                 return false;
             }
@@ -192,5 +194,22 @@ public class ClientHandler implements Runnable {
         return numOfPlayers;
     }
 
+    public boolean sendGameMode(boolean isExpert) {
+        System.out.println("SET GAME MODE - Sending: " + MessageGenerator.gamemodeMessage(isExpert));
+        writer.print(MessageGenerator.gamemodeMessage(isExpert));
+        writer.flush();
+        JsonObject json = getMessage();
+        System.out.println("Received: " + json);
+        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
+
+    public boolean sendNumberOfPlayers(int numOfPlayers) {
+        System.out.println("SET GAME MODE - Sending: " + MessageGenerator.numberOfPlayerMessage(numOfPlayers));
+        writer.print(MessageGenerator.numberOfPlayerMessage(numOfPlayers));
+        writer.flush();
+        JsonObject json = getMessage();
+        System.out.println("Received: " + json);
+        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
 
 }
