@@ -10,6 +10,8 @@ public enum MessageTypeEnum {
     ACTION,
     SET,
     END_OF_GAME_MESSAGE,
-    UPDATE
+    UPDATE,
+    REQUEST,
+    ANSWER,
 
 }

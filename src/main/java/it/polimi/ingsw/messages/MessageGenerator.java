@@ -104,7 +104,6 @@ public class MessageGenerator {
         return gson.toJson(json) + "\n";
     }
 
-
     /**
      * Generates the message Pong
      *
@@ -129,6 +128,82 @@ public class MessageGenerator {
 
         return gson.toJson(json) + "\n";
     }
+
+    /**
+     * Generates a String formatted in json for request the actual condition of the lobby
+     *
+     * @return : json String for request lobby number of players
+     */
+    public static String lobbyRequestMessage() {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.REQUEST.ordinal());
+        json.addProperty("RequestType", RequestTypeEnum.LOBBY_REQUEST.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json for answer the actual condition of the lobby
+     *
+     * @return : json String with number of players in the lobby
+     */
+    public static String numberPlayerlobbyMessage(int numOfPlayers) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.LOBBY_ANSWER.ordinal());
+        json.addProperty("numOfPlayers", numOfPlayers);
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json for request the gamemode
+     *
+     * @return : json String for request gamemode
+     */
+    public static String gamemodeRequestMessage() {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.REQUEST.ordinal());
+        json.addProperty("RequestType", RequestTypeEnum.GAMEMODE_REQUEST.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json for answer the actual gamemode
+     *
+     * @return : json String with number of players in the lobby
+     */
+    public static String gamemodeMessage(boolean isExpert) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.GAMEMODE_ANSWER.ordinal());
+        json.addProperty("gamemode", isExpert);
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json for request the number of player for this match
+     *
+     * @return : json String for request number of player
+     */
+    public static String numberOfPlayerRequestMessage() {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.REQUEST.ordinal());
+        json.addProperty("RequestType", RequestTypeEnum.PLAYERS_NUMBER_REQUEST.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json for answer the actual number of players
+     *
+     * @return : json String with number of players in this match
+     */
+    public static String numberOfPlayerMessage(int numOfPlayers) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.PLAYERS_NUMBER_ANSWER.ordinal());
+        json.addProperty("numOfPlayers", numOfPlayers);
+        return gson.toJson(json) + "\n";
+    }
+
 
     /**
      * Generates the UseAssistantCard Action message
@@ -157,7 +232,6 @@ public class MessageGenerator {
         json.addProperty("SpecialCardName", specialCardName);
         return gson.toJson(json) + "\n";
     }
-
 
     /**
      * Generates the MoveStudent Action message, used to move a student of a given color from one given location
@@ -311,11 +385,10 @@ public class MessageGenerator {
      * @param isExpertMode   : same semantics of {@link #setGameModeMessage(boolean isExpertMode)}.
      * @return : json string of the SetupUpdate message
      */
-
     public static String setupUpdateMessage(Map<String, Tower> playersMapping, int numPlayers, boolean isExpertMode) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.SETUP_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SETUP_UPDATE.ordinal());
         json.put("NumberOfPlayers", numPlayers);
         json.put("isExpertMode", isExpertMode);
         json.put("PlayersMapping", playersMapping);
@@ -332,11 +405,10 @@ public class MessageGenerator {
      * @param limit       : the maximum limit of students on the cloud
      * @return : json string of the CloudViewUpdate message
      */
-
     public static String cloudViewUpdateMessage(int position, int limit, Map<Color, Integer> studentsMap) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.CLOUD_VIEW_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal());
         json.put("position", position);
         json.put("StudentsLimit", limit);
         json.put("StudentsMap", studentsMap);
@@ -357,7 +429,7 @@ public class MessageGenerator {
     public static String islandViewUpdateMessage(int position, Map<Color, Integer> studentsMap, Tower towerColor, int numTower, boolean isDisabled) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.ISLAND_VIEW_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal());
         json.put("position", position);
         json.put("StudentsMap", studentsMap);
         json.put("TowerColor", towerColor.ordinal());
@@ -376,7 +448,7 @@ public class MessageGenerator {
     public static String archipelagoViewUpdateMessage(int numIslands, int motherNaturePosition) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.ARCHIPELAGO_VIEW_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal());
         json.put("NumOfIslands", numIslands);
         json.put("MotherNaturePosition", motherNaturePosition);
 
@@ -397,7 +469,7 @@ public class MessageGenerator {
     public static String schoolBoardUpdateMessage(Map<Color, Integer> diningRoomMap, Map<Color, Integer> schoolEntranceMap, Tower towerColor, int numTower, int coins) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.SCHOOL_BOARD_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal());
         json.put("SchoolEntranceMap", schoolEntranceMap);
         json.put("DiningRoomMap", diningRoomMap);
         json.put("TowerColor", towerColor.ordinal());
@@ -417,7 +489,7 @@ public class MessageGenerator {
     public static String professorsUpdateMessage(Map<Color, Tower> professors) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.PROFESSORS_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PROFESSORS_UPDATE.ordinal());
         json.put("ProfessorsMap", professors);
         return json + "\n";
     }
@@ -430,11 +502,10 @@ public class MessageGenerator {
      * @param coinCost: the current cost of that specialCard
      * @return : json string of the SpecialCardUpdate message
      */
-
     private static JSONObject specialCardStandardMessage(SpecialCardName name, int coinCost) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.SPECIAL_CARD_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal());
         json.put("Name", name.ordinal());
         json.put("coinCost", coinCost);
         return json;
@@ -483,11 +554,10 @@ public class MessageGenerator {
      * @param phase : the name of the new current phase. In the json it is represented by its ordinal value in the enum.
      * @return : json string of the phaseUpdate message
      */
-
     public static String phaseUpdateMessage(PhaseEnum phase) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.PHASE_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PHASE_UPDATE.ordinal());
         json.put("CurrentPhase", phase.ordinal());
         return json + "\n";
     }
@@ -500,11 +570,10 @@ public class MessageGenerator {
      * @param availableCards : the list of available AssistantCards in the player's deck.
      * @return : json string of the AssistantCardUpdate message
      */
-
     public static String assistantCardUpdateMessage(Tower playerTower, ArrayList<Integer> availableCards) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.ASSISTANT_CARD_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal());
         json.put("PlayerTower", playerTower.ordinal());
         json.put("AvailableCards", availableCards);
         return json + "\n";
@@ -518,11 +587,10 @@ public class MessageGenerator {
      * @param lastUsed    : the list of available AssistantCards in the player's deck.
      * @return : json string of the LastUsedAssistantCardUpdate message
      */
-
     public static String lastUsedAssistantCardUpdateMessage(Tower playerTower, int lastUsed) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.LAST_USED_ASSISTANT_CARD_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.LAST_USED_ASSISTANT_CARD_UPDATE.ordinal());
         json.put("PlayerTower", playerTower.ordinal());
         json.put("LastUsed", lastUsed);
         return json + "\n";
@@ -535,11 +603,10 @@ public class MessageGenerator {
      * @param nickname : the nickname of the current active player.
      * @return : json string of the CurrentPlayerUpdate message
      */
-
     public static String currentPlayerUpdateMessage(String nickname) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.CURRENT_PLAYER_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal());
         json.put("CurrentPlayer", nickname);
         return json + "\n";
     }
@@ -552,11 +619,10 @@ public class MessageGenerator {
      * @param leaderboard : the current updated leaderboard (results and scores).
      * @return : json string of the LeaderboardUpdate message
      */
-
     public static String leaderboardUpdateMessage(boolean isEndOfGame, Map<String, Integer> leaderboard) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnumeration.LEADERBOARD_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.LEADERBOARD_UPDATE.ordinal());
         json.put("IsEndOfGame", isEndOfGame);
         json.put("Leaderboard", leaderboard);
         return json + "\n";
