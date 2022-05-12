@@ -58,7 +58,7 @@ public class ConnectionSocket {
             System.out.println("waiting for message");
             String jsonFromServer = socketIn.nextLine();
             if (jsonFromServer != null) System.out.println("Got message " + jsonFromServer);
-            json = new Gson().fromJson(jsonFromServer, JsonObject.class);
+            json = gson.fromJson(jsonFromServer, JsonObject.class);
             error = json == null || !json.has("MessageType");
         } while (error);
         return json;
@@ -130,9 +130,10 @@ public class ConnectionSocket {
      */
     public boolean setGameMode(boolean isExpert) {
         socketOut.print(MessageGenerator.setGameModeMessage(isExpert));
-        socketOut.flush();
         System.out.println("SET GAME MODE - Sending: " + MessageGenerator.setGameModeMessage(isExpert));
+        socketOut.flush();
         JsonObject json = getMessage();
+        System.out.println("Received: " + json);
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 

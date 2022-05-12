@@ -24,8 +24,6 @@ public class Server {
     private static ExecutorService executorService;
     private static int numClientConnected;
     private static List<String> allPlayers;
-    private static Object blockerPlayer;
-    private static Object blockerLobby;
     private List<Game> games;
 
     public static int getPort(String[] args) {
@@ -73,7 +71,7 @@ public class Server {
     }
 
     public static boolean blockPlayerName(String nickname) throws NicknameAlreadyTakenException {
-        synchronized (blockerPlayer) {
+        synchronized (allPlayers) {
             System.out.println("SERVER ADD PLAYER - enter synchronized part");
             if (allPlayers.contains(nickname)) throw new NicknameAlreadyTakenException();
             allPlayers.add(nickname);
@@ -81,7 +79,7 @@ public class Server {
             return true;
         }
     }
-    
+
     private static Socket establishConnection(ServerSocket serverSocket) {
         Socket clientSocket = null;
         System.out.println("Server accepting connection...");
@@ -99,14 +97,14 @@ public class Server {
     }
 
     public static void setLobbySettings(boolean gamemode, int numPlayers) {
-        synchronized (blockerLobby) {
+        synchronized (lobby) {
             lobby.setNumOfPlayers(numPlayers);
             lobby.setIsExpert(gamemode);
         }
     }
 
     public static void addPlayerInLobby(ClientHandler client){
-        synchronized (blockerLobby){
+        synchronized (lobby){
             lobby.addPlayer(client);
         }
     }

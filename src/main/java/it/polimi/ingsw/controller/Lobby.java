@@ -10,6 +10,7 @@ public class Lobby {
     private boolean isExpert;
     private int numOfPlayers;
 
+
     public int getNumOfActiveUsers(){
         return queue.size();
     }
@@ -23,10 +24,11 @@ public class Lobby {
     }
 
     public int getNumOfPlayers(){
-        return getNumOfPlayers();
+        return numOfPlayers;
     }
 
     public void addPlayer(ClientHandler client){
         queue.add(client);
+        numOfPlayers+=1;
     }
 }

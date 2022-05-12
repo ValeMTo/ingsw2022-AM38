@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 
 import java.io.PrintStream;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ClientCLI {
@@ -38,11 +39,8 @@ public class ClientCLI {
      * Login phase of a new player.
      */
     public void login() {
-        if (!isRunning()) {
-            //TODO: while true???
-            this.connectionSocket= crateConnectionWithServer(hostName, portNumber);
-            isRunning = true;
-        }
+        this.connectionSocket= crateConnectionWithServer(hostName, portNumber);
+
         sendNickname();
         if(connectionSocket.isTheFirst()){
             sendGameMode();
@@ -129,19 +127,17 @@ public class ClientCLI {
      * CLI view to send the numberOfPlayers to the server
      */
     private void sendNumOfPlayers(){
-        boolean confirmation = false;
-        Integer numOfPlayers = null;
-        while (!confirmation) {
-            do {
-                System.out.println(">Insert the game mode [2/3]: ");
+        int numOfPlayers = 0;
+        while (numOfPlayers != 2 && numOfPlayers != 3){
+            System.out.println(">Insert the number of players [2/3]: ");
+            try {
                 numOfPlayers = in.nextInt();
-            } while (numOfPlayers != 2 && numOfPlayers != 3);
-            System.out.println("You have chosen " + numOfPlayers.toString() + " players game mode");
-            System.out.println(">Is it ok? [Y/n]:  ");
-            if (in.nextLine().equalsIgnoreCase("Y")) {
-                confirmation = true;
+                System.out.println(numOfPlayers);
+            } catch (InputMismatchException e){
+                System.out.println("Please, insert a number.");
             }
         }
+        System.out.println("You have chosen " + numOfPlayers+ " players game mode");
         connectionSocket.setNumberOfPlayers(numOfPlayers);
     }
 
@@ -151,33 +147,29 @@ public class ClientCLI {
      *
      * @return decision of the player to play.
      */
-    private boolean acceptSettingsOfTheGame(){
+    private boolean acceptSettingsOfTheGame() {
         boolean confirmation = false;
         while (!confirmation) {
             System.out.println("The rules are already set...");
             System.out.println("numOfPlayers: " + connectionSocket.getNumberOfPlayers().toString());
-            if(connectionSocket.getGameMode()){
+            if (connectionSocket.getGameMode()) {
                 System.out.println("GameMode: expert");
-            } else{
+            } else {
                 System.out.println("GameMode: easy");
             }
             System.out.println("Do you want to play with upper settings?[Y/n]");
-            if (in.nextLine().equalsIgnoreCase("Y")){
+            if (in.nextLine().equalsIgnoreCase("Y")) {
                 connectionSocket.accept();
                 return true;
             }
             System.out.println("If you don't accept the condition, you cannot play.");
             System.out.println("Are you sure?[Y/n]");
-            if (in.nextLine().equalsIgnoreCase("Y")){
-                confirmation=true;
+            if (in.nextLine().equalsIgnoreCase("Y")) {
+                confirmation = true;
             }
         }
         connectionSocket.refuse();
         return false;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
     }
 
 
