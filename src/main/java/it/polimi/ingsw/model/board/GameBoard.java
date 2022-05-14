@@ -2,7 +2,6 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
-import it.polimi.ingsw.exceptions.NoSuchTowerException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -145,6 +144,8 @@ public abstract class GameBoard {
         }
         // No more assistant card (all 10 cards used)
         if (numRound == 11) return EndOfMatchCondition.InstantEndOfMatch;
+        // Final round
+        if (numRound == 10) return EndOfMatchCondition.DelayedEndOfMatch;
         // 3 Islands groups
         if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3)
             return EndOfMatchCondition.InstantEndOfMatch;
@@ -476,6 +477,29 @@ public abstract class GameBoard {
                 professors.put(color, playerTowerWithMaxValue);
             }
         }
+    }
+
+    /**
+     * Return the list of the clouds' positions that the player can choose
+     * The cloud positions are in the range [1,numPlayer]
+     *
+     * @return : the list of the positions of the usable clouds
+     */
+    public List<Integer> getUsableClouds() {
+        List<Integer> usableClouds = new ArrayList<>();
+        for (int i = 0; i < playerNumber; i++) {
+            if (clouds[i].isFull())
+                usableClouds.add(i + 1);
+        }
+        return usableClouds;
+    }
+
+    public Tower getPlayerTower(String nickname) {
+        for (PlayerBoard player : players) {
+            if (nickname.equalsIgnoreCase(player.getNickName()))
+                return player.getTowerColor();
+        }
+        return null;
     }
 
     /**
