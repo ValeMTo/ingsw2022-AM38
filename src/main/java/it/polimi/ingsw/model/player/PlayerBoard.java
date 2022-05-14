@@ -54,6 +54,7 @@ public class PlayerBoard {
         this.coin = 0;
     }
 
+
     /**
      * Constructor of PlayerBoard class.
      * It is used for the easy mode game.
@@ -87,6 +88,14 @@ public class PlayerBoard {
         this.numTowersLimit = numTowers;
         this.towerColor = towerColor;
         this.coin = coin;
+    }
+
+    /**
+     * Returns the nickname of the player
+     * @return the String of the nickname of the player
+     */
+    public String getNickName() {
+        return nickName;
     }
 
     /**
