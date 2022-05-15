@@ -169,7 +169,7 @@ public class MessageGenerator {
     /**
      * Generates a String formatted in json for answer the actual gamemode
      *
-     * @return : json String with number of players in the lobby
+     * @return : json String with gamemode of the lobby
      */
     public static String gamemodeMessage(boolean isExpert) {
         JsonObject json = new JsonObject();
@@ -220,7 +220,7 @@ public class MessageGenerator {
     }
 
     /**
-     * Generates the UseAssistantCard Action message
+     * Generates the UseSpecialCard Action message
      *
      * @param specialCardName :  the name of the SpecialCard that is used
      * @return : json String of the Action UseSpecialCard message

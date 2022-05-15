@@ -196,7 +196,7 @@ public class ConnectionSocket {
     }
 
     /**
-     * Establishes the connection between the server
+     * Establishes the connection with the server
      *
      * @param serverIP   : Ip of the server
      * @param serverPort : server port

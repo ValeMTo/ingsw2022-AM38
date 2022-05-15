@@ -39,7 +39,7 @@ public class ClientCLI {
      * Login phase of a new player.
      */
     public void login() {
-        this.connectionSocket= crateConnectionWithServer(hostName, portNumber);
+        this.connectionSocket= createConnectionWithServer(hostName, portNumber);
 
         sendNickname();
         if(connectionSocket.isTheFirst()){
@@ -60,7 +60,7 @@ public class ClientCLI {
      * @param portNumber port of the Eriantys server
      * @return connectionSocket
      */
-    private ConnectionSocket crateConnectionWithServer(String hostName, int portNumber){
+    private ConnectionSocket createConnectionWithServer(String hostName, int portNumber){
         this.connectionSocket = new ConnectionSocket(hostName, portNumber);
         try {
             if (!connectionSocket.setup()) {

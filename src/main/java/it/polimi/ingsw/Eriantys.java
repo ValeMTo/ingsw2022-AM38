@@ -17,7 +17,7 @@ public class Eriantys {
         System.out.println("0 Server");
         System.out.println("1 Client CLI");
         System.out.println("2 Client GUI");
-        System.out.println("What do want to run?");
+        System.out.println("Which do you want to run?");
         Scanner scanner = new Scanner(System.in);
 
         int actionCode=-1;
