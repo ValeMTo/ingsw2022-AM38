@@ -1,10 +1,7 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
-import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.ExpertGameBoard;
-import it.polimi.ingsw.model.board.StudentCounter;
-import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
@@ -355,7 +352,7 @@ public class ExpertGameBoardTest {
      */
     @Test
     @DisplayName("Test increased movement of motherNature")
-    public void motherNatureMovement() {
+    public void motherNatureMovement() throws AlreadyUsedException {
         ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
         expert.increaseMovementMotherNature();
         if (!expert.useAssistantCard(Tower.WHITE, 2)) System.out.println("CARD NOT USABLE");

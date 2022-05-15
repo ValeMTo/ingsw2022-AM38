@@ -7,4 +7,10 @@ public class IslandOutOfBoundException extends Exception{
         this.lowerBound = lowerBound;
         this.higherBound = higherBound;
     }
+    public int getLowerBound(){
+      return this.lowerBound;
+    }
+    public int getHigherBound(){
+        return this.higherBound;
+    }
 }

@@ -28,7 +28,6 @@ public class SchoolBoard {
         try {
             return house.addStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
 
@@ -45,7 +44,6 @@ public class SchoolBoard {
         try {
             return entrance.addStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -61,7 +59,6 @@ public class SchoolBoard {
         try {
             return house.removeStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -77,7 +74,6 @@ public class SchoolBoard {
         try {
             return entrance.removeStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }

@@ -1,9 +1,9 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.LocationNotAllowedException;
 import it.polimi.ingsw.exceptions.NoSuchTowerException;
 import it.polimi.ingsw.exceptions.NotLastCardUsedException;
-import it.polimi.ingsw.model.board.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -87,8 +87,12 @@ public class GameBoardTest {
     @Test
     public void noMultipleUsesAssistantCard() {
         GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
-        assertTrue(gameboard.useAssistantCard(Tower.WHITE, 1));
-        assertFalse(gameboard.useAssistantCard(Tower.WHITE, 1));
+        try {
+            assertTrue(gameboard.useAssistantCard(Tower.WHITE, 1));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        assertThrows(AlreadyUsedException.class, () -> gameboard.useAssistantCard(Tower.WHITE, 1));
     }
 
     /**
@@ -150,10 +154,12 @@ public class GameBoardTest {
     @Test
     public void endOfMatchTestEndOfCards() {
         GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 9; i++) {
             assertEquals(EndOfMatchCondition.NoEndOfMatch, gameboard.isEndOfMatch());
             gameboard.increaseRound();
         }
+        assertEquals(EndOfMatchCondition.DelayedEndOfMatch, gameboard.isEndOfMatch());
+        gameboard.increaseRound();
         assertEquals(EndOfMatchCondition.InstantEndOfMatch, gameboard.isEndOfMatch());
     }
 
@@ -434,10 +440,10 @@ public class GameBoardTest {
     @Test
     public void moveMotherNatureCorrectly() {
         GameBoard gameboard = new EasyGameBoard(3, getNicknames(3));
-        gameboard.useAssistantCard(Tower.WHITE, 1);
-        gameboard.useAssistantCard(Tower.BLACK, 2);
-        gameboard.useAssistantCard(Tower.GRAY, 3);
         try {
+            gameboard.useAssistantCard(Tower.WHITE, 1);
+            gameboard.useAssistantCard(Tower.BLACK, 2);
+            gameboard.useAssistantCard(Tower.GRAY, 3);
             assertTrue(gameboard.moveMotherNature(2));
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -451,11 +457,12 @@ public class GameBoardTest {
     @Test
     public void moveMotherNatureBeyondLimit() {
         GameBoard gameboard = new EasyGameBoard(3, getNicknames(3));
-        gameboard.useAssistantCard(Tower.WHITE, 1);
-        gameboard.useAssistantCard(Tower.BLACK, 2);
-        gameboard.useAssistantCard(Tower.GRAY, 3);
-        System.out.println(gameboard);
         try {
+            gameboard.useAssistantCard(Tower.WHITE, 1);
+            gameboard.useAssistantCard(Tower.BLACK, 2);
+            gameboard.useAssistantCard(Tower.GRAY, 3);
+            System.out.println(gameboard);
+
             assertFalse(gameboard.moveMotherNature(12));
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -603,15 +610,15 @@ public class GameBoardTest {
     public void useAndGetLastAssistantCard(int priority) {
         GameBoard gameboard = new ExpertGameBoard(2, getNicknames(2));
         assertThrows(NotLastCardUsedException.class, () -> gameboard.getLastAssistantCard(Tower.WHITE));
-        if (priority >= 1 && priority <= 10) {
-            assertTrue(gameboard.useAssistantCard(Tower.WHITE, priority));
-            try {
+        try {
+            if (priority >= 1 && priority <= 10) {
+                assertTrue(gameboard.useAssistantCard(Tower.WHITE, priority));
                 assertEquals(priority, gameboard.getLastAssistantCard(Tower.WHITE));
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-        } else assertThrows(IndexOutOfBoundsException.class, () -> gameboard.useAssistantCard(Tower.WHITE, priority));
-
+            } else
+                assertThrows(IndexOutOfBoundsException.class, () -> gameboard.useAssistantCard(Tower.WHITE, priority));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
     }
 
     /**

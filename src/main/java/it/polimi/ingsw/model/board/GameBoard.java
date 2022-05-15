@@ -350,9 +350,12 @@ public abstract class GameBoard {
      * @param numCard     : number of the card we want to use (=priority of the AssistantCard)
      * @return : true if the card is correctly used, false if it cannot be used
      */
-    public boolean useAssistantCard(Tower playerTower, int numCard) throws IndexOutOfBoundsException {
+    public boolean useAssistantCard(Tower playerTower, int numCard) throws IndexOutOfBoundsException, AlreadyUsedException {
         for (PlayerBoard player : players) {
-            if (player.getTowerColor() == playerTower) return player.useAssistantCard(numCard);
+            if (player.getTowerColor() == playerTower) {
+                player.useAssistantCard(numCard);
+                return true;
+            }
         }
         return false;
     }
@@ -488,16 +491,14 @@ public abstract class GameBoard {
     public List<Integer> getUsableClouds() {
         List<Integer> usableClouds = new ArrayList<>();
         for (int i = 0; i < playerNumber; i++) {
-            if (clouds[i].isFull())
-                usableClouds.add(i + 1);
+            if (clouds[i].isFull()) usableClouds.add(i + 1);
         }
         return usableClouds;
     }
 
     public Tower getPlayerTower(String nickname) {
         for (PlayerBoard player : players) {
-            if (nickname.equalsIgnoreCase(player.getNickName()))
-                return player.getTowerColor();
+            if (nickname.equalsIgnoreCase(player.getNickName())) return player.getTowerColor();
         }
         return null;
     }

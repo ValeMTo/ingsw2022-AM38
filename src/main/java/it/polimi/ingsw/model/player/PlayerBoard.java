@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.player;
 
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.NotLastCardUsedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
@@ -92,6 +93,7 @@ public class PlayerBoard {
 
     /**
      * Returns the nickname of the player
+     *
      * @return the String of the nickname of the player
      */
     public String getNickName() {
@@ -105,15 +107,18 @@ public class PlayerBoard {
      * @param position the number of card that has to be used
      * @return the output of the legacy of the action
      */
-    public boolean useAssistantCard(int position) throws IndexOutOfBoundsException {
+    public void useAssistantCard(int position) throws IndexOutOfBoundsException, AlreadyUsedException {
         if (position < 1 || position > deck.size())
             throw new IndexOutOfBoundsException("AssistantCardValues are from " + 1 + " to " + 12);
         if (!deck.get(position - 1).isUsed()) {
             deck.get(position - 1).use();
             this.lastUsed = position;
-            return true;
+        } else {
+            List<Integer> usableCards = new ArrayList<>();
+            for (AssistantCard card : deck)
+                if (!card.isUsed()) usableCards.add(card.getPriority());
+            throw new AlreadyUsedException(usableCards);
         }
-        return false;
     }
 
     /**
