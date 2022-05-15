@@ -23,6 +23,8 @@ public class EasyGameBoard extends GameBoard {
      */
     @Override
     public Tower computeInfluence(int island) throws IslandOutOfBoundException {
+        if(island < 1 || island>islands.length)
+            throw new IslandOutOfBoundException(1,islands[islands.length - 1].getPosition());
         Island currentIsland = islands[island - 1];
         Tower playerTower = null;
 

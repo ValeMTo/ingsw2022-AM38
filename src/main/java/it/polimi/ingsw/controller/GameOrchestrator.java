@@ -1,9 +1,6 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.exceptions.CloudAlreadyUsedException;
-import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
-import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
-import it.polimi.ingsw.exceptions.LocationNotAllowedException;
+import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.board.*;
 
 import java.util.*;
@@ -23,7 +20,9 @@ public class GameOrchestrator {
     protected GameBoard gameBoard;
 
 
-    public GameOrchestrator(List<String> players) {
+    public GameOrchestrator(List<String> players, boolean isExpert) {
+        if (isExpert) this.gameBoard = new ExpertGameBoard(players.size(), players);
+        else this.gameBoard = new EasyGameBoard(players.size(), players);
         this.players = new ArrayList<String>();
         this.players.addAll(players);
         this.activePlayer = 0;
@@ -49,6 +48,7 @@ public class GameOrchestrator {
                         break;
                 }
             }
+            gameBoard.fillClouds();
         }
         actionOrder = new String[players.size()];
         currentPhase = PhaseEnum.PLANNING;
@@ -129,12 +129,12 @@ public class GameOrchestrator {
      * @param island : Number of the Island we want to move the student into
      * @return true if the student was added correctly
      */
-    public boolean moveStudent(Color color, int island) throws IndexOutOfBoundsException {
+    public boolean moveStudent(Color color, int island) throws IndexOutOfBoundsException, AllMovesUsedException {
         synchronized (actionBlocker) {
             if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS) return false;
             if (studentMovesLeft == 0) {
                 setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                return false;
+                throw new AllMovesUsedException();
             }
             try {
                 if (gameBoard.removeStudent(StudentCounter.SCHOOLENTRANCE, color)) {
@@ -160,7 +160,7 @@ public class GameOrchestrator {
      * @return : true if the card has been correctly used, otherwise false
      * @throws IndexOutOfBoundsException : if the card priority is not in the correct range
      */
-    public boolean chooseCard(int priority) throws IndexOutOfBoundsException {
+    public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException {
         synchronized (actionBlocker) {
             if (getCurrentPhase() != PhaseEnum.PLANNING) return false;
             if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) nextPlayer();
@@ -186,8 +186,6 @@ public class GameOrchestrator {
         }
     }
 
-    //TODO: possible method specific to the cloud that gives the Map of Color, Integer and empty it?
-
     /**
      * Transfer the students from the cloud to the current player schoolEntrance
      * Removes all the student of all colors from the cloud and adds them to the player SchoolEntrance
@@ -195,14 +193,14 @@ public class GameOrchestrator {
      * @param cloudPosition : position of the Cloud the player choose to use
      * @return : true if the
      * @throws IndexOutOfBoundsException if the position exceed the usable range [1, numOfPlayers]
-     * @throws CloudAlreadyUsedException if the Cloud is not usable anymore
+     * @throws AlreadyUsedException      if the Cloud is not usable anymore
      */
-    public boolean chooseCloud(int cloudPosition) throws IndexOutOfBoundsException, CloudAlreadyUsedException {
+    public boolean chooseCloud(int cloudPosition) throws IndexOutOfBoundsException, AlreadyUsedException {
         synchronized (actionBlocker) {
             if (getCurrentPhase() != PhaseEnum.ACTION_CHOOSE_CLOUD) return false;
             if (cloudPosition < 1 || cloudPosition > players.size()) throw new IndexOutOfBoundsException();
             if (!gameBoard.getUsableClouds().contains(cloudPosition))
-                throw new CloudAlreadyUsedException(gameBoard.getUsableClouds());
+                throw new AlreadyUsedException(gameBoard.getUsableClouds());
             try {
                 for (Color color : Color.values()) {
                     while (gameBoard.removeStudent(StudentCounter.CLOUD, color, cloudPosition)) {
@@ -302,6 +300,7 @@ public class GameOrchestrator {
                     }
                     setCurrentPhase(PhaseEnum.PLANNING);
                     gameBoard.increaseRound();
+                    gameBoard.fillClouds();
                     playedAssistantCard.clear();
                 }
                 //If the game ends
