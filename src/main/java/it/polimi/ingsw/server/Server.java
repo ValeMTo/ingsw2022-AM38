@@ -2,30 +2,32 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import it.polimi.ingsw.controller.Game;
 import it.polimi.ingsw.controller.Lobby;
-import it.polimi.ingsw.exceptions.GameModeAlreadySetException;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
-import it.polimi.ingsw.exceptions.NumberOfPlayersAlreadySetException;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
 
     private static int port;
+    private static Lobby lobby;
+    private static ExecutorService executorService;
+    private static int numClientConnected;
+    private static List<String> allPlayers;
     private List<Game> games;
-    private Lobby lobby2Easy;
-    private Lobby lobby3Easy;
-    private Lobby lobby2Expert;
-    private Lobby lobby3Expert;
 
     public static int getPort(String[] args) {
-        if (args != null && args.length > 1 ) {
+        if (args != null && args.length > 1) {
             port = Integer.parseInt(args[1]);
         } else {
             try {
@@ -44,21 +46,15 @@ public class Server {
     }
 
     public static void main(String[] args) {
+        numClientConnected = 0;
+        allPlayers = new ArrayList<>();
         ServerSocket serverSocket = createServerSocket(args);
+        executorService = Executors.newCachedThreadPool();
+        lobby = new Lobby();
+
         while (true) {
-            threadPool.execute(new ClientHandler(establishConnection(serverSocket)));
-        }
-    }
-
-    public static int getNumOfPlayers() {
-        synchronized (blockerPlayer) {
-            return Server.numOfPlayers;
-        }
-    }
-
-    public static boolean isExpert() {
-        synchronized (blockerGameMode) {
-            return Server.isExpert;
+            executorService.submit(new ClientHandler(establishConnection(serverSocket)));
+            numClientConnected += 1;
         }
     }
 
@@ -74,46 +70,15 @@ public class Server {
         return serverSocket;
     }
 
-    public static boolean addPlayer(String nickname) throws NicknameAlreadyTakenException {
-        System.out.println("SERVER ADD PLAYER: " + nickname);
-        synchronized (Server.blockerPlayer) {
+    public static boolean blockPlayerName(String nickname) throws NicknameAlreadyTakenException {
+        synchronized (allPlayers) {
             System.out.println("SERVER ADD PLAYER - enter synchronized part");
-            if (players.contains(nickname)) throw new NicknameAlreadyTakenException();
-            if (players.size() >= numOfPlayers && isNumOfPlayersSet) return false;
-            players.add(nickname);
+            if (allPlayers.contains(nickname)) throw new NicknameAlreadyTakenException();
+            allPlayers.add(nickname);
+            System.out.println("SERVER ADD PLAYER: " + nickname);
             return true;
         }
     }
-
-    public static boolean setNumOfPlayers(int numOfPlayers) throws NumberOfPlayersAlreadySetException {
-        synchronized (Server.blockerPlayer) {
-            if (Server.numOfPlayers == 0) {
-                Server.numOfPlayers = numOfPlayers;
-                return true;
-            }
-            if (numOfPlayers < 2 || numOfPlayers > 3) return false;
-        }
-        if (numOfPlayers == Server.getNumOfPlayers()) return true;
-        throw new NumberOfPlayersAlreadySetException();
-    }
-
-    public static int getNumOfPlayer() {
-        synchronized (Server.blockerPlayer) {
-            return Server.numOfPlayers;
-        }
-    }
-
-    public static void setGameMode(boolean isExpert) throws GameModeAlreadySetException {
-        synchronized (blockerGameMode) {
-            if (!gameModeAlreadySet) {
-                Server.isExpert = isExpert;
-                gameModeAlreadySet = true;
-                return;
-            }
-        }
-        throw new GameModeAlreadySetException();
-    }
-
 
     private static Socket establishConnection(ServerSocket serverSocket) {
         Socket clientSocket = null;
@@ -125,5 +90,34 @@ public class Server {
             exc.printStackTrace();
         }
         return clientSocket;
+    }
+
+    public static int getLobbyNumberOfActivePlayers() {
+        return lobby.getNumOfActiveUsers();
+    }
+
+    public static void setLobbySettings(boolean gamemode, int numPlayers) {
+        synchronized (lobby) {
+            lobby.setNumOfPlayers(numPlayers);
+            lobby.setIsExpert(gamemode);
+        }
+    }
+
+    public static void addPlayerInLobby(ClientHandler client){
+        synchronized (lobby){
+            lobby.addPlayer(client);
+        }
+    }
+
+    public static int getNumOfPlayerGame(){
+        synchronized (lobby) {
+            return lobby.getNumOfPlayers();
+        }
+    }
+
+    public static boolean getGamemode(){
+        synchronized (lobby){
+            return lobby.getGamemode();
+        }
     }
 }

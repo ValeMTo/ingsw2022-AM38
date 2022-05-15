@@ -1,6 +1,6 @@
 package it.polimi.ingsw.messages;
 
-public enum UpdateTypeEnumeration {
+public enum UpdateTypeEnum {
     SETUP_UPDATE,
     CLOUD_VIEW_UPDATE,
     ISLAND_VIEW_UPDATE,
