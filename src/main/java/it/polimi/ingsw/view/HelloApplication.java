@@ -26,12 +26,13 @@ public class HelloApplication extends Application {
     public void start(Stage primaryStage) throws IOException {
 
         Group root = new Group();
-        Canvas canvas = new Canvas(1920, 1080);
+        Canvas canvas = new Canvas(600, 400);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         ImageView imageView;
 
         Image img = new Image("Assistente_1.png");
         imageView = new ImageView(img);
+        gc.drawImage(img,20,20,100,100);
 
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
