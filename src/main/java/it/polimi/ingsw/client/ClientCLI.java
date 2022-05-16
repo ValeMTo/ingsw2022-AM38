@@ -1,17 +1,22 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.view.ViewState;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ClientCLI {
+    private ViewState viewState;
     private static String hostName;
     private static int portNumber;
     private Scanner in = null;
     private final PrintStream out;
     private boolean isRunning;
+    private final String CLICyan = "\033[36";
     ConnectionSocket connectionSocket;
 
     public ClientCLI() {
@@ -32,8 +37,9 @@ public class ClientCLI {
         ClientCLI cli = new ClientCLI();
         System.out.println("Information set: IP " + hostName + " port " + portNumber);
         cli.login();
-
+        cli.startGame();
     }
+
 
     /**
      * Login phase of a new player.
@@ -42,6 +48,7 @@ public class ClientCLI {
         this.connectionSocket= createConnectionWithServer(hostName, portNumber);
 
         sendNickname();
+        cleaner();
         if(connectionSocket.isTheFirst()){
             sendGameMode();
             sendNumOfPlayers();
@@ -50,8 +57,41 @@ public class ClientCLI {
                 //TODO: add the player to the lobby
                 //TODO: WELCOME IN ERIANTYS
             }
+            else
+                connectionSocket.disconnect();
+        }
+        this.viewState = connectionSocket.startGame();
+    }
+
+    public void startGame(){
+        while(!viewState.isEndOfMatch()){
+            cleaner();
+            showMenu();
+            //showBoard();
+            getInputAndSendMessage();
         }
     }
+
+    public void getInputAndSendMessage(){
+        String input = in.nextLine();
+    }
+
+    private void cleaner(){
+        System.out.println("\033[H\033[2J");
+        ProcessBuilder processBuilder;
+        try{
+            if(System.getProperty("os.name").contains("Windows")){
+                processBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
+
+            }
+            else processBuilder = new ProcessBuilder("clear").inheritIO();
+            processBuilder.start();
+        }
+        catch(IOException exc){
+            exc.printStackTrace();
+        }
+    }
+
 
     /**
      * Establish connection with the server
@@ -171,6 +211,18 @@ public class ClientCLI {
         connectionSocket.refuse();
         return false;
     }
-
-
+    private void showMenu(){
+        if(!viewState.isActiveView()){
+            System.out.println(CLICyan+" NOT YOUR TURN - WAIT UNTIL IS YOUR TURN");
+        }
+        else
+        {
+            if(viewState.getCurrentPhase()== PhaseEnum.PLANNING){
+                System.out.println(CLICyan+" CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS");
+            }
+            else if(viewState.getCurrentPhase()== PhaseEnum.ACTION_MOVE_STUDENTS){
+                System.out.println(CLICyan+" CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)");
+            }
+        }
+    }
 }

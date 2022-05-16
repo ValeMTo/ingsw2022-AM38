@@ -3,11 +3,11 @@ package it.polimi.ingsw.model.board;
 import java.util.HashMap;
 
 public class Island {
-    private HashMap<Color, Integer> influence;
-    private int position;
-    private boolean influenceIsEnabled = true;
-    private Tower towerColor = null;
-    private int towerNumber = 0;
+    protected HashMap<Color, Integer> influence;
+    protected int position;
+    protected boolean influenceIsEnabled = true;
+    protected Tower towerColor = null;
+    protected int towerNumber = 0;
 
     /**
      * Constructor that initializes the HashMap and position
