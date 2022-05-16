@@ -15,18 +15,19 @@ import java.util.Map;
 public class ViewState {
     private final Map<String, Tower> players;
     private final List<IslandView> islands;
-    private PhaseEnum currentPhase;
-    private boolean activeView;
-    private List<Integer> usableCards;
-    private Tower playerTower;
     private final Map<Color, Integer> schoolEntranceOccupancy;
     private final Map<Color, Integer> diningRoomOccupancy;
-    private Map<Color, Tower> professors;
     private final boolean isExpert;
+    private PhaseEnum currentPhase;
+    private boolean activeView;
+    private final List<Integer> usableCards;
+    private Tower playerTower;
+    private Map<Color, Tower> professors;
     private int motherNature;
     private boolean isEndOfMatch = false;
 
     public ViewState(Map<String, Tower> players, boolean isExpert) {
+        this.usableCards = new ArrayList<Integer>();
         this.players = new HashMap<>(players);
         this.isExpert = isExpert;
         activeView = true;

@@ -11,6 +11,10 @@ import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.MessageTypeEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
+import it.polimi.ingsw.model.board.Tower;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MessageParser {
@@ -124,6 +128,18 @@ public class MessageParser {
         } catch (AlreadyUsedException exc) {
             return MessageGenerator.errorWithUsableValues(ErrorTypeEnum.ALREADY_USED_CLOUD, "ERROR - the cloud was already used", exc.getUsableIndexes());
         }
+    }
+
+    /**
+     * Method for the get for the SETUP update
+     * @return the Map of players string and tower color
+     */
+    public Map<String, Tower> getPlayersTower(){
+        return new HashMap<String,Tower>(this.gameOrchestrator.getPlayersTower());
+    }
+
+    public boolean isExpert(){
+        return this.gameOrchestrator.isExpert();
     }
 
 }
