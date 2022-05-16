@@ -15,14 +15,15 @@ import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
 
 public class ClientHandler implements Runnable {
     private final Socket inSocket;
+    private final Gson gson;
     private Scanner inputReader;
     private PrintWriter writer;
     private String playerName;
-    private Gson gson;
     private MessageParser messageParser = null;
+
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
-        gson=new Gson();
+        gson = new Gson();
         try {
             inputReader = new Scanner(inSocket.getInputStream());
         } catch (IOException e) {
@@ -44,22 +45,41 @@ public class ClientHandler implements Runnable {
         do {
             error = !addPlayer();
         } while (error);
-        boolean setMessageParser;
-
-        do{
-            try{
-                this.wait(10000);
-            }
-            catch(Exception exc){
-                exc.printStackTrace();
-            }
-            setMessageParser = !(null==this.messageParser);
-        }while(!setMessageParser);
-        while(true){
+        setupMessageParser();
+        while (true) {
             writer.print(messageParser.parseMessageToAction(inputReader.nextLine()));
         }
     }
 
+    /**
+     * Setups the message parser, waiting that the Lobby is completed and the GameOrchestrator has been generated
+     */
+    private void setupMessageParser() {
+        boolean set;
+        do {
+            try {
+                System.out.println("CLIENT HANDLER of" + playerName + "- Waiting for messageParser");
+                synchronized (this) {
+                    this.messageParser = Server.getMessageParserFromLobby(this);
+                    if (this.messageParser == null) {
+                        this.wait();
+                        this.messageParser = Server.getMessageParserFromLobby(this);
+                    }
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+            if (this.messageParser != null)
+                System.out.println("CLIENT HANDLER of" + playerName + " - Got messageParser");
+            set = null != this.messageParser;
+            if (set) System.out.println("Set yes");
+            else System.out.println("Set no");
+        } while (!set);
+        System.out.println("CLIENT HANDLER of" + playerName + " - messageParserSet sends setup...");
+        writer.print(MessageGenerator.setupUpdateMessage(messageParser.getPlayersTower(), messageParser.getPlayersTower().size(), messageParser.isExpert()));
+        writer.flush();
+        System.out.println("CLIENT HANDLER of" + playerName + " - messageParserSet now waiting for messages...");
+    }
 
 
     /**
@@ -67,9 +87,10 @@ public class ClientHandler implements Runnable {
      *
      * @param messageParser
      */
-    public void setMessageParser(MessageParser messageParser){
+    public void setMessageParser(MessageParser messageParser) {
         this.messageParser = messageParser;
-        System.out.println("CLIENTHANDLER of "+this.playerName+" set messageParser");
+        System.out.println("CLIENTHANDLER of " + this.playerName + " set messageParser");
+
     }
 
     /**
@@ -106,12 +127,12 @@ public class ClientHandler implements Runnable {
 
         this.playerName = receiveNickname();
         lobbyRequestHandler();
-        if(Server.getLobbyNumberOfActivePlayers() == 0){
+        if (Server.getLobbyNumberOfActivePlayers() == 0) {
             Server.setLobbySettings(receiveGamemode(), receiveNumOfPlayers());
-        }else{
+        } else {
             sendNumberOfPlayers(Server.getNumOfPlayerGame());
             sendGameMode(Server.getGamemode());
-            if(!getQuickAnswer()){
+            if (!getQuickAnswer()) {
                 return false;
             }
         }
@@ -121,9 +142,10 @@ public class ClientHandler implements Runnable {
 
     /**
      * Gets the nickname of the player
+     *
      * @return : the String of the player nickname
      */
-    public String getNickName(){
+    public String getNickName() {
         return this.playerName;
     }
 
@@ -132,7 +154,7 @@ public class ClientHandler implements Runnable {
      *
      * @return the exit of the message
      */
-    private boolean getQuickAnswer(){
+    private boolean getQuickAnswer() {
         System.out.println("YES OR NO MESSAGE - Waiting for a message ");
         JsonObject json = getMessage();
         return (json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal());
@@ -144,7 +166,7 @@ public class ClientHandler implements Runnable {
      *
      * @return the nickname chosen by the player
      */
-    private String receiveNickname(){
+    private String receiveNickname() {
         System.out.println("ADD PLAYER - Waiting for a message ");
         JsonObject json = getMessage();
         String nickname = null;
@@ -162,7 +184,7 @@ public class ClientHandler implements Runnable {
                     receiveNickname();
                 }
             }
-        } else{
+        } else {
             receiveNickname();
         }
         return nickname;
@@ -171,7 +193,7 @@ public class ClientHandler implements Runnable {
     /**
      * Send a message with the number of active users in the lobby room
      */
-    private void lobbyRequestHandler(){
+    private void lobbyRequestHandler() {
         System.out.println("LOBBY REQUEST - Waiting for a message ");
         JsonObject json = getMessage();
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.REQUEST.ordinal()) {
@@ -180,7 +202,7 @@ public class ClientHandler implements Runnable {
                 System.out.println("Sending: " + MessageGenerator.numberPlayerlobbyMessage(Server.getLobbyNumberOfActivePlayers()));
                 writer.flush();
             }
-        } else{
+        } else {
             lobbyRequestHandler();
         }
     }
@@ -193,7 +215,7 @@ public class ClientHandler implements Runnable {
     private boolean receiveGamemode() {
         System.out.println("GAMEMODE SET - Waiting for a message ");
         JsonObject json = getMessage();
-        Boolean gamemode =null;
+        Boolean gamemode = null;
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
             if (json.get("SetType").getAsInt() == SetTypeEnum.SET_GAME_MODE.ordinal()) {
                 gamemode = json.get("SetExpertGameMode").getAsBoolean();

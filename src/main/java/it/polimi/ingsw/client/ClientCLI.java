@@ -10,15 +10,14 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ClientCLI {
-    private ViewState viewState;
     private static String hostName;
     private static int portNumber;
     private final PrintStream out;
-    private boolean isRunning;
-    private final String CLICyan = "\033[36";
-    ConnectionSocket connectionSocket;
-    private Scanner in = null;
+    private final String CLICyan = "\033[36;1;4m";
     private final boolean isRunning;
+    ConnectionSocket connectionSocket;
+    private ViewState viewState;
+    private Scanner in = null;
 
     public ClientCLI() {
 
@@ -46,49 +45,55 @@ public class ClientCLI {
      * Login phase of a new player.
      */
     public void login() {
-        this.connectionSocket= createConnectionWithServer(hostName, portNumber);
+        this.connectionSocket = createConnectionWithServer(hostName, portNumber);
 
         sendNickname();
         cleaner();
-        if(connectionSocket.isTheFirst()){
+        if (connectionSocket.isTheFirst()) {
             sendGameMode();
             sendNumOfPlayers();
         } else {
             if (acceptSettingsOfTheGame()) {
                 //TODO: add the player to the lobby
                 //TODO: WELCOME IN ERIANTYS
-            }
-            else
-                connectionSocket.disconnect();
+            } else connectionSocket.disconnect();
         }
         this.viewState = connectionSocket.startGame();
     }
 
-    public void startGame(){
-        while(!viewState.isEndOfMatch()){
-            cleaner();
+    /**
+     * Start Game models the recursive phase of printing coherent menus and interface and waits for correct inputs
+     */
+    public void startGame() {
+        while (!viewState.isEndOfMatch()) {
+            //cleaner();
             showMenu();
             //showBoard();
             getInputAndSendMessage();
         }
     }
 
-    public void getInputAndSendMessage(){
+    /**
+     *
+     */
+    //TODO : support to sending message in base of the current phase
+    public void getInputAndSendMessage() {
         String input = in.nextLine();
     }
 
-    private void cleaner(){
+    /**
+     * Cleans the CLI
+     */
+    private void cleaner() {
         System.out.println("\033[H\033[2J");
         ProcessBuilder processBuilder;
-        try{
-            if(System.getProperty("os.name").contains("Windows")){
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
                 processBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
 
-            }
-            else processBuilder = new ProcessBuilder("clear").inheritIO();
+            } else processBuilder = new ProcessBuilder("clear").inheritIO();
             processBuilder.start();
-        }
-        catch(IOException exc){
+        } catch (IOException exc) {
             exc.printStackTrace();
         }
     }
@@ -101,7 +106,7 @@ public class ClientCLI {
      * @param portNumber port of the Eriantys server
      * @return connectionSocket
      */
-    private ConnectionSocket createConnectionWithServer(String hostName, int portNumber){
+    private ConnectionSocket createConnectionWithServer(String hostName, int portNumber) {
         this.connectionSocket = new ConnectionSocket(hostName, portNumber);
         try {
             if (!connectionSocket.setup()) {
@@ -212,17 +217,18 @@ public class ClientCLI {
         connectionSocket.refuse();
         return false;
     }
-    private void showMenu(){
-        if(!viewState.isActiveView()){
-            System.out.println(CLICyan+" NOT YOUR TURN - WAIT UNTIL IS YOUR TURN");
-        }
-        else
-        {
-            if(viewState.getCurrentPhase()== PhaseEnum.PLANNING){
-                System.out.println(CLICyan+" CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS");
-            }
-            else if(viewState.getCurrentPhase()== PhaseEnum.ACTION_MOVE_STUDENTS){
-                System.out.println(CLICyan+" CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)");
+
+    /**
+     * Shows the possible commands and what to do in the current phase
+     */
+    private void showMenu() {
+        if (!viewState.isActiveView()) {
+            System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN");
+        } else {
+            if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
+                System.out.println(CLICyan + "  CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS");
+            } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
+                System.out.println(CLICyan + "  CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)");
             }
         }
     }

@@ -7,8 +7,9 @@ import java.util.*;
 
 public class GameOrchestrator {
     protected final int maxStudentMoves = 3;
+    protected final Map<String, Tower> playersTower;
+    protected final boolean isExpert;
     protected List<String> players;
-    protected Map<String, Tower> playersTower;
     protected SortedSet<Integer> playedAssistantCard;
     protected String[] planningOrder;
     protected String[] actionOrder;
@@ -21,15 +22,19 @@ public class GameOrchestrator {
 
 
     public GameOrchestrator(List<String> players, boolean isExpert) {
+        this.isExpert = isExpert;
+        System.out.println("GAMEORCHESTRATOR - SETTING");
         if (isExpert) this.gameBoard = new ExpertGameBoard(players.size(), players);
         else this.gameBoard = new EasyGameBoard(players.size(), players);
         this.players = new ArrayList<String>();
         this.players.addAll(players);
         this.activePlayer = 0;
+        this.actionOrder = new String[players.size()];
+        this.planningOrder = new String[players.size()];
         this.playersTower = new HashMap<String, Tower>();
         this.playedAssistantCard = new TreeSet<Integer>();
-        planningOrder = new String[players.size()];
         for (int i = 0; i < players.size(); i++) {
+            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i);
             planningOrder[i] = players.get(i);
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
@@ -48,9 +53,9 @@ public class GameOrchestrator {
                         break;
                 }
             }
-            gameBoard.fillClouds();
         }
-        actionOrder = new String[players.size()];
+        gameBoard.fillClouds();
+
         currentPhase = PhaseEnum.PLANNING;
     }
 
@@ -63,6 +68,25 @@ public class GameOrchestrator {
         synchronized (phaseBlocker) {
             return this.players.get(activePlayer);
         }
+    }
+
+    /**
+     * Method for the get for the SETUP update
+     *
+     * @return the Map of players string and tower color
+     */
+    public Map<String, Tower> getPlayersTower() {
+        return new HashMap<String, Tower>(this.playersTower);
+    }
+
+    /**
+     * Needed for the SETUP update to give the set gameMode
+     *
+     * @return true if Expert, false if simple
+     */
+
+    public boolean isExpert() {
+        return this.isExpert;
     }
 
     /**

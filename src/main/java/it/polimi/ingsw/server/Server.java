@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.controller.Game;
 import it.polimi.ingsw.controller.Lobby;
+import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 
 import java.io.FileReader;
@@ -117,6 +118,19 @@ public class Server {
     public static boolean getGamemode() {
         synchronized (lobby) {
             return lobby.getGamemode();
+        }
+    }
+
+    /**
+     * Return the created messageParser by the Lobby
+     *
+     * @param client : client that solicited the Lobby to get its MessageParser to connect to the Controller
+     * @return a new messageParser created by the lobby or null
+     */
+
+    public static MessageParser getMessageParserFromLobby(ClientHandler client) {
+        synchronized (lobby) {
+            return lobby.getMessageParser(client);
         }
     }
 }
