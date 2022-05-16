@@ -1,8 +1,10 @@
 package it.polimi.ingsw.client;
 
+import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.model.board.Color;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -13,7 +15,13 @@ public class ClientCLI {
     private static String hostName;
     private static int portNumber;
     private final PrintStream out;
-    private final String CLICyan = "\033[36;1;4m";
+    private final String CLICyan = "\033[36;1m";
+    private final String CLIRed = "\033[31;1m";
+    private final String CLIGreen = "\033[32;1m";
+    private final String CLIYellow = "\033[93;1m";
+    private final String CLIBlue = "\033[94;1m";
+    private final String CLIPink = "\033[95;1m";
+    private final String CLIEffectReset = "\033[0m";
     private final boolean isRunning;
     ConnectionSocket connectionSocket;
     private ViewState viewState;
@@ -58,6 +66,7 @@ public class ClientCLI {
                 //TODO: WELCOME IN ERIANTYS
             } else connectionSocket.disconnect();
         }
+        cleaner();
         this.viewState = connectionSocket.startGame();
     }
 
@@ -66,10 +75,12 @@ public class ClientCLI {
      */
     public void startGame() {
         while (!viewState.isEndOfMatch()) {
-            //cleaner();
             showMenu();
+            printArchipelago();
             //showBoard();
+            printAssistantCards();
             getInputAndSendMessage();
+            cleaner();
         }
     }
 
@@ -82,11 +93,35 @@ public class ClientCLI {
     }
 
     /**
+     * Given a color enumeration value, gives the proper command to print the characters into the CLI
+     *
+     * @param color : color that is given to be converted
+     * @return the ANSI command string
+     */
+    private String getColorCommand(Color color) {
+        switch (color) {
+            case BLUE:
+                return CLIBlue;
+            case RED:
+                return CLIRed;
+            case GREEN:
+                return CLIGreen;
+            case PINK:
+                return CLIPink;
+            case YELLOW:
+                return CLIYellow;
+        }
+        return "";
+    }
+
+    /**
      * Cleans the CLI
      */
     private void cleaner() {
-        System.out.println("\033[H\033[2J");
-        ProcessBuilder processBuilder;
+        //7System.out.println("\033[H\033[2J");
+        System.out.println("\033[2J");
+        System.out.println("\033[3J");
+        /*ProcessBuilder processBuilder;
         try {
             if (System.getProperty("os.name").contains("Windows")) {
                 processBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
@@ -95,7 +130,7 @@ public class ClientCLI {
             processBuilder.start();
         } catch (IOException exc) {
             exc.printStackTrace();
-        }
+        }*/
     }
 
 
@@ -218,18 +253,97 @@ public class ClientCLI {
         return false;
     }
 
+    private void printVector(String[] stringMatrix) {
+        for (String rows : stringMatrix) {
+            System.out.println(rows);
+        }
+    }
+
+    /**
+     * Prints the usable assistant card
+     */
+    private void printAssistantCards() {
+        String[] rows = new String[7];
+        int steps;
+        for (int i = 0; i < 7; i++)
+            rows[i] = "";
+        for (Integer i : viewState.getUsableCards()) {
+            steps = i / 2 + i % 2;
+            rows[0] += "  _______________ ";
+            if (i >= 10)
+                rows[1] += "  | " + CLIRed + "Priority:" + CLIEffectReset + i + " | ";
+            else
+                rows[1] += "  | " + CLIRed + "Priority:" + CLIEffectReset + i + "  | ";
+            rows[3] += "  | " + CLIGreen + "Steps:" + CLIEffectReset + steps + "     | ";
+            for (int j = 2; j < 6; j++)
+                if (j != 3)
+                    rows[j] += "  |             | ";
+            rows[6] += "  |_____________| ";
+        }
+        printVector(rows);
+
+
+    }
+
     /**
      * Shows the possible commands and what to do in the current phase
      */
     private void showMenu() {
         if (!viewState.isActiveView()) {
-            System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN");
+            System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
         } else {
             if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
-                System.out.println(CLICyan + "  CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS");
+                System.out.println(CLICyan + "CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS (enter the Priority value)" + CLIEffectReset);
             } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
-                System.out.println(CLICyan + "  CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)");
+                System.out.println(CLICyan + "CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)" + CLIEffectReset);
+            } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
+                System.out.println(CLICyan + "CHOICE WHERE TO MOVE THE MOTHER NATURE (enter the island destination island)" + CLIEffectReset);
+            } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
+                System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOLENTRANCE (enter the cloud number)" + CLIEffectReset);
             }
         }
+    }
+
+    private void printArchipelago(){
+      String[]rows = new String[12];
+      for(int i=0;i<12;i++)
+          rows[i] = new String();
+      int maxIslandsPerRow = 4;
+      int counter = 0;
+      for(IslandView island: viewState.getIslands()) {
+          if(island.getTowerNumber()<=1)
+          rows[0] += "                    ";
+          else
+          rows[0] += " GROUP OF x ISLANDS  ";
+          if(island.getPosition()>=10)
+          rows[1] += "   Position NR. xx   ";
+          else
+          rows[1] += "   Position NR. x       ";
+          rows[2] += "      ___________     ";
+          if(!island.isTaken())
+          rows[3] += "     /           \\     ";
+          else if (island.isTaken()&&island.getTowerNumber()<=1)
+          rows[3] += "    / xx TOWER    \\     ";
+          else
+          rows[3] += "    / xx TOWER(xN)\\     ";
+          rows[4] += "   /    BLUE:x     \\    ";
+          rows[5] += "  /     GREEN:x     \\   ";
+          rows[6] += "  |     YELLOW:x     |  ";
+          rows[7] += "  |     PINK:x       |  ";
+          rows[8] += "   \\    RED:x        /  ";
+          rows[9] += "    \\               /   ";
+          if(viewState.getMotherNature()!=island.getPosition())
+          rows[10] += "     \\             /    ";
+          else
+          rows[10] += "     \\MOTHERNATURE /    ";
+          rows[11] +="      \\___________/     ";
+          counter ++;
+          if(counter >= maxIslandsPerRow){
+              printVector(rows);
+              counter = 0;
+              for(int j =0;j<12;j++)
+                  rows[j] = "";
+          }
+      }
     }
 }
