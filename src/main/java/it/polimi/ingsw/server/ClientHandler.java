@@ -2,6 +2,7 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 import it.polimi.ingsw.messages.*;
 
@@ -18,7 +19,7 @@ public class ClientHandler implements Runnable {
     private PrintWriter writer;
     private String playerName;
     private Gson gson;
-
+    private MessageParser messageParser = null;
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
         gson=new Gson();
@@ -43,6 +44,32 @@ public class ClientHandler implements Runnable {
         do {
             error = !addPlayer();
         } while (error);
+        boolean setMessageParser;
+
+        do{
+            try{
+                this.wait(10000);
+            }
+            catch(Exception exc){
+                exc.printStackTrace();
+            }
+            setMessageParser = !(null==this.messageParser);
+        }while(!setMessageParser);
+        while(true){
+            writer.print(messageParser.parseMessageToAction(inputReader.nextLine()));
+        }
+    }
+
+
+
+    /**
+     * When the lobby is full, the class receives the created messageParser
+     *
+     * @param messageParser
+     */
+    public void setMessageParser(MessageParser messageParser){
+        this.messageParser = messageParser;
+        System.out.println("CLIENTHANDLER of "+this.playerName+" set messageParser");
     }
 
     /**
@@ -90,6 +117,14 @@ public class ClientHandler implements Runnable {
         }
         Server.addPlayerInLobby(this);
         return true;
+    }
+
+    /**
+     * Gets the nickname of the player
+     * @return : the String of the player nickname
+     */
+    public String getNickName(){
+        return this.playerName;
     }
 
     /**

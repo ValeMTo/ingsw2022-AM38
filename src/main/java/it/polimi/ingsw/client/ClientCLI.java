@@ -13,11 +13,12 @@ public class ClientCLI {
     private ViewState viewState;
     private static String hostName;
     private static int portNumber;
-    private Scanner in = null;
     private final PrintStream out;
     private boolean isRunning;
     private final String CLICyan = "\033[36";
     ConnectionSocket connectionSocket;
+    private Scanner in = null;
+    private final boolean isRunning;
 
     public ClientCLI() {
 
@@ -53,7 +54,7 @@ public class ClientCLI {
             sendGameMode();
             sendNumOfPlayers();
         } else {
-            if(acceptSettingsOfTheGame()){
+            if (acceptSettingsOfTheGame()) {
                 //TODO: add the player to the lobby
                 //TODO: WELCOME IN ERIANTYS
             }
@@ -96,7 +97,7 @@ public class ClientCLI {
     /**
      * Establish connection with the server
      *
-     * @param hostName IP of the server
+     * @param hostName   IP of the server
      * @param portNumber port of the Eriantys server
      * @return connectionSocket
      */
@@ -117,7 +118,7 @@ public class ClientCLI {
     /**
      * CLI view to ask the nickname to the server
      */
-    private void sendNickname(){
+    private void sendNickname() {
         boolean confirmation = false;
         String nickname = null;
         while (!confirmation) {
@@ -141,17 +142,17 @@ public class ClientCLI {
     /**
      * CLI view to send the gameMode to the server
      */
-    private void sendGameMode(){
+    private void sendGameMode() {
         boolean confirmation = false;
         String mode;
         Boolean isExpert = null;
         while (!confirmation) {
             System.out.println(">Insert the game mode [E/D]: ");
             mode = in.nextLine();
-            if(mode.equalsIgnoreCase("E")){
+            if (mode.equalsIgnoreCase("E")) {
                 System.out.println("You have chosen the expert mode");
-                isExpert =  true;
-            } else if (mode.equalsIgnoreCase("D")){
+                isExpert = true;
+            } else if (mode.equalsIgnoreCase("D")) {
                 System.out.println("You have chosen the easy mode");
                 isExpert = false;
             }
@@ -166,18 +167,18 @@ public class ClientCLI {
     /**
      * CLI view to send the numberOfPlayers to the server
      */
-    private void sendNumOfPlayers(){
+    private void sendNumOfPlayers() {
         int numOfPlayers = 0;
-        while (numOfPlayers != 2 && numOfPlayers != 3){
+        while (numOfPlayers != 2 && numOfPlayers != 3) {
             System.out.println(">Insert the number of players [2/3]: ");
             try {
                 numOfPlayers = in.nextInt();
                 System.out.println(numOfPlayers);
-            } catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 System.out.println("Please, insert a number.");
             }
         }
-        System.out.println("You have chosen " + numOfPlayers+ " players game mode");
+        System.out.println("You have chosen " + numOfPlayers + " players game mode");
         connectionSocket.setNumberOfPlayers(numOfPlayers);
     }
 
