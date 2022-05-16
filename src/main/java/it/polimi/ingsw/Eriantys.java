@@ -32,7 +32,7 @@ public class Eriantys {
             switch (actionCode){
                 case 0 -> Server.main(null);
                 case 1 -> ClientCLI.main(null);
-                case 2 -> Application.launch(HelloApplication.class);
+                case 2 -> HelloApplication.main(null);
                 //case 2-> ClientGUI.main(null);
                 default -> System.err.println("Only 0/1/2 numbers admitted");
             }
