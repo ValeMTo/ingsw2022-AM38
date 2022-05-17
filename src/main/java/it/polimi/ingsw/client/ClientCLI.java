@@ -5,10 +5,11 @@ import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.board.Tower;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ClientCLI {
@@ -22,6 +23,14 @@ public class ClientCLI {
     private final String CLIBlue = "\033[94;1m";
     private final String CLIPink = "\033[95;1m";
     private final String CLIEffectReset = "\033[0m";
+    private final String CLIBlack = "\033[30;107;1m";
+    private final String CLIGray = "\033[90;1m";
+    private final String CLIBoldWhite = "\033[1m;";
+    private final String verticalLine = "│";
+    private final String horizontalLine = "─";
+    private final String horizontalLinex10 = "──────────";
+
+
     private final boolean isRunning;
     ConnectionSocket connectionSocket;
     private ViewState viewState;
@@ -118,19 +127,8 @@ public class ClientCLI {
      * Cleans the CLI
      */
     private void cleaner() {
-        //7System.out.println("\033[H\033[2J");
-        System.out.println("\033[2J");
-        System.out.println("\033[3J");
-        /*ProcessBuilder processBuilder;
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                processBuilder = new ProcessBuilder("cmd", "/c", "cls").inheritIO();
-
-            } else processBuilder = new ProcessBuilder("clear").inheritIO();
-            processBuilder.start();
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }*/
+        System.out.println("\033[H\033[2J");
+        System.out.flush();
     }
 
 
@@ -269,16 +267,16 @@ public class ClientCLI {
             rows[i] = "";
         for (Integer i : viewState.getUsableCards()) {
             steps = i / 2 + i % 2;
-            rows[0] += "  _______________ ";
+            rows[0] += "  ┌─────────────┐ ";
             if (i >= 10)
-                rows[1] += "  | " + CLIRed + "Priority:" + CLIEffectReset + i + " | ";
+                rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + " │ ";
             else
-                rows[1] += "  | " + CLIRed + "Priority:" + CLIEffectReset + i + "  | ";
-            rows[3] += "  | " + CLIGreen + "Steps:" + CLIEffectReset + steps + "     | ";
+                rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + "  │ ";
+            rows[3] += "  │ " + CLIGreen + "Steps:" + CLIEffectReset + steps + "     │ ";
             for (int j = 2; j < 6; j++)
                 if (j != 3)
-                    rows[j] += "  |             | ";
-            rows[6] += "  |_____________| ";
+                    rows[j] += "  │             │ ";
+            rows[6] += "  └─────────────┘ ";
         }
         printVector(rows);
 
@@ -304,46 +302,81 @@ public class ClientCLI {
         }
     }
 
-    private void printArchipelago(){
-      String[]rows = new String[12];
-      for(int i=0;i<12;i++)
-          rows[i] = new String();
-      int maxIslandsPerRow = 4;
-      int counter = 0;
-      for(IslandView island: viewState.getIslands()) {
-          if(island.getTowerNumber()<=1)
-          rows[0] += "                    ";
-          else
-          rows[0] += " GROUP OF x ISLANDS  ";
-          if(island.getPosition()>=10)
-          rows[1] += "   Position NR. xx   ";
-          else
-          rows[1] += "   Position NR. x       ";
-          rows[2] += "      ___________     ";
-          if(!island.isTaken())
-          rows[3] += "     /           \\     ";
-          else if (island.isTaken()&&island.getTowerNumber()<=1)
-          rows[3] += "    / xx TOWER    \\     ";
-          else
-          rows[3] += "    / xx TOWER(xN)\\     ";
-          rows[4] += "   /    BLUE:x     \\    ";
-          rows[5] += "  /     GREEN:x     \\   ";
-          rows[6] += "  |     YELLOW:x     |  ";
-          rows[7] += "  |     PINK:x       |  ";
-          rows[8] += "   \\    RED:x        /  ";
-          rows[9] += "    \\               /   ";
-          if(viewState.getMotherNature()!=island.getPosition())
-          rows[10] += "     \\             /    ";
-          else
-          rows[10] += "     \\MOTHERNATURE /    ";
-          rows[11] +="      \\___________/     ";
-          counter ++;
-          if(counter >= maxIslandsPerRow){
-              printVector(rows);
-              counter = 0;
-              for(int j =0;j<12;j++)
-                  rows[j] = "";
-          }
-      }
+    private void printArchipelago() {
+        String[] rows = new String[12];
+        for (int i = 0; i < 12; i++)
+            rows[i] = "";
+        int maxIslandsPerRow = 6;
+        int counter = 0;
+        Map students;
+        for (IslandView island : viewState.getIslands()) {
+            students = island.getStudentMap();
+            if (island.getTowerNumber() <= 1)
+                rows[0] += "                    ";
+            else
+                rows[0] += " " + CLICyan + "GROUP OF " + island.getTowerNumber() + " ISLANDS  " + CLIEffectReset;
+            if (island.getPosition() >= 10)
+                rows[1] += "   " + CLICyan + "Position NR. " + island.getPosition() + CLIEffectReset + "   ";
+            else
+                rows[1] += "   " + CLICyan + "Position NR. " + island.getPosition() + CLIEffectReset + "       ";
+            rows[2] += "      " + horizontalLinex10 + "──      ";
+            if (!island.isTaken())
+                rows[3] += "    /             \\     ";
+            else if (island.isTaken() && island.getTowerNumber() <= 1)
+                rows[3] += "    │ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + " TOWER" + CLIEffectReset + "     \\     ";
+            else
+                rows[3] += "    │ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + " TOWER(" + island.getTowerNumber() + "N)" + CLIEffectReset + "\\     ";
+            rows[4] += "  ┌─┘   " + CLIBlue + "BLUE:" + students.get(Color.BLUE) + CLIEffectReset + "     \\    ";
+            rows[5] += "  │     " + CLIGreen + "GREEN:" + students.get(Color.GREEN) + CLIEffectReset + "     \\   ";
+            rows[6] += "  │     " + CLIYellow + "YELLOW:" + students.get(Color.YELLOW) + CLIEffectReset + "     |  ";
+            rows[7] += "  │     " + CLIPink + "PINK:" + students.get(Color.PINK) + CLIEffectReset + "       |  ";
+            rows[8] += "  └──" +
+                    "    " + CLIRed + "RED:" + students.get(Color.RED) + CLIEffectReset + "        /  ";
+            rows[9] += "    \\               /   ";
+            if (viewState.getMotherNature() != island.getPosition())
+                rows[9] += "    \\               /   ";
+            else
+                rows[9] += "    \\ " + CLIBoldWhite + "MOTHERNATURE" + CLIEffectReset + "  /   ";
+            rows[10] += "      │           │    ";
+
+            rows[11] += "      └───────────┘     ";
+            counter++;
+            if (counter >= maxIslandsPerRow) {
+                printVector(rows);
+                counter = 0;
+                for (int j = 0; j < 12; j++)
+                    rows[j] = "";
+            }
+        }
+    }
+
+    /**
+     * Returns the color codes given the Tower
+     *
+     * @param tower : tower we want to print into the island
+     * @return the String of the ANSI code for that specific tower
+     */
+    private String getAnsiStringFromTower(Tower tower) {
+        switch (tower) {
+            case WHITE:
+                return CLIBoldWhite;
+            case BLACK:
+                return CLIBlack;
+            case GRAY:
+                return CLIGray;
+        }
+        return "";
+    }
+
+    private String getTowerAbbreviation(Tower tower) {
+        switch (tower) {
+            case WHITE:
+                return "WH";
+            case BLACK:
+                return "BK";
+            case GRAY:
+                return "GR";
+        }
+        return "";
     }
 }

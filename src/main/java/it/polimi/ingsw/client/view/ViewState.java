@@ -14,9 +14,9 @@ import java.util.Map;
  */
 public class ViewState {
     private final Map<String, Tower> players;
-    private final List<IslandView> islands;
-    private final Map<Color, Integer> schoolEntranceOccupancy;
-    private final Map<Color, Integer> diningRoomOccupancy;
+    private List<IslandView> islands;
+    private Map<Color, Integer> schoolEntranceOccupancy;
+    private Map<Color, Integer> diningRoomOccupancy;
     private final boolean isExpert;
     private PhaseEnum currentPhase;
     private boolean activeView;
