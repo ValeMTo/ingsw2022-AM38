@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.view;
 
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
@@ -12,16 +13,25 @@ import java.util.Map;
  * ViewState contains all the information to visualize the current state of the gameBoard
  */
 public class ViewState {
-    List<Integer> usableCards;
-    Tower playerTower;
-    Map<Color, Integer> schoolEntranceOccupancy;
-    Map<Color, Integer> diningRoomOccupancy;
-    private Map<Color, Tower> professors;
+    private final Map<String, Tower> players;
     private final List<IslandView> islands;
+    private final Map<Color, Integer> schoolEntranceOccupancy;
+    private final Map<Color, Integer> diningRoomOccupancy;
+    private final boolean isExpert;
+    private PhaseEnum currentPhase;
+    private boolean activeView;
+    private final List<Integer> usableCards;
+    private Tower playerTower;
+    private Map<Color, Tower> professors;
     private int motherNature;
+    private boolean isEndOfMatch = false;
 
-
-    public ViewState() {
+    public ViewState(Map<String, Tower> players, boolean isExpert) {
+        this.usableCards = new ArrayList<Integer>();
+        this.players = new HashMap<>(players);
+        this.isExpert = isExpert;
+        activeView = true;
+        currentPhase = PhaseEnum.PLANNING;
         professors = new HashMap<>();
         islands = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
@@ -47,6 +57,15 @@ public class ViewState {
     public void setUsableCards(List<Integer> usableCards) {
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
+
+    }
+
+    public boolean isEndOfMatch() {
+        return isEndOfMatch;
+    }
+
+    public void setEndOfMatch(boolean endOfMatch) {
+        isEndOfMatch = endOfMatch;
     }
 
     public Map<Color, Tower> getProfessors() {
@@ -55,6 +74,22 @@ public class ViewState {
 
     public void setProfessors(Map<Color, Tower> professors) {
         this.professors = new HashMap<>(professors);
+    }
+
+    public PhaseEnum getCurrentPhase() {
+        return currentPhase;
+    }
+
+    public void setCurrentPhase(PhaseEnum currentPhase) {
+        this.currentPhase = currentPhase;
+    }
+
+    public boolean isActiveView() {
+        return activeView;
+    }
+
+    public void setActiveView(boolean activeView) {
+        this.activeView = activeView;
     }
 
     public int getMotherNature() {
@@ -80,5 +115,23 @@ public class ViewState {
 
     public void setPlayerTower(Tower playerTower) {
         this.playerTower = playerTower;
+    }
+
+    public Map<Color, Integer> getDiningRoomOccupancy() {
+        return new HashMap<>(diningRoomOccupancy);
+    }
+
+    public void setDiningRoomOccupancy(Map<Color, Integer> diningRoomOccupancy) {
+        this.diningRoomOccupancy.clear();
+        this.diningRoomOccupancy.putAll(diningRoomOccupancy);
+    }
+
+    public Map<Color, Integer> getSchoolEntranceOccupancy() {
+        return new HashMap<>(schoolEntranceOccupancy);
+    }
+
+    public void setSchoolEntranceOccupancy(Map<Color, Integer> schoolEntranceOccupancy) {
+        this.schoolEntranceOccupancy.clear();
+        this.schoolEntranceOccupancy.putAll(schoolEntranceOccupancy);
     }
 }

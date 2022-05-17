@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 // See the implementation below for the exact names of fields in the generated json (overrides the names in the GoogleDoc).
@@ -54,6 +55,26 @@ public class MessageGenerator {
         json.addProperty("errorString", errorString);
 
         return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates the Error messages caused by an already used exception.
+     * This message contains also the List of usable integers
+     *
+     * @param errorType   : type of error
+     * @param errorString : String of the particular error to send
+     * @param usableIndexes : List of the usable integer indexes
+     *
+     * @return : json String of the error message
+     */
+    public static String errorWithUsableValues(ErrorTypeEnum errorType, String errorString, List<Integer> usableIndexes) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.ERROR.ordinal());
+        json.put("ErrorType", errorType.ordinal());
+        json.put("errorString", errorString);
+        json.put("usableIndexes",usableIndexes);
+
+        return json + "\n";
     }
 
     /**
@@ -169,7 +190,7 @@ public class MessageGenerator {
     /**
      * Generates a String formatted in json for answer the actual gamemode
      *
-     * @return : json String with number of players in the lobby
+     * @return : json String with gamemode of the lobby
      */
     public static String gamemodeMessage(boolean isExpert) {
         JsonObject json = new JsonObject();
@@ -220,7 +241,7 @@ public class MessageGenerator {
     }
 
     /**
-     * Generates the UseAssistantCard Action message
+     * Generates the UseSpecialCard Action message
      *
      * @param specialCardName :  the name of the SpecialCard that is used
      * @return : json String of the Action UseSpecialCard message

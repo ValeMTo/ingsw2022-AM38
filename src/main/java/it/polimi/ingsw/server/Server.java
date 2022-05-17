@@ -4,14 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.controller.Game;
 import it.polimi.ingsw.controller.Lobby;
+import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -58,6 +57,7 @@ public class Server {
         }
     }
 
+
     private static ServerSocket createServerSocket(String[] args) {
         port = getPort(args);
         ServerSocket serverSocket = null;
@@ -103,21 +103,34 @@ public class Server {
         }
     }
 
-    public static void addPlayerInLobby(ClientHandler client){
-        synchronized (lobby){
+    public static void addPlayerInLobby(ClientHandler client) {
+        synchronized (lobby) {
             lobby.addPlayer(client);
         }
     }
 
-    public static int getNumOfPlayerGame(){
+    public static int getNumOfPlayerGame() {
         synchronized (lobby) {
             return lobby.getNumOfPlayers();
         }
     }
 
-    public static boolean getGamemode(){
-        synchronized (lobby){
+    public static boolean getGamemode() {
+        synchronized (lobby) {
             return lobby.getGamemode();
+        }
+    }
+
+    /**
+     * Return the created messageParser by the Lobby
+     *
+     * @param client : client that solicited the Lobby to get its MessageParser to connect to the Controller
+     * @return a new messageParser created by the lobby or null
+     */
+
+    public static MessageParser getMessageParserFromLobby(ClientHandler client) {
+        synchronized (lobby) {
+            return lobby.getMessageParser(client);
         }
     }
 }

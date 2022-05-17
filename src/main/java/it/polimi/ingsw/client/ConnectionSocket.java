@@ -2,15 +2,16 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
-import it.polimi.ingsw.messages.AnswerTypeEnum;
-import it.polimi.ingsw.messages.ConnectionTypeEnum;
-import it.polimi.ingsw.messages.MessageGenerator;
-import it.polimi.ingsw.messages.MessageTypeEnum;
+import it.polimi.ingsw.messages.*;
+import it.polimi.ingsw.model.board.Tower;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +26,7 @@ public class ConnectionSocket {
     private final Gson gson;
     private Scanner socketIn;
     private PrintWriter socketOut;
+    private ViewState viewState;
 
     public ConnectionSocket(String serverIP, int serverPort) {
         this.serverIP = serverIP;
@@ -87,13 +89,13 @@ public class ConnectionSocket {
         return null;
     }
 
-    public void accept(){
+    public void accept() {
         System.out.println("ACCEPT - Sending: " + MessageGenerator.okMessage());
         socketOut.print(MessageGenerator.okMessage());
         socketOut.flush();
     }
 
-    public void refuse(){
+    public void refuse() {
         System.out.println("REFUSE - Sending: " + MessageGenerator.nackMessage());
         socketOut.print(MessageGenerator.nackMessage());
         socketOut.flush();
@@ -196,7 +198,25 @@ public class ConnectionSocket {
     }
 
     /**
-     * Establishes the connection between the server
+     * Waits until the last connecting player and then start a broadcast message from the server to start the game
+     * with the Update - SETUP message
+     *
+     * @return the new ViewState created using the setup message fields
+     */
+    public ViewState startGame() {
+        Gson gson = new Gson();
+        JsonObject json;
+        //Take messages until the setup message is correctly received
+        do {
+            json = getMessage();
+        }
+        while (!(json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) || !(json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()));
+        Map<String, Tower> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
+        return new ViewState(players, json.get("isExpertMode").getAsBoolean());
+    }
+
+    /**
+     * Establishes the connection with the server
      *
      * @param serverIP   : Ip of the server
      * @param serverPort : server port

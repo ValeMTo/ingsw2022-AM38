@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.player;
 
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.NotLastCardUsedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
@@ -26,8 +27,9 @@ public class PlayerBoardTest {
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
     public void useAssistantCardTest(int numCard) {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8);
-        assertTrue(player.useAssistantCard(numCard));
-        assertFalse(player.useAssistantCard(numCard));
+
+        assertDoesNotThrow(() -> player.useAssistantCard(numCard));
+        assertThrows(AlreadyUsedException.class, () -> player.useAssistantCard(numCard));
 
     }
 
@@ -42,8 +44,8 @@ public class PlayerBoardTest {
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
     public void useAssistantCardExpertTest(int numCard) {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 6, 2);
-        assertTrue(player.useAssistantCard(numCard));
-        assertFalse(player.useAssistantCard(numCard));
+        assertDoesNotThrow(() -> player.useAssistantCard(numCard));
+        assertThrows(AlreadyUsedException.class, () -> player.useAssistantCard(numCard));
 
     }
 
@@ -65,7 +67,7 @@ public class PlayerBoardTest {
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
     public void getLastCardTest(int numCard) {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8, 2);
-        player.useAssistantCard(numCard);
+        assertDoesNotThrow(() -> player.useAssistantCard(numCard));
         try {
             assertEquals(numCard, player.getLastCard());
         } catch (NotLastCardUsedException e) {
@@ -84,7 +86,7 @@ public class PlayerBoardTest {
     public void getUsableCardTest(int numCard) {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8, 2);
         ArrayList<Integer> cleanCards = new ArrayList<Integer>();
-        player.useAssistantCard(numCard);
+        assertDoesNotThrow(() -> player.useAssistantCard(numCard));
 
         for (int i = 0; i < cleanCards.size(); i++) {
             if (i != numCard) {
@@ -100,7 +102,8 @@ public class PlayerBoardTest {
     public void getNoUsableCardTest() {
         PlayerBoard player = new PlayerBoard("Valeria", Tower.WHITE, 8, 2);
         for (int i = 1; i <= 10; i++) {
-            player.useAssistantCard(i);
+            final int x = i;
+            assertDoesNotThrow(() -> player.useAssistantCard(x));
         }
         assertEquals(0, player.showUsableCards().size());
 
