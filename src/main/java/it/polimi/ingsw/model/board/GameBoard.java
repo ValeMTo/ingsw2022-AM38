@@ -265,10 +265,25 @@ public abstract class GameBoard {
                 return players[currentPlayer].removeStudentDiningRoom(student);
             case SCHOOLENTRANCE:
                 return players[currentPlayer].removeStudentEntrance(student);
-
             default:
                 throw new LocationNotAllowedException("Islands, clouds and special cards are not allowed since this remove method does not have a position value");
         }
+    }
+
+    /**
+     * Draws a student from the bag
+     *
+     * @return the student Color drawn, null if no students are into the bag
+     */
+    public Color drawFromBag() {
+        return this.bag.drawStudent();
+    }
+
+    /**
+     * Initializes the bag after the initial phase
+     */
+    public void initializeBag() {
+        this.bag.initialise();
     }
 
     /**

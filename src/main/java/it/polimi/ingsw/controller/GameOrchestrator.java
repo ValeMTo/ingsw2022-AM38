@@ -53,6 +53,18 @@ public class GameOrchestrator {
                         break;
                 }
             }
+            //Initializes the students on the islands drawing the firsts 10 students
+            try {
+                for (int j = 2; j <= 6; j++)
+                    gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
+                for (int j = 8; j <= 12; j++)
+                    gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            // Initialize the bag for the normal phase
+            gameBoard.initializeBag();
+            //TODO fill the SchoolEntrance of the players
         }
         gameBoard.fillClouds();
 
@@ -118,10 +130,12 @@ public class GameOrchestrator {
      *
      * @param color : Color of the student to move
      * @return : true if the student is correctly moved, otherwise false
+     * @throws IncorrectPhaseException if the phase is not move student phase
      */
-    public boolean moveStudent(Color color) {
+    public boolean moveStudent(Color color) throws IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS) return false;
+            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS)
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             if (this.studentMovesLeft == 0) {
                 this.setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                 return false;
@@ -152,10 +166,12 @@ public class GameOrchestrator {
      * @param color  : Color of the student to move from the SchoolEntrance to the Island
      * @param island : Number of the Island we want to move the student into
      * @return true if the student was added correctly
+     * @throws IncorrectPhaseException if the phase is not move student phase
      */
-    public boolean moveStudent(Color color, int island) throws IndexOutOfBoundsException, AllMovesUsedException {
+    public boolean moveStudent(Color color, int island) throws IndexOutOfBoundsException, AllMovesUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS) return false;
+            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS)
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             if (studentMovesLeft == 0) {
                 setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                 throw new AllMovesUsedException();
@@ -183,11 +199,15 @@ public class GameOrchestrator {
      * @param priority : priority of the assistant card to use
      * @return : true if the card has been correctly used, otherwise false
      * @throws IndexOutOfBoundsException : if the card priority is not in the correct range
+     * @throws IncorrectPhaseException   if the phase is not planning phase
      */
-    public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException {
+    public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.PLANNING) return false;
-            if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) nextPlayer();
+            if (getCurrentPhase() != PhaseEnum.PLANNING) throw new IncorrectPhaseException(this.getCurrentPhase());
+            if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) {
+                nextPlayer();
+                return true;
+            }
             return false;
         }
     }
@@ -198,10 +218,12 @@ public class GameOrchestrator {
      * @param destinationIsland : island where the player wants to move the motherNature
      * @return : true if the move is allowed, false if the island is unreachable with the steps given by the last card
      * @throws IslandOutOfBoundException : if the island position is out of bound
+     * @throws IncorrectPhaseException   if the phase is not moving motherNature phase
      */
-    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException {
+    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) return false;
+            if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE))
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             if (gameBoard.moveMotherNature(destinationIsland)) {
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
                 return true;
@@ -218,10 +240,12 @@ public class GameOrchestrator {
      * @return : true if the
      * @throws IndexOutOfBoundsException if the position exceed the usable range [1, numOfPlayers]
      * @throws AlreadyUsedException      if the Cloud is not usable anymore
+     * @throws IncorrectPhaseException   if the phase is not choose cloud phase
      */
-    public boolean chooseCloud(int cloudPosition) throws IndexOutOfBoundsException, AlreadyUsedException {
+    public boolean chooseCloud(int cloudPosition) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.ACTION_CHOOSE_CLOUD) return false;
+            if (getCurrentPhase() != PhaseEnum.ACTION_CHOOSE_CLOUD)
+                throw new IncorrectPhaseException(getCurrentPhase());
             if (cloudPosition < 1 || cloudPosition > players.size()) throw new IndexOutOfBoundsException();
             if (!gameBoard.getUsableClouds().contains(cloudPosition))
                 throw new AlreadyUsedException(gameBoard.getUsableClouds());
@@ -283,8 +307,8 @@ public class GameOrchestrator {
         synchronized (phaseBlocker) {
             if (getCurrentPhase() == PhaseEnum.PLANNING) {
                 //Goes to the next player and set it into the gameBoard
+                activePlayer++;
                 if (activePlayer < players.size()) {
-                    activePlayer++;
                     try {
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
                     } catch (Exception exc) {

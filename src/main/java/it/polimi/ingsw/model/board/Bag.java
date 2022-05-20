@@ -55,7 +55,7 @@ public class Bag {
      * when the Controller will call the isEmpty() method.
      *
      * @return the color of the student that has been drawn.
-     *
+     * <p>
      * Notes on the algorithm for random picking:
      * It creates a new linked hashmap that associates each color with a range, marked by a threshold.
      * The values of the thresholds must be >= 1, are incremental and increase with the number of students contained

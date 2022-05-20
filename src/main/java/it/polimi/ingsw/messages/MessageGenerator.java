@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import org.apache.maven.plugin.lifecycle.Phase;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -95,6 +96,19 @@ public class MessageGenerator {
         json.addProperty("maxVal", maxVal);
 
         return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates an error message caused by using an action that cannot be used in the current phase of the turn
+     * @param actualPhase actual phase that is now set
+     * @return the json String of the error message
+     */
+    public static String errorWrongPhase(PhaseEnum actualPhase){
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
+        json.addProperty("ErrorType", ErrorTypeEnum.WRONG_PHASE_ACTION.ordinal());
+        json.addProperty("actualPhase", actualPhase.ordinal());
+        return gson.toJson(json)+"\n";
     }
 
     /**
@@ -416,6 +430,8 @@ public class MessageGenerator {
 
         return json + "\n";    // using the toString() on a JSONObject instead of using toJson
     }
+
+
 
 
     /**

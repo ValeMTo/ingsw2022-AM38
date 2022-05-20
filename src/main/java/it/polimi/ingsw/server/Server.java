@@ -2,7 +2,6 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.controller.Game;
 import it.polimi.ingsw.controller.Lobby;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
@@ -23,7 +22,6 @@ public class Server {
     private static ExecutorService executorService;
     private static int numClientConnected;
     private static List<String> allPlayers;
-    private List<Game> games;
 
     public static int getPort(String[] args) {
         if (args != null && args.length > 1) {

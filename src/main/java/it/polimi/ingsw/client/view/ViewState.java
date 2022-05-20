@@ -22,15 +22,6 @@ public class ViewState {
     private boolean activeView;
     private final List<Integer> usableCards;
     private Tower playerTower;
-    private final Map<String, Tower> players;
-    private List<IslandView> islands;
-    private Map<Color, Integer> schoolEntranceOccupancy;
-    private Map<Color, Integer> diningRoomOccupancy;
-    private final boolean isExpert;
-    private PhaseEnum currentPhase;
-    private boolean activeView;
-    private final List<Integer> usableCards;
-    private Tower playerTower;
     private Map<Color, Tower> professors;
     private int motherNature;
     private boolean isEndOfMatch = false;
