@@ -2,13 +2,11 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.mvc.Listenable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public abstract class GameBoard {
+public abstract class GameBoard extends Listenable {
     protected final int initialIslandNumber = 12;
     protected int playerNumber;
     protected int currentPlayer; // The position in the array which has the active player.

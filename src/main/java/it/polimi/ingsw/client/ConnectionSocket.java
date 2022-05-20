@@ -21,7 +21,6 @@ public class ConnectionSocket {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final String serverIP;
     private final int serverPort;
-    private final Scanner stdin;
 
     private final Gson gson;
     private Scanner socketIn;
@@ -31,7 +30,6 @@ public class ConnectionSocket {
     public ConnectionSocket(String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
-        this.stdin = new Scanner(System.in);
         this.gson = new Gson();
 
     }
@@ -40,7 +38,6 @@ public class ConnectionSocket {
     /**
      * Method setup initializes a new socket connection and handles the nickname-choice response.
      */
-    //@throws NicknameAlreadyTakenException when the nickname is already in use.
     public boolean setup() throws FunctionNotImplementedException {
 
         System.out.println("Trying to connect with the socket...");
@@ -48,6 +45,7 @@ public class ConnectionSocket {
 
         if (socket == null) socket = establishConnection(serverIP, serverPort);
         if (socket == null) return false;
+
         socketIn = createScanner(socket);
         socketOut = createWriter(socket);
         return true;

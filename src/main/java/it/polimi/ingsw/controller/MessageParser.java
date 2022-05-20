@@ -12,12 +12,13 @@ import it.polimi.ingsw.messages.MessageTypeEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.mvc.Listener;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class MessageParser {
+public class MessageParser implements Listener {
     private final GameOrchestrator gameOrchestrator;
     private final String nickName;
 

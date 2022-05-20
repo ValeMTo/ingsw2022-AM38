@@ -3,6 +3,8 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.mvc.Listenable;
+import it.polimi.ingsw.mvc.Listener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,20 +14,11 @@ import java.util.Map;
 /**
  * ViewState contains all the information to visualize the current state of the gameBoard
  */
-public class ViewState {
+public class ViewState extends Listenable implements Listener {
     private final Map<String, Tower> players;
     private final List<IslandView> islands;
     private final Map<Color, Integer> schoolEntranceOccupancy;
     private final Map<Color, Integer> diningRoomOccupancy;
-    private final boolean isExpert;
-    private PhaseEnum currentPhase;
-    private boolean activeView;
-    private final List<Integer> usableCards;
-    private Tower playerTower;
-    private final Map<String, Tower> players;
-    private List<IslandView> islands;
-    private Map<Color, Integer> schoolEntranceOccupancy;
-    private Map<Color, Integer> diningRoomOccupancy;
     private final boolean isExpert;
     private PhaseEnum currentPhase;
     private boolean activeView;

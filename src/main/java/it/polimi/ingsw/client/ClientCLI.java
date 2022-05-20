@@ -7,7 +7,7 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
-import java.io.IOException;
+
 import java.io.PrintStream;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class ClientCLI {
 
     public ClientCLI() {
 
-        this.in = new Scanner(System.in);
+        in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
         this.isRunning = true;
 
