@@ -2,7 +2,6 @@ package it.polimi.ingsw.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.exceptions.AllMovesUsedException;
 import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
@@ -97,8 +96,6 @@ public class MessageParser {
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_VALID_ORIGIN, "ERROR - Only SchoolEntrance is allowed in this phase");
         } catch (IndexOutOfBoundsException exc) {
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "ERROR - No island has the given position");
-        } catch (AllMovesUsedException exc) {
-            return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.ALL_MOVED_USED, "ERROR - All moves of the students are done, now is time for motherNature movement");
         } catch (IncorrectPhaseException exc) {
             return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
