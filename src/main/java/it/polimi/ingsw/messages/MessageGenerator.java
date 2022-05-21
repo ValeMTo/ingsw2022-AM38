@@ -7,12 +7,11 @@ import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
-import org.apache.maven.plugin.lifecycle.Phase;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 // See the implementation below for the exact names of fields in the generated json (overrides the names in the GoogleDoc).
 
@@ -62,18 +61,17 @@ public class MessageGenerator {
      * Generates the Error messages caused by an already used exception.
      * This message contains also the List of usable integers
      *
-     * @param errorType   : type of error
-     * @param errorString : String of the particular error to send
+     * @param errorType     : type of error
+     * @param errorString   : String of the particular error to send
      * @param usableIndexes : List of the usable integer indexes
-     *
      * @return : json String of the error message
      */
-    public static String errorWithUsableValues(ErrorTypeEnum errorType, String errorString, List<Integer> usableIndexes) {
+    public static String errorWithUsableValues(ErrorTypeEnum errorType, String errorString, Set<Integer> usableIndexes) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.put("ErrorType", errorType.ordinal());
         json.put("errorString", errorString);
-        json.put("usableIndexes",usableIndexes);
+        json.put("usableIndexes", usableIndexes);
 
         return json + "\n";
     }
@@ -100,15 +98,16 @@ public class MessageGenerator {
 
     /**
      * Generates an error message caused by using an action that cannot be used in the current phase of the turn
+     *
      * @param actualPhase actual phase that is now set
      * @return the json String of the error message
      */
-    public static String errorWrongPhase(PhaseEnum actualPhase){
+    public static String errorWrongPhase(PhaseEnum actualPhase) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.addProperty("ErrorType", ErrorTypeEnum.WRONG_PHASE_ACTION.ordinal());
         json.addProperty("actualPhase", actualPhase.ordinal());
-        return gson.toJson(json)+"\n";
+        return gson.toJson(json) + "\n";
     }
 
     /**
@@ -430,8 +429,6 @@ public class MessageGenerator {
 
         return json + "\n";    // using the toString() on a JSONObject instead of using toJson
     }
-
-
 
 
     /**

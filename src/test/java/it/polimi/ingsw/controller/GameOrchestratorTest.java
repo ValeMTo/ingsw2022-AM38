@@ -2,16 +2,16 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;
+import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,7 +58,68 @@ public class GameOrchestratorTest {
                 exc.printStackTrace();
             } catch (AlreadyUsedException exc) {
                 System.out.println("Already used card");
+                List<Integer> a = new ArrayList<>(exc.getUsableIndexes());
+                try {
+                    game.chooseCard(a.get(0));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        }
+    }
+
+    /**
+     * Does a random move student phase
+     *
+     * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
+     */
+    private void doAMoveStudents(GameOrchestrator game) {
+        Random random = new Random();
+        while (game.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
+            try {
+                if (random.nextBoolean()) game.moveStudent(Color.values()[random.nextInt(Color.values().length)]);
+                else game.moveStudent(Color.values()[random.nextInt(Color.values().length)], 1);
+            } catch (IncorrectPhaseException exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
+
+
+    /**
+     * Does a random movement of motherNature
+     *
+     * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
+     */
+    private void doAMoveMotherNature(GameOrchestrator game) {
+        Random random = new Random();
+        int max = 12;
+        while (game.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
+            try {
+                game.moveMotherNature(random.nextInt(max));
+            } catch (IslandOutOfBoundException exc) {
+                System.out.println("GOT ISLAND OUT OF BOUND");
+                max = exc.getHigherBound();
+            } catch (IncorrectPhaseException exc) {
+                exc.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Does an entire round using the support method of this class
+     *
+     * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
+     */
+    private void doARound(GameOrchestrator game) {
+        doAPlanningPhase(game);
+        int counter = 0;
+        while (PhaseEnum.PLANNING != game.getCurrentPhase() && PhaseEnum.END != game.getCurrentPhase()) {
+            doAMoveStudents(game);
+            doAMoveMotherNature(game);
+            final int idx = counter;
+            assertDoesNotThrow(() -> game.chooseCloud(idx + 1));
+            counter++;
         }
     }
 
@@ -73,6 +134,8 @@ public class GameOrchestratorTest {
     @CsvSource("{true,true},{true,false},{false,true},{false,false}")
     public void setupTest(boolean threePlayers, boolean expert) {
         GameOrchestrator game = new GameOrchestrator(getNicknames(threePlayers), expert);
+        //Checks the GameMode
+        assertEquals(expert, game.isExpert());
         //Checks that active phase is correct and active player is not null and contained into the List of nicknames
         assertEquals(PhaseEnum.PLANNING, game.getCurrentPhase());
         assertNotNull(game.getActivePlayer());
@@ -185,6 +248,17 @@ public class GameOrchestratorTest {
     }
 
     /**
+     * Tests that it is not allowed to use the same card while there are other card usables
+     */
+    @Test
+    @DisplayName("SameCard used by two players exception")
+    public void sameCardUsed() {
+        GameOrchestrator game = setup(false, false);
+        assertDoesNotThrow(() -> game.chooseCard(1));
+        assertThrows(AlreadyUsedException.class, () -> game.chooseCard(1));
+    }
+
+    /**
      * Sees that the player can move correctly three times the students from the SchoolEntrance to the DiningRoom
      *
      * @param threePlayers : indicates if there are 2 or 3 players
@@ -214,9 +288,6 @@ public class GameOrchestratorTest {
         assertThrows(IncorrectPhaseException.class, () -> game.moveStudent(Color.BLUE));
     }
 
-
-    //TODO: active player problem...
-    //TODO: in first rounds not allowed to use same card!
 
     /**
      * Sees that the player can move correctly three times the students from the SchoolEntrance to one Island
@@ -250,4 +321,127 @@ public class GameOrchestratorTest {
         assertEquals(activePlayer, game.getActivePlayer());
         assertThrows(IncorrectPhaseException.class, () -> game.moveStudent(Color.BLUE));
     }
+
+    /**
+     * Tests that motherNature moves correctly in nominal situations
+     */
+    @Test
+    @DisplayName("Simple motherNature movement")
+    public void simpleMotherNatureMovement() {
+        GameOrchestrator game = setup(false, false);
+        try {
+            game.chooseCard(6);
+            game.chooseCard(8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.doAMoveStudents(game);
+        assertDoesNotThrow(() -> game.moveMotherNature(3));
+        assertEquals(PhaseEnum.ACTION_CHOOSE_CLOUD, game.getCurrentPhase());
+    }
+
+    /**
+     * Tests that if the steps of the played card are not sufficient to reach an island, the method return false and does not change phase
+     */
+    @Test
+    @DisplayName("Not enough step movement exception of mother nature")
+    public void notEnoughStepMovement() {
+        GameOrchestrator game = setup(false, false);
+        try {
+            game.chooseCard(2);
+            game.chooseCard(5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.doAMoveStudents(game);
+        try {
+            assertFalse(game.moveMotherNature(10));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
+        assertEquals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE, game.getCurrentPhase());
+    }
+
+    /**
+     * Tests the choice of a cloud by a player and the phase change
+     */
+    @Test
+    @DisplayName("Choose cloud test - nominal")
+    public void normalChooseCloud() {
+        GameOrchestrator game = setup(false, false);
+        doAPlanningPhase(game);
+        doAMoveStudents(game);
+        doAMoveMotherNature(game);
+        assertDoesNotThrow(() -> game.chooseCloud(1));
+        assertEquals(PhaseEnum.ACTION_MOVE_STUDENTS, game.getCurrentPhase());
+    }
+
+    /**
+     * Tests if two player can correctly do their respective cloud choice.
+     */
+    @Test
+    @DisplayName("Choose cloud test - two players nominal")
+    public void nominalChooseCloudTwoPlayers() {
+        GameOrchestrator game = setup(false, false);
+        doAPlanningPhase(game);
+        doAMoveStudents(game);
+        doAMoveMotherNature(game);
+        assertDoesNotThrow(() -> game.chooseCloud(1));
+        doAMoveStudents(game);
+        doAMoveMotherNature(game);
+        assertDoesNotThrow(() -> game.chooseCloud(2));
+        assertEquals(PhaseEnum.PLANNING, game.getCurrentPhase());
+    }
+
+    /**
+     * Tests that the AlreadyUsedException is thrown if the cloud chosen has been already used
+     */
+    @Test
+    @DisplayName("Choose cloud test - already used cloud exception")
+    public void alreadyChosenCloudTwoPlayers() {
+        GameOrchestrator game = setup(false, false);
+        doAPlanningPhase(game);
+        doAMoveStudents(game);
+        doAMoveMotherNature(game);
+        assertDoesNotThrow(() -> game.chooseCloud(1));
+        doAMoveStudents(game);
+        doAMoveMotherNature(game);
+        assertThrows(AlreadyUsedException.class, () -> game.chooseCloud(1));
+        assertEquals(PhaseEnum.ACTION_CHOOSE_CLOUD, game.getCurrentPhase());
+    }
+
+    /**
+     * Does two rounds
+     *
+     * @param threePlayers : indicates if there are 2 or 3 players
+     */
+    @ParameterizedTest
+    @DisplayName("Two round test")
+    @ValueSource(booleans = {false, true})
+    public void twoRoundTest(boolean threePlayers) {
+        GameOrchestrator game = setup(threePlayers, false);
+        Set<PhaseEnum> conditionEndRound = new HashSet<>();
+        conditionEndRound.add(PhaseEnum.PLANNING);
+        conditionEndRound.add(PhaseEnum.END);
+        doARound(game);
+        assertTrue(conditionEndRound.contains(game.getCurrentPhase()));
+    }
+
+    /**
+     * Tests an entire play, expecting into 10 rounds the end signaling.
+     */
+    /*@ParameterizedTest
+    @DisplayName("End of the game in 10 rounds")
+    @CsvSource("{true,true},{true,false},{false,true},{false,false}")
+    public void endInTenRounds(boolean threePlayers, boolean expert) {
+        GameOrchestrator game = setup(threePlayers, expert);
+        int numOfRound = 0;
+        while (game.getCurrentPhase() != PhaseEnum.END) {
+            assertTrue(numOfRound < 10);
+            numOfRound++;
+            doARound(game);
+        }
+        assertEquals(PhaseEnum.END, game.getCurrentPhase());
+        assertThrows(IncorrectPhaseException.class, () -> game.moveStudent(Color.BLUE));
+    }*/
 }

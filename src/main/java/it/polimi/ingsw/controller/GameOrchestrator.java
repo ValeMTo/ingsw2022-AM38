@@ -40,29 +40,14 @@ public class GameOrchestrator {
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
                 playersTower.put(players.get(i), gameBoard.getPlayerTower(players.get(i)));
-                // In case of null pointer exception
-            else {
-                switch (i) {
-                    case 0:
-                        playersTower.put(players.get(i), Tower.WHITE);
-                        break;
-                    case 1:
-                        playersTower.put(players.get(i), Tower.BLACK);
-                        break;
-                    case 2:
-                        playersTower.put(players.get(i), Tower.GRAY);
-                        break;
-                }
-            }
-            //Initializes the students on the islands drawing the firsts 10 students
-            try {
-                for (int j = 2; j <= 6; j++)
-                    gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
-                for (int j = 8; j <= 12; j++)
-                    gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
+        }
+        //Initializes the students on the islands drawing the firsts 10 students
+        try {
+            for (int j = 2; j <= 6; j++)
+                gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
+            for (int j = 8; j <= 12; j++)
+                gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
+
             // Initialize the bag for the normal phase
             gameBoard.initializeBag();
             // Fills with students the SchoolEntrances of the players
@@ -71,14 +56,14 @@ public class GameOrchestrator {
             else limit = 9;
             for (int j = 0; j < players.size(); j++) {
                 for (int idx = 0; idx < limit; idx++) {
-                    try {
-                        gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                    }
+
+                    gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
                 }
             }
+        } catch (Exception exc) {
+            exc.printStackTrace();
         }
+
         gameBoard.fillClouds();
 
         currentPhase = PhaseEnum.PLANNING;
@@ -201,7 +186,10 @@ public class GameOrchestrator {
                     return true;
                 }
                 return false;
-            } catch (Exception exc) {
+            } catch (FunctionNotImplementedException exc) {
+                exc.printStackTrace();
+                return false;
+            } catch (LocationNotAllowedException exc) {
                 exc.printStackTrace();
                 return false;
             }
@@ -218,10 +206,23 @@ public class GameOrchestrator {
      */
     public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
+            // If the current phase is incorrect
             if (getCurrentPhase() != PhaseEnum.PLANNING) throw new IncorrectPhaseException(this.getCurrentPhase());
+            try {
+                Set<Integer> usableCards = gameBoard.getUsableAssistantCard(gameBoard.getPlayerTower(getActivePlayer())).keySet();
+                usableCards.removeAll(playedAssistantCard);
+                for (Integer i : usableCards)
+                    System.out.println("Usable card of " + getActivePlayer() + " " + i);
+                // If the player has other cards to use other than the one played by other have to play another card
+                if (usableCards.size() > 0 && !usableCards.contains(priority))
+                    throw new AlreadyUsedException(usableCards);
+            } catch (NoSuchTowerException exc) {
+                exc.printStackTrace();
+            }
+            // The player plays the chosen card and if it is correctly played update the card used and go to the next phase wit nextStep
             if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) {
                 this.playedAssistantCard.add(priority);
-                nextPlayer();
+                nextStep();
                 return true;
             }
             return false;
@@ -275,7 +276,7 @@ public class GameOrchestrator {
                 exc.printStackTrace();
                 return false;
             }
-            nextPlayer();
+            nextStep();
             return true;
         }
     }
@@ -285,33 +286,6 @@ public class GameOrchestrator {
      *
      * @return : true if now the activePlayer has been updated, false if the phase is incorrect or if we have finished the passive phase
      */
-    private boolean updateNextPlanningPlayer() {
-        synchronized (phaseBlocker) {
-            if (getCurrentPhase() != PhaseEnum.PLANNING) return false;
-            if (activePlayer >= players.size() - 1) {
-                setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                return false;
-            }
-            activePlayer++;
-            return true;
-        }
-    }
-
-    /**
-     * Updates to the successive player of the action phase
-     *
-     * @return : true if now the activePlayer has been updated, false if the phase is incorrect or if we have finished the passive phase
-     */
-    private boolean updateNextActivePlayer() {
-        synchronized (phaseBlocker) {
-            if (getCurrentPhase() == PhaseEnum.PLANNING) {
-                if (activePlayer >= players.size() - 1) return false;
-                activePlayer++;
-                return true;
-            }
-            return false;
-        }
-    }
 
     /**
      * Set the next player.
@@ -319,61 +293,56 @@ public class GameOrchestrator {
      * If the active player is the last player of the action phase, controls the ending conditions and the nr. of rounds.
      * If the game continues, sets the order of the successive phase and sets the active player.
      */
-    private void nextPlayer() {
+    private void nextStep() {
         synchronized (phaseBlocker) {
-            if (getCurrentPhase() == PhaseEnum.PLANNING) {
-                //Goes to the next player and set it into the gameBoard
-                activePlayer++;
-                if (activePlayer < players.size()) {
-                    try {
+            try {
+                if (getCurrentPhase() == PhaseEnum.PLANNING) {
+                    //Goes to the next player and set it into the gameBoard
+                    activePlayer++;
+                    if (activePlayer < players.size()) {
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+
                     }
-                }
-                //Sets the order of the action phase, set the phase as action and set the player as the first of the array
-                else {
-                    this.setActionOrder();
-                    activePlayer = 0;
-                    try {
+                    //Sets the order of the action phase, set the phase as action and set the player as the first of the array
+                    else {
+                        this.setActionOrder();
+                        activePlayer = 0;
+
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
                         System.out.println("Setting as current player: " + actionOrder[activePlayer] + " with tower " + gameBoard.getPlayerTower(actionOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+
+                        this.studentMovesLeft = maxStudentMoves;
+                        setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                     }
-                    this.studentMovesLeft = maxStudentMoves;
-                    setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                }
-            } else if (getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
-                //Sets the active player as the next on the action order and sets the action phase as move student
-                if (activePlayer < players.size()) {
+                } else if (getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
+                    //Sets the active player as the next on the action order and sets the action phase as move student
                     activePlayer++;
-                    try {
+                    if (activePlayer < players.size()) {
+
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+
+                        this.studentMovesLeft = maxStudentMoves;
+                        setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                     }
-                    this.studentMovesLeft = maxStudentMoves;
-                    setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                }
-                //If the game is not finished, set everything for the next planning phase
-                else if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.NoEndOfMatch)) {
-                    this.setPlanningOrder();
-                    activePlayer = 0;
-                    try {
+                    //If the game is not finished, set everything for the next planning phase
+                    else if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.NoEndOfMatch)) {
+                        this.setPlanningOrder();
+                        activePlayer = 0;
+
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+
+                        setCurrentPhase(PhaseEnum.PLANNING);
+                        gameBoard.increaseRound();
+                        gameBoard.fillClouds();
+                        playedAssistantCard.clear();
                     }
-                    setCurrentPhase(PhaseEnum.PLANNING);
-                    gameBoard.increaseRound();
-                    gameBoard.fillClouds();
-                    playedAssistantCard.clear();
+                    //If the game ends
+                    else {
+                        setCurrentPhase(PhaseEnum.END);
+                    }
                 }
-                //If the game ends
-                else {
-                    setCurrentPhase(PhaseEnum.END);
-                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
     }

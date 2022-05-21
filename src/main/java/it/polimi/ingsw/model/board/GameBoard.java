@@ -3,10 +3,7 @@ package it.polimi.ingsw.model.board;
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class GameBoard {
     protected final int initialIslandNumber = 12;
@@ -146,6 +143,9 @@ public abstract class GameBoard {
         if (numRound == 11) return EndOfMatchCondition.InstantEndOfMatch;
         // Final round
         if (numRound == 10) return EndOfMatchCondition.DelayedEndOfMatch;
+        for (PlayerBoard player : players) {
+            if (player.getAvailableCards().size() == 1) return EndOfMatchCondition.DelayedEndOfMatch;
+        }
         // 3 Islands groups
         if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3)
             return EndOfMatchCondition.InstantEndOfMatch;
@@ -240,7 +240,7 @@ public abstract class GameBoard {
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
             case ISLAND:
                 if (position <= islands.length && position > 0) return islands[position - 1].addStudent(student);
-                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length].getPosition());
+                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length-1].getPosition());
             case CLOUD:
                 if (position <= clouds.length && position >= 1) return clouds[position - 1].addStudent(student);
                 throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
@@ -503,8 +503,8 @@ public abstract class GameBoard {
      *
      * @return : the list of the positions of the usable clouds
      */
-    public List<Integer> getUsableClouds() {
-        List<Integer> usableClouds = new ArrayList<>();
+    public Set<Integer> getUsableClouds() {
+        Set<Integer> usableClouds = new HashSet<>();
         for (int i = 0; i < playerNumber; i++) {
             if (clouds[i].isFull()) usableClouds.add(i + 1);
         }
