@@ -44,6 +44,8 @@ public class MessageParser {
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_MOTHER_NATURE.ordinal())
                 return moveMotherNature(json);
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
+            if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal())
+                return useSpecialCard(json);
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
     }
@@ -138,6 +140,11 @@ public class MessageParser {
         }
     }
 
+    private String useSpecialCard(JsonObject json) {
+        //TODO: IMPLEMENT USE OF SPECIAL CARD
+        return null;
+    }
+
     /**
      * Method for the get for the SETUP update
      *
@@ -146,6 +153,7 @@ public class MessageParser {
     public Map<String, Tower> getPlayersTower() {
         return new HashMap<String, Tower>(this.gameOrchestrator.getPlayersTower());
     }
+
 
     public boolean isExpert() {
         return this.gameOrchestrator.isExpert();

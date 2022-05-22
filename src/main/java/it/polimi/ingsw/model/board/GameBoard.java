@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.*;
 
@@ -240,7 +241,7 @@ public abstract class GameBoard {
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
             case ISLAND:
                 if (position <= islands.length && position > 0) return islands[position - 1].addStudent(student);
-                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length-1].getPosition());
+                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length - 1].getPosition());
             case CLOUD:
                 if (position <= clouds.length && position >= 1) return clouds[position - 1].addStudent(student);
                 throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
@@ -592,4 +593,27 @@ public abstract class GameBoard {
      */
     public abstract void increaseMovementMotherNature() throws FunctionNotImplementedException;
 
+    /**
+     * Returns a Set with the specialCardNames
+     *
+     * @return : a Set with the SpecialCardNames of the instantiated special cards
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract Set<SpecialCardName> getSetOfSpecialCardNames() throws FunctionNotImplementedException;
+
+    /**
+     * Pay the coins of the active player to use a particular special card
+     *
+     * @param cost : expense of the activation of a SpecialCard, expressed in coin
+     * @return : true if the SpecialCard has been pay, false if the cost is too much and the expense could not be pay.
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract boolean paySpecialCard(int cost) throws FunctionNotImplementedException;
+
+    /**
+     * Disable the towerInfluence in order to not count the towers in the influence score computation
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract void disableTowerInfluence() throws FunctionNotImplementedException;
 }
