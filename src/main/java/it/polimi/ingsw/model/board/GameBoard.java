@@ -632,4 +632,12 @@ public abstract class GameBoard {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
     public abstract void professorsUpdateTieEffect() throws FunctionNotImplementedException ;
+
+    /**
+     * Returns an array with the specialCardNames
+     *
+     * @return : an array with the SpecialCardNames of the instantiated special cards
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract SpecialCardName[] getArrayOfSpecialCardNames() throws FunctionNotImplementedException ;
 }

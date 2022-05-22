@@ -185,4 +185,14 @@ public class EasyGameBoard extends GameBoard {
      */ public void professorsUpdateTieEffect() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     }
+
+    /**
+     * Not usable in easy mode
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    @Override
+    public SpecialCardName[] getArrayOfSpecialCardNames() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
 }
