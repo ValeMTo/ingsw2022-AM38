@@ -12,13 +12,12 @@ import it.polimi.ingsw.messages.MessageTypeEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
-import it.polimi.ingsw.mvc.Listener;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class MessageParser implements Listener {
+public class MessageParser{
     private final GameOrchestrator gameOrchestrator;
     private final String nickName;
 
@@ -37,14 +36,17 @@ public class MessageParser implements Listener {
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
         if (!gameOrchestrator.getActivePlayer().equalsIgnoreCase(nickName))
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
-
+        String returnMessage = null;
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal()) {
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_ASSISTANT_CARD.ordinal())
-                return useAssistantCard(json);
-            if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_STUDENT.ordinal()) return moveStudent(json);
-            if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_MOTHER_NATURE.ordinal())
-                return moveMotherNature(json);
-            if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
+                returnMessage = useAssistantCard(json);
+            else if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_STUDENT.ordinal())
+                returnMessage = moveStudent(json);
+            else if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_MOTHER_NATURE.ordinal())
+                returnMessage = moveMotherNature(json);
+            else if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal())
+                returnMessage = chooseCloud(json);
+            return returnMessage;
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
     }
@@ -133,13 +135,14 @@ public class MessageParser implements Listener {
 
     /**
      * Method for the get for the SETUP update
+     *
      * @return the Map of players string and tower color
      */
-    public Map<String, Tower> getPlayersTower(){
-        return new HashMap<String,Tower>(this.gameOrchestrator.getPlayersTower());
+    public Map<String, Tower> getPlayersTower() {
+        return new HashMap<String, Tower>(this.gameOrchestrator.getPlayersTower());
     }
 
-    public boolean isExpert(){
+    public boolean isExpert() {
         return this.gameOrchestrator.isExpert();
     }
 

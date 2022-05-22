@@ -1,9 +1,10 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.mvc.Listenable;
-
 import java.util.Scanner;
 
+/**
+ * This class is the continuous channel to read jsonObject from Scanner given
+ */
 public class Reader implements Runnable {
     private Scanner inputReader;
 

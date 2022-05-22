@@ -121,4 +121,8 @@ public class Cloud {
         return this.counter.get(color);
     }
 
+    public int getStudentLimit(){
+        return studentLimit;
+    }
+
 }

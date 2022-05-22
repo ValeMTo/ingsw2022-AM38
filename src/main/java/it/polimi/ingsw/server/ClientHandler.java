@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable {
     private PrintWriter writer;
     private String playerName;
     private MessageParser messageParser = null;
+    private int id;
 
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
@@ -37,6 +38,13 @@ public class ClientHandler implements Runnable {
     }
 
     /**
+     * Set the id game
+     */
+    public void setIDGame(int id){
+        this.id = id;
+    }
+
+    /**
      * Phase handler of the connection with the client
      */
     @Override
@@ -46,8 +54,13 @@ public class ClientHandler implements Runnable {
             error = !addPlayer();
         } while (error);
         setupMessageParser();
+        String message;
         while (true) {
-            writer.print(messageParser.parseMessageToAction(inputReader.nextLine()));
+            System.out.println(playerName);
+            message = inputReader.nextLine();
+            System.out.println(message);
+            writer.print(messageParser.parseMessageToAction(message));
+            System.out.println("/n");
         }
     }
 
@@ -267,6 +280,10 @@ public class ClientHandler implements Runnable {
         JsonObject json = getMessage();
         System.out.println("Received: " + json);
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
+
+    public int getGameID(){
+        return id;
     }
 
 }

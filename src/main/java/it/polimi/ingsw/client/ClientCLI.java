@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.model.player.PlayerBoard;
 
 
 import java.io.PrintStream;
@@ -85,18 +86,85 @@ public class ClientCLI {
      */
     public void startGame() {
         while (!viewState.isEndOfMatch()) {
+            if (!viewState.isActiveView()) {
+                showNotYoutTurnView();
+            } else {
+                if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
+                    printAssistantCards();
+                    int card = showPlanningInstructionAndGetCard();
+                    connectionSocket.setAssistantCard(card);
+                } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
+                    showActionMoveStudentsInstruction();
+                } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
+                    showMoveMotherNatureInstruction();
+                } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
+                    showCloudChoiceInstruction();
+                }
+            }
+            cleaner();
+
+            /*
             showMenu();
             printArchipelago();
             //showBoard();
             printAssistantCards();
             getInputAndSendMessage();
             cleaner();
+             */
         }
     }
 
     /**
-     *
+     * Shows the possible commands and what to do in the planning phase.
+     * Then get the number of card from stdin
      */
+    private int showPlanningInstructionAndGetCard(){
+        System.out.println(CLICyan + "CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS (enter the Priority value)" + CLIEffectReset);
+        System.out.println("Which card have you chosen?");
+
+        System.out.println("Insert a number");
+        Integer numOfCard = 0;
+        while ((numOfCard <= 0 || numOfCard >10) {
+            try {
+                numOfCard = in.nextInt();
+                System.out.println("You have choosen tha card with " + numOfCard.toString() + " priority");
+            } catch (InputMismatchException e) {
+                System.out.println("Please, insert a number.");
+            }
+        }
+
+        return numOfCard;
+
+    }
+
+    /**
+     * Shows the possible commands and what to do in the action phase: move cloud choice subaction
+     */
+    private void showCloudChoiceInstruction(){
+        System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOL ENTRANCE (enter the cloud number)" + CLIEffectReset);
+    }
+
+    /**
+     * Shows the possible commands and what to do in the action phase: move mothernature subaction
+     */
+    private void showMoveMotherNatureInstruction(){
+        System.out.println(CLICyan + "CHOICE WHERE TO MOVE THE MOTHER NATURE (enter the island destination island)" + CLIEffectReset);
+    }
+
+    /**
+     * Shows the possible commands and what to do in the action phase: move students subaction
+     */
+    private void showActionMoveStudentsInstruction(){
+        System.out.println(CLICyan + "CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)" + CLIEffectReset);
+    }
+
+    /**
+     * Shows what to do in the not playing state
+     */
+    private void showNotYoutTurnView(){
+        System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
+    }
+
     //TODO : support to sending message in base of the current phase
     public void getInputAndSendMessage() {
         String input = in.nextLine();
@@ -282,25 +350,6 @@ public class ClientCLI {
         printVector(rows);
 
 
-    }
-
-    /**
-     * Shows the possible commands and what to do in the current phase
-     */
-    private void showMenu() {
-        if (!viewState.isActiveView()) {
-            System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
-        } else {
-            if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
-                System.out.println(CLICyan + "CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS (enter the Priority value)" + CLIEffectReset);
-            } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
-                System.out.println(CLICyan + "CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)" + CLIEffectReset);
-            } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
-                System.out.println(CLICyan + "CHOICE WHERE TO MOVE THE MOTHER NATURE (enter the island destination island)" + CLIEffectReset);
-            } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
-                System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOLENTRANCE (enter the cloud number)" + CLIEffectReset);
-            }
-        }
     }
 
     private void printArchipelago() {

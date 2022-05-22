@@ -8,6 +8,7 @@ import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Tower;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
@@ -26,14 +27,15 @@ public class ConnectionSocket {
     private Scanner socketIn;
     private PrintWriter socketOut;
     private ViewState viewState;
+    private boolean isActive;
 
     public ConnectionSocket(String serverIP, int serverPort) {
+        this.isActive=true;
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.gson = new Gson();
 
     }
-
 
     /**
      * Method setup initializes a new socket connection and handles the nickname-choice response.
@@ -47,6 +49,8 @@ public class ConnectionSocket {
         if (socket == null) return false;
 
         socketIn = createScanner(socket);
+        Thread r = new Thread(new Reader(socketIn)); //Thread to read from the server channel - async
+        r.start();
         socketOut = createWriter(socket);
         return true;
     }
@@ -213,6 +217,11 @@ public class ConnectionSocket {
         return new ViewState(players, json.get("isExpertMode").getAsBoolean());
     }
 
+    public void setAssistantCard(int numberOfCard){
+        socketOut.print(MessageGenerator.useAssistantCardMessage(numberOfCard));
+        socketOut.flush();
+    }
+
     /**
      * Establishes the connection with the server
      *
@@ -253,6 +262,12 @@ public class ConnectionSocket {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return scanner;
+    }
+
+
+
+    public boolean isActive(){
+        return isActive;
     }
 
 

@@ -2,11 +2,10 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
-import it.polimi.ingsw.mvc.Listenable;
 
 import java.util.*;
 
-public abstract class GameBoard extends Listenable {
+public abstract class GameBoard {
     protected final int initialIslandNumber = 12;
     protected int playerNumber;
     protected int currentPlayer; // The position in the array which has the active player.
@@ -20,6 +19,7 @@ public abstract class GameBoard extends Listenable {
     protected int motherNature;
 
     public GameBoard(int playerNumber, List<String> playersNicknames) {
+
         this.playerNumber = playerNumber;
         currentPlayer = 0;
         professors = new HashMap<Color, Tower>();
@@ -358,6 +358,13 @@ public abstract class GameBoard extends Listenable {
         return false;
     }
 
+    /**
+     * Returns usable assistant cards
+     *
+     * @param playerTower : color tower of the player chosen
+     * @return the hashmap of usable card with priority as key value
+     * @throws NoSuchTowerException : that tower color is not applicable in this game
+     */
     public Map<Integer, Integer> getUsableAssistantCard(Tower playerTower) throws NoSuchTowerException {
         if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
         Map<Integer, Integer> list = new HashMap<Integer, Integer>();
@@ -574,5 +581,12 @@ public abstract class GameBoard extends Listenable {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
     public abstract void increaseMovementMotherNature() throws FunctionNotImplementedException;
+
+    /**
+     * Getter of cloud limit number
+     */
+    public int getCloudLimit(){
+        return clouds[0].getStudentLimit();
+    }
 
 }

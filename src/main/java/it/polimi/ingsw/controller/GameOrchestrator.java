@@ -1,11 +1,18 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.controller.listeners.CloudsListener;
+import it.polimi.ingsw.controller.listeners.GameListener;
+import it.polimi.ingsw.controller.listeners.IslandsListener;
+import it.polimi.ingsw.controller.listeners.PlayerBoardListener;
 import it.polimi.ingsw.exceptions.*;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.*;
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
 
 import java.util.*;
 
-public class GameOrchestrator {
+public class GameOrchestrator extends Listenable {
     protected final int maxStudentMoves = 3;
     protected final Map<String, Tower> playersTower;
     protected final boolean isExpert;
@@ -19,9 +26,16 @@ public class GameOrchestrator {
     protected Object actionBlocker = new Object();
     protected int studentMovesLeft;
     protected GameBoard gameBoard;
+    protected IslandsListener islandsListener;
+    protected CloudsListener cloudsListener;
+    protected Map<Tower, PlayerBoardListener> playerBoardListeners = new HashMap<>();
+    protected GameListener gameListener;
+    protected int id;
 
 
-    public GameOrchestrator(List<String> players, boolean isExpert) {
+    public GameOrchestrator(List<String> players, boolean isExpert, int id) {
+        createListeners();
+
         this.isExpert = isExpert;
         System.out.println("GAMEORCHESTRATOR - SETTING");
         if (isExpert) this.gameBoard = new ExpertGameBoard(players.size(), players);
@@ -29,6 +43,7 @@ public class GameOrchestrator {
         this.players = new ArrayList<String>();
         this.players.addAll(players);
         this.activePlayer = 0;
+        this.id = id;
         this.actionOrder = new String[players.size()];
         this.planningOrder = new String[players.size()];
         this.playersTower = new HashMap<String, Tower>();
@@ -54,6 +69,7 @@ public class GameOrchestrator {
                 }
             }
         }
+
         gameBoard.fillClouds();
 
         currentPhase = PhaseEnum.PLANNING;
@@ -111,6 +127,7 @@ public class GameOrchestrator {
                 this.currentPhase = PhaseEnum.END;
             else this.currentPhase = updatePhase;
         }
+        notify(gameListener, MessageGenerator.phaseUpdateMessage(currentPhase));
     }
 
     /**
@@ -135,6 +152,7 @@ public class GameOrchestrator {
                         return false;
                     }
                     studentMovesLeft--;
+                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM));
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                     return true;
                 }
@@ -166,6 +184,7 @@ public class GameOrchestrator {
                         gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, color);
                         studentMovesLeft--;
                         if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
+                        notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island));
                         return true;
                     }
                 }
@@ -187,7 +206,17 @@ public class GameOrchestrator {
     public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException {
         synchronized (actionBlocker) {
             if (getCurrentPhase() != PhaseEnum.PLANNING) return false;
-            if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) nextPlayer();
+            if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)){
+                nextPlayer();
+                try {
+                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()),
+                            MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(),
+                            (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()));
+                } catch (NoSuchTowerException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return false;
         }
     }
@@ -204,6 +233,7 @@ public class GameOrchestrator {
             if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) return false;
             if (gameBoard.moveMotherNature(destinationIsland)) {
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
+                notify(islandsListener, MessageGenerator.moveMotherNatureMessage(destinationIsland));
                 return true;
             }
             return false;
@@ -236,6 +266,7 @@ public class GameOrchestrator {
                 return false;
             }
             nextPlayer();
+            notify(cloudsListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null));
             return true;
         }
     }
@@ -333,6 +364,7 @@ public class GameOrchestrator {
                 }
             }
         }
+        notify(gameListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
     }
 
 
@@ -378,5 +410,28 @@ public class GameOrchestrator {
                     actionOrder[i] = planningOrder[i];
             }
         }
+    }
+
+    /**
+     * Creates all listeners and initialises them
+     */
+    private void createListeners(){
+        islandsListener = new IslandsListener();
+        cloudsListener = new CloudsListener();
+        gameListener =  new GameListener();
+
+        addListener(islandsListener);
+        addListener(cloudsListener);
+        addListener(gameListener);
+        for(Tower person : playersTower.values()){
+            playerBoardListeners.put(person, new PlayerBoardListener());
+            addListener(playerBoardListeners.get(person));
+        }
+    }
+
+    @Override
+    public void notify(Listener listener, String message) {
+        listener.update(message);
+
     }
 }

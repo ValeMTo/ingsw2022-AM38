@@ -11,6 +11,11 @@ public class Lobby {
     private boolean isExpert;
     private int numOfPlayers;
     private GameOrchestrator gameOrchestrator = null;
+    private int id;
+
+    public Lobby(){
+        id =0;
+    }
 
 
     public int getNumOfActiveUsers() {
@@ -39,15 +44,17 @@ public class Lobby {
             if (queue.size() == numOfPlayers && queue.size() > 1) {
                 System.out.println("LOBBY - Creating Game");
 
-                gameOrchestrator = new GameOrchestrator(players, isExpert);
+                gameOrchestrator = new GameOrchestrator(players, isExpert, id);
                 System.out.println("LOBBY - Created gameOrchestrator!");
                 for (ClientHandler clients : queue) {
                     System.out.println("LOBBY - Gonna WakeUp clientHandlers!");
+                    client.setIDGame(id);
                     synchronized (clients) {
                         System.out.println("LOBBY - WakeUp clientHandlers!");
                         clients.notifyAll();
                     }
                 }
+                id++;
             }
         }
     }

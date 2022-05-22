@@ -3,8 +3,8 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
-import it.polimi.ingsw.mvc.Listenable;
-import it.polimi.ingsw.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
