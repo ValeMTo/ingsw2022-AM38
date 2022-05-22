@@ -153,14 +153,14 @@ public class ExpertGameBoard extends GameBoard {
     }
 
     /**
-     * Returns an array with the specialCardNames
+     * Returns an array with the specialCard
      *
-     * @return : an array with the SpecialCardNames of the instantiated special cards
+     * @return : an array with the instantiated special cards
      */
-    public SpecialCardName[] getArrayOfSpecialCardNames(){
-        SpecialCardName[] returnArray = new SpecialCardName[specialCards.length];
+    public SpecialCard[] getArrayOfSpecialCard(){
+        SpecialCard[] returnArray = new SpecialCard[specialCards.length];
         for(int i = 0; i<specialCards.length;i++)
-            returnArray[i] = specialCards[i].getName();
+            returnArray[i] = specialCards[i];
         return returnArray;
     }
 

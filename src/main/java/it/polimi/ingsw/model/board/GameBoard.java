@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.*;
@@ -639,5 +640,5 @@ public abstract class GameBoard {
      * @return : an array with the SpecialCardNames of the instantiated special cards
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
-    public abstract SpecialCardName[] getArrayOfSpecialCardNames() throws FunctionNotImplementedException ;
+    public abstract SpecialCard[] getArrayOfSpecialCard() throws FunctionNotImplementedException ;
 }

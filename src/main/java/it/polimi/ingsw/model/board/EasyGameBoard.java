@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.board;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.HashMap;
@@ -192,7 +193,7 @@ public class EasyGameBoard extends GameBoard {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
     @Override
-    public SpecialCardName[] getArrayOfSpecialCardNames() throws FunctionNotImplementedException {
+    public SpecialCard[] getArrayOfSpecialCard() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     }
 }

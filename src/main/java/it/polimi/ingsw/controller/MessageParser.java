@@ -3,6 +3,7 @@ package it.polimi.ingsw.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.exceptions.AlreadyUsedException;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.messages.ActionTypeEnum;
@@ -44,7 +45,7 @@ public class MessageParser {
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_MOTHER_NATURE.ordinal())
                 return moveMotherNature(json);
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
-            if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal())
+            if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal())
                 return useSpecialCard(json);
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
@@ -140,9 +141,29 @@ public class MessageParser {
         }
     }
 
+
+    /**
+     * Uses the special card with the gameOrchestrator methods
+     *
+     * @param json :  received message that will be converted in calling the chooseCloud method of gameOrchestrator
+     * @return the answer message to the Client in json
+     */
     private String useSpecialCard(JsonObject json) {
-        //TODO: IMPLEMENT USE OF SPECIAL CARD
-        return null;
+        try {
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal()) {
+                return gameOrchestrator.useSpecialCard(json.get("SpecialCardName").getAsString());
+            }
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal()) {
+                return gameOrchestrator.chooseColor(Color.values()[json.get("Color").getAsInt()]);
+            }
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal())
+                return gameOrchestrator.chooseIsland(json.get("IslandPosition").getAsInt());
+        } catch (FunctionNotImplementedException exc) {
+            return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.FUNCTION_NOT_IMPLEMENTED, "ERROR - this functionality is for expert game mode only");
+        } catch (IslandOutOfBoundException exc) {
+            return MessageGenerator.errorInvalidInputMessage("ERROR - Island out of bound", exc.getLowerBound(), exc.getHigherBound());
+        }
+        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error in special card usage");
     }
 
     /**

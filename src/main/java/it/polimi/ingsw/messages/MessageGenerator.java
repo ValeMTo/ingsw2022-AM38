@@ -352,6 +352,21 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the chooseIslandPosition Action message, used to choose the Island for a special card effect.
+     *
+     * @param islandPosition : the index representing the specific Island where to apply the special card effect.
+     * @return : json String of the Action message ChooseCloud
+     */
+    public static String chooseIslandPositionMessage(int islandPosition) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
+        json.addProperty("ActionType", ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal());
+        json.addProperty("IslandPosition", islandPosition);
+
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates the ChooseColor Action message, used to choose a specific Color within an interaction with the Server.
      *
      * @param color : the chosen Color
