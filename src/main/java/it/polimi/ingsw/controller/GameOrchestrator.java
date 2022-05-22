@@ -19,6 +19,7 @@ public abstract class GameOrchestrator {
     protected Object actionBlocker = new Object();
     protected int studentMovesLeft;
     protected GameBoard gameBoard;
+    protected boolean specialCardAlreadyUsed;
 
 
     public GameOrchestrator(List<String> players, boolean isExpert) {
@@ -33,6 +34,7 @@ public abstract class GameOrchestrator {
         this.planningOrder = new String[players.size()];
         this.playersTower = new HashMap<String, Tower>();
         this.playedAssistantCard = new TreeSet<Integer>();
+        this.specialCardAlreadyUsed = false;
         this.studentMovesLeft = maxStudentMoves;
         for (int i = 0; i < players.size(); i++) {
             System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i);
@@ -116,7 +118,7 @@ public abstract class GameOrchestrator {
      *
      * @param updatePhase : new phase to update
      */
-    private void setCurrentPhase(PhaseEnum updatePhase) {
+    protected void setCurrentPhase(PhaseEnum updatePhase) {
         synchronized (phaseBlocker) {
             if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.InstantEndOfMatch))
                 this.currentPhase = PhaseEnum.END;
@@ -242,6 +244,7 @@ public abstract class GameOrchestrator {
             if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE))
                 throw new IncorrectPhaseException(this.getCurrentPhase());
             if (gameBoard.moveMotherNature(destinationIsland)) {
+                gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
                 return true;
             }
@@ -317,6 +320,7 @@ public abstract class GameOrchestrator {
                 } else if (getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
                     //Sets the active player as the next on the action order and sets the action phase as move student
                     activePlayer++;
+                    this.specialCardAlreadyUsed = false;
                     if (activePlayer < players.size()) {
 
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
@@ -330,7 +334,7 @@ public abstract class GameOrchestrator {
                         activePlayer = 0;
 
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
-
+                        this.specialCardAlreadyUsed = false;
                         setCurrentPhase(PhaseEnum.PLANNING);
                         gameBoard.increaseRound();
                         gameBoard.fillClouds();

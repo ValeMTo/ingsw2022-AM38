@@ -626,4 +626,10 @@ public abstract class GameBoard {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
     public abstract void disableTowerInfluence() throws FunctionNotImplementedException;
+
+    /**
+     * Activates the special effect
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract void professorsUpdateTieEffect() throws FunctionNotImplementedException ;
 }

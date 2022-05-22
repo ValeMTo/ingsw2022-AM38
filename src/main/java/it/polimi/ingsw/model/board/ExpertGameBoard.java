@@ -19,6 +19,7 @@ public class ExpertGameBoard extends GameBoard {
     private Color noInfluenceByColor;
     private int moreInfluenceQuantity = 0;
     private boolean motherNatureIncreasedMove = false;
+    private boolean professorsUpdateTieEffect = false;
     private int increasedMovement = 0;
 
 
@@ -163,7 +164,9 @@ public class ExpertGameBoard extends GameBoard {
     public Tower computeInfluence(int island) throws IslandOutOfBoundException { //It could be returning a Tower... but player nickname is also ok...
         if (island < 1 || island > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
-
+        // Update the professors accordingly to the professorsUpdateTieEffect special effect flag
+        if (this.professorsUpdateTieEffect) updateProfessorOwnershipIfTie();
+        else updateProfessorOwnership();
         Tower islandTower = islands[island - 1].getTower();
         // If the Island we want to compute the influence is disabled, we re-enable it and do not compute influence, just return the old TowerColor
         if (!this.islands[island - 1].isInfluenceEnabled()) {
@@ -325,6 +328,7 @@ public class ExpertGameBoard extends GameBoard {
         motherNatureIncreasedMove = false;
         noInfluenceByColor = null;
         increasedMovement = 0;
+        professorsUpdateTieEffect = false;
     }
 
     /**
@@ -343,6 +347,13 @@ public class ExpertGameBoard extends GameBoard {
     public void increaseMovementMotherNature() {
         increasedMovement = 2;
         motherNatureIncreasedMove = true;
+    }
+
+    /**
+     * Activates the special effect
+     */
+    public void professorsUpdateTieEffect() {
+        this.professorsUpdateTieEffect = true;
     }
 
 
@@ -419,6 +430,13 @@ public class ExpertGameBoard extends GameBoard {
 
     }
 
+    /**
+     * Gets the cost of a particular special card
+     *
+     * @param specialCardName : name of the special card to pay
+     * @return true if the special card exists and is one of the initialized special cards, false if not
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
     @Override
     public boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException {
         for (SpecialCard specialCard : specialCards) {

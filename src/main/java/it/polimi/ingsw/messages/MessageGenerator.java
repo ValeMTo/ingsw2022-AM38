@@ -3,6 +3,7 @@ package it.polimi.ingsw.messages;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.controller.PhaseEnum;
+import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
@@ -250,6 +251,20 @@ public class MessageGenerator {
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", ActionTypeEnum.USE_ASSISTANT_CARD.ordinal());
         json.addProperty("CardPriority", priority);
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates the ok message that includes the next step needed to use the special card
+     *
+     * @return : json String of the Action UseSpecialCard message
+     */
+    public static String specialCardAnswer(SpecialCardRequiredAction specialCardRequiredAction, boolean optionalAction) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.SPECIAL_CARD_ANSWER.ordinal());
+        json.addProperty("SpecialCardAnswer", specialCardRequiredAction.ordinal());
+        json.addProperty("Optional", optionalAction);
         return gson.toJson(json) + "\n";
     }
 
