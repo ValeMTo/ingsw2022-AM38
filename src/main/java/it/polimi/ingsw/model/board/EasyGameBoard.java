@@ -167,4 +167,8 @@ public class EasyGameBoard extends GameBoard {
         throw new FunctionNotImplementedException();
     }
 
+    @Override
+    public boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
 }

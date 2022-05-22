@@ -418,4 +418,16 @@ public class ExpertGameBoard extends GameBoard {
         return super.removeStudent(location, student, position);
 
     }
+
+    @Override
+    public boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException {
+        for (SpecialCard specialCard : specialCards) {
+            if (specialCard.getName().equals(specialCardName)) {
+                cost = specialCard.getCostCoin();
+                return true;
+            }
+        }
+        cost = null;
+        return false;
+    }
 }

@@ -38,7 +38,8 @@ public class GameOrchestratorTest {
      * @return a new GameOrchestrator created with given parameters
      */
     private GameOrchestrator setup(boolean threePlayers, boolean expert) {
-        return new GameOrchestrator(getNicknames(threePlayers), expert);
+        if (expert) return new ExpertGameOrchestrator(getNicknames(threePlayers));
+        return new EasyGameOrchestrator(getNicknames(threePlayers));
     }
 
     /**
@@ -133,7 +134,9 @@ public class GameOrchestratorTest {
     @DisplayName("Initial Setup test")
     @CsvSource("{true,true},{true,false},{false,true},{false,false}")
     public void setupTest(boolean threePlayers, boolean expert) {
-        GameOrchestrator game = new GameOrchestrator(getNicknames(threePlayers), expert);
+        GameOrchestrator game;
+        if (expert) game = new ExpertGameOrchestrator(getNicknames(threePlayers));
+        else game = new EasyGameOrchestrator(getNicknames(threePlayers));
         //Checks the GameMode
         assertEquals(expert, game.isExpert());
         //Checks that active phase is correct and active player is not null and contained into the List of nicknames

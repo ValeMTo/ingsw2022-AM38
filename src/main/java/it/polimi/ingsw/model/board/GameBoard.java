@@ -611,6 +611,16 @@ public abstract class GameBoard {
     public abstract boolean paySpecialCard(int cost) throws FunctionNotImplementedException;
 
     /**
+     * Gets the cost of a particular special card
+     *
+     * @param specialCardName : name of the special card to pay
+     * @return true if the special card exists and is one of the initialized special cards, false if not
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+
+    public abstract boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException;
+
+    /**
      * Disable the towerInfluence in order to not count the towers in the influence score computation
      *
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
