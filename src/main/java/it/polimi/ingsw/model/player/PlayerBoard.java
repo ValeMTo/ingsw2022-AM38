@@ -5,10 +5,7 @@ import it.polimi.ingsw.exceptions.NotLastCardUsedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PlayerBoard {
     private final String nickName;
@@ -114,7 +111,7 @@ public class PlayerBoard {
             deck.get(position - 1).use();
             this.lastUsed = position;
         } else {
-            List<Integer> usableCards = new ArrayList<>();
+            Set<Integer> usableCards = new HashSet<>();
             for (AssistantCard card : deck)
                 if (!card.isUsed()) usableCards.add(card.getPriority());
             throw new AlreadyUsedException(usableCards);

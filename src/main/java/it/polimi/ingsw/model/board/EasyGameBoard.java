@@ -3,10 +3,12 @@ package it.polimi.ingsw.model.board;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class EasyGameBoard extends GameBoard {
 
@@ -23,8 +25,9 @@ public class EasyGameBoard extends GameBoard {
      */
     @Override
     public Tower computeInfluence(int island) throws IslandOutOfBoundException {
-        if(island < 1 || island>islands.length)
-            throw new IslandOutOfBoundException(1,islands[islands.length - 1].getPosition());
+        if (island < 1 || island > islands.length)
+            throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
+        updateProfessorOwnership();
         Island currentIsland = islands[island - 1];
         Tower playerTower = null;
 
@@ -135,6 +138,51 @@ public class EasyGameBoard extends GameBoard {
      *
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */ public void increaseMovementMotherNature() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
+
+    @Override
+    /**
+     * Not usable in easy mode
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */ public Set<SpecialCardName> getSetOfSpecialCardNames() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
+
+    @Override
+    /**
+     * Not usable in easy mode
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */ public boolean paySpecialCard(int cost) throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
+
+    @Override
+    /**
+     * Not usable in easy mode
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */ public void disableTowerInfluence() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
+
+    @Override
+    /**
+     * Not usable in easy mode
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */ public boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    }
+
+    @Override
+    /**
+     * Not usable in easy mode
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */ public void professorsUpdateTieEffect() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     }
 }

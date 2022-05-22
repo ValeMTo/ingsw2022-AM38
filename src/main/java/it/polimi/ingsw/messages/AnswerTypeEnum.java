@@ -4,4 +4,5 @@ public enum AnswerTypeEnum {
     LOBBY_ANSWER,
     GAMEMODE_ANSWER,
     PLAYERS_NUMBER_ANSWER,
+    SPECIAL_CARD_ANSWER
 }

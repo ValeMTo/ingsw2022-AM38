@@ -44,7 +44,8 @@ public class Lobby {
             if (queue.size() == numOfPlayers && queue.size() > 1) {
                 System.out.println("LOBBY - Creating Game");
 
-                gameOrchestrator = new GameOrchestrator(players, isExpert, id);
+                if (isExpert) gameOrchestrator = new ExpertGameOrchestrator(players);
+                else gameOrchestrator = new EasyGameOrchestrator(players);
                 System.out.println("LOBBY - Created gameOrchestrator!");
                 for (ClientHandler clients : queue) {
                     System.out.println("LOBBY - Gonna WakeUp clientHandlers!");

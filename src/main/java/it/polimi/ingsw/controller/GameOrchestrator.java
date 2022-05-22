@@ -31,6 +31,7 @@ public class GameOrchestrator extends Listenable {
     protected Map<Tower, PlayerBoardListener> playerBoardListeners = new HashMap<>();
     protected GameListener gameListener;
     protected int id;
+    protected boolean specialCardAlreadyUsed;
 
 
     public GameOrchestrator(List<String> players, boolean isExpert, int id) {
@@ -48,26 +49,36 @@ public class GameOrchestrator extends Listenable {
         this.planningOrder = new String[players.size()];
         this.playersTower = new HashMap<String, Tower>();
         this.playedAssistantCard = new TreeSet<Integer>();
+        this.specialCardAlreadyUsed = false;
+        this.studentMovesLeft = maxStudentMoves;
         for (int i = 0; i < players.size(); i++) {
             System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i);
             planningOrder[i] = players.get(i);
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
                 playersTower.put(players.get(i), gameBoard.getPlayerTower(players.get(i)));
-                // In case of null pointer exception
-            else {
-                switch (i) {
-                    case 0:
-                        playersTower.put(players.get(i), Tower.WHITE);
-                        break;
-                    case 1:
-                        playersTower.put(players.get(i), Tower.BLACK);
-                        break;
-                    case 2:
-                        playersTower.put(players.get(i), Tower.GRAY);
-                        break;
+        }
+        //Initializes the students on the islands drawing the firsts 10 students
+        try {
+            for (int j = 2; j <= 6; j++)
+                gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
+            for (int j = 8; j <= 12; j++)
+                gameBoard.addStudent(StudentCounter.ISLAND, gameBoard.drawFromBag(), j);
+
+            // Initialize the bag for the normal phase
+            gameBoard.initializeBag();
+            // Fills with students the SchoolEntrances of the players
+            int limit;
+            if (players.size() == 3) limit = 7;
+            else limit = 9;
+            for (int j = 0; j < players.size(); j++) {
+                for (int idx = 0; idx < limit; idx++) {
+
+                    gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
                 }
             }
+        } catch (Exception exc) {
+            exc.printStackTrace();
         }
 
         gameBoard.fillClouds();
@@ -82,7 +93,8 @@ public class GameOrchestrator extends Listenable {
      */
     public String getActivePlayer() {
         synchronized (phaseBlocker) {
-            return this.players.get(activePlayer);
+            if (getCurrentPhase().equals(PhaseEnum.PLANNING)) return this.planningOrder[activePlayer];
+            return this.actionOrder[activePlayer];
         }
     }
 
@@ -121,7 +133,7 @@ public class GameOrchestrator extends Listenable {
      *
      * @param updatePhase : new phase to update
      */
-    private void setCurrentPhase(PhaseEnum updatePhase) { //TODO: solve, since you access the gameBoard you should also avoid actions but possible deadlocks!
+    protected void setCurrentPhase(PhaseEnum updatePhase) {
         synchronized (phaseBlocker) {
             if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.InstantEndOfMatch))
                 this.currentPhase = PhaseEnum.END;
@@ -135,13 +147,15 @@ public class GameOrchestrator extends Listenable {
      *
      * @param color : Color of the student to move
      * @return : true if the student is correctly moved, otherwise false
+     * @throws IncorrectPhaseException if the phase is not move student phase
      */
-    public boolean moveStudent(Color color) {
+    public boolean moveStudent(Color color) throws IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS) return false;
+            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS)
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             if (this.studentMovesLeft == 0) {
                 this.setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                return false;
+                throw new IncorrectPhaseException(getCurrentPhase());
             }
             try {
                 // Try to remove the student, if is removed correctly add the student to the DiningR.
@@ -165,31 +179,37 @@ public class GameOrchestrator extends Listenable {
     }
 
     /**
-     * Moves te student to the Island
+     * Moves the student to the Island
      *
      * @param color  : Color of the student to move from the SchoolEntrance to the Island
      * @param island : Number of the Island we want to move the student into
      * @return true if the student was added correctly
+     * @throws IncorrectPhaseException if the phase is not move student phase
      */
-    public boolean moveStudent(Color color, int island) throws IndexOutOfBoundsException, AllMovesUsedException {
+    public boolean moveStudent(Color color, int island) throws IndexOutOfBoundsException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS) return false;
+            if (getCurrentPhase() != PhaseEnum.ACTION_MOVE_STUDENTS)
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             if (studentMovesLeft == 0) {
                 setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                throw new AllMovesUsedException();
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             }
             try {
                 if (gameBoard.removeStudent(StudentCounter.SCHOOLENTRANCE, color)) {
                     if (!gameBoard.addStudent(StudentCounter.ISLAND, color, island)) {
                         gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, color);
-                        studentMovesLeft--;
-                        if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                        notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island));
-                        return true;
+                        return false;
                     }
+                    studentMovesLeft--;
+                    if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
+                     notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island));
+                    return true;
                 }
                 return false;
-            } catch (Exception exc) {
+            } catch (FunctionNotImplementedException exc) {
+                exc.printStackTrace();
+                return false;
+            } catch (LocationNotAllowedException exc) {
                 exc.printStackTrace();
                 return false;
             }
@@ -202,21 +222,30 @@ public class GameOrchestrator extends Listenable {
      * @param priority : priority of the assistant card to use
      * @return : true if the card has been correctly used, otherwise false
      * @throws IndexOutOfBoundsException : if the card priority is not in the correct range
+     * @throws IncorrectPhaseException   if the phase is not planning phase
      */
-    public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException {
+    public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.PLANNING) return false;
-            if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)){
-                nextPlayer();
-                try {
-                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()),
-                            MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(),
-                            (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()));
-                } catch (NoSuchTowerException e) {
-                    e.printStackTrace();
-                }
+            // If the current phase is incorrect
+            if (getCurrentPhase() != PhaseEnum.PLANNING) throw new IncorrectPhaseException(this.getCurrentPhase());
+            try {
+                Set<Integer> usableCards = gameBoard.getUsableAssistantCard(gameBoard.getPlayerTower(getActivePlayer())).keySet();
+                usableCards.removeAll(playedAssistantCard);
+                for (Integer i : usableCards)
+                    System.out.println("Usable card of " + getActivePlayer() + " " + i);
+                // If the player has other cards to use other than the one played by other have to play another card
+                if (usableCards.size() > 0 && !usableCards.contains(priority))
+                    throw new AlreadyUsedException(usableCards);
+            } catch (NoSuchTowerException exc) {
+                exc.printStackTrace();
             }
-
+            // The player plays the chosen card and if it is correctly played update the card used and go to the next phase wit nextStep
+            if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) {
+                this.playedAssistantCard.add(priority);
+                nextStep();
+                notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()));
+                return true;
+            }
             return false;
         }
     }
@@ -227,11 +256,14 @@ public class GameOrchestrator extends Listenable {
      * @param destinationIsland : island where the player wants to move the motherNature
      * @return : true if the move is allowed, false if the island is unreachable with the steps given by the last card
      * @throws IslandOutOfBoundException : if the island position is out of bound
+     * @throws IncorrectPhaseException   if the phase is not moving motherNature phase
      */
-    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException {
+    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) return false;
+            if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE))
+                throw new IncorrectPhaseException(this.getCurrentPhase());
             if (gameBoard.moveMotherNature(destinationIsland)) {
+                gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
                 notify(islandsListener, MessageGenerator.moveMotherNatureMessage(destinationIsland));
                 return true;
@@ -248,10 +280,12 @@ public class GameOrchestrator extends Listenable {
      * @return : true if the
      * @throws IndexOutOfBoundsException if the position exceed the usable range [1, numOfPlayers]
      * @throws AlreadyUsedException      if the Cloud is not usable anymore
+     * @throws IncorrectPhaseException   if the phase is not choose cloud phase
      */
-    public boolean chooseCloud(int cloudPosition) throws IndexOutOfBoundsException, AlreadyUsedException {
+    public boolean chooseCloud(int cloudPosition) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
-            if (getCurrentPhase() != PhaseEnum.ACTION_CHOOSE_CLOUD) return false;
+            if (getCurrentPhase() != PhaseEnum.ACTION_CHOOSE_CLOUD)
+                throw new IncorrectPhaseException(getCurrentPhase());
             if (cloudPosition < 1 || cloudPosition > players.size()) throw new IndexOutOfBoundsException();
             if (!gameBoard.getUsableClouds().contains(cloudPosition))
                 throw new AlreadyUsedException(gameBoard.getUsableClouds());
@@ -265,8 +299,8 @@ public class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
                 return false;
             }
-            nextPlayer();
             notify(cloudsListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null));
+            nextStep();
             return true;
         }
     }
@@ -276,33 +310,6 @@ public class GameOrchestrator extends Listenable {
      *
      * @return : true if now the activePlayer has been updated, false if the phase is incorrect or if we have finished the passive phase
      */
-    private boolean updateNextPlanningPlayer() {
-        synchronized (phaseBlocker) {
-            if (getCurrentPhase() != PhaseEnum.PLANNING) return false;
-            if (activePlayer >= players.size() - 1) {
-                setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                return false;
-            }
-            activePlayer++;
-            return true;
-        }
-    }
-
-    /**
-     * Updates to the successive player of the action phase
-     *
-     * @return : true if now the activePlayer has been updated, false if the phase is incorrect or if we have finished the passive phase
-     */
-    private boolean updateNextActivePlayer() {
-        synchronized (phaseBlocker) {
-            if (getCurrentPhase() == PhaseEnum.PLANNING) {
-                if (activePlayer >= players.size() - 1) return false;
-                activePlayer++;
-                return true;
-            }
-            return false;
-        }
-    }
 
     /**
      * Set the next player.
@@ -310,58 +317,57 @@ public class GameOrchestrator extends Listenable {
      * If the active player is the last player of the action phase, controls the ending conditions and the nr. of rounds.
      * If the game continues, sets the order of the successive phase and sets the active player.
      */
-    private void nextPlayer() {
+    private void nextStep() {
         synchronized (phaseBlocker) {
-            if (getCurrentPhase() == PhaseEnum.PLANNING) {
-                //Goes to the next player and set it into the gameBoard
-                if (activePlayer < players.size()) {
+            try {
+                if (getCurrentPhase() == PhaseEnum.PLANNING) {
+                    //Goes to the next player and set it into the gameBoard
                     activePlayer++;
-                    try {
+                    if (activePlayer < players.size()) {
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+
                     }
-                }
-                //Sets the order of the action phase, set the phase as action and set the player as the first of the array
-                else {
-                    this.setActionOrder();
-                    activePlayer = 0;
-                    try {
+                    //Sets the order of the action phase, set the phase as action and set the player as the first of the array
+                    else {
+                        this.setActionOrder();
+                        activePlayer = 0;
+
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+                        System.out.println("Setting as current player: " + actionOrder[activePlayer] + " with tower " + gameBoard.getPlayerTower(actionOrder[activePlayer]));
+
+                        this.studentMovesLeft = maxStudentMoves;
+                        setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                     }
-                    setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                }
-            } else if (getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
-                //Sets the active player as the next on the action order and sets the action phase as move student
-                if (activePlayer < players.size()) {
+                } else if (getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
+                    //Sets the active player as the next on the action order and sets the action phase as move student
                     activePlayer++;
-                    try {
+                    this.specialCardAlreadyUsed = false;
+                    if (activePlayer < players.size()) {
+
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+
+                        this.studentMovesLeft = maxStudentMoves;
+                        setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                     }
-                    setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                }
-                //If the game is not finished, set everything for the next planning phase
-                else if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.NoEndOfMatch)) {
-                    this.setPlanningOrder();
-                    activePlayer = 0;
-                    try {
+                    //If the game is not finished, set everything for the next planning phase
+                    else if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.NoEndOfMatch)) {
+                        this.setPlanningOrder();
+                        activePlayer = 0;
+
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
+                        this.specialCardAlreadyUsed = false;
+                        setCurrentPhase(PhaseEnum.PLANNING);
+                        gameBoard.increaseRound();
+                        gameBoard.fillClouds();
+                        playedAssistantCard.clear();
                     }
-                    setCurrentPhase(PhaseEnum.PLANNING);
-                    gameBoard.increaseRound();
-                    gameBoard.fillClouds();
-                    playedAssistantCard.clear();
+                    //If the game ends
+                    else {
+                        setCurrentPhase(PhaseEnum.END);
+                    }
                 }
-                //If the game ends
-                else {
-                    setCurrentPhase(PhaseEnum.END);
-                }
+            } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
         notify(gameListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
@@ -399,6 +405,7 @@ public class GameOrchestrator extends Listenable {
                 for (Integer value : playedAssistantCard) {
                     for (String player : planningOrder) {
                         if (value.equals(gameBoard.getLastAssistantCard(gameBoard.getPlayerTower(player)))) {
+                            System.out.println("Setting player " + player + " as position " + index + " since has played card " + value);
                             actionOrder[index] = player;
                             index++;
                         }
@@ -411,6 +418,38 @@ public class GameOrchestrator extends Listenable {
             }
         }
     }
+
+    /**
+     * Uses the special card specified with the String of the name of the card to be used
+     *
+     * @param cardName    : Name of the specialCard to use
+     * @param nextRequest : if the interaction with the client continues, contains the response to the client and the successive information requested
+     * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
+     * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
+     */
+
+    public abstract SpecialCardRequiredAction useSpecialCard(String cardName, String nextRequest) throws FunctionNotImplementedException;
+
+    /**
+     * Choose a color for the SpecialCard usage
+     *
+     * @param color       : color chosen by the player
+     * @param nextRequest : if the interaction with the client continues, contains the response to the client and the successive information requested
+     * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
+     * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
+     */
+    public abstract SpecialCardRequiredAction chooseColor(Color color, String nextRequest) throws FunctionNotImplementedException;
+
+    /**
+     * Choose an Island for the SpecialCard usage
+     *
+     * @param position    : position of the chosen island
+     * @param nextRequest : if the interaction with the client continues, contains the response to the client and the successive information requested
+     * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
+     * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
+     * @throws IslandOutOfBoundException       if the island position is incorrect
+     */
+    public abstract SpecialCardRequiredAction chooseIsland(int position, String nextRequest) throws FunctionNotImplementedException, IslandOutOfBoundException;
 
     /**
      * Creates all listeners and initialises them
