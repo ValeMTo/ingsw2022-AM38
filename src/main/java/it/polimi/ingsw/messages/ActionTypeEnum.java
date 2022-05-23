@@ -7,5 +7,6 @@ public enum ActionTypeEnum {
     MOVE_MOTHER_NATURE,
     CHOOSE_CLOUD,
     CHOOSE_TILE_POSITION,
-    CHOOSE_COLOR
+    CHOOSE_COLOR,
+    CHOOSE_ISLAND
 }

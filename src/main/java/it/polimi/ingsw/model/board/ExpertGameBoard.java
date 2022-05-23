@@ -152,6 +152,18 @@ public class ExpertGameBoard extends GameBoard {
         return returnSet;
     }
 
+    /**
+     * Returns an array with the specialCard
+     *
+     * @return : an array with the instantiated special cards
+     */
+    public SpecialCard[] getArrayOfSpecialCard(){
+        SpecialCard[] returnArray = new SpecialCard[specialCards.length];
+        for(int i = 0; i<specialCards.length;i++)
+            returnArray[i] = specialCards[i];
+        return returnArray;
+    }
+
 
     /**
      * Compute the influence on a specific Island.

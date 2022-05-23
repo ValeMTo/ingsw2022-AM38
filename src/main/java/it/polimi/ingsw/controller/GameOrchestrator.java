@@ -423,28 +423,25 @@ public class GameOrchestrator extends Listenable {
      * Uses the special card specified with the String of the name of the card to be used
      *
      * @param cardName    : Name of the specialCard to use
-     * @param nextRequest : if the interaction with the client continues, contains the response to the client and the successive information requested
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      */
 
-    public abstract SpecialCardRequiredAction useSpecialCard(String cardName, String nextRequest) throws FunctionNotImplementedException;
+    public abstract String useSpecialCard(String cardName) throws FunctionNotImplementedException;
 
     /**
      * Choose a color for the SpecialCard usage
      *
      * @param color       : color chosen by the player
-     * @param nextRequest : if the interaction with the client continues, contains the response to the client and the successive information requested
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      */
-    public abstract SpecialCardRequiredAction chooseColor(Color color, String nextRequest) throws FunctionNotImplementedException;
+    public abstract String chooseColor(Color color) throws FunctionNotImplementedException;
 
     /**
      * Choose an Island for the SpecialCard usage
      *
      * @param position    : position of the chosen island
-     * @param nextRequest : if the interaction with the client continues, contains the response to the client and the successive information requested
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      * @throws IslandOutOfBoundException       if the island position is incorrect

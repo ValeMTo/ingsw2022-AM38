@@ -19,7 +19,7 @@ public class EasyGameOrchestrator extends GameOrchestrator {
      * Throws FunctionNotImplementedException since the function is not implemented by the easy game mode
      */
     @Override
-    public SpecialCardRequiredAction useSpecialCard(String cardName, String nextRequest) throws FunctionNotImplementedException {
+    public String useSpecialCard(String cardName) throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     }
 
@@ -27,7 +27,7 @@ public class EasyGameOrchestrator extends GameOrchestrator {
      * Throws FunctionNotImplementedException since the function is not implemented by the easy game mode
      */
     @Override
-    public SpecialCardRequiredAction chooseColor(Color color, String nextRequest) throws FunctionNotImplementedException {
+    public String chooseColor(Color color) throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     }
 
@@ -35,7 +35,7 @@ public class EasyGameOrchestrator extends GameOrchestrator {
      * Throws FunctionNotImplementedException since the function is not implemented by the easy game mode
      */
     @Override
-    public SpecialCardRequiredAction chooseIsland(int position, String nextRequest) throws FunctionNotImplementedException, IslandOutOfBoundException {
+    public String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException {
         throw new FunctionNotImplementedException();
     }
 
@@ -50,5 +50,6 @@ public class EasyGameOrchestrator extends GameOrchestrator {
         }
         return returnValue;
     }
+
 
 }
