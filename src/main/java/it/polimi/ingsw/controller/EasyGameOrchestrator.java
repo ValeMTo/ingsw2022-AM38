@@ -4,6 +4,7 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.List;
 
@@ -11,8 +12,8 @@ import java.util.List;
  * GameOrchestrator implementation class in case of the easy game mode
  */
 public class EasyGameOrchestrator extends GameOrchestrator {
-    public EasyGameOrchestrator(List<String> players) {
-        super(players, false);
+    public EasyGameOrchestrator(List<String> players, int id, List<ClientHandler> clients) {
+        super(players, false, id, clients);
     }
 
     /**

@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * ViewState contains all the information to visualize the current state of the gameBoard
  */
-public class ViewState extends Listenable implements Listener {
+public class ViewState {
     private final Map<String, Tower> players;
     private final List<IslandView> islands;
     private final Map<Color, Integer> schoolEntranceOccupancy;

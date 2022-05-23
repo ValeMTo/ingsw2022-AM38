@@ -9,6 +9,7 @@ import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.*;
 import it.polimi.ingsw.controller.mvc.Listenable;
 import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
@@ -32,10 +33,12 @@ public class GameOrchestrator extends Listenable {
     protected GameListener gameListener;
     protected int id;
     protected boolean specialCardAlreadyUsed;
+    protected List<ClientHandler> clients;
 
 
-    public GameOrchestrator(List<String> players, boolean isExpert, int id) {
+    public GameOrchestrator(List<String> players, boolean isExpert, int id, List<ClientHandler> clients) {
         createListeners();
+        this.clients = clients;
 
         this.isExpert = isExpert;
         System.out.println("GAMEORCHESTRATOR - SETTING");
@@ -139,7 +142,7 @@ public class GameOrchestrator extends Listenable {
                 this.currentPhase = PhaseEnum.END;
             else this.currentPhase = updatePhase;
         }
-        notify(gameListener, MessageGenerator.phaseUpdateMessage(currentPhase));
+        notify(gameListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
     }
 
     /**
@@ -166,7 +169,7 @@ public class GameOrchestrator extends Listenable {
                         return false;
                     }
                     studentMovesLeft--;
-                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM));
+                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM), clients);
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                     return true;
                 }
@@ -202,7 +205,7 @@ public class GameOrchestrator extends Listenable {
                     }
                     studentMovesLeft--;
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                     notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island));
+                     notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
                     return true;
                 }
                 return false;
@@ -243,7 +246,7 @@ public class GameOrchestrator extends Listenable {
             if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) {
                 this.playedAssistantCard.add(priority);
                 nextStep();
-                notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()));
+                notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()), clients);
                 return true;
             }
             return false;
@@ -265,7 +268,7 @@ public class GameOrchestrator extends Listenable {
             if (gameBoard.moveMotherNature(destinationIsland)) {
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
-                notify(islandsListener, MessageGenerator.moveMotherNatureMessage(destinationIsland));
+                notify(islandsListener, MessageGenerator.moveMotherNatureMessage(destinationIsland), clients);
                 return true;
             }
             return false;
@@ -299,7 +302,7 @@ public class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
                 return false;
             }
-            notify(cloudsListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null));
+            notify(cloudsListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
             nextStep();
             return true;
         }
@@ -370,7 +373,7 @@ public class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
             }
         }
-        notify(gameListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
+        notify(gameListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
     }
 
 
@@ -466,8 +469,8 @@ public class GameOrchestrator extends Listenable {
     }
 
     @Override
-    public void notify(Listener listener, String message) {
-        listener.update(message);
+    public void notify(Listener listener, String message, List<ClientHandler> clients) {
+        listener.update(message, clients);
 
     }
 }

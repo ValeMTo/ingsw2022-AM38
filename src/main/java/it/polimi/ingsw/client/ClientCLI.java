@@ -124,7 +124,7 @@ public class ClientCLI {
 
         System.out.println("Insert a number");
         Integer numOfCard = 0;
-        while ((numOfCard <= 0 || numOfCard >10) {
+        while ((numOfCard <= 0 || numOfCard >10)) {
             try {
                 numOfCard = in.nextInt();
                 System.out.println("You have choosen tha card with " + numOfCard.toString() + " priority");

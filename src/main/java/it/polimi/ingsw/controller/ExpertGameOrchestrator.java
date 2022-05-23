@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +32,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
     // Color that we have removed from a card or other place and that we are waiting to locate.
     private Color pendingColor;
 
-    public ExpertGameOrchestrator(List<String> players) {
-        super(players, true);
+    public ExpertGameOrchestrator(List<String> players, int id, List<ClientHandler> clients) {
+        super(players, true, id, clients);
         try {
             this.specialCardsArray = gameBoard.getArrayOfSpecialCard();
             this.specialCards = new HashSet<>(gameBoard.getSetOfSpecialCardNames());
