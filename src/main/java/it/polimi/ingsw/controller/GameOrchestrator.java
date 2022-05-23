@@ -4,16 +4,16 @@ import it.polimi.ingsw.controller.listeners.CloudsListener;
 import it.polimi.ingsw.controller.listeners.GameListener;
 import it.polimi.ingsw.controller.listeners.IslandsListener;
 import it.polimi.ingsw.controller.listeners.PlayerBoardListener;
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.*;
-import it.polimi.ingsw.controller.mvc.Listenable;
-import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
-public class GameOrchestrator extends Listenable {
+public abstract class GameOrchestrator extends Listenable {
     protected final int maxStudentMoves = 3;
     protected final Map<String, Tower> playersTower;
     protected final boolean isExpert;
@@ -205,7 +205,7 @@ public class GameOrchestrator extends Listenable {
                     }
                     studentMovesLeft--;
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                     notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
+                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
                     return true;
                 }
                 return false;
@@ -246,7 +246,11 @@ public class GameOrchestrator extends Listenable {
             if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) {
                 this.playedAssistantCard.add(priority);
                 nextStep();
-                notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()), clients);
+                try {
+                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()), clients);
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
                 return true;
             }
             return false;
@@ -425,7 +429,7 @@ public class GameOrchestrator extends Listenable {
     /**
      * Uses the special card specified with the String of the name of the card to be used
      *
-     * @param cardName    : Name of the specialCard to use
+     * @param cardName : Name of the specialCard to use
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      */
@@ -435,7 +439,7 @@ public class GameOrchestrator extends Listenable {
     /**
      * Choose a color for the SpecialCard usage
      *
-     * @param color       : color chosen by the player
+     * @param color : color chosen by the player
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      */
@@ -444,25 +448,28 @@ public class GameOrchestrator extends Listenable {
     /**
      * Choose an Island for the SpecialCard usage
      *
-     * @param position    : position of the chosen island
+     * @param position : position of the chosen island
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      * @throws IslandOutOfBoundException       if the island position is incorrect
      */
     public abstract SpecialCardRequiredAction chooseIsland(int position, String nextRequest) throws FunctionNotImplementedException, IslandOutOfBoundException;
 
+    public abstract String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException;
+
+
     /**
      * Creates all listeners and initialises them
      */
-    private void createListeners(){
+    private void createListeners() {
         islandsListener = new IslandsListener();
         cloudsListener = new CloudsListener();
-        gameListener =  new GameListener();
+        gameListener = new GameListener();
 
         addListener(islandsListener);
         addListener(cloudsListener);
         addListener(gameListener);
-        for(Tower person : playersTower.values()){
+        for (Tower person : playersTower.values()) {
             playerBoardListeners.put(person, new PlayerBoardListener());
             addListener(playerBoardListeners.get(person));
         }

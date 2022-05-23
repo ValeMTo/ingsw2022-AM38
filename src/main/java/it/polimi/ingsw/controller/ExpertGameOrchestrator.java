@@ -68,8 +68,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
     /**
      * Uses the special card specified with the String of the name of the card to be used
      *
-     * @param cardName    : Name of the specialCard to use
-     * @return  contains the response to the client and the successive information requested or the ok message to end the interaction
+     * @param cardName : Name of the specialCard to use
+     * @return contains the response to the client and the successive information requested or the ok message to end the interaction
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      */
     @Override
@@ -119,8 +119,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         this.expectingPhase = SpecialCardRequiredAction.CHOOSE_ISLAND;
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_ISLAND, false);
                     case HERBALIST:
-                        if(specialCardsArray[getPositionSpecialCard()].isEmptyOfTiles())
-                        {
+                        if (specialCardsArray[getPositionSpecialCard()].isEmptyOfTiles()) {
                             resetPhase();
                             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.ALL_TILES_USED, "ERROR - The herbalist special card has no usable tiles");
                         }
@@ -154,10 +153,9 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
     }
 
     /**
-     *
      * @return the position of the activated SpecialCard
      */
-    private Integer getPositionSpecialCard(){
+    private Integer getPositionSpecialCard() {
         for (int i = 0; i < specialCardsArray.length; i++)
             if (specialCardsArray[i].equals(activatedSpecialCard)) return i;
         return null;
@@ -169,8 +167,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
      * An interaction for the specialCard usage can require more than one color to be selected, in that case the first one is saved into pendingColor.
      * This method is called after the activation of the card and requires the color which has been chosen by the player and that will be removed/added basing to the specific special card effect
      *
-     * @param color       : color chosen by the player
-     * @return  contains the response to the client and the successive information requested or the ok message to end the interaction
+     * @param color : color chosen by the player
+     * @return contains the response to the client and the successive information requested or the ok message to end the interaction
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      */
     @Override
@@ -284,7 +282,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
     /**
      * Choose an Island for the SpecialCard usage
      *
-     * @param position    : position of the chosen island
+     * @param position : position of the chosen island
      * @return the required action for the card usage or the result of the action, needed to model the interaction with the client
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      * @throws IslandOutOfBoundException       if the island position is incorrect
@@ -300,8 +298,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 switch (activatedSpecialCard) {
                     case PRIEST:
                         // Add the student chosen first and add it to the island, then draw a new student for the card
-                        gameBoard.addStudent(StudentCounter.ISLAND, pendingColor,position);
-                        gameBoard.addStudent(StudentCounter.CARD,gameBoard.drawFromBag(),cardPosition);
+                        gameBoard.addStudent(StudentCounter.ISLAND, pendingColor, position);
+                        gameBoard.addStudent(StudentCounter.CARD, gameBoard.drawFromBag(), cardPosition);
                         resetPhase();
                         return MessageGenerator.okMessage();
                     case HERALD:
@@ -311,17 +309,15 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         return MessageGenerator.okMessage();
                     case HERBALIST:
                         // Disables an Island influence computation and remove the tile from the special card
-                        if(gameBoard.disableInfluence(position)) {
+                        if (gameBoard.disableInfluence(position)) {
                             specialCardsArray[position].removeTile();
                         }
                         resetPhase();
-                       return MessageGenerator.okMessage();
+                        return MessageGenerator.okMessage();
                 }
-            }
-            catch (IslandOutOfBoundException exc){
-                return MessageGenerator.errorInvalidInputMessage("ERROR - Island out of bound",exc.getLowerBound(),exc.getHigherBound());
-            }
-            catch (LocationNotAllowedException exc){
+            } catch (IslandOutOfBoundException exc) {
+                return MessageGenerator.errorInvalidInputMessage("ERROR - Island out of bound", exc.getLowerBound(), exc.getHigherBound());
+            } catch (LocationNotAllowedException exc) {
                 exc.printStackTrace();
             }
         }
