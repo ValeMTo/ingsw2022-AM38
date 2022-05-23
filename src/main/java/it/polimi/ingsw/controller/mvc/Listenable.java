@@ -20,6 +20,6 @@ public abstract class Listenable<T> {
     }
 
     public void notify(Listener listener, String message){
-        listener.update();
+        listener.update(message);
     }
 }
