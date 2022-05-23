@@ -213,8 +213,8 @@ public abstract class GameOrchestrator {
             try {
                 Set<Integer> usableCards = gameBoard.getUsableAssistantCard(gameBoard.getPlayerTower(getActivePlayer())).keySet();
                 usableCards.removeAll(playedAssistantCard);
-                for (Integer i : usableCards)
-                    System.out.println("Usable card of " + getActivePlayer() + " " + i);
+                //for (Integer i : usableCards)
+                //    System.out.println("Usable card of " + getActivePlayer() + " " + i);
                 // If the player has other cards to use other than the one played by other have to play another card
                 if (usableCards.size() > 0 && !usableCards.contains(priority))
                     throw new AlreadyUsedException(usableCards);

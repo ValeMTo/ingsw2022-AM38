@@ -98,6 +98,26 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the error message for IslandOutOfBound with the additional fields that informs on the allowed range
+     * of values for the input.
+     *
+     * @param errorString : String of the particular error to send
+     * @param minVal      : the minimum allowed value for the input
+     * @param maxVal      : the maximum allowed value for the input
+     * @return : json String of the error message
+     */
+    public static String errorIslandOutOfBoundInputMessage(String errorString, int minVal, int maxVal) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
+        json.addProperty("ErrorType", ErrorTypeEnum.ISLAND_OUT_OF_BOUND.ordinal());
+        json.addProperty("errorString", errorString);
+        json.addProperty("minVal", minVal);
+        json.addProperty("maxVal", maxVal);
+
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates an error message caused by using an action that cannot be used in the current phase of the turn
      *
      * @param actualPhase actual phase that is now set

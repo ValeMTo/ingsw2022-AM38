@@ -619,7 +619,7 @@ public abstract class GameBoard {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
 
-    public abstract boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException;
+    public abstract Integer getSpecialCardCost(SpecialCardName specialCardName) throws FunctionNotImplementedException;
 
     /**
      * Disable the towerInfluence in order to not count the towers in the influence score computation
