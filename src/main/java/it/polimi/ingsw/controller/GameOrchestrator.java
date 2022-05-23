@@ -453,7 +453,6 @@ public abstract class GameOrchestrator extends Listenable {
      * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
      * @throws IslandOutOfBoundException       if the island position is incorrect
      */
-    public abstract SpecialCardRequiredAction chooseIsland(int position, String nextRequest) throws FunctionNotImplementedException, IslandOutOfBoundException;
 
     public abstract String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException;
 
