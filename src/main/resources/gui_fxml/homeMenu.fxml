@@ -8,32 +8,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-    <AnchorPane prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.homeMenuController"  style="-fx-background-color: black;" VBox.vgrow="ALWAYS" >
+<AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.homeMenuController">
       <children>
-        <Label alignment="BOTTOM_CENTER" layoutX="292.0" layoutY="522.0" style="&#10;" text="Credits" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false" AnchorPane.bottomAnchor="50.799999999999955" AnchorPane.leftAnchor="292.0" AnchorPane.rightAnchor="292.0" >
+        <Label alignment="BOTTOM_CENTER" layoutX="304.0" layoutY="616.0" style="&#10;" text="Credits" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false" AnchorPane.bottomAnchor="68.79999999999995" AnchorPane.leftAnchor="304.0" AnchorPane.rightAnchor="280.0">
           <font>
-            <Font size="18.0" />
+            <Font size="24.0" />
           </font>
         </Label>
-            <ImageView id="home_background" fitHeight="321.0" fitWidth="792.0" layoutX="84.0" layoutY="148.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="148.21917724609375" AnchorPane.leftAnchor="84.0" AnchorPane.rightAnchor="84.0">
+            <ImageView id="home_background" fitHeight="440.0" fitWidth="1012.0" layoutX="105.0" layoutY="162.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="169.83560180664062" AnchorPane.leftAnchor="105.0" AnchorPane.rightAnchor="83.0">
                <image>
                   <Image url="@../graphics/backgrounds/Eriantys_slider_wide.png" />
                </image>
             </ImageView>
-            <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="390.0" layoutY="63.0" text="Welcome to Eriantys" textFill="#46b9e7">
+            <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="462.0" layoutY="68.0" text="Welcome to Eriantys" textFill="#46b9e7">
                <font>
-                  <Font size="20.0" />
+                  <Font size="32.0" />
                </font>
             </Label>
-            <Button fx:id="playButton" layoutX="191.0" layoutY="280.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="65.0" style="-fx-background-color: GREEN;" text="PLAY" AnchorPane.leftAnchor="191.0" onMouseClicked="#startPlay">
+            <Button fx:id="playButton" layoutX="230.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#startPlay" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: GREEN;" text="PLAY" AnchorPane.leftAnchor="230.0">
                <font>
                   <Font size="18.0" />
                </font></Button>
-            <Button fx:id="quitButton" layoutX="733.0" layoutY="280.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="65.0" style="-fx-background-color: RED;" text="QUIT" AnchorPane.rightAnchor="191.0">
+            <Button fx:id="quitButton" layoutX="903.0" layoutY="335.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: RED;" text="QUIT" AnchorPane.rightAnchor="186.60000000000002">
                <font>
                   <Font size="18.0" />
                </font></Button>
       </children>
     </AnchorPane>
-

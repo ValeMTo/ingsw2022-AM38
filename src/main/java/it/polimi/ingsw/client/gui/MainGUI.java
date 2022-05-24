@@ -50,9 +50,9 @@ public class MainGUI extends Application {
 
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage primaryStage) {
         loadScenes();
-        this.primaryStage = stage;
+        this.primaryStage = primaryStage;
         runStage();
 
     }
@@ -75,6 +75,7 @@ public class MainGUI extends Application {
         primaryStage.setTitle("Eriantys");
         primaryStage.setScene(currentScene);
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/graphics/logos/Eriantys_logo-180x180.png")));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
@@ -125,6 +126,7 @@ public class MainGUI extends Application {
     public void changeStage(String newScene) {
         currentScene = guiScenesMap.get(newScene);
         primaryStage.setScene(currentScene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
