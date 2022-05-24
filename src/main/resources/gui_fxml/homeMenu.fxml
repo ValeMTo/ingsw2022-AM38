@@ -8,11 +8,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
-  <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS">
+
+    <AnchorPane prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.homeMenuController"  style="-fx-background-color: black;" VBox.vgrow="ALWAYS" >
       <children>
-        <Label alignment="BOTTOM_CENTER" layoutX="292.0" layoutY="522.0" style="&#10;" text="Credits" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false" AnchorPane.bottomAnchor="50.799999999999955" AnchorPane.leftAnchor="292.0" AnchorPane.rightAnchor="292.0">
+        <Label alignment="BOTTOM_CENTER" layoutX="292.0" layoutY="522.0" style="&#10;" text="Credits" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false" AnchorPane.bottomAnchor="50.799999999999955" AnchorPane.leftAnchor="292.0" AnchorPane.rightAnchor="292.0" >
           <font>
             <Font size="18.0" />
           </font>
@@ -27,7 +26,7 @@
                   <Font size="20.0" />
                </font>
             </Label>
-            <Button fx:id="playButton" layoutX="191.0" layoutY="280.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="65.0" style="-fx-background-color: GREEN;" text="PLAY" AnchorPane.leftAnchor="191.0">
+            <Button fx:id="playButton" layoutX="191.0" layoutY="280.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="65.0" style="-fx-background-color: GREEN;" text="PLAY" AnchorPane.leftAnchor="191.0" onMouseClicked="#startPlay">
                <font>
                   <Font size="18.0" />
                </font></Button>
@@ -37,5 +36,4 @@
                </font></Button>
       </children>
     </AnchorPane>
-  </children>
-</VBox>
+

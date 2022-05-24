@@ -4,7 +4,7 @@ import it.polimi.ingsw.client.gui.MainGUI;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class homeMenuController implements GUIController  {
+public class loginMenuController implements GUIController  {
 
     private MainGUI gui;
 
@@ -18,9 +18,7 @@ public class homeMenuController implements GUIController  {
         this.gui = gui;
     }
 
-    public void startPlay() {
-        gui.changeStage("loginMenu.fxml");
-    }
+
 
 
 }
