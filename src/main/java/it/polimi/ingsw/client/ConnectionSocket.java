@@ -97,9 +97,9 @@ public class ConnectionSocket {
         return null;
     }
 
-    public void accept() {
-        System.out.println("ACCEPT - Sending: " + MessageGenerator.okMessage());
-        socketOut.print(MessageGenerator.okMessage());
+    public void acceptRules() {
+        System.out.println("ACCEPT RULES - Sending: " + MessageGenerator.okRulesGameMessage());
+        socketOut.print(MessageGenerator.okRulesGameMessage());
         socketOut.flush();
     }
 

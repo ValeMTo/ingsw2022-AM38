@@ -7,7 +7,6 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
-
 import java.io.PrintStream;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -30,11 +29,9 @@ public class ClientCLI {
     private final String verticalLine = "│";
     private final String horizontalLine = "─";
     private final String horizontalLinex10 = "──────────";
-    private ViewState viewState;
-
-
     private final boolean isRunning;
     ConnectionSocket connectionSocket;
+    private ViewState viewState;
     private Scanner in = null;
 
     public ClientCLI() {
@@ -74,9 +71,9 @@ public class ClientCLI {
             sendNumOfPlayers();
         } else {
             if (acceptSettingsOfTheGame()) {
-                //TODO: add the player to the lobby
-                //TODO: WELCOME IN ERIANTYS
-            } else connectionSocket.disconnect();
+            } else {
+                connectionSocket.disconnect();
+            }
         }
         cleaner();
         this.viewState = connectionSocket.startGame();
@@ -103,15 +100,6 @@ public class ClientCLI {
                 }
             }
             cleaner();
-
-            /*
-            showMenu();
-            printArchipelago();
-            //showBoard();
-            printAssistantCards();
-            getInputAndSendMessage();
-            cleaner();
-             */
         }
     }
 
@@ -119,16 +107,16 @@ public class ClientCLI {
      * Shows the possible commands and what to do in the planning phase.
      * Then get the number of card from stdin
      */
-    private int showPlanningInstructionAndGetCard(){
+    private int showPlanningInstructionAndGetCard() {
         System.out.println(CLICyan + "CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS (enter the Priority value)" + CLIEffectReset);
         System.out.println("Which card have you chosen?");
 
         System.out.println("Insert a number");
         Integer numOfCard = 0;
-        while ((numOfCard <= 0 || numOfCard >10)) {
+        while ((numOfCard <= 0 || numOfCard > 10)) {
             try {
                 numOfCard = in.nextInt();
-                System.out.println("You have chosen tha card with " + numOfCard.toString() + " priority");
+                System.out.println("You have chosen tha card with " + numOfCard + " priority");
             } catch (InputMismatchException e) {
                 System.out.println("Please, insert a number.");
             }
@@ -141,28 +129,28 @@ public class ClientCLI {
     /**
      * Shows the possible commands and what to do in the action phase: move cloud choice subaction
      */
-    private void showCloudChoiceInstruction(){
+    private void showCloudChoiceInstruction() {
         System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOL ENTRANCE (enter the cloud number)" + CLIEffectReset);
     }
 
     /**
      * Shows the possible commands and what to do in the action phase: move mothernature subaction
      */
-    private void showMoveMotherNatureInstruction(){
+    private void showMoveMotherNatureInstruction() {
         System.out.println(CLICyan + "CHOICE WHERE TO MOVE THE MOTHER NATURE (enter the island destination island)" + CLIEffectReset);
     }
 
     /**
      * Shows the possible commands and what to do in the action phase: move students subaction
      */
-    private void showActionMoveStudentsInstruction(){
+    private void showActionMoveStudentsInstruction() {
         System.out.println(CLICyan + "CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)" + CLIEffectReset);
     }
 
     /**
      * Shows what to do in the not playing state
      */
-    private void showNotYoutTurnView(){
+    private void showNotYoutTurnView() {
         System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
     }
 
@@ -304,7 +292,7 @@ public class ClientCLI {
             }
             System.out.println("Do you want to play with upper settings?[Y/n]");
             if (in.nextLine().equalsIgnoreCase("Y")) {
-                connectionSocket.accept();
+                connectionSocket.acceptRules();
                 return true;
             }
             System.out.println("If you don't accept the condition, you cannot play.");

@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
 
 public class ClientHandler implements Runnable {
@@ -21,8 +22,10 @@ public class ClientHandler implements Runnable {
     private String playerName;
     private MessageParser messageParser = null;
     private int id;
+    private boolean confirmation;
 
     public ClientHandler(Socket clientSocket) {
+        confirmation=false;
         inSocket = clientSocket;
         gson = new Gson();
         try {
@@ -50,9 +53,9 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         boolean error;
-        do {
-            error = !addPlayer();
-        } while (error);
+        while(!confirmation) {
+            addPlayer();
+        }
         setupMessageParser();
         String message;
         while (true) {
@@ -150,21 +153,13 @@ public class ClientHandler implements Runnable {
      */
     //TODO: Il server NON deve mandare alcun messaggio. DEve rispondere a una richiesta da parte del client.
     //TODO: sistemare parser in modo da permettere al server di rispondere alle richieste anche nella fase di login.
-    public boolean addPlayer() {
+    public void addPlayer() {
 
         this.playerName = receiveNickname();
         lobbyRequestHandler();
         if (Server.getLobbyNumberOfActivePlayers() == 0) {
             Server.setLobbySettings(receiveGamemode(), receiveNumOfPlayers());
-        } else {
-            sendNumberOfPlayers(Server.getNumOfPlayerGame());
-            sendGameMode(Server.getGamemode());
-            if (!getQuickAnswer()) {
-                return false;
-            }
         }
-        Server.addPlayerInLobby(this);
-        return true;
     }
 
     /**
@@ -176,17 +171,6 @@ public class ClientHandler implements Runnable {
         return this.playerName;
     }
 
-    /**
-     * Wait for a yes or no message
-     *
-     * @return the exit of the message
-     */
-    private boolean getQuickAnswer() {
-        System.out.println("YES OR NO MESSAGE - Waiting for a message ");
-        JsonObject json = getMessage();
-        return (json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal());
-
-    }
 
     /**
      * Receive the nickname of a user that wants to play
@@ -298,6 +282,10 @@ public class ClientHandler implements Runnable {
 
     public int getGameID(){
         return id;
+    }
+
+    public void confirm(){
+        confirmation=true;
     }
 
 }

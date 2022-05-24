@@ -6,13 +6,12 @@ import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
-import it.polimi.ingsw.messages.ActionTypeEnum;
-import it.polimi.ingsw.messages.ErrorTypeEnum;
-import it.polimi.ingsw.messages.MessageGenerator;
-import it.polimi.ingsw.messages.MessageTypeEnum;
+import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.server.ClientHandler;
+import it.polimi.ingsw.server.Server;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +19,11 @@ import java.util.Map;
 
 public class MessageParser{
     private final GameOrchestrator gameOrchestrator;
-    private final String nickName;
+    private final ClientHandler client;
 
-    public MessageParser(GameOrchestrator gameOrchestrator, String nickName) {
+    public MessageParser(GameOrchestrator gameOrchestrator, ClientHandler client) {
         this.gameOrchestrator = gameOrchestrator;
-        this.nickName = nickName;
+        this.client = client;
     }
 
     /**
@@ -35,7 +34,7 @@ public class MessageParser{
      */
     public String parseMessageToAction(String message) {
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
-        if (!gameOrchestrator.getActivePlayer().equalsIgnoreCase(nickName))
+        if (!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName()))
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
         String returnMessage = null;
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal()) {
@@ -47,6 +46,20 @@ public class MessageParser{
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal())
                 return useSpecialCard(json);
+        } else if(json.get("MessageType").getAsInt() == MessageTypeEnum.REQUEST.ordinal()){
+            if(json.get("RequestType").getAsInt() == RequestTypeEnum.PLAYERS_NUMBER_REQUEST.ordinal()){
+                return MessageGenerator.numberOfPlayerMessage(Server.getNumOfPlayerGame());
+            } else if (json.get("MessageType").getAsInt() == RequestTypeEnum.GAMEMODE_REQUEST.ordinal()){
+                return MessageGenerator.gamemodeMessage(Server.getGamemode());
+            }
+        } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()){
+            if(json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_RULES_ANSWER.ordinal()) {
+                Server.addPlayerInLobby(client);
+                client.confirm();
+                return MessageGenerator.okMessage();
+            } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.REFUSE_RULES_ANSWER.ordinal()){
+                return MessageGenerator.okMessage();
+            }
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
     }

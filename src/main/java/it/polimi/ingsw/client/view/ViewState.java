@@ -3,8 +3,6 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
-import it.polimi.ingsw.controller.mvc.Listenable;
-import it.polimi.ingsw.controller.mvc.Listener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +15,7 @@ import java.util.Map;
 public class ViewState {
     private Map<String, Tower> players;
     private List<IslandView> islands;
-    private Map<Color, Integer> schoolEntranceOccupancy;
-    private Map<Color, Integer> diningRoomOccupancy;
+    private List<SchoolBoardState> schoolBoards;
     private boolean isExpert;
     private boolean isTheCommander;
     private PhaseEnum currentPhase;
@@ -45,12 +42,14 @@ public class ViewState {
         for (int i = 1; i <= 12; i++) {
             islands.add(new IslandView(i));
         }
-        schoolEntranceOccupancy = new HashMap<>();
-        diningRoomOccupancy = new HashMap<>();
+
+        schoolBoards = new ArrayList<>();
+        for (Tower playerPerson : players.values()){
+            schoolBoards.add(new SchoolBoardState(playerPerson));
+        }
+
         for (Color color : Color.values()) {
             professors.put(color, null);
-            schoolEntranceOccupancy.put(color, 0);
-            diningRoomOccupancy.put(color, 0);
 
         }
         motherNature = 1;
@@ -125,22 +124,21 @@ public class ViewState {
         this.playerTower = playerTower;
     }
 
-    public Map<Color, Integer> getDiningRoomOccupancy() {
-        return new HashMap<>(diningRoomOccupancy);
+    private SchoolBoardState findSchoolBoard(Tower player){
+        for (SchoolBoardState schoolboard: schoolBoards){
+            if (schoolboard.getPlayer().equals(player)){
+                return schoolboard;
+            }
+        }
+        return null;
     }
 
-    public void setDiningRoomOccupancy(Map<Color, Integer> diningRoomOccupancy) {
-        this.diningRoomOccupancy.clear();
-        this.diningRoomOccupancy.putAll(diningRoomOccupancy);
+    public void setDiningRoomOccupancy(Tower player, Map<Color, Integer> diningRoomOccupancy) {
+        findSchoolBoard(player).fillDiningRoom(diningRoomOccupancy);
     }
 
-    public Map<Color, Integer> getSchoolEntranceOccupancy() {
-        return new HashMap<>(schoolEntranceOccupancy);
-    }
-
-    public void setSchoolEntranceOccupancy(Map<Color, Integer> schoolEntranceOccupancy) {
-        this.schoolEntranceOccupancy.clear();
-        this.schoolEntranceOccupancy.putAll(schoolEntranceOccupancy);
+    public void setSchoolEntranceOccupancy(Tower player, Map<Color, Integer> schoolEntranceOccupancy) {
+        findSchoolBoard(player).fillSchoolEntrance(schoolEntranceOccupancy);
     }
 
     public boolean isTheCommander(){

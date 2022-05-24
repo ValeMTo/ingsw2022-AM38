@@ -177,6 +177,30 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates a String formatted in json to accept rules game
+     *
+     * @return : json String with an ok
+     */
+    public static String okRulesGameMessage(){
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.ACCEPT_RULES_ANSWER.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json to refuse rules game
+     *
+     * @return : json String with an ok
+     */
+    public static String nackRulesGameMessage(){
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.REFUSE_RULES_ANSWER.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates a String formatted in json for answer the actual condition of the lobby
      *
      * @return : json String with number of players in the lobby
