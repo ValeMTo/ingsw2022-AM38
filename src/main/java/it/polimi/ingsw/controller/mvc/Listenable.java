@@ -7,15 +7,15 @@ import java.util.List;
 
 public abstract class Listenable<T> {
 
-    private final List<Listener<T>> listeners = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
 
-    public void addListener(Listener<T> Listener) {
+    public void addListener(Listener Listener) {
         synchronized (listeners) {
             listeners.add(Listener);
         }
     }
 
-    public void removeListener(Listener<T> Listener) {
+    public void removeListener(Listener Listener) {
         synchronized (listeners) {
             listeners.remove(Listener);
         }

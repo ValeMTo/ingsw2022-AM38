@@ -7,8 +7,9 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Tower;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
@@ -24,16 +25,18 @@ public class ConnectionSocket {
     private final int serverPort;
 
     private final Gson gson;
-    private Scanner socketIn;
+    private final boolean isActive;
+    private BufferedReader socketIn;
     private PrintWriter socketOut;
     private ViewState viewState;
-    private boolean isActive;
+    private ViewMessageParser viewMessageParser;
 
-    public ConnectionSocket(String serverIP, int serverPort) {
-        this.isActive=true;
+    public ConnectionSocket(String serverIP, int serverPort, ViewState viewState) {
+        this.isActive = true;
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.gson = new Gson();
+        this.viewState = viewState;
 
     }
 
@@ -49,7 +52,9 @@ public class ConnectionSocket {
         if (socket == null) return false;
 
         socketIn = createScanner(socket);
-        Thread r = new Thread(new Reader(socketIn)); //Thread to read from the server channel - async
+
+        viewMessageParser = new ViewMessageParser(viewState);
+        Thread r = new Thread(new Reader(socketIn, viewMessageParser)); //Thread to read from the server channel - async
         r.start();
         socketOut = createWriter(socket);
         return true;
@@ -60,7 +65,12 @@ public class ConnectionSocket {
         JsonObject json;
         do {
             System.out.println("waiting for message");
-            String jsonFromServer = socketIn.nextLine();
+            String jsonFromServer = null;
+            try {
+                jsonFromServer = socketIn.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if (jsonFromServer != null) System.out.println("Got message " + jsonFromServer);
             json = gson.fromJson(jsonFromServer, JsonObject.class);
             error = json == null || !json.has("MessageType");
@@ -79,15 +89,11 @@ public class ConnectionSocket {
         socketOut.flush();
         System.out.println("SEND REQUEST - Sending: " + MessageGenerator.lobbyRequestMessage());
         JsonObject json = getMessage();
-        if (json == null) {
-            isTheFirst();
-        }
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
-                return json.get("numOfPlayers").getAsInt() == 0;
+                return(json.get("numOfPlayers").getAsInt() == 0);
             }
         }
-        isTheFirst();
         return null;
     }
 
@@ -103,12 +109,10 @@ public class ConnectionSocket {
         socketOut.flush();
     }
 
-    public boolean sendNickname(String nickname) {
+    public void sendNickname(String nickname) {
         socketOut.print(MessageGenerator.nickNameMessage(nickname));
         socketOut.flush();
         System.out.println("SEND NICKNAME - Sending: " + MessageGenerator.nickNameMessage(nickname));
-        JsonObject json = getMessage();
-        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 
     /**
@@ -117,27 +121,21 @@ public class ConnectionSocket {
      * @param numOfPlayers number of player that can play
      * @return answer of the server
      */
-    public boolean setNumberOfPlayers(int numOfPlayers) {
+    public void setNumberOfPlayers(int numOfPlayers) {
+        System.out.println("SEND NICKNAME - Sending: " + MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         socketOut.print(MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         socketOut.flush();
-        System.out.println("SET NUM PLAYER - Sending: " + MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
-        JsonObject json = getMessage();
-        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 
     /**
      * send to the server the gamemode of this match.
      *
      * @param isExpert game mode
-     * @return answer of the server
      */
-    public boolean setGameMode(boolean isExpert) {
+    public void setGameMode(boolean isExpert) {
         socketOut.print(MessageGenerator.setGameModeMessage(isExpert));
         System.out.println("SET GAME MODE - Sending: " + MessageGenerator.setGameModeMessage(isExpert));
         socketOut.flush();
-        JsonObject json = getMessage();
-        System.out.println("Received: " + json);
-        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
     }
 
     /**
@@ -214,10 +212,11 @@ public class ConnectionSocket {
         }
         while (!(json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) || !(json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()));
         Map<String, Tower> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
-        return new ViewState(players, json.get("isExpertMode").getAsBoolean());
+        this.viewState.setViewState(players, json.get("isExpertMode").getAsBoolean());
+        return this.viewState;
     }
 
-    public void setAssistantCard(int numberOfCard){
+    public void setAssistantCard(int numberOfCard) {
         socketOut.print(MessageGenerator.useAssistantCardMessage(numberOfCard));
         socketOut.flush();
     }
@@ -242,10 +241,10 @@ public class ConnectionSocket {
         return socket;
     }
 
-    private Scanner createScanner(Socket socket) {
-        Scanner scanner = null;
+    private BufferedReader createScanner(Socket socket) {
+        BufferedReader scanner = null;
         try {
-            scanner = new Scanner(socket.getInputStream());
+            scanner = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
             System.err.println("Error in socketIn scanner");
             logger.log(Level.SEVERE, e.getMessage(), e);
@@ -264,9 +263,7 @@ public class ConnectionSocket {
         return scanner;
     }
 
-
-
-    public boolean isActive(){
+    public boolean isActive() {
         return isActive;
     }
 

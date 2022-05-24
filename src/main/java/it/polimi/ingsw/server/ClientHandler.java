@@ -59,9 +59,21 @@ public class ClientHandler implements Runnable {
             System.out.println(playerName);
             message = inputReader.nextLine();
             System.out.println(message);
+            System.out.println(message);
             writer.print(messageParser.parseMessageToAction(message));
             System.out.println("/n");
         }
+    }
+
+    /**
+     * Sends message to the client connected.
+     *
+     * @param message : message to send
+     */
+    public void asyncSend(String message){
+        System.out.println("ASYNC MESSAGE - Sending: " + message);
+        writer.print(message);
+        writer.flush();
     }
 
     /**
@@ -136,6 +148,8 @@ public class ClientHandler implements Runnable {
      *
      * @return true if it could add the player correctly, otherwise false
      */
+    //TODO: Il server NON deve mandare alcun messaggio. DEve rispondere a una richiesta da parte del client.
+    //TODO: sistemare parser in modo da permettere al server di rispondere alle richieste anche nella fase di login.
     public boolean addPlayer() {
 
         this.playerName = receiveNickname();

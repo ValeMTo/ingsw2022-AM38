@@ -6,7 +6,6 @@ import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
-import it.polimi.ingsw.model.player.PlayerBoard;
 
 
 import java.io.PrintStream;
@@ -31,11 +30,11 @@ public class ClientCLI {
     private final String verticalLine = "│";
     private final String horizontalLine = "─";
     private final String horizontalLinex10 = "──────────";
+    private ViewState viewState;
 
 
     private final boolean isRunning;
     ConnectionSocket connectionSocket;
-    private ViewState viewState;
     private Scanner in = null;
 
     public ClientCLI() {
@@ -43,6 +42,8 @@ public class ClientCLI {
         in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
         this.isRunning = true;
+        viewState = new ViewState();
+
 
     }
 
@@ -127,7 +128,7 @@ public class ClientCLI {
         while ((numOfCard <= 0 || numOfCard >10)) {
             try {
                 numOfCard = in.nextInt();
-                System.out.println("You have choosen tha card with " + numOfCard.toString() + " priority");
+                System.out.println("You have chosen tha card with " + numOfCard.toString() + " priority");
             } catch (InputMismatchException e) {
                 System.out.println("Please, insert a number.");
             }
@@ -209,7 +210,7 @@ public class ClientCLI {
      * @return connectionSocket
      */
     private ConnectionSocket createConnectionWithServer(String hostName, int portNumber) {
-        this.connectionSocket = new ConnectionSocket(hostName, portNumber);
+        this.connectionSocket = new ConnectionSocket(hostName, portNumber, viewState);
         try {
             if (!connectionSocket.setup()) {
                 System.err.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
@@ -239,11 +240,7 @@ public class ClientCLI {
                 nickname = null;
             }
         }
-
-        if (!connectionSocket.sendNickname(nickname)) {
-            System.err.println("ERROR - You have chosen a nickname that has been already taken.");
-            sendNickname();
-        } else System.out.println("Nickname set up correctly");
+        connectionSocket.sendNickname(nickname);
     }
 
     /**

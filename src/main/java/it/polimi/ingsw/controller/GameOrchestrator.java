@@ -1,11 +1,8 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.controller.listeners.CloudsListener;
-import it.polimi.ingsw.controller.listeners.GameListener;
-import it.polimi.ingsw.controller.listeners.IslandsListener;
-import it.polimi.ingsw.controller.listeners.PlayerBoardListener;
 import it.polimi.ingsw.controller.mvc.Listenable;
 import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.ModelListener;
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.*;
@@ -27,13 +24,11 @@ public abstract class GameOrchestrator extends Listenable {
     protected Object actionBlocker = new Object();
     protected int studentMovesLeft;
     protected GameBoard gameBoard;
-    protected IslandsListener islandsListener;
-    protected CloudsListener cloudsListener;
-    protected Map<Tower, PlayerBoardListener> playerBoardListeners = new HashMap<>();
-    protected GameListener gameListener;
+    protected Listener modelListener;
     protected int id;
     protected boolean specialCardAlreadyUsed;
     protected List<ClientHandler> clients;
+    protected HashMap<Tower, ClientHandler> playerBoardListeners;
 
 
     public GameOrchestrator(List<String> players, boolean isExpert, int id, List<ClientHandler> clients) {
@@ -142,7 +137,7 @@ public abstract class GameOrchestrator extends Listenable {
                 this.currentPhase = PhaseEnum.END;
             else this.currentPhase = updatePhase;
         }
-        notify(gameListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
+        notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
     }
 
     /**
@@ -169,7 +164,7 @@ public abstract class GameOrchestrator extends Listenable {
                         return false;
                     }
                     studentMovesLeft--;
-                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM), clients);
+                    notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM), clients);
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                     return true;
                 }
@@ -205,7 +200,7 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                     studentMovesLeft--;
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
+                    notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
                     return true;
                 }
                 return false;
@@ -247,7 +242,7 @@ public abstract class GameOrchestrator extends Listenable {
                 this.playedAssistantCard.add(priority);
                 nextStep();
                 try {
-                    notify(playerBoardListeners.get(gameBoard.getCurrentPlayer()), MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()), clients);
+                    notify(modelListener, MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()), clients);
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
@@ -255,6 +250,16 @@ public abstract class GameOrchestrator extends Listenable {
             }
             return false;
         }
+    }
+
+    //TODO: maybe remove
+    private ClientHandler findClient(List<ClientHandler> clients, String nickname){
+        for( ClientHandler client : clients){
+            if(client.getNickName().equals(nickname)){
+                return client;
+            }
+        }
+        return null;
     }
 
     /**
@@ -272,7 +277,7 @@ public abstract class GameOrchestrator extends Listenable {
             if (gameBoard.moveMotherNature(destinationIsland)) {
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
-                notify(islandsListener, MessageGenerator.moveMotherNatureMessage(destinationIsland), clients);
+                notify(modelListener, MessageGenerator.moveMotherNatureMessage(destinationIsland), clients);
                 return true;
             }
             return false;
@@ -306,7 +311,7 @@ public abstract class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
                 return false;
             }
-            notify(cloudsListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
+            notify(modelListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
             nextStep();
             return true;
         }
@@ -377,7 +382,7 @@ public abstract class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
             }
         }
-        notify(gameListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
+        notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
     }
 
 
@@ -461,22 +466,8 @@ public abstract class GameOrchestrator extends Listenable {
      * Creates all listeners and initialises them
      */
     private void createListeners() {
-        islandsListener = new IslandsListener();
-        cloudsListener = new CloudsListener();
-        gameListener = new GameListener();
-
-        addListener(islandsListener);
-        addListener(cloudsListener);
-        addListener(gameListener);
-        for (Tower person : playersTower.values()) {
-            playerBoardListeners.put(person, new PlayerBoardListener());
-            addListener(playerBoardListeners.get(person));
-        }
+        modelListener = new ModelListener();
+        addListener(modelListener);
     }
 
-    @Override
-    public void notify(Listener listener, String message, List<ClientHandler> clients) {
-        listener.update(message, clients);
-
-    }
 }

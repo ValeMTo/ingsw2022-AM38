@@ -15,20 +15,26 @@ import java.util.Map;
  * ViewState contains all the information to visualize the current state of the gameBoard
  */
 public class ViewState {
-    private final Map<String, Tower> players;
-    private final List<IslandView> islands;
-    private final Map<Color, Integer> schoolEntranceOccupancy;
-    private final Map<Color, Integer> diningRoomOccupancy;
-    private final boolean isExpert;
+    private Map<String, Tower> players;
+    private List<IslandView> islands;
+    private Map<Color, Integer> schoolEntranceOccupancy;
+    private Map<Color, Integer> diningRoomOccupancy;
+    private boolean isExpert;
+    private boolean isTheCommander;
     private PhaseEnum currentPhase;
     private boolean activeView;
-    private final List<Integer> usableCards;
+    private List<Integer> usableCards;
     private Tower playerTower;
     private Map<Color, Tower> professors;
     private int motherNature;
     private boolean isEndOfMatch = false;
 
-    public ViewState(Map<String, Tower> players, boolean isExpert) {
+
+    public ViewState(){
+        isTheCommander = false;
+    }
+
+    public void setViewState(Map<String, Tower> players, boolean isExpert) {
         this.usableCards = new ArrayList<Integer>();
         this.players = new HashMap<>(players);
         this.isExpert = isExpert;
@@ -135,5 +141,13 @@ public class ViewState {
     public void setSchoolEntranceOccupancy(Map<Color, Integer> schoolEntranceOccupancy) {
         this.schoolEntranceOccupancy.clear();
         this.schoolEntranceOccupancy.putAll(schoolEntranceOccupancy);
+    }
+
+    public boolean isTheCommander(){
+        return isTheCommander;
+    }
+
+    public void setTheCommander(){
+        isTheCommander= true;
     }
 }

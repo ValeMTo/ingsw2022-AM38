@@ -4,7 +4,9 @@ import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.List;
 
-public interface Listener<T> {
+public interface Listener {
 
-    void update(String message, List<ClientHandler> clients);
+    public void update(String message, List<ClientHandler> clients);
+
+    public void update(String message, ClientHandler client);
 }
