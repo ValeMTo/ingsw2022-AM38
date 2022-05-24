@@ -1,9 +1,9 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.client.ClientCLI;
+import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.server.Server;
-import it.polimi.ingsw.view.HelloApplication;
-import javafx.application.Application;
+import it.polimi.ingsw.client.gui.HelloApplication;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -32,7 +32,7 @@ public class Eriantys {
             switch (actionCode){
                 case 0 -> Server.main(null);
                 case 1 -> ClientCLI.main(null);
-                case 2 -> HelloApplication.main(null);
+                case 2 -> MainGUI.main(null);
                 //case 2-> ClientGUI.main(null);
                 default -> System.err.println("Only 0/1/2 numbers admitted");
             }
