@@ -379,8 +379,6 @@ public class GameBoardTest {
             GameBoard gameboard = new ExpertGameBoard(3, getNicknames(3));
             gameboard.addStudent(StudentCounter.DININGROOM, Color.BLUE, 0);
             gameboard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
-            assertNull(gameboard.computeInfluence(1));
-            gameboard.updateProfessorOwnership();
             assertEquals(gameboard.computeInfluence(1), Tower.WHITE);
         } catch (Exception exc) {
             exc.printStackTrace();

@@ -300,8 +300,8 @@ public class ExpertGameBoard extends GameBoard {
     public boolean disableInfluence(int position) throws IslandOutOfBoundException {
         if (position > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
-        if (islands[position].isInfluenceEnabled()) {
-            islands[position].disableInfluence();
+        if (islands[position-1].isInfluenceEnabled()) {
+            islands[position-1].disableInfluence();
             return true;
         }
         return false;
