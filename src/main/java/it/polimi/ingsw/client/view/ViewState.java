@@ -32,6 +32,13 @@ public class ViewState {
 
     public ViewState(){
         isTheCommander = false;
+        this.usableCards = new ArrayList<Integer>();
+        this.players = new HashMap<>();
+        this.isExpert = false;
+        activeView = true;
+        currentPhase = PhaseEnum.PLANNING;
+        professors = new HashMap<>();
+        islands = new ArrayList<>();
     }
 
     public void setViewState(Map<String, Tower> players, boolean isExpert) {
@@ -51,7 +58,6 @@ public class ViewState {
             professors.put(color, null);
             schoolEntranceOccupancy.put(color, 0);
             diningRoomOccupancy.put(color, 0);
-
         }
         motherNature = 1;
         for (int i = 1; i < 11; i++)
@@ -131,6 +137,8 @@ public class ViewState {
 
     public void setDiningRoomOccupancy(Map<Color, Integer> diningRoomOccupancy) {
         this.diningRoomOccupancy.clear();
+        for(Color color :Color.values())
+            this.diningRoomOccupancy.put(color,0);
         this.diningRoomOccupancy.putAll(diningRoomOccupancy);
     }
 
@@ -140,6 +148,8 @@ public class ViewState {
 
     public void setSchoolEntranceOccupancy(Map<Color, Integer> schoolEntranceOccupancy) {
         this.schoolEntranceOccupancy.clear();
+        for(Color color :Color.values())
+            this.schoolEntranceOccupancy.put(color,0);
         this.schoolEntranceOccupancy.putAll(schoolEntranceOccupancy);
     }
 
