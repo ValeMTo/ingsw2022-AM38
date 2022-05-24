@@ -341,7 +341,6 @@ public abstract class GameOrchestrator extends Listenable {
                     activePlayer++;
                     if (activePlayer < players.size()) {
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
-
                     }
                     //Sets the order of the action phase, set the phase as action and set the player as the first of the array
                     else {

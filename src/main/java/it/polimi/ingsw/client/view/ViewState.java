@@ -4,10 +4,7 @@ import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ViewState contains all the information to visualize the current state of the gameBoard
@@ -37,6 +34,7 @@ public class ViewState {
         professors = new HashMap<>();
         islands = new ArrayList<>();
     }
+
 
     public void setViewState(Map<String, Tower> players, boolean isExpert) {
         this.usableCards = new ArrayList<Integer>();
@@ -146,6 +144,18 @@ public class ViewState {
 
     public void setSchoolEntranceOccupancy(Tower player, Map<Color, Integer> schoolEntranceOccupancy) {
         findSchoolBoard(player).fillSchoolEntrance(schoolEntranceOccupancy);
+    }
+
+    public Map<Color,Integer> getDiningRoomOccupancy(Tower player){
+        return findSchoolBoard(player).getDiningRoomOccupancy();
+    }
+
+    public Map<Color,Integer> getSchoolEntranceOccupancy(Tower player){
+        return findSchoolBoard(player).getSchoolEntranceOccupancy();
+    }
+
+    public Collection<Tower> getTowers(){
+        return this.players.values();
     }
 
     public boolean isTheCommander(){

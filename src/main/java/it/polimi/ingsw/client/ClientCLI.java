@@ -65,11 +65,18 @@ public class ClientCLI {
         Map<String,Tower> mapPlayers = new HashMap<>();
         mapPlayers.put("Nick",Tower.WHITE);
         mapPlayers.put("Vale",Tower.BLACK);
+        mapPlayers.put("Fra",Tower.GRAY);
+
         viewState.setViewState(mapPlayers,false);
         viewState.setPlayerTower(Tower.WHITE);
         Map<Color, Integer> mapOccupancy = new HashMap<>();
         mapOccupancy.put(Color.BLUE,2);
-        viewState.setDiningRoomOccupancy(mapOccupancy);
+        viewState.setDiningRoomOccupancy(Tower.WHITE,mapOccupancy);
+        viewState.setDiningRoomOccupancy(Tower.BLACK,mapOccupancy);
+        viewState.setDiningRoomOccupancy(Tower.GRAY,mapOccupancy);
+        mapOccupancy.put(Color.YELLOW,4);
+        viewState.setSchoolEntranceOccupancy(Tower.GRAY,mapOccupancy);
+        Map<Color, Integer> dini = viewState.getDiningRoomOccupancy(Tower.WHITE);
         printArchipelago();
         printAssistantCards();
         // Until here
@@ -326,10 +333,10 @@ public class ClientCLI {
      * Prints the usable assistant card
      */
     private void printAssistantCards() {
-        System.out.println(CLIBlack+" - Usable assistant cards - \n\t(Less priority = first in action order, Steps = steps that the motherNature can do)"+CLIEffectReset);
-        String[] rows = new String[7];
+        System.out.println(CLIBlack+" - Usable assistant cards - \n\t(Less priority = first in action order, Steps = steps that the motherNature can do)\n"+CLIEffectReset);
+        String[] rows = new String[5];
         int steps;
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 5; i++)
             rows[i] = "";
         for (Integer i : viewState.getUsableCards()) {
             steps = i / 2 + i % 2;
@@ -339,10 +346,10 @@ public class ClientCLI {
             else
                 rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + "  │ ";
             rows[3] += "  │ " + CLIGreen + "Steps:" + CLIEffectReset + steps + "     │ ";
-            for (int j = 2; j < 6; j++)
+            for (int j = 2; j < 4; j++)
                 if (j != 3)
                     rows[j] += "  │             │ ";
-            rows[6] += "  └─────────────┘ ";
+            rows[4] += "  └─────────────┘ ";
         }
         printVector(rows);
     }
@@ -372,7 +379,7 @@ public class ClientCLI {
     }
 
     private void printArchipelago() {
-        System.out.println(CLIBlack+" - Archipelago - \n\t TW: tower on the island, M.N. : motherNature"+CLIEffectReset);
+        System.out.println(CLIBlack+" - Archipelago - \n\t TW: tower on the island, M.N. : motherNature\n"+CLIEffectReset);
         String[] rows = new String[12];
         for (int i = 0; i < 12; i++)
             rows[i] = "";
@@ -441,49 +448,71 @@ public class ClientCLI {
         return cubes;
     }
 
+    private String getLastAssistantCardString(Tower playerTower){
+        return "";
+    }
+
     /**
      * Prints the playerBoard (SchoolBoard, DiningRoom and Professors owned)
      */
     private void printPlayerBoard(){
-        System.out.println(CLIBlack+" - PlayerBoard - \n\t PROFESSORS : owned professors, DINING ROOM: student in the dining room, needed to determine the owned professors,\n SCHOOL ENTRANCE: Movable students "+CLIEffectReset);
+        System.out.println(CLIBlack+" - PlayerBoard - \n\t PROFESSORS : owned professors, DINING ROOM: student in the dining room, needed to determine the owned professors,\n SCHOOL ENTRANCE: Movable students \n"+CLIEffectReset);
         String[] rows = new String[12];
-
-        rows [0] = "  ┌────────────┬────────────────┬─────────────────┐  ";
-        rows [1] = "  │ "+CLIBlack+"PROFESSORS"+CLIEffectReset+" │   "+CLIBlack+"DINING ROOM"+CLIEffectReset+"  │ "+CLIBlack+"SCHOOL ENTRANCE"+CLIEffectReset+" │  ";
-        rows [2] = "  │            │                │                 │  ";
-        if(this.viewState.getPlayerTower().equals(viewState.getProfessors().get(Color.BLUE)))
-        rows [3] = "  │     "+CLIBlue+"BLUE"+CLIEffectReset+"   ";
-        else
-        rows [3] = "  │            ";
-        rows [3] +=               "│ "+CLIBlue+"B:"+viewState.getDiningRoomOccupancy().get(Color.BLUE)+CLIEffectReset+" "+createCubesString(Color.BLUE,viewState.getDiningRoomOccupancy().get(Color.BLUE))+" │  "+CLIBlue+"B:"+viewState.getSchoolEntranceOccupancy().get(Color.BLUE)+CLIEffectReset+" "+createSchoolEntranceCubesString(Color.BLUE,viewState.getSchoolEntranceOccupancy().get(Color.BLUE))+"  │  ";
-
-        if(this.viewState.getPlayerTower().equals(viewState.getProfessors().get(Color.GREEN)))
-            rows [4] = "  │     "+CLIGreen+"GREEN"+CLIEffectReset+"  ";
-        else
-            rows [4] = "  │            ";
-        rows [4] +=               "│ "+CLIGreen+"G:"+viewState.getDiningRoomOccupancy().get(Color.GREEN)+CLIEffectReset+" "+createCubesString(Color.GREEN,viewState.getDiningRoomOccupancy().get(Color.GREEN))+" │  "+CLIGreen+"G:"+viewState.getSchoolEntranceOccupancy().get(Color.GREEN)+CLIEffectReset+" "+createSchoolEntranceCubesString(Color.GREEN,viewState.getSchoolEntranceOccupancy().get(Color.GREEN))+"  │  ";
-
-        if(this.viewState.getPlayerTower().equals(viewState.getProfessors().get(Color.GREEN)))
-            rows [5] = "  │    "+CLIYellow+"YELLOW"+CLIEffectReset+"  ";
-        else
-            rows [5] = "  │            ";
-        rows [5] +=               "│ "+CLIYellow+"Y:"+viewState.getDiningRoomOccupancy().get(Color.YELLOW)+CLIEffectReset+" "+createCubesString(Color.YELLOW,viewState.getDiningRoomOccupancy().get(Color.YELLOW))+" │  "+CLIYellow+"Y:"+viewState.getSchoolEntranceOccupancy().get(Color.YELLOW)+CLIEffectReset+" "+createSchoolEntranceCubesString(Color.YELLOW,viewState.getSchoolEntranceOccupancy().get(Color.YELLOW))+"  │  ";
-
-        if(this.viewState.getPlayerTower().equals(viewState.getProfessors().get(Color.GREEN)))
-            rows [6] = "  │    "+CLIPink+"PINK"+CLIEffectReset+"  ";
-        else
-            rows [6] = "  │            ";
-        rows [6] +=               "│ "+CLIPink+"P:"+viewState.getDiningRoomOccupancy().get(Color.PINK)+CLIEffectReset+" "+createCubesString(Color.PINK,viewState.getDiningRoomOccupancy().get(Color.PINK))+" │  "+CLIPink+"P:"+viewState.getSchoolEntranceOccupancy().get(Color.PINK)+CLIEffectReset+" "+createSchoolEntranceCubesString(Color.PINK,viewState.getSchoolEntranceOccupancy().get(Color.PINK))+"  │  ";
-
-        if(this.viewState.getPlayerTower().equals(viewState.getProfessors().get(Color.GREEN)))
-            rows [7] = "  │    "+CLIRed+"Red"+CLIEffectReset+"  ";
-        else
-            rows [7] = "  │            ";
-        rows [7] +=               "│ "+CLIRed+"R:"+viewState.getDiningRoomOccupancy().get(Color.RED)+CLIEffectReset+" "+createCubesString(Color.RED,viewState.getDiningRoomOccupancy().get(Color.RED))+" │  "+CLIRed+"R:"+viewState.getSchoolEntranceOccupancy().get(Color.RED)+CLIEffectReset+" "+createSchoolEntranceCubesString(Color.RED,viewState.getSchoolEntranceOccupancy().get(Color.RED))+"  │  ";
-        rows [8] = "  └────────────┴────────────────┴─────────────────┘  ";
+        for(int i=0;i<12;i++)
+            rows [i] = "";
+        Map<Color, Integer> schoolEntranceOccupancy;
+        Map<Color, Integer> diningRoomOccupancy;
+        Map<Color, Tower> professors = viewState.getProfessors();
 
 
-        printVector(rows);
+        for(Tower playerTower: viewState.getTowers()) {
+            diningRoomOccupancy = viewState.getDiningRoomOccupancy(playerTower);
+            schoolEntranceOccupancy =  viewState.getSchoolEntranceOccupancy(playerTower);
+            String effectSchoolBoard;
+            if(playerTower.equals(viewState.getPlayerTower())) {
+                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYER BOARD (Tower: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" -  LAST CARD USED     " + CLIEffectReset;
+                effectSchoolBoard = CLIRed;
+            }
+            else {
+                effectSchoolBoard = CLIEffectReset;
+                rows[0] += CLICyan + "   PLAYER BOARD OF TOWER: " + getTowerAbbreviation(playerTower) + " LAST CARD USED " + getLastAssistantCardString(playerTower) + "          " + CLIEffectReset;
+            }rows[1] += effectSchoolBoard+"  ┌────────────┬────────────────┬─────────────────┐  "+CLIEffectReset;
+            rows[2] += "  "+effectSchoolBoard+"│ " + CLIBlack + "PROFESSORS" + CLIEffectReset +effectSchoolBoard+ " │   " + CLIBlack + "DINING ROOM" + CLIEffectReset +effectSchoolBoard+ "  │ " + CLIBlack + "SCHOOL ENTRANCE" + CLIEffectReset +effectSchoolBoard+ " │  ";
+            rows[3] += "  "+effectSchoolBoard+"│            │                │                 │  ";
+            if (playerTower.equals(viewState.getProfessors().get(Color.BLUE)))
+            rows[4] += "  "+effectSchoolBoard+"│     " + CLIBlue + "BLUE" + CLIEffectReset + "   ";
+            else
+            rows[4] += "  "+effectSchoolBoard+"│            ";
+            rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE)) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
+
+            if (playerTower.equals(professors.get(Color.GREEN)))
+            rows[5] += effectSchoolBoard+"  │     " + CLIGreen + "GREEN" + CLIEffectReset + "  ";
+            else
+            rows[5] += effectSchoolBoard+"  │            ";
+            rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN)) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
+
+            if (playerTower.equals(professors.get(Color.GREEN)))
+                rows[6] += effectSchoolBoard+"  │    " + CLIYellow + "YELLOW" + CLIEffectReset + "  ";
+            else
+                rows[6] +=effectSchoolBoard+ "  │            ";
+            rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
+
+            if (playerTower.equals(professors.get(Color.GREEN)))
+                rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK" + CLIEffectReset + "  ";
+            else
+                rows[7] += effectSchoolBoard+"  │            ";
+            rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK)) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
+
+            if (playerTower.equals(professors.get(Color.GREEN)))
+                rows[8] += effectSchoolBoard+"  │    " + CLIRed + "Red" + CLIEffectReset + "  ";
+            else
+                rows[8] += effectSchoolBoard+"  │            ";
+            rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED)) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
+            rows[9] += effectSchoolBoard+"  └────────────┴────────────────┴─────────────────┘  "+CLIEffectReset;
+
+        }
+            printVector(rows);
+
     }
 
     /**
