@@ -11,6 +11,11 @@ public class Lobby {
     private boolean isExpert;
     private int numOfPlayers;
     private GameOrchestrator gameOrchestrator = null;
+    private int id;
+
+    public Lobby(){
+        id =0;
+    }
 
 
     public int getNumOfActiveUsers() {
@@ -39,15 +44,18 @@ public class Lobby {
             if (queue.size() == numOfPlayers && queue.size() > 1) {
                 System.out.println("LOBBY - Creating Game");
 
-                gameOrchestrator = new GameOrchestrator(players, isExpert);
+                if (isExpert) gameOrchestrator = new ExpertGameOrchestrator(players, id, queue);
+                else gameOrchestrator = new EasyGameOrchestrator(players, id, queue);
                 System.out.println("LOBBY - Created gameOrchestrator!");
                 for (ClientHandler clients : queue) {
                     System.out.println("LOBBY - Gonna WakeUp clientHandlers!");
+                    client.setIDGame(id);
                     synchronized (clients) {
                         System.out.println("LOBBY - WakeUp clientHandlers!");
                         clients.notifyAll();
                     }
                 }
+                id++;
             }
         }
     }
@@ -68,7 +76,7 @@ public class Lobby {
         }
         if (queue.remove(client)) {
             System.out.println("LOBBY - client removed correctly returning a new message parser");
-            MessageParser messageParser = new MessageParser(gameOrchestrator, client.getNickName());
+            MessageParser messageParser = new MessageParser(gameOrchestrator, client);
             //Reset the lobby as inactive
             if (queue.size() <= 0) {
                 System.out.println("LOBBY - no more clients, reset lobby");

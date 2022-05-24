@@ -4,29 +4,39 @@ import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ViewState contains all the information to visualize the current state of the gameBoard
  */
 public class ViewState {
-    private final Map<String, Tower> players;
-    private final List<IslandView> islands;
-    private final Map<Color, Integer> schoolEntranceOccupancy;
-    private final Map<Color, Integer> diningRoomOccupancy;
-    private final boolean isExpert;
+    private Map<String, Tower> players;
+    private List<IslandView> islands;
+    private List<SchoolBoardState> schoolBoards;
+    private boolean isExpert;
+    private boolean isTheCommander;
     private PhaseEnum currentPhase;
     private boolean activeView;
-    private final List<Integer> usableCards;
+    private List<Integer> usableCards;
     private Tower playerTower;
     private Map<Color, Tower> professors;
     private int motherNature;
     private boolean isEndOfMatch = false;
 
-    public ViewState(Map<String, Tower> players, boolean isExpert) {
+
+    public ViewState(){
+        isTheCommander = false;
+        this.usableCards = new ArrayList<Integer>();
+        this.players = new HashMap<>();
+        this.isExpert = false;
+        activeView = true;
+        currentPhase = PhaseEnum.PLANNING;
+        professors = new HashMap<>();
+        islands = new ArrayList<>();
+    }
+
+
+    public void setViewState(Map<String, Tower> players, boolean isExpert) {
         this.usableCards = new ArrayList<Integer>();
         this.players = new HashMap<>(players);
         this.isExpert = isExpert;
@@ -37,12 +47,14 @@ public class ViewState {
         for (int i = 1; i <= 12; i++) {
             islands.add(new IslandView(i));
         }
-        schoolEntranceOccupancy = new HashMap<>();
-        diningRoomOccupancy = new HashMap<>();
+
+        schoolBoards = new ArrayList<>();
+        for (Tower playerPerson : players.values()){
+            schoolBoards.add(new SchoolBoardState(playerPerson));
+        }
+
         for (Color color : Color.values()) {
             professors.put(color, null);
-            schoolEntranceOccupancy.put(color, 0);
-            diningRoomOccupancy.put(color, 0);
 
         }
         motherNature = 1;
@@ -117,21 +129,40 @@ public class ViewState {
         this.playerTower = playerTower;
     }
 
-    public Map<Color, Integer> getDiningRoomOccupancy() {
-        return new HashMap<>(diningRoomOccupancy);
+    private SchoolBoardState findSchoolBoard(Tower player){
+        for (SchoolBoardState schoolboard: schoolBoards){
+            if (schoolboard.getPlayer().equals(player)){
+                return schoolboard;
+            }
+        }
+        return null;
     }
 
-    public void setDiningRoomOccupancy(Map<Color, Integer> diningRoomOccupancy) {
-        this.diningRoomOccupancy.clear();
-        this.diningRoomOccupancy.putAll(diningRoomOccupancy);
+    public void setDiningRoomOccupancy(Tower player, Map<Color, Integer> diningRoomOccupancy) {
+        findSchoolBoard(player).fillDiningRoom(diningRoomOccupancy);
     }
 
-    public Map<Color, Integer> getSchoolEntranceOccupancy() {
-        return new HashMap<>(schoolEntranceOccupancy);
+    public void setSchoolEntranceOccupancy(Tower player, Map<Color, Integer> schoolEntranceOccupancy) {
+        findSchoolBoard(player).fillSchoolEntrance(schoolEntranceOccupancy);
     }
 
-    public void setSchoolEntranceOccupancy(Map<Color, Integer> schoolEntranceOccupancy) {
-        this.schoolEntranceOccupancy.clear();
-        this.schoolEntranceOccupancy.putAll(schoolEntranceOccupancy);
+    public Map<Color,Integer> getDiningRoomOccupancy(Tower player){
+        return findSchoolBoard(player).getDiningRoomOccupancy();
+    }
+
+    public Map<Color,Integer> getSchoolEntranceOccupancy(Tower player){
+        return findSchoolBoard(player).getSchoolEntranceOccupancy();
+    }
+
+    public Collection<Tower> getTowers(){
+        return this.players.values();
+    }
+
+    public boolean isTheCommander(){
+        return isTheCommander;
+    }
+
+    public void setTheCommander(){
+        isTheCommander= true;
     }
 }

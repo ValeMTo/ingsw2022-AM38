@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
 
 public class ClientHandler implements Runnable {
@@ -20,8 +21,11 @@ public class ClientHandler implements Runnable {
     private PrintWriter writer;
     private String playerName;
     private MessageParser messageParser = null;
+    private int id;
+    private boolean confirmation;
 
     public ClientHandler(Socket clientSocket) {
+        confirmation=false;
         inSocket = clientSocket;
         gson = new Gson();
         try {
@@ -37,18 +41,42 @@ public class ClientHandler implements Runnable {
     }
 
     /**
+     * Set the id game
+     */
+    public void setIDGame(int id){
+        this.id = id;
+    }
+
+    /**
      * Phase handler of the connection with the client
      */
     @Override
     public void run() {
         boolean error;
-        do {
-            error = !addPlayer();
-        } while (error);
-        setupMessageParser();
-        while (true) {
-            writer.print(messageParser.parseMessageToAction(inputReader.nextLine()));
+        while(!confirmation) {
+            addPlayer();
         }
+        setupMessageParser();
+        String message;
+        while (true) {
+            System.out.println(playerName);
+            message = inputReader.nextLine();
+            System.out.println(message);
+            System.out.println(message);
+            writer.print(messageParser.parseMessageToAction(message));
+            System.out.println("/n");
+        }
+    }
+
+    /**
+     * Sends message to the client connected.
+     *
+     * @param message : message to send
+     */
+    public void asyncSend(String message){
+        System.out.println("ASYNC MESSAGE - Sending: " + message);
+        writer.print(message);
+        writer.flush();
     }
 
     /**
@@ -123,21 +151,15 @@ public class ClientHandler implements Runnable {
      *
      * @return true if it could add the player correctly, otherwise false
      */
-    public boolean addPlayer() {
+    //TODO: Il server NON deve mandare alcun messaggio. DEve rispondere a una richiesta da parte del client.
+    //TODO: sistemare parser in modo da permettere al server di rispondere alle richieste anche nella fase di login.
+    public void addPlayer() {
 
         this.playerName = receiveNickname();
         lobbyRequestHandler();
         if (Server.getLobbyNumberOfActivePlayers() == 0) {
             Server.setLobbySettings(receiveGamemode(), receiveNumOfPlayers());
-        } else {
-            sendNumberOfPlayers(Server.getNumOfPlayerGame());
-            sendGameMode(Server.getGamemode());
-            if (!getQuickAnswer()) {
-                return false;
-            }
         }
-        Server.addPlayerInLobby(this);
-        return true;
     }
 
     /**
@@ -149,17 +171,6 @@ public class ClientHandler implements Runnable {
         return this.playerName;
     }
 
-    /**
-     * Wait for a yes or no message
-     *
-     * @return the exit of the message
-     */
-    private boolean getQuickAnswer() {
-        System.out.println("YES OR NO MESSAGE - Waiting for a message ");
-        JsonObject json = getMessage();
-        return (json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal());
-
-    }
 
     /**
      * Receive the nickname of a user that wants to play
@@ -267,6 +278,14 @@ public class ClientHandler implements Runnable {
         JsonObject json = getMessage();
         System.out.println("Received: " + json);
         return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
+    }
+
+    public int getGameID(){
+        return id;
+    }
+
+    public void confirm(){
+        confirmation=true;
     }
 
 }

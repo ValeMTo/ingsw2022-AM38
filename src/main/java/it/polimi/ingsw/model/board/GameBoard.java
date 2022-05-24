@@ -2,11 +2,10 @@ package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.model.specialCards.SpecialCard;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class GameBoard {
     protected final int initialIslandNumber = 12;
@@ -22,6 +21,7 @@ public abstract class GameBoard {
     protected int motherNature;
 
     public GameBoard(int playerNumber, List<String> playersNicknames) {
+
         this.playerNumber = playerNumber;
         currentPlayer = 0;
         professors = new HashMap<Color, Tower>();
@@ -146,6 +146,9 @@ public abstract class GameBoard {
         if (numRound == 11) return EndOfMatchCondition.InstantEndOfMatch;
         // Final round
         if (numRound == 10) return EndOfMatchCondition.DelayedEndOfMatch;
+        for (PlayerBoard player : players) {
+            if (player.getAvailableCards().size() == 1) return EndOfMatchCondition.DelayedEndOfMatch;
+        }
         // 3 Islands groups
         if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3)
             return EndOfMatchCondition.InstantEndOfMatch;
@@ -240,7 +243,7 @@ public abstract class GameBoard {
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
             case ISLAND:
                 if (position <= islands.length && position > 0) return islands[position - 1].addStudent(student);
-                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length].getPosition());
+                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length - 1].getPosition());
             case CLOUD:
                 if (position <= clouds.length && position >= 1) return clouds[position - 1].addStudent(student);
                 throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
@@ -265,10 +268,25 @@ public abstract class GameBoard {
                 return players[currentPlayer].removeStudentDiningRoom(student);
             case SCHOOLENTRANCE:
                 return players[currentPlayer].removeStudentEntrance(student);
-
             default:
                 throw new LocationNotAllowedException("Islands, clouds and special cards are not allowed since this remove method does not have a position value");
         }
+    }
+
+    /**
+     * Draws a student from the bag
+     *
+     * @return the student Color drawn, null if no students are into the bag
+     */
+    public Color drawFromBag() {
+        return this.bag.drawStudent();
+    }
+
+    /**
+     * Initializes the bag after the initial phase
+     */
+    public void initializeBag() {
+        this.bag.initialise();
     }
 
     /**
@@ -360,6 +378,13 @@ public abstract class GameBoard {
         return false;
     }
 
+    /**
+     * Returns usable assistant cards
+     *
+     * @param playerTower : color tower of the player chosen
+     * @return the hashmap of usable card with priority as key value
+     * @throws NoSuchTowerException : that tower color is not applicable in this game
+     */
     public Map<Integer, Integer> getUsableAssistantCard(Tower playerTower) throws NoSuchTowerException {
         if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
         Map<Integer, Integer> list = new HashMap<Integer, Integer>();
@@ -488,8 +513,8 @@ public abstract class GameBoard {
      *
      * @return : the list of the positions of the usable clouds
      */
-    public List<Integer> getUsableClouds() {
-        List<Integer> usableClouds = new ArrayList<>();
+    public Set<Integer> getUsableClouds() {
+        Set<Integer> usableClouds = new HashSet<>();
         for (int i = 0; i < playerNumber; i++) {
             if (clouds[i].isFull()) usableClouds.add(i + 1);
         }
@@ -577,4 +602,58 @@ public abstract class GameBoard {
      */
     public abstract void increaseMovementMotherNature() throws FunctionNotImplementedException;
 
+    /**
+     * Getter of cloud limit number
+     */
+    public int getCloudLimit(){
+        return clouds[0].getStudentLimit();
+    }
+
+    /**
+     * Returns a Set with the specialCardNames
+     *
+     * @return : a Set with the SpecialCardNames of the instantiated special cards
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract Set<SpecialCardName> getSetOfSpecialCardNames() throws FunctionNotImplementedException;
+
+    /**
+     * Pay the coins of the active player to use a particular special card
+     *
+     * @param cost : expense of the activation of a SpecialCard, expressed in coin
+     * @return : true if the SpecialCard has been pay, false if the cost is too much and the expense could not be pay.
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract boolean paySpecialCard(int cost) throws FunctionNotImplementedException;
+
+    /**
+     * Gets the cost of a particular special card
+     *
+     * @param specialCardName : name of the special card to pay
+     * @return true if the special card exists and is one of the initialized special cards, false if not
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+
+    public abstract boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException;
+
+    /**
+     * Disable the towerInfluence in order to not count the towers in the influence score computation
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract void disableTowerInfluence() throws FunctionNotImplementedException;
+
+    /**
+     * Activates the special effect
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract void professorsUpdateTieEffect() throws FunctionNotImplementedException ;
+
+    /**
+     * Returns an array with the specialCardNames
+     *
+     * @return : an array with the SpecialCardNames of the instantiated special cards
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract SpecialCard[] getArrayOfSpecialCard() throws FunctionNotImplementedException ;
 }

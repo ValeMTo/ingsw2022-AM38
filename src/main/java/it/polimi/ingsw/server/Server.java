@@ -2,7 +2,6 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.controller.Game;
 import it.polimi.ingsw.controller.Lobby;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
@@ -12,7 +11,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,8 +23,8 @@ public class Server {
     private static Lobby lobby;
     private static ExecutorService executorService;
     private static int numClientConnected;
-    private static List<String> allPlayers;
-    private List<Game> games;
+    private static Map<String, ClientHandler> allPlayers;
+    protected static ArrayList<ClientHandler> allClients = new ArrayList<>();
 
     public static int getPort(String[] args) {
         if (args != null && args.length > 1) {
@@ -46,13 +47,16 @@ public class Server {
 
     public static void main(String[] args) {
         numClientConnected = 0;
-        allPlayers = new ArrayList<>();
+        allPlayers = new HashMap<>();
         ServerSocket serverSocket = createServerSocket(args);
         executorService = Executors.newCachedThreadPool();
         lobby = new Lobby();
 
+
         while (true) {
-            executorService.submit(new ClientHandler(establishConnection(serverSocket)));
+            ClientHandler client = new ClientHandler(establishConnection(serverSocket));
+            allClients.add(client);
+            executorService.submit(client);
             numClientConnected += 1;
         }
     }
@@ -73,8 +77,8 @@ public class Server {
     public static boolean blockPlayerName(String nickname) throws NicknameAlreadyTakenException {
         synchronized (allPlayers) {
             System.out.println("SERVER ADD PLAYER - enter synchronized part");
-            if (allPlayers.contains(nickname)) throw new NicknameAlreadyTakenException();
-            allPlayers.add(nickname);
+            if (allPlayers.keySet().contains(nickname)) throw new NicknameAlreadyTakenException();
+            allPlayers.put(nickname, null);
             System.out.println("SERVER ADD PLAYER: " + nickname);
             return true;
         }

@@ -2,28 +2,28 @@ package it.polimi.ingsw.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.exceptions.AllMovesUsedException;
 import it.polimi.ingsw.exceptions.AlreadyUsedException;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.exceptions.IncorrectPhaseException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
-import it.polimi.ingsw.messages.ActionTypeEnum;
-import it.polimi.ingsw.messages.ErrorTypeEnum;
-import it.polimi.ingsw.messages.MessageGenerator;
-import it.polimi.ingsw.messages.MessageTypeEnum;
+import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.server.ClientHandler;
+import it.polimi.ingsw.server.Server;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class MessageParser {
+public class MessageParser{
     private final GameOrchestrator gameOrchestrator;
-    private final String nickName;
+    private final ClientHandler client;
 
-    public MessageParser(GameOrchestrator gameOrchestrator, String nickName) {
+    public MessageParser(GameOrchestrator gameOrchestrator, ClientHandler client) {
         this.gameOrchestrator = gameOrchestrator;
-        this.nickName = nickName;
+        this.client = client;
     }
 
     /**
@@ -34,9 +34,9 @@ public class MessageParser {
      */
     public String parseMessageToAction(String message) {
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
-        if (!gameOrchestrator.getActivePlayer().equalsIgnoreCase(nickName))
+        if (!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName()))
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
-
+        String returnMessage = null;
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal()) {
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_ASSISTANT_CARD.ordinal())
                 return useAssistantCard(json);
@@ -44,6 +44,22 @@ public class MessageParser {
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.MOVE_MOTHER_NATURE.ordinal())
                 return moveMotherNature(json);
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
+            if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal())
+                return useSpecialCard(json);
+        } else if(json.get("MessageType").getAsInt() == MessageTypeEnum.REQUEST.ordinal()){
+            if(json.get("RequestType").getAsInt() == RequestTypeEnum.PLAYERS_NUMBER_REQUEST.ordinal()){
+                return MessageGenerator.numberOfPlayerMessage(Server.getNumOfPlayerGame());
+            } else if (json.get("MessageType").getAsInt() == RequestTypeEnum.GAMEMODE_REQUEST.ordinal()){
+                return MessageGenerator.gamemodeMessage(Server.getGamemode());
+            }
+        } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()){
+            if(json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_RULES_ANSWER.ordinal()) {
+                Server.addPlayerInLobby(client);
+                client.confirm();
+                return MessageGenerator.okMessage();
+            } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.REFUSE_RULES_ANSWER.ordinal()){
+                return MessageGenerator.okMessage();
+            }
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
     }
@@ -61,6 +77,8 @@ public class MessageParser {
             return MessageGenerator.errorInvalidInputMessage("ERROR - Invalid input, out of bound", 1, 10);
         } catch (AlreadyUsedException exc) {
             return MessageGenerator.errorWithUsableValues(ErrorTypeEnum.ALREADY_USED_ASSISTANT_CARD, "ERROR - The card has been already used", exc.getUsableIndexes());
+        } catch (IncorrectPhaseException exc) {
+            return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - Generic error using assistant card");
     }
@@ -74,27 +92,29 @@ public class MessageParser {
     private String moveStudent(JsonObject json) {
         if (!gameOrchestrator.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS))
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - The given command is not for the phase");
-        if (json.get("From").getAsInt() == StudentCounter.SCHOOLENTRANCE.ordinal()) {
-            if (json.get("To").getAsInt() == StudentCounter.PLAYER.ordinal()) {
-                if (gameOrchestrator.moveStudent(Color.values()[json.get("Color").getAsInt()])) {
-                    return MessageGenerator.okMessage();
-                } else
-                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_STUDENT_IN_SCHOOL_ENTRANCE, "ERROR - No students of the given color in your schoolEntrance");
-            } else if (json.get("To").getAsInt() == StudentCounter.ISLAND.ordinal()) {
-                try {
+        try {
+            if (json.get("From").getAsInt() == StudentCounter.SCHOOLENTRANCE.ordinal()) {
+                if (json.get("To").getAsInt() == StudentCounter.PLAYER.ordinal()) {
+                    if (gameOrchestrator.moveStudent(Color.values()[json.get("Color").getAsInt()])) {
+                        return MessageGenerator.okMessage();
+                    } else
+                        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_STUDENT_IN_SCHOOL_ENTRANCE, "ERROR - No students of the given color in your schoolEntrance");
+                } else if (json.get("To").getAsInt() == StudentCounter.ISLAND.ordinal()) {
+
                     if (gameOrchestrator.moveStudent(Color.values()[json.get("Color").getAsInt()], json.get("Position").getAsInt())) {
                         return MessageGenerator.okMessage();
                     } else
                         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_STUDENT_IN_SCHOOL_ENTRANCE, "ERROR - No students of the given color in your schoolEntrance");
-                } catch (IndexOutOfBoundsException exc) {
-                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "ERROR - No island has the given position");
-                } catch (AllMovesUsedException exc) {
-                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.ALL_MOVED_USED, "ERROR - All moves of the students are done, now is time for motherNature movement");
-                }
-            } else
-                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_VALID_DESTINATION, "ERROR - Only DiningRoom and Island are allowed in this phase");
+
+                } else
+                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_VALID_DESTINATION, "ERROR - Only DiningRoom and Island are allowed in this phase");
+            }
+            return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_VALID_ORIGIN, "ERROR - Only SchoolEntrance is allowed in this phase");
+        } catch (IndexOutOfBoundsException exc) {
+            return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "ERROR - No island has the given position");
+        } catch (IncorrectPhaseException exc) {
+            return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
-        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_VALID_ORIGIN, "ERROR - Only SchoolEntrance is allowed in this phase");
     }
 
     /**
@@ -111,6 +131,8 @@ public class MessageParser {
                 return MessageGenerator.okMessage();
         } catch (IslandOutOfBoundException exc) {
             return MessageGenerator.errorInvalidInputMessage("ERROR - Island out of bound", exc.getLowerBound(), exc.getHigherBound());
+        } catch (IncorrectPhaseException exc) {
+            return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_VALID_DESTINATION, "ERROR - Not enough steps to reach the island ");
     }
@@ -127,18 +149,46 @@ public class MessageParser {
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - Error in choice of the cloud");
         } catch (AlreadyUsedException exc) {
             return MessageGenerator.errorWithUsableValues(ErrorTypeEnum.ALREADY_USED_CLOUD, "ERROR - the cloud was already used", exc.getUsableIndexes());
+        } catch (IncorrectPhaseException exc) {
+            return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
+    }
+
+
+    /**
+     * Uses the special card with the gameOrchestrator methods
+     *
+     * @param json :  received message that will be converted in calling the chooseCloud method of gameOrchestrator
+     * @return the answer message to the Client in json
+     */
+    private String useSpecialCard(JsonObject json) {
+        try {
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal()) {
+                return gameOrchestrator.useSpecialCard(json.get("SpecialCardName").getAsString());
+            }
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal()) {
+                return gameOrchestrator.chooseColor(Color.values()[json.get("Color").getAsInt()]);
+            }
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal())
+                return gameOrchestrator.chooseIsland(json.get("IslandPosition").getAsInt());
+        } catch (FunctionNotImplementedException exc) {
+            return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.FUNCTION_NOT_IMPLEMENTED, "ERROR - this functionality is for expert game mode only");
+        } catch (IslandOutOfBoundException exc) {
+            return MessageGenerator.errorInvalidInputMessage("ERROR - Island out of bound", exc.getLowerBound(), exc.getHigherBound());
+        }
+        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error in special card usage");
     }
 
     /**
      * Method for the get for the SETUP update
+     *
      * @return the Map of players string and tower color
      */
-    public Map<String, Tower> getPlayersTower(){
-        return new HashMap<String,Tower>(this.gameOrchestrator.getPlayersTower());
+    public Map<String, Tower> getPlayersTower() {
+        return new HashMap<String, Tower>(this.gameOrchestrator.getPlayersTower());
     }
 
-    public boolean isExpert(){
+    public boolean isExpert() {
         return this.gameOrchestrator.isExpert();
     }
 

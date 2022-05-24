@@ -3,6 +3,7 @@ package it.polimi.ingsw.messages;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.controller.PhaseEnum;
+import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
@@ -10,8 +11,8 @@ import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 // See the implementation below for the exact names of fields in the generated json (overrides the names in the GoogleDoc).
 
@@ -61,18 +62,17 @@ public class MessageGenerator {
      * Generates the Error messages caused by an already used exception.
      * This message contains also the List of usable integers
      *
-     * @param errorType   : type of error
-     * @param errorString : String of the particular error to send
+     * @param errorType     : type of error
+     * @param errorString   : String of the particular error to send
      * @param usableIndexes : List of the usable integer indexes
-     *
      * @return : json String of the error message
      */
-    public static String errorWithUsableValues(ErrorTypeEnum errorType, String errorString, List<Integer> usableIndexes) {
+    public static String errorWithUsableValues(ErrorTypeEnum errorType, String errorString, Set<Integer> usableIndexes) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.ERROR.ordinal());
         json.put("ErrorType", errorType.ordinal());
         json.put("errorString", errorString);
-        json.put("usableIndexes",usableIndexes);
+        json.put("usableIndexes", usableIndexes);
 
         return json + "\n";
     }
@@ -94,6 +94,20 @@ public class MessageGenerator {
         json.addProperty("minVal", minVal);
         json.addProperty("maxVal", maxVal);
 
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates an error message caused by using an action that cannot be used in the current phase of the turn
+     *
+     * @param actualPhase actual phase that is now set
+     * @return the json String of the error message
+     */
+    public static String errorWrongPhase(PhaseEnum actualPhase) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
+        json.addProperty("ErrorType", ErrorTypeEnum.WRONG_PHASE_ACTION.ordinal());
+        json.addProperty("actualPhase", actualPhase.ordinal());
         return gson.toJson(json) + "\n";
     }
 
@@ -159,6 +173,30 @@ public class MessageGenerator {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.REQUEST.ordinal());
         json.addProperty("RequestType", RequestTypeEnum.LOBBY_REQUEST.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json to accept rules game
+     *
+     * @return : json String with an ok
+     */
+    public static String okRulesGameMessage(){
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.ACCEPT_RULES_ANSWER.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates a String formatted in json to refuse rules game
+     *
+     * @return : json String with an ok
+     */
+    public static String nackRulesGameMessage(){
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.REFUSE_RULES_ANSWER.ordinal());
         return gson.toJson(json) + "\n";
     }
 
@@ -241,6 +279,20 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the ok message that includes the next step needed to use the special card
+     *
+     * @return : json String of the Action UseSpecialCard message
+     */
+    public static String specialCardAnswer(SpecialCardRequiredAction specialCardRequiredAction, boolean optionalAction) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.addProperty("AnswerType", AnswerTypeEnum.SPECIAL_CARD_ANSWER.ordinal());
+        json.addProperty("SpecialCardAnswer", specialCardRequiredAction.ordinal());
+        json.addProperty("Optional", optionalAction);
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates the UseSpecialCard Action message
      *
      * @param specialCardName :  the name of the SpecialCard that is used
@@ -273,6 +325,27 @@ public class MessageGenerator {
         json.addProperty("From", fromLoc.ordinal());
         json.addProperty("To", toLoc.ordinal());
         json.addProperty("Position", position);
+
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates the MoveStudent Action message, used to move a student of a given color from one given location
+     * to another.
+     *
+     * @param color     : the color of the student to move
+     * @param fromLoc   : the location from which the student is moved
+     * @param toLoc     : the location to which the student is moved (its destination)
+     * @return : json String of the Action MoveStudent message
+     */
+    public static String moveStudentMessage(Color color, StudentCounter fromLoc, StudentCounter toLoc) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
+        json.addProperty("ActionType", ActionTypeEnum.MOVE_STUDENT.ordinal());
+
+        json.addProperty("Color", color.ordinal());
+        json.addProperty("From", fromLoc.ordinal());
+        json.addProperty("To", toLoc.ordinal());
 
         return gson.toJson(json) + "\n";
     }
@@ -315,6 +388,21 @@ public class MessageGenerator {
      * @see it.polimi.ingsw.model.specialCards.Herbalist
      */
     public static String chooseTilePositionMessage(int islandPosition) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
+        json.addProperty("ActionType", ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal());
+        json.addProperty("IslandPosition", islandPosition);
+
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
+     * Generates the chooseIslandPosition Action message, used to choose the Island for a special card effect.
+     *
+     * @param islandPosition : the index representing the specific Island where to apply the special card effect.
+     * @return : json String of the Action message ChooseCloud
+     */
+    public static String chooseIslandPositionMessage(int islandPosition) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.addProperty("ActionType", ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal());
@@ -486,8 +574,7 @@ public class MessageGenerator {
      * @param coins              : the amount of coins left on the SchoolBoard.
      * @return : json string of the SchoolBoardUpdate message
      */
-
-    public static String schoolBoardUpdateMessage(Map<Color, Integer> diningRoomMap, Map<Color, Integer> schoolEntranceMap, Tower towerColor, int numTower, int coins) {
+    public static String schoolBoardViewUpdate(Map<Color, Integer> diningRoomMap, Map<Color, Integer> schoolEntranceMap, Tower towerColor, int numTower, int coins) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal());
@@ -624,7 +711,7 @@ public class MessageGenerator {
      * @param nickname : the nickname of the current active player.
      * @return : json string of the CurrentPlayerUpdate message
      */
-    public static String currentPlayerUpdateMessage(String nickname) {
+    public static String currentPlayerUpdateMessage(Tower nickname) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal());

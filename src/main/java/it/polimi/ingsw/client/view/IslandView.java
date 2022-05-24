@@ -15,6 +15,10 @@ public class IslandView extends Island {
      */
     public IslandView(int position) {
         super(position);
+        for(Color color : Color.values()){
+            if(!this.influence.containsKey(color))
+                this.influence.put(color,0);
+        }
     }
 
     /**
@@ -34,5 +38,9 @@ public class IslandView extends Island {
     public void setStudentMap(Map<Color, Integer> studentMap) {
         this.influence.clear();
         this.influence.putAll(studentMap);
+        for(Color color : Color.values()){
+            if(!this.influence.containsKey(color))
+                this.influence.put(color,0);
+        }
     }
 }
