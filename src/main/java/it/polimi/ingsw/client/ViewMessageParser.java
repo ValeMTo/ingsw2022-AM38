@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.messages.AnswerTypeEnum;
 import it.polimi.ingsw.messages.MessageTypeEnum;
+import it.polimi.ingsw.messages.UpdateTypeEnum;
 
 public class ViewMessageParser {
     Gson gson = new Gson();
@@ -24,6 +25,12 @@ public class ViewMessageParser {
 
         if (json.get("MessageType").equals(MessageTypeEnum.ERROR.ordinal())){
             System.out.println(json.get("ErrorType") + " - " + json.get("errorString"));
+        } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()){
+            if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()){
+                if (json.get("PlayerTower").equals(view.getPlayerTower())){
+                    
+                }
+            }
         }
 
     }

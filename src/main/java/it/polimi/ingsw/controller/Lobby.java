@@ -76,7 +76,7 @@ public class Lobby {
         }
         if (queue.remove(client)) {
             System.out.println("LOBBY - client removed correctly returning a new message parser");
-            MessageParser messageParser = new MessageParser(gameOrchestrator, client.getNickName());
+            MessageParser messageParser = new MessageParser(gameOrchestrator, client);
             //Reset the lobby as inactive
             if (queue.size() <= 0) {
                 System.out.println("LOBBY - no more clients, reset lobby");

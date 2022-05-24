@@ -242,7 +242,11 @@ public abstract class GameOrchestrator extends Listenable {
                 this.playedAssistantCard.add(priority);
                 nextStep();
                 try {
-                    notify(modelListener, MessageGenerator.assistantCardUpdateMessage(gameBoard.getCurrentPlayer(), (ArrayList<Integer>) gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()), clients);
+                    ArrayList<Integer> usableCards = new ArrayList<>();
+                    for ( Integer card : gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()){
+                        usableCards.add(card);
+                    }
+                    notify(modelListener, MessageGenerator.useAssistantCardMessage(priority), clients);
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
