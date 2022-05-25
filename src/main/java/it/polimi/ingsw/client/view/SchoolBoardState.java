@@ -11,6 +11,7 @@ public class SchoolBoardState {
     private Tower player;
     private Map<Color, Integer> SchoolEntranceOccupancy;
     private Map<Color, Integer> diningRoomOccupancy;
+    private int lastAssistantCardUsed;
 
     public SchoolBoardState(Tower player){
 
@@ -35,5 +36,13 @@ public class SchoolBoardState {
 
     public Tower getPlayer(){
         return player;
+    }
+
+    public void setLastAssistantCardUsed(int lastAssistantCardUsed) {
+        this.lastAssistantCardUsed = lastAssistantCardUsed;
+    }
+
+    public int getLastAssistantCardUsed(){
+        return lastAssistantCardUsed;
     }
 }

@@ -333,7 +333,7 @@ public abstract class GameOrchestrator extends Listenable {
      * If the active player is the last player of the action phase, controls the ending conditions and the nr. of rounds.
      * If the game continues, sets the order of the successive phase and sets the active player.
      */
-    private void nextStep() {
+    public void nextStep() {
         synchronized (phaseBlocker) {
             try {
                 if (getCurrentPhase() == PhaseEnum.PLANNING) {
@@ -387,6 +387,7 @@ public abstract class GameOrchestrator extends Listenable {
             }
         }
         notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
+        System.out.println(MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
     }
 
 
