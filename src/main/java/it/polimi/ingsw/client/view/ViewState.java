@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.view;
 
+import it.polimi.ingsw.client.GameSettings;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
@@ -22,6 +23,7 @@ public class ViewState {
     private Map<Color, Tower> professors;
     private int motherNature;
     private boolean isEndOfMatch = false;
+    private GameSettings gameSettings;
 
 
     public ViewState(){
@@ -33,6 +35,7 @@ public class ViewState {
         currentPhase = PhaseEnum.PLANNING;
         professors = new HashMap<>();
         islands = new ArrayList<>();
+        gameSettings=null;
     }
 
 
@@ -66,10 +69,21 @@ public class ViewState {
         return new ArrayList<Integer>(usableCards);
     }
 
+    public String getNamePlayer(Tower towerPlayer){
+        for (String name : players.keySet()){
+            if (players.get(name).equals(towerPlayer)){
+                return name;
+            }
+        }
+        return null;
+    }
     public void setUsableCards(List<Integer> usableCards) {
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
 
+    }
+    public void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
+        this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
     }
 
     public boolean isEndOfMatch() {
@@ -164,5 +178,18 @@ public class ViewState {
 
     public void setTheCommander(){
         isTheCommander= true;
+    }
+
+    public void useAssistantCard(Tower player, int numCard){
+        if (player.equals(playerTower)){
+            usableCards.remove(numCard);
+        }
+
+        findSchoolBoard(player).setLastAssistantCardUsed(numCard);
+
+    }
+
+    public GameSettings getGameSettings(){
+        return gameSettings;
     }
 }

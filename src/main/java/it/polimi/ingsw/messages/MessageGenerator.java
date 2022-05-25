@@ -177,6 +177,18 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates a String formatted in json for request the start of the game
+     *
+     * @return : json String for request lobby number of players
+     */
+    public static String startGameRequestMessage() {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.REQUEST.ordinal());
+        json.addProperty("RequestType", RequestTypeEnum.START_GAME.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates a String formatted in json to accept rules game
      *
      * @return : json String with an ok
@@ -205,10 +217,12 @@ public class MessageGenerator {
      *
      * @return : json String with number of players in the lobby
      */
-    public static String numberPlayerlobbyMessage(int numOfPlayers) {
+    public static String answerlobbyMessage(int actualPlayer, boolean isExpert,int numOfPlayers ) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
         json.addProperty("AnswerType", AnswerTypeEnum.LOBBY_ANSWER.ordinal());
+        json.addProperty("actualPlayers", actualPlayer);
+        json.addProperty("isExpert", isExpert);
         json.addProperty("numOfPlayers", numOfPlayers);
         return gson.toJson(json) + "\n";
     }
@@ -505,7 +519,6 @@ public class MessageGenerator {
         return json + "\n";    // using the toString() on a JSONObject instead of using toJson
     }
 
-
     /**
      * Generates the CloudViewUpdate message, used to notify the updated status of a given cloud.
      *
@@ -666,7 +679,6 @@ public class MessageGenerator {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.PHASE_UPDATE.ordinal());
-        json.put("CurrentPhase", phase.ordinal());
         return json + "\n";
     }
 
@@ -735,6 +747,7 @@ public class MessageGenerator {
         json.put("Leaderboard", leaderboard);
         return json + "\n";
     }
+
 
 
 }

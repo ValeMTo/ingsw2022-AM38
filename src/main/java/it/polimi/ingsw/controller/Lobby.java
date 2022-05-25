@@ -8,13 +8,15 @@ import java.util.List;
 public class Lobby {
     private final List<ClientHandler> queue = new ArrayList<>();
     private final List<String> players = new ArrayList<>();
+    private List<MessageParser> messageParsers;
     private boolean isExpert;
-    private int numOfPlayers;
+    private int numOfPlayers; //Number of players that will play
     private GameOrchestrator gameOrchestrator = null;
     private int id;
 
     public Lobby(){
         id =0;
+        messageParsers = new ArrayList<>();
     }
 
 
@@ -56,27 +58,27 @@ public class Lobby {
                     }
                 }
                 id++;
+                emptyLobby();
             }
         }
     }
 
-
-    /**
-     * Returns null if the GameHandler is not already created or the client does not exist into the lobby queue
-     * also reset the lobby if the last ConnectionSocket got its personal MessageParser
-     *
-     * @param client : client that wants to have a MessageParser to connect to the Controller
-     * @return a new MessageParser with the created GameOrchestrator or null if no GameOrchestrator has been created or the player does not exist into the lobby
-     */
-    public MessageParser getMessageParser(ClientHandler client) {
-        // Not already set parser
-        if (gameOrchestrator == null) {
-            System.out.println("LOBBY - returning null orchestrator");
-            return null;
+    public MessageParser getMessageParser(ClientHandler client){
+        for (MessageParser parser : messageParsers){
+            if (parser.getName().equals(client.getNickName())){
+                return parser;
+            }
         }
-        if (queue.remove(client)) {
+        return null;
+    }
+
+
+    public void emptyLobby() {
+
+        for (ClientHandler client : queue) {
+            client.setGameOrchestrator(gameOrchestrator);
+            queue.remove(client);
             System.out.println("LOBBY - client removed correctly returning a new message parser");
-            MessageParser messageParser = new MessageParser(gameOrchestrator, client);
             //Reset the lobby as inactive
             if (queue.size() <= 0) {
                 System.out.println("LOBBY - no more clients, reset lobby");
@@ -85,11 +87,7 @@ public class Lobby {
                 gameOrchestrator = null;
 
             }
-            //return the MessageParser
-            return messageParser;
         }
-        System.out.println("LOBBY - return null -- problem");
-        return null;
     }
 
     public boolean getGamemode() {

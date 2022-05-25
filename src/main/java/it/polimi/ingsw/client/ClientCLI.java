@@ -84,31 +84,47 @@ public class ClientCLI {
         this.connectionSocket = createConnectionWithServer(hostName, portNumber);
         sendNickname();
         cleaner();
-        if (connectionSocket.isTheFirst()) {
+        connectionSocket.isTheFirst();
+
+        //TODO: listener that waits the no null value of GameSetting
+        while (viewState.getGameSettings() == null){}
+
+        System.out.println("GameSettings" + viewState.getGameSettings().getActualClients());
+        if (viewState.getGameSettings().getActualClients() <= 0) {
             sendGameMode();
             sendNumOfPlayers();
         } else {
             if (acceptSettingsOfTheGame()) {
+                System.out.println("You have accepted previous rules");
+                cleaner();
+                connectionSocket.startGame();
             } else {
                 connectionSocket.disconnect();
+                System.out.println("See you next time!!");
             }
         }
-        cleaner();
-        this.viewState = connectionSocket.startGame();
+
     }
 
     /**
      * Start Game models the recursive phase of printing coherent menus and interface and waits for correct inputs
      */
     public void startGame() {
+        boolean YourTurnShown = false;
         while (!viewState.isEndOfMatch()) {
             if (!viewState.isActiveView()) {
-                showNotYoutTurnView();
+                if (!YourTurnShown){
+                    showNotYoutTurnView();
+                    YourTurnShown = true;
+                }
             } else {
+                YourTurnShown= false;
                 if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
                     printAssistantCards();
                     int card = showPlanningInstructionAndGetCard();
                     connectionSocket.setAssistantCard(card);
+                    viewState.setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS); //TODO: maybe change
+                    connectionSocket.updateNewPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
                     showActionMoveStudentsInstruction();
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
@@ -117,7 +133,7 @@ public class ClientCLI {
                     showCloudChoiceInstruction();
                 }
             }
-            cleaner();
+            //Not put cleaner here
         }
     }
 
@@ -302,8 +318,8 @@ public class ClientCLI {
         boolean confirmation = false;
         while (!confirmation) {
             System.out.println("The rules are already set...");
-            System.out.println("numOfPlayers: " + connectionSocket.getNumberOfPlayers().toString());
-            if (connectionSocket.getGameMode()) {
+            System.out.println("numOfPlayers: " + viewState.getGameSettings().getNumPlayers());
+            if (viewState.getGameSettings().getExpert()) {
                 System.out.println("GameMode: expert");
             } else {
                 System.out.println("GameMode: easy");
@@ -319,7 +335,7 @@ public class ClientCLI {
                 confirmation = true;
             }
         }
-        connectionSocket.refuse();
+        connectionSocket.refuseRules();
         return false;
     }
 

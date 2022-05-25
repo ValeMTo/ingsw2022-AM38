@@ -18,12 +18,24 @@ import java.util.Map;
 
 
 public class MessageParser{
-    private final GameOrchestrator gameOrchestrator;
+    private GameOrchestrator gameOrchestrator;
     private final ClientHandler client;
+    private String name;
 
-    public MessageParser(GameOrchestrator gameOrchestrator, ClientHandler client) {
-        this.gameOrchestrator = gameOrchestrator;
+    public MessageParser(ClientHandler client) {
         this.client = client;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setName(){
+        this.name = name;
+    }
+
+    public void setGameOrchestrator(GameOrchestrator gameOrchestrator) {
+        this.gameOrchestrator = gameOrchestrator;
     }
 
     /**
@@ -33,10 +45,16 @@ public class MessageParser{
      * @return : a String (json) that is the answer message from the server
      */
     public String parseMessageToAction(String message) {
+        System.out.println("MessageParser");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
-        if (!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName()))
+        if ( gameOrchestrator!= null &&!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName())) {
+            System.out.println("ERROR - This is not his/her turn");
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
+        }
         String returnMessage = null;
+        System.out.println(client == null);
+        System.out.println(message);
+
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal()) {
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_ASSISTANT_CARD.ordinal())
                 return useAssistantCard(json);
@@ -46,21 +64,62 @@ public class MessageParser{
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal())
                 return useSpecialCard(json);
+
         } else if(json.get("MessageType").getAsInt() == MessageTypeEnum.REQUEST.ordinal()){
             if(json.get("RequestType").getAsInt() == RequestTypeEnum.PLAYERS_NUMBER_REQUEST.ordinal()){
                 return MessageGenerator.numberOfPlayerMessage(Server.getNumOfPlayerGame());
-            } else if (json.get("MessageType").getAsInt() == RequestTypeEnum.GAMEMODE_REQUEST.ordinal()){
+            } else if (json.get("RequestType").getAsInt() == RequestTypeEnum.GAMEMODE_REQUEST.ordinal()){
                 return MessageGenerator.gamemodeMessage(Server.getGamemode());
+            } else if (json.get("RequestType").getAsInt() == RequestTypeEnum.LOBBY_REQUEST.ordinal()){
+                System.out.println("Lobby");
+                client.lobbyRequestHandler();
+                System.out.println("Lobby answer sent");
+            } else if (json.get("RequestType").getAsInt() == RequestTypeEnum.START_GAME.ordinal()){
+                System.out.println("START GAME");
+                gameOrchestrator.setCurrentPhase(PhaseEnum.PLANNING);
+                System.out.println("SET PLANNING PHASE");
+                gameOrchestrator.nextStep();
             }
+            return MessageGenerator.okMessage();
+
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()){
             if(json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_RULES_ANSWER.ordinal()) {
-                Server.addPlayerInLobby(client);
-                client.confirm();
+                gameOrchestrator.nextStep();
                 return MessageGenerator.okMessage();
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.REFUSE_RULES_ANSWER.ordinal()){
-                return MessageGenerator.okMessage();
+                client.disconnectionManager();
             }
+            return MessageGenerator.okMessage();
+        }else if (json.get("MessageType").getAsInt() == MessageTypeEnum.CONNECTION.ordinal()){
+            if (json.get("MessageType").getAsInt() == ConnectionTypeEnum.CLOSE_CONNECTION.ordinal()){
+                client.disconnectionManager();
+            }
+            return MessageGenerator.okMessage();
+
+        }else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()){
+            if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()){
+                gameOrchestrator.nextStep();
+            }
+            return MessageGenerator.okMessage();
+
+        } else if(json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
+            if (json.get("SetType").getAsInt() == SetTypeEnum.SET_NICKNAME.ordinal()) {
+                client.confirmNickname(json.get("nickname").getAsString());
+
+            } else if (json.get("SetType").getAsInt()==SetTypeEnum.SET_GAME_MODE.ordinal()){
+                if (Server.getLobbyNumberOfActivePlayers() == 0) {
+                    Server.setLobbySettings(json.get("SetExpertGameMode").getAsBoolean());
+                }
+            } else if (json.get("SetType").getAsInt()==SetTypeEnum.SELECT_NUMBER_OF_PLAYERS.ordinal()){
+                if (Server.getLobbyNumberOfActivePlayers() == 0) {
+                    Server.setLobbySettings(json.get("SetNumberOfPlayers").getAsInt());
+                    Server.addPlayerInLobby(client); //TODO
+                }
+
+            }
+            return MessageGenerator.okMessage();
         }
+
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
     }
 
@@ -72,7 +131,9 @@ public class MessageParser{
      */
     private String useAssistantCard(JsonObject json) {
         try {
-            if (gameOrchestrator.chooseCard(json.get("CardPriority").getAsInt())) return MessageGenerator.okMessage();
+            if (gameOrchestrator.chooseCard(json.get("CardPriority").getAsInt())){
+                return MessageGenerator.okMessage();
+            }
         } catch (IndexOutOfBoundsException exc) {
             return MessageGenerator.errorInvalidInputMessage("ERROR - Invalid input, out of bound", 1, 10);
         } catch (AlreadyUsedException exc) {

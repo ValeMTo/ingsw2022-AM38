@@ -2,6 +2,7 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.controller.GameOrchestrator;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 import it.polimi.ingsw.messages.*;
@@ -20,12 +21,10 @@ public class ClientHandler implements Runnable {
     private Scanner inputReader;
     private PrintWriter writer;
     private String playerName;
-    private MessageParser messageParser = null;
+    private MessageParser messageParser;
     private int id;
-    private boolean confirmation;
 
     public ClientHandler(Socket clientSocket) {
-        confirmation=false;
         inSocket = clientSocket;
         gson = new Gson();
         try {
@@ -52,16 +51,11 @@ public class ClientHandler implements Runnable {
      */
     @Override
     public void run() {
-        boolean error;
-        while(!confirmation) {
-            addPlayer();
-        }
-        setupMessageParser();
+        messageParser = new MessageParser(this);
         String message;
         while (true) {
             System.out.println(playerName);
             message = inputReader.nextLine();
-            System.out.println(message);
             System.out.println(message);
             writer.print(messageParser.parseMessageToAction(message));
             System.out.println("/n");
@@ -118,19 +112,14 @@ public class ClientHandler implements Runnable {
     public void setMessageParser(MessageParser messageParser) {
         this.messageParser = messageParser;
         System.out.println("CLIENTHANDLER of " + this.playerName + " set messageParser");
-
     }
 
     /**
      * Manage the disconnection and controls the messages searching for the disconnection request
-     *
-     * @param json : json witch it wants to control if it solicited a close connection
      */
-    private void disconnectionManager(JsonObject json) {
-        if (json.get("MessageType").getAsInt() == MessageTypeEnum.CONNECTION.ordinal() && json.get("SetType").getAsInt() == ConnectionTypeEnum.CLOSE_CONNECTION.ordinal()) {
-            writer.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
-            System.exit(1);
-        }
+    public void disconnectionManager() {
+        Server.removePlayer(playerName);
+        System.exit(1);
     }
 
     private JsonObject getMessage() {
@@ -147,22 +136,6 @@ public class ClientHandler implements Runnable {
     }
 
     /**
-     * Wait for a message from the client to add the player
-     *
-     * @return true if it could add the player correctly, otherwise false
-     */
-    //TODO: Il server NON deve mandare alcun messaggio. DEve rispondere a una richiesta da parte del client.
-    //TODO: sistemare parser in modo da permettere al server di rispondere alle richieste anche nella fase di login.
-    public void addPlayer() {
-
-        this.playerName = receiveNickname();
-        lobbyRequestHandler();
-        if (Server.getLobbyNumberOfActivePlayers() == 0) {
-            Server.setLobbySettings(receiveGamemode(), receiveNumOfPlayers());
-        }
-    }
-
-    /**
      * Gets the nickname of the player
      *
      * @return : the String of the player nickname
@@ -173,49 +146,33 @@ public class ClientHandler implements Runnable {
 
 
     /**
-     * Receive the nickname of a user that wants to play
+     * accept/refuse the nickname of a user that wants to play
      *
      * @return the nickname chosen by the player
      */
-    private String receiveNickname() {
-        System.out.println("ADD PLAYER - Waiting for a message ");
-        JsonObject json = getMessage();
-        String nickname = null;
-        if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
-            if (json.get("SetType").getAsInt() == SetTypeEnum.SET_NICKNAME.ordinal()) {
-                nickname = json.get("nickname").getAsString();
-                try {
-                    Server.blockPlayerName(nickname);
-                    System.out.println("Sending: " + MessageGenerator.okMessage());
-                    writer.print(MessageGenerator.okMessage());
-                    writer.flush();
-                } catch (NicknameAlreadyTakenException e) {
-                    writer.print(MessageGenerator.errorWithStringMessage(NICKNAME_ALREADY_TAKEN, "Already taken nickname"));
-                    writer.flush();
-                    receiveNickname();
-                }
-            }
-        } else {
-            receiveNickname();
+    public void confirmNickname(String nickname) {
+        try {
+            System.out.println("confirmNickname");
+            Server.blockPlayerName(nickname);
+            System.out.println("Sending: " + MessageGenerator.okMessage());
+            writer.print(MessageGenerator.okMessage());
+            writer.flush();
+        } catch (NicknameAlreadyTakenException e) {
+            writer.print(MessageGenerator.errorWithStringMessage(NICKNAME_ALREADY_TAKEN, "Already taken nickname"));
+            writer.flush();
         }
-        return nickname;
+
     }
 
     /**
      * Send a message with the number of active users in the lobby room
      */
-    private void lobbyRequestHandler() {
-        System.out.println("LOBBY REQUEST - Waiting for a message ");
-        JsonObject json = getMessage();
-        if (json.get("MessageType").getAsInt() == MessageTypeEnum.REQUEST.ordinal()) {
-            if (json.get("RequestType").getAsInt() == RequestTypeEnum.LOBBY_REQUEST.ordinal()) {
-                writer.print(MessageGenerator.numberPlayerlobbyMessage(Server.getLobbyNumberOfActivePlayers()));
-                System.out.println("Sending: " + MessageGenerator.numberPlayerlobbyMessage(Server.getLobbyNumberOfActivePlayers()));
-                writer.flush();
-            }
-        } else {
-            lobbyRequestHandler();
-        }
+    public void lobbyRequestHandler() {
+        System.out.println("I'm in lobbyRequestHandler");
+        writer.print(MessageGenerator.answerlobbyMessage(Server.getLobbyNumberOfActivePlayers(), Server.getGamemode(), Server.getNumOfPlayerGame()));
+        System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(Server.getLobbyNumberOfActivePlayers(), Server.getGamemode(), Server.getNumOfPlayerGame()));
+        writer.flush();
+
     }
 
     /**
@@ -284,8 +241,10 @@ public class ClientHandler implements Runnable {
         return id;
     }
 
-    public void confirm(){
-        confirmation=true;
+    public void setGameOrchestrator(GameOrchestrator gameOrchestrator){
+        messageParser.setGameOrchestrator(gameOrchestrator);
+
     }
+
 
 }
