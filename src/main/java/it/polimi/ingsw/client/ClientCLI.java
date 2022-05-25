@@ -40,13 +40,14 @@ public class ClientCLI {
     ConnectionSocket connectionSocket;
     private ViewState viewState;
     private Scanner in = null;
+    private String nickname;
 
     public ClientCLI() {
 
         in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
         this.isRunning = true;
-        viewState = new ViewState();
+        viewState = new ViewState(this.nickname);
 
 
     }

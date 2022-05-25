@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -534,6 +535,9 @@ public class MessageGenerator {
         json.put("UpdateType", UpdateTypeEnum.SETUP_UPDATE.ordinal());
         json.put("NumberOfPlayers", numPlayers);
         json.put("isExpertMode", isExpertMode);
+        Map<String, String> playerStringMap = new HashMap<>();
+        for(String s:playersMapping.keySet())
+            playerStringMap.put(s,playersMapping.get(s).name());
         json.put("PlayersMapping", playersMapping);
 
         return json + "\n";    // using the toString() on a JSONObject instead of using toJson

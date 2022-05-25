@@ -80,10 +80,10 @@ public abstract class GameOrchestrator extends Listenable {
         }
 
         gameBoard.fillClouds();
-        System.out.println("GAMEORHCESTRATOR NOTIFY: SETUP OF THE VIEW STATES");
-        Map<String, Tower> sendMap = new HashMap<>();
-        sendMap.putAll(this.playersTower);
         if(clients!=null&&modelListener!=null) {
+            System.out.println("GAMEORHCESTRATOR NOTIFY: SETUP OF THE VIEW STATES");
+            Map<String, Tower> sendMap = new HashMap<>();
+            sendMap.putAll(this.playersTower);
             notify(modelListener, MessageGenerator.setupUpdateMessage(sendMap, playersTower.size(), isExpert), clients);
             currentPhase = PhaseEnum.PLANNING;
             System.out.println("GAMEORHCESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));

@@ -41,8 +41,13 @@ public class ViewMessageParser {
                     view.setActiveView(false);
                 }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()){
-                Map<String, Tower> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
-                view.setViewState(players, json.get("isExpertMode").getAsBoolean());
+                Map<String, String> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
+                Map<String, Tower> playersWithTower = new HashMap<>();
+                for(String s:players.keySet()){
+                    playersWithTower.put(s,Tower.toTower(players.get(s)));
+                }
+
+                view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
             }
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {

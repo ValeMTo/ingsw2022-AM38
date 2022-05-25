@@ -30,6 +30,7 @@ public class ViewState {
     private GameSettings gameSettings;
     private Map<SpecialCardName,Integer> usableSpecialCards;
 
+    private String nickName = null;
 
     public ViewState(){
         isTheCommander = false;
@@ -42,13 +43,18 @@ public class ViewState {
         islands = new ArrayList<>();
         gameSettings=null;
     }
+    public ViewState(String nickname){
+        super();
+        this.nickName = nickname;
+    }
 
 
     public void setViewState(Map<String, Tower> players, boolean isExpert) {
         this.clouds = new HashMap<>();
         this.usableSpecialCards = new HashMap<>();
         this.usableCards = new ArrayList<Integer>();
-        this.players = new HashMap<>(players);
+        this.players = new HashMap<>();
+        this.players.putAll(players);
         this.isExpert = isExpert;
         activeView = true;
         currentPhase = PhaseEnum.PLANNING;
@@ -70,6 +76,8 @@ public class ViewState {
         motherNature = 1;
         for (int i = 1; i < 11; i++)
             usableCards.add(i);
+
+        playerTower = players.get(this.nickName);
     }
 
     public List<Integer> getUsableCards() {
@@ -82,6 +90,7 @@ public class ViewState {
                 return name;
             }
         }
+        System.out.println("VIEW STATE - GetNamePlayer - OH NO");
         return null;
     }
     public void setUsableCards(List<Integer> usableCards) {
