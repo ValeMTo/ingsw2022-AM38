@@ -82,8 +82,8 @@ public class GameOrchestratorTest {
      * @return a new GameOrchestrator created with given parameters
      */
     private GameOrchestrator setup(boolean threePlayers, boolean expert) {
-        if (expert) return new ExpertGameOrchestrator(getNicknames(threePlayers));
-        return new EasyGameOrchestrator(getNicknames(threePlayers));
+        if (expert) return new ExpertGameOrchestrator(getNicknames(threePlayers), 0, null);
+        return new EasyGameOrchestrator(getNicknames(threePlayers), 0, null);
     }
 
     /**

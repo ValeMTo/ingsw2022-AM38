@@ -85,8 +85,8 @@ public class ExpertGameOrchestratorTest {
      * @return the created ExpertGameOrchestrator containing the card an update after a certain amount of rounds
      */
     private GameOrchestrator doRoundsAndAssureCardContained(SpecialCardName specialCard, int numOfRounds) {
-        ExpertGameOrchestrator game = new ExpertGameOrchestrator(getNicknames(true));
-        while (!game.specialCards.contains(specialCard)) game = new ExpertGameOrchestrator(getNicknames(true));
+        ExpertGameOrchestrator game = new ExpertGameOrchestrator(getNicknames(true), 0, null);
+        while (!game.specialCards.contains(specialCard)) game = new ExpertGameOrchestrator(getNicknames(true), 0, null);
         int counter = 0;
         for (int i = 0; i < 8; i++) {
             GameOrchestratorTest.doAPlanningPhase(game);
@@ -136,7 +136,7 @@ public class ExpertGameOrchestratorTest {
     @EnumSource(SpecialCardName.class)
     @DisplayName("Use of the special card with the starting one coin")
     public void testUseSpecialCardOneCoin(SpecialCardName specialCard) {
-        ExpertGameOrchestrator game = new ExpertGameOrchestrator(getNicknames(true));
+        ExpertGameOrchestrator game = new ExpertGameOrchestrator(getNicknames(true), 0, null);
         GameOrchestratorTest.doAPlanningPhase(game);
         String json;
         JsonObject jsonObject;
