@@ -40,7 +40,7 @@ public class Lobby {
 
         queue.add(client);
         players.add(client.getNickName());
-        System.out.println("LOBBY - Adding new player (" + queue.size() + " of " + numOfPlayers + ")");
+        System.out.println("LOBBY - Adding new player named "+client.getNickName()+" (" + queue.size() + " of " + numOfPlayers + ")");
         //Creates a new GameOrchestrator and relatives messageParsers for the players
         synchronized (this) {
             if (queue.size() == numOfPlayers && queue.size() > 1) {

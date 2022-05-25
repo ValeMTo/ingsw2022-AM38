@@ -50,7 +50,7 @@ public abstract class GameOrchestrator extends Listenable {
         this.specialCardAlreadyUsed = false;
         this.studentMovesLeft = maxStudentMoves;
         for (int i = 0; i < players.size(); i++) {
-            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i);
+            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i+" "+players.get(i));
             planningOrder[i] = players.get(i);
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
@@ -80,8 +80,15 @@ public abstract class GameOrchestrator extends Listenable {
         }
 
         gameBoard.fillClouds();
-
+        System.out.println("GAMEORHCESTRATOR NOTIFY: SETUP OF THE VIEW STATES");
+        Map<String, Tower> sendMap = new HashMap<>();
+        sendMap.putAll(this.playersTower);
+        notify(modelListener,MessageGenerator.setupUpdateMessage(sendMap,playersTower.size(),isExpert),clients);
         currentPhase = PhaseEnum.PLANNING;
+        System.out.println("GAMEORHCESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER "+gameBoard.getPlayerTower(planningOrder[activePlayer]));
+        notify(modelListener,MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])),clients);
+        System.out.println("GAMEORHCESTRATOR NOTIFY: new phase"+currentPhase.name());
+        notify(modelListener,MessageGenerator.phaseUpdateMessage(currentPhase),clients);
     }
 
     /**

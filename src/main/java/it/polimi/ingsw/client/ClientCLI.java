@@ -60,27 +60,6 @@ public class ClientCLI {
      * Login phase of a new player.
      */
     public void login() {
-        // TODO: remove this things
-        this.viewState = new ViewState();
-        Map<String,Tower> mapPlayers = new HashMap<>();
-        mapPlayers.put("Nick",Tower.WHITE);
-        mapPlayers.put("Vale",Tower.BLACK);
-        mapPlayers.put("Fra",Tower.GRAY);
-
-        viewState.setViewState(mapPlayers,false);
-        viewState.setPlayerTower(Tower.WHITE);
-        Map<Color, Integer> mapOccupancy = new HashMap<>();
-        mapOccupancy.put(Color.BLUE,2);
-        viewState.setDiningRoomOccupancy(Tower.WHITE,mapOccupancy);
-        viewState.setDiningRoomOccupancy(Tower.BLACK,mapOccupancy);
-        viewState.setDiningRoomOccupancy(Tower.GRAY,mapOccupancy);
-        mapOccupancy.put(Color.YELLOW,4);
-        viewState.setSchoolEntranceOccupancy(Tower.GRAY,mapOccupancy);
-        Map<Color, Integer> dini = viewState.getDiningRoomOccupancy(Tower.WHITE);
-        printArchipelago();
-        printAssistantCards();
-        // Until here
-        printPlayerBoard();
         this.connectionSocket = createConnectionWithServer(hostName, portNumber);
         sendNickname();
         cleaner();

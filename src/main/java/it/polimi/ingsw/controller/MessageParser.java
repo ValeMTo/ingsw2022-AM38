@@ -84,7 +84,7 @@ public class MessageParser{
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()){
             if(json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_RULES_ANSWER.ordinal()) {
-                gameOrchestrator.nextStep();
+                Server.addPlayerInLobby(client);
                 return MessageGenerator.okMessage();
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.REFUSE_RULES_ANSWER.ordinal()){
                 client.disconnectionManager();

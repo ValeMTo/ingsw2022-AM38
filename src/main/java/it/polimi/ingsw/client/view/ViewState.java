@@ -32,7 +32,7 @@ public class ViewState {
         this.players = new HashMap<>();
         this.isExpert = false;
         activeView = true;
-        currentPhase = PhaseEnum.PLANNING;
+        currentPhase = PhaseEnum.CREATING_GAME;
         professors = new HashMap<>();
         islands = new ArrayList<>();
         gameSettings=null;
@@ -103,11 +103,16 @@ public class ViewState {
     }
 
     public PhaseEnum getCurrentPhase() {
-        return currentPhase;
+        synchronized (this) {
+            return this.currentPhase;
+        }
     }
 
     public void setCurrentPhase(PhaseEnum currentPhase) {
-        this.currentPhase = currentPhase;
+        synchronized (this) {
+            System.out.println("VIEW - Changing phase from: "+this.currentPhase+" to: "+currentPhase);
+            this.currentPhase = currentPhase;
+        }
     }
 
     public boolean isActiveView() {
