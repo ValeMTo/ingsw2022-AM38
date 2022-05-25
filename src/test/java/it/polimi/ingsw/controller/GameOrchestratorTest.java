@@ -17,37 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameOrchestratorTest {
     /**
-     * Needed to have a list of nicknames for the GameOrchestrator constructor
-     *
-     * @param threePlayers indicates if three or two players are needed into the list
-     * @return the List containing the nicknames of the players
-     */
-    private List<String> getNicknames(boolean threePlayers) {
-        List<String> nicknames = new ArrayList<>();
-        nicknames.add("Fra");
-        nicknames.add("Vale");
-        if (threePlayers) nicknames.add("Nick");
-        return nicknames;
-    }
-
-    /**
-     * Creates the GameOrchestrator with given setup parameters
-     *
-     * @param threePlayers : if three players or if false 2 players
-     * @param expert       : if expert gameMode or if false easy
-     * @return a new GameOrchestrator created with given parameters
-     */
-    private GameOrchestrator setup(boolean threePlayers, boolean expert) {
-        if (expert) return new ExpertGameOrchestrator(getNicknames(threePlayers), 5, null);
-        return new EasyGameOrchestrator(getNicknames(threePlayers), 5, null);
-    }
-
-    /**
      * Do a planning turn, plays some assistant cards
      *
      * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
      */
-    private void doAPlanningPhase(GameOrchestrator game) {
+    static void doAPlanningPhase(GameOrchestrator game) {
         Random random = new Random();
         int card;
         while (game.getCurrentPhase() == PhaseEnum.PLANNING) {
@@ -74,7 +48,7 @@ public class GameOrchestratorTest {
      *
      * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
      */
-    private void doAMoveStudents(GameOrchestrator game) {
+    static void doAMoveStudents(GameOrchestrator game) {
         Random random = new Random();
         while (game.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
             try {
@@ -86,20 +60,46 @@ public class GameOrchestratorTest {
         }
     }
 
+    /**
+     * Needed to have a list of nicknames for the GameOrchestrator constructor
+     *
+     * @param threePlayers indicates if three or two players are needed into the list
+     * @return the List containing the nicknames of the players
+     */
+    private List<String> getNicknames(boolean threePlayers) {
+        List<String> nicknames = new ArrayList<>();
+        nicknames.add("Fra");
+        nicknames.add("Vale");
+        if (threePlayers) nicknames.add("Nick");
+        return nicknames;
+    }
+
+    /**
+     * Creates the GameOrchestrator with given setup parameters
+     *
+     * @param threePlayers : if three players or if false 2 players
+     * @param expert       : if expert gameMode or if false easy
+     * @return a new GameOrchestrator created with given parameters
+     */
+    private GameOrchestrator setup(boolean threePlayers, boolean expert) {
+        if (expert) return new ExpertGameOrchestrator(getNicknames(threePlayers));
+        return new EasyGameOrchestrator(getNicknames(threePlayers));
+    }
 
     /**
      * Does a random movement of motherNature
      *
      * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
      */
-    private void doAMoveMotherNature(GameOrchestrator game) {
+    public void doAMoveMotherNature(GameOrchestrator game) {
         Random random = new Random();
-        int max = 12;
+        int max = 12, position = 0;
         while (game.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
             try {
-                game.moveMotherNature(random.nextInt(max));
+                position = random.nextInt(max) + 1;
+                game.moveMotherNature(position);
             } catch (IslandOutOfBoundException exc) {
-                System.out.println("GOT ISLAND OUT OF BOUND");
+                System.out.println("GOT ISLAND OUT OF BOUND: " + position + " is out of bound, min is " + exc.getLowerBound() + " max is " + exc.getHigherBound());
                 max = exc.getHigherBound();
             } catch (IncorrectPhaseException exc) {
                 exc.printStackTrace();
@@ -112,7 +112,7 @@ public class GameOrchestratorTest {
      *
      * @param game : GameOrchestrator that we want to evolve to the phase MoveStudent after the planning
      */
-    private void doARound(GameOrchestrator game) {
+    public void doARound(GameOrchestrator game) {
         doAPlanningPhase(game);
         int counter = 0;
         while (PhaseEnum.PLANNING != game.getCurrentPhase() && PhaseEnum.END != game.getCurrentPhase()) {
@@ -338,7 +338,7 @@ public class GameOrchestratorTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.doAMoveStudents(game);
+        doAMoveStudents(game);
         assertDoesNotThrow(() -> game.moveMotherNature(3));
         assertEquals(PhaseEnum.ACTION_CHOOSE_CLOUD, game.getCurrentPhase());
     }
@@ -356,7 +356,7 @@ public class GameOrchestratorTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.doAMoveStudents(game);
+        doAMoveStudents(game);
         try {
             assertFalse(game.moveMotherNature(10));
         } catch (Exception exc) {

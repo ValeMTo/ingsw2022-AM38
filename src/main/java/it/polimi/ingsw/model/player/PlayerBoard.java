@@ -49,7 +49,7 @@ public class PlayerBoard {
         this.towers = numTowers;
         this.numTowersLimit = numTowers;
         this.towerColor = towerColor;
-        this.coin = 0;
+        this.coin = 1;
     }
 
 

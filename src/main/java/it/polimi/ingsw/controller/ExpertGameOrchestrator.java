@@ -22,15 +22,15 @@ import java.util.Set;
  */
 public class ExpertGameOrchestrator extends GameOrchestrator {
 
-    private SpecialCard[] specialCardsArray;
-    private Set<SpecialCardName> specialCards;
-    private SpecialCardRequiredAction expectingPhase;
-    private SpecialCardName activatedSpecialCard;
-    private int numberOfUsedInteractions;
-    private PhaseEnum oldPhase;
+    protected SpecialCard[] specialCardsArray;
+    protected Set<SpecialCardName> specialCards;
+    protected SpecialCardRequiredAction expectingPhase;
+    protected SpecialCardName activatedSpecialCard;
+    protected int numberOfUsedInteractions;
+    protected PhaseEnum oldPhase;
 
     // Color that we have removed from a card or other place and that we are waiting to locate.
-    private Color pendingColor;
+    protected Color pendingColor;
 
     public ExpertGameOrchestrator(List<String> players, int id, List<ClientHandler> clients) {
         super(players, true, id, clients);
@@ -39,6 +39,29 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
             this.specialCards = new HashSet<>(gameBoard.getSetOfSpecialCardNames());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        // Fills the special cards with students if they have any
+        for(int i=0;i<specialCardsArray.length;i++) {
+            boolean flag = false;
+            Color drawnColor = null;
+            do {
+                try {
+                    specialCardsArray[i].countStudents();
+                    drawnColor = gameBoard.drawFromBag();
+                    flag = gameBoard.addStudent(StudentCounter.CARD, drawnColor,i);
+                    // If the student cannot be added to the bag is added back to it
+                    if(!flag)
+                        gameBoard.addStudent(StudentCounter.BAG,drawnColor);
+                }
+                // If the count is not implemented is because it cannot contain students
+                catch (FunctionNotImplementedException e)
+                {
+                    flag = true;
+                }
+                catch (LocationNotAllowedException e){
+                    e.printStackTrace();
+                }
+            }while(!flag);
         }
     }
 
@@ -90,11 +113,11 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_SPECIAL_CARD, "ERROR - no such specialCard");
                 }
                 numberOfUsedInteractions = 0;
-                Integer cost = null;
                 // Case it is not possible to pay for the card use
-                if (!gameBoard.getSpecialCardCost(convertedName, cost)) {
+                if (gameBoard.getSpecialCardCost(convertedName)==null) {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_SPECIAL_CARD, "ERROR - no such specialCard");
                 }
+                Integer cost = gameBoard.getSpecialCardCost(convertedName);
                 if (!gameBoard.paySpecialCard(cost)) {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_ENOUGH_COINS, "ERROR - not enought coin to activate this special card");
                 }
@@ -114,7 +137,12 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         this.gameBoard.professorsUpdateTieEffect();
                         resetPhase();
                         return MessageGenerator.okMessage();
-                    case HERALD, ARCHER:
+                    case ARCHER:
+                        this.specialCardAlreadyUsed = true;
+                        this.gameBoard.disableTowerInfluence();
+                        resetPhase();
+                        return MessageGenerator.okMessage();
+                    case HERALD:
                         this.specialCardAlreadyUsed = true;
                         this.expectingPhase = SpecialCardRequiredAction.CHOOSE_ISLAND;
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_ISLAND, false);
@@ -146,10 +174,11 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, false);
                 }
             } catch (Exception e) {
-                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - Error during the special card usage");
+                e.printStackTrace();
+                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - Error during the special card usage "+e.toString());
             }
         }
-        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_SPECIAL_CARD, "ERROR - wrong name used");
+        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_SPECIAL_CARD, "ERROR - wrong name used ");
     }
 
     /**
@@ -157,7 +186,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
      */
     private Integer getPositionSpecialCard() {
         for (int i = 0; i < specialCardsArray.length; i++)
-            if (specialCardsArray[i].equals(activatedSpecialCard)) return i;
+            if (specialCardsArray[i].getName().equals(activatedSpecialCard)) return i;
         return null;
     }
 
@@ -315,9 +344,11 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         resetPhase();
                         return MessageGenerator.okMessage();
                 }
-            } catch (IslandOutOfBoundException exc) {
-                return MessageGenerator.errorInvalidInputMessage("ERROR - Island out of bound", exc.getLowerBound(), exc.getHigherBound());
-            } catch (LocationNotAllowedException exc) {
+            }
+            catch (IslandOutOfBoundException exc){
+                return MessageGenerator.errorIslandOutOfBoundInputMessage("ERROR - Island out of bound",exc.getLowerBound(),exc.getHigherBound());
+            }
+            catch (LocationNotAllowedException exc){
                 exc.printStackTrace();
             }
         }

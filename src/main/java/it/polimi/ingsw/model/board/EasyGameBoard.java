@@ -174,7 +174,7 @@ public class EasyGameBoard extends GameBoard {
      * Not usable in easy mode
      *
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
-     */ public boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException {
+     */ public Integer getSpecialCardCost(SpecialCardName specialCardName) throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     }
 
