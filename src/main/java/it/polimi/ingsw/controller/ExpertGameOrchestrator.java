@@ -261,7 +261,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             }
                             pendingColor = color;
                             this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM;
-                            return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM, false);
+                            return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM, true);
                         } else {
                             // If the phase requires to remove the player from the Dining Room and place the selected.
                             if (!gameBoard.removeStudent(StudentCounter.DININGROOM, color)) {

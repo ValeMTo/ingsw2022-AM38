@@ -2,8 +2,10 @@ package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.GameSettings;
 import it.polimi.ingsw.controller.PhaseEnum;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.*;
 
@@ -24,6 +26,7 @@ public class ViewState {
     private int motherNature;
     private boolean isEndOfMatch = false;
     private GameSettings gameSettings;
+    private Map<SpecialCardName,Integer> usableSpecialCards;
 
 
     public ViewState(){
@@ -40,6 +43,7 @@ public class ViewState {
 
 
     public void setViewState(Map<String, Tower> players, boolean isExpert) {
+        this.usableSpecialCards = new HashMap<>();
         this.usableCards = new ArrayList<Integer>();
         this.players = new HashMap<>(players);
         this.isExpert = isExpert;
@@ -192,6 +196,31 @@ public class ViewState {
 
         findSchoolBoard(player).setLastAssistantCardUsed(numCard);
 
+    }
+
+    public boolean isExpert(){
+        return this.isExpert;
+    }
+
+    /**
+     * Sets the specialCard of this particular game
+     * @param specialCard : the list of names of the usable special cards
+     */
+    public void setUsableSpecialCard(Map<SpecialCardName,Integer> specialCard){
+        if(usableSpecialCards!=null)
+            this.usableSpecialCards.clear();
+        this.usableSpecialCards.putAll(specialCard);
+    }
+
+    /**
+     * Returns a copy of the special card of this game,
+     * @return : the map with the special card name and its cost (Integer)
+     */
+    public Map<SpecialCardName,Integer> getUsableSpecialCards() throws FunctionNotImplementedException {
+        if(!isExpert) throw new FunctionNotImplementedException("VIEW STATE - ERROR - Function for expert game mode only");
+        Map<SpecialCardName,Integer> returnList = new HashMap<>();
+        returnList.putAll(this.usableSpecialCards);
+        return returnList;
     }
 
     public GameSettings getGameSettings(){

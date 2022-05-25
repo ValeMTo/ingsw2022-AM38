@@ -1,12 +1,20 @@
 package it.polimi.ingsw.client;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.*;
 
@@ -350,27 +358,53 @@ public class ClientCLI {
     }
 
     /**
-     * Prints the usable special cards
+     * Prints the usable special cards with their texts, does not print anything if it is easy game mode
      */
     private void printSpecialCards() {
-        System.out.println(CLIBlack + " - Special cards - "+CLIEffectReset);
-        String[] rows = new String[3];
-        for (int i = 0; i < 7; i++)
-            rows[i] = "";
-        for (Integer i : viewState.getUsableCards()) {
+        if(viewState.isExpert()) {
+            Gson parser = new Gson();
+            try {
+                JsonObject json = parser.fromJson(new FileReader("src/main/resources/json/SpecialCardsEffectsDescription.json"),JsonObject.class);
+                System.out.println(CLIBlack + "         - Special cards - \n" + CLIEffectReset);
+                String[] rows = new String[6];
+                for (int i = 0; i < 6; i++)
+                    rows[i] = "";
+                for (SpecialCardName specialCardName : viewState.getUsableSpecialCards().keySet()) {
 
-            rows[0] += "  ┌─────────────┐ ";
-            if (i >= 10)
-                rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + " │ ";
-            else
-                rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + "  │ ";
-            rows[3] += "  │ " + CLIGreen + "Steps:" + CLIEffectReset  + "     │ ";
-            for (int j = 2; j < 6; j++)
-                if (j != 3)
-                    rows[j] += "  │             │ ";
-            rows[6] += "  └─────────────┘ ";
+                    rows[0] += "  ┌─────────────┐ ";
+                    rows[1] += "  │ " + CLIRed + specialCardName.name() + CLIEffectReset;
+                    for (int i = specialCardName.name().length(); i < 12; i++)
+                        rows[1] += " ";
+                    rows[1] += "│ ";
+
+                    rows[3] += "  │ " + CLIGreen + "Cost: " + viewState.getUsableSpecialCards().get(specialCardName)+ CLIEffectReset + "     │ ";
+                    for (int j = 2; j < 5; j++)
+                        if (j != 3)
+                            rows[j] += "  │             │ ";
+                    rows[5] += "  └─────────────┘ ";
+                    if(json.get(specialCardName.name())!=null) {
+                        List<String> message = parser.fromJson(json.get(specialCardName.name()),List.class);
+                        int maxWordPerRow = 150;
+                        // Set the message on the right of the special card
+                        if (message != null) {
+                            for (int i = 0; i < 5&&i<message.size(); i++) {
+                                rows[i+1] += message.get(i);
+                            }
+                        }
+                    }
+                }
+
+            printVector(rows);
+            }
+            catch (FileNotFoundException exc){
+                exc.printStackTrace(); }
+            catch (FunctionNotImplementedException exc) {
+                System.out.println(CLIPink + "EXCEPTION : The print of the special cards is for expert game mode only!" + CLIEffectReset);
+            }
         }
-        printVector(rows);
+        else{
+            System.out.println(CLIPink+"NO SPECIAL CARDS FOR EASY GAME MODE"+CLIEffectReset);
+        }
     }
 
     private void printArchipelago() {
