@@ -23,7 +23,7 @@ public class homeMenuController implements GUIController  {
         alert.setHeaderText("Do you want to start a new game ?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            gui.changeStage("loginMenu.fxml");
+            gui.setNextStage("loginMenu.fxml");
         }
     }
 
@@ -41,10 +41,18 @@ public class homeMenuController implements GUIController  {
 
 
     @Override
-    public void initGUI(MainGUI gui) {
+    public void setGuiToController(MainGUI gui) {
         this.gui = gui;
     }
 
+    @Override
+    public void showErrorAlert(String errorTitle, String errorString) {
+        Alert errorWindow = new Alert(Alert.AlertType.ERROR);
+        errorWindow.setTitle("Error");
+        errorWindow.setHeaderText(errorTitle);
+        errorWindow.setContentText(errorString);
+        errorWindow.showAndWait();
+    }
 
 
 }

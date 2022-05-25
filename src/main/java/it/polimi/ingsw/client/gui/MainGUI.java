@@ -28,7 +28,7 @@ public class MainGUI extends Application {
     public static final String HOME_SCENE = "homeMenu.fxml";
     public static final String LOGIN_SCENE = "loginMenu.fxml";
 
-    //private final ViewState viewState;
+    private final ViewState viewState;
     private Stage primaryStage;
     private Scene currentScene;
 
@@ -36,13 +36,14 @@ public class MainGUI extends Application {
     private final HashMap<String, GUIController> guiControllersMap = new HashMap<>();
 
     private final Logger logger = Logger.getLogger(getClass().getName());
-
+    private boolean isRunning;
 
     /**
      * MainGUI  default constructor
      */
     public MainGUI() {
-        // this.viewState = new ViewState()
+        this.isRunning = true;
+        this.viewState = new ViewState();
     }
 
 
@@ -81,19 +82,24 @@ public class MainGUI extends Application {
 
 
     /**
-     * Fills the two maps (for the scenes and for their controllers, linking them to the fxml files), then  loads the HOME_MENU scene
+     * Fills the two maps (for the scenes and for their controllers, linking them to the fxml files), then  loads the
+     * HOME_MENU scene, which is the first scene to be displayed.
      *
      */
     public void loadScenes() {
 
-        List<String> fxmlScenes = new ArrayList<>(Arrays.asList(HOME_SCENE, LOGIN_SCENE));
+        List<String> fxmlScenes = new ArrayList<String>();
+
+        fxmlScenes.add(HOME_SCENE);
+        fxmlScenes.add(LOGIN_SCENE);
+
         try {
             for (String fxmlName : fxmlScenes) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui_fxml/" + fxmlName));
                 Scene loadedScene = new Scene(loader.load());
                 guiScenesMap.put(fxmlName, loadedScene);
                 GUIController guiController = loader.getController();
-                guiController.initGUI(this);
+                guiController.setGuiToController(this);
                 guiControllersMap.put(fxmlName, guiController);
             }
         } catch (IOException e) {
@@ -107,7 +113,7 @@ public class MainGUI extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui_fxml/" + fxmlHomeMenu));
             currentScene = new Scene(loader.load());
             GUIController guiController = loader.getController();
-            guiController.initGUI(this);
+            guiController.setGuiToController(this);
 
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
@@ -123,7 +129,7 @@ public class MainGUI extends Application {
      * @param newScene : the new scene that has to be displayed
      *
      */
-    public void changeStage(String newScene) {
+    public void setNextStage(String newScene) {
         currentScene = guiScenesMap.get(newScene);
         primaryStage.setScene(currentScene);
         primaryStage.setResizable(false);
@@ -131,5 +137,8 @@ public class MainGUI extends Application {
     }
 
 
+    public ViewState getViewState() {
+        return viewState;
+    }
 
 }
