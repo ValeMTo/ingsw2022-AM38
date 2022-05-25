@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.GameSettings;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
@@ -15,6 +16,7 @@ import java.util.*;
 public class ViewState {
     private Map<String, Tower> players;
     private List<IslandView> islands;
+    private Map<Cloud, Integer> clouds;
     private List<SchoolBoardState> schoolBoards;
     private boolean isExpert;
     private boolean isTheCommander;
@@ -43,6 +45,7 @@ public class ViewState {
 
 
     public void setViewState(Map<String, Tower> players, boolean isExpert) {
+        this.clouds = new HashMap<>();
         this.usableSpecialCards = new HashMap<>();
         this.usableCards = new ArrayList<Integer>();
         this.players = new HashMap<>(players);
@@ -223,6 +226,24 @@ public class ViewState {
         return returnList;
     }
 
+    /**
+     * Set the clouds with their own positions
+     * @param clouds : the Map with the clouds and their position
+     */
+    public void setCloud(Map<Cloud,Integer> clouds){
+        this.clouds.clear();
+        this.clouds.putAll(clouds);
+    }
+
+    /**
+     * Return the clouds stored into the ViewState
+     * @return the map with the clouds and their respective positions
+     */
+    public Map<Cloud,Integer> getClouds(){
+        Map<Cloud,Integer> returnMap = new HashMap<>();
+        returnMap.putAll(this.clouds);
+        return returnMap;
+    }
     public GameSettings getGameSettings(){
         return gameSettings;
     }

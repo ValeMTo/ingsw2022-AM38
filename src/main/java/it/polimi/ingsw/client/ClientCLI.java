@@ -8,6 +8,7 @@ import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.MessageGenerator;
+import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
@@ -370,7 +371,8 @@ public class ClientCLI {
                 for (int i = 0; i < 6; i++)
                     rows[i] = "";
                 for (SpecialCardName specialCardName : viewState.getUsableSpecialCards().keySet()) {
-
+                    for (int i = 0; i < 6; i++)
+                        rows[i] = "";
                     rows[0] += "  ┌─────────────┐ ";
                     rows[1] += "  │ " + CLIRed + specialCardName.name() + CLIEffectReset;
                     for (int i = specialCardName.name().length(); i < 12; i++)
@@ -392,9 +394,8 @@ public class ClientCLI {
                             }
                         }
                     }
+                    printVector(rows);
                 }
-
-            printVector(rows);
             }
             catch (FileNotFoundException exc){
                 exc.printStackTrace(); }
@@ -405,6 +406,36 @@ public class ClientCLI {
         else{
             System.out.println(CLIPink+"NO SPECIAL CARDS FOR EASY GAME MODE"+CLIEffectReset);
         }
+    }
+
+    private void printClouds(){
+        System.out.println(CLIBlack + "         - Clouds - \n" + CLIEffectReset);
+        String[] rows = new String[8];
+        for (int i = 0; i < 8; i++)
+            rows[i] = "";
+        Map<Cloud,Integer> clouds = viewState.getClouds();
+        for(Cloud cloud: clouds.keySet()){
+            rows[0] += " " + CLICyan + "    Position : " + clouds.get(cloud) + CLIEffectReset + "     .";
+            rows[1] += "      ░░░░░░░░░░      .";
+            int counter=0;
+            rows[2] += "     ░";
+            rows[3] += "   ░░░";
+            rows[4] += " ░░░░░";
+            rows[5] += "   ░░░";
+            rows[6] += "     ░";
+
+            for(Color color:Color.values()) {
+                rows[2+counter] += "░ " + getColorAbbreviationWithInitialAnsiiCode(color) + ":"+cloud.countStudent(color)+CLIEffectReset+" "+createCubesString(color,cloud.countStudent(color),4)+CLIEffectReset+"";
+                counter++;
+            }
+            rows[2] += "░     .";
+            rows[3] += "░░░   .";
+            rows[4] += "░░░░░ .";
+            rows[5] += "░░░   .";
+            rows[6] += "░     .";
+            rows[7] += "      ░░░░░░░░░░      .";
+        }
+        printVector(rows);
     }
 
     private void printArchipelago() {
@@ -453,9 +484,9 @@ public class ClientCLI {
         }
     }
 
-    private String createCubesString(Color color, int number){
+    private String createCubesString(Color color, int number,int max){
         String cubes ="";
-        for(int i =10;i>=1;i--){
+        for(int i =max;i>=1;i--){
             if(i<=number){
                 cubes += getAnsiStringFromColor(color)+"¤"+CLIEffectReset;
             }
@@ -512,31 +543,31 @@ public class ClientCLI {
             rows[4] += "  "+effectSchoolBoard+"│     " + CLIBlue + "BLUE" + CLIEffectReset + "   ";
             else
             rows[4] += "  "+effectSchoolBoard+"│            ";
-            rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE)) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
+            rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE),10) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
             rows[5] += effectSchoolBoard+"  │     " + CLIGreen + "GREEN" + CLIEffectReset + "  ";
             else
             rows[5] += effectSchoolBoard+"  │            ";
-            rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN)) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
+            rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN),10) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
                 rows[6] += effectSchoolBoard+"  │    " + CLIYellow + "YELLOW" + CLIEffectReset + "  ";
             else
                 rows[6] +=effectSchoolBoard+ "  │            ";
-            rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
+            rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW),10) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
                 rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK" + CLIEffectReset + "  ";
             else
                 rows[7] += effectSchoolBoard+"  │            ";
-            rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK)) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
+            rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK),10) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
                 rows[8] += effectSchoolBoard+"  │    " + CLIRed + "Red" + CLIEffectReset + "  ";
             else
                 rows[8] += effectSchoolBoard+"  │            ";
-            rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED)) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
+            rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED),10) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
             rows[9] += effectSchoolBoard+"  └────────────┴────────────────┴─────────────────┘  "+CLIEffectReset;
 
         }
@@ -592,6 +623,22 @@ public class ClientCLI {
                 return "BK";
             case GRAY:
                 return "GR";
+        }
+        return "";
+    }
+
+    private String getColorAbbreviationWithInitialAnsiiCode(Color color) {
+        switch (color) {
+            case BLUE:
+                return CLIBlue+"B";
+            case GREEN:
+                return CLIGreen+"G";
+            case YELLOW:
+                return CLIYellow+"Y";
+            case PINK:
+                return CLIPink+"P";
+            case RED:
+                return CLIRed+"R";
         }
         return "";
     }

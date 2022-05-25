@@ -66,6 +66,7 @@ public class Lobby {
     public MessageParser getMessageParser(ClientHandler client){
         for (MessageParser parser : messageParsers){
             if (parser.getName().equals(client.getNickName())){
+                queue.remove(client);
                 return parser;
             }
         }
