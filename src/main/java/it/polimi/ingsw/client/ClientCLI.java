@@ -47,8 +47,7 @@ public class ClientCLI {
         in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
         this.isRunning = true;
-        viewState = new ViewState(this.nickname);
-
+        viewState = new ViewState();
 
     }
 
@@ -72,6 +71,7 @@ public class ClientCLI {
     public void login() {
         this.connectionSocket = createConnectionWithServer(hostName, portNumber);
         sendNickname();
+        viewState.setNamePlayer(this.nickname);
         cleaner();
         connectionSocket.isTheFirst();
 
@@ -239,7 +239,7 @@ public class ClientCLI {
      */
     private void sendNickname() {
         boolean confirmation = false;
-        String nickname = null;
+        nickname = null;
         while (!confirmation) {
             System.out.println(">Insert your nickname: ");
             nickname = in.nextLine();

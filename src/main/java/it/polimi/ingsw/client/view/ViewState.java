@@ -50,6 +50,9 @@ public class ViewState {
 
 
     public void setViewState(Map<String, Tower> players, boolean isExpert) {
+        for(String player:players.keySet())
+            System.out.println("VIEW STATE - ADDING PLAYERS - Player "+player+" with tower "+players.get(player));
+
         this.clouds = new HashMap<>();
         this.usableSpecialCards = new HashMap<>();
         this.usableCards = new ArrayList<Integer>();
@@ -84,7 +87,11 @@ public class ViewState {
         return new ArrayList<Integer>(usableCards);
     }
 
+    public void setNamePlayer(String nickname){
+        this.nickName = nickname;
+    }
     public String getNamePlayer(Tower towerPlayer){
+        System.out.println("VIEW STATE - Requested tower player "+towerPlayer);
         for (String name : players.keySet()){
             if (players.get(name).equals(towerPlayer)){
                 return name;

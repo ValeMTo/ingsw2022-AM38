@@ -35,7 +35,8 @@ public class ViewMessageParser {
                 Tower tower = Tower.toTower(json.get("PlayerTower").getAsString());
                 view.useAssistantCard(tower, json.get("LastUsed").getAsInt());
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
-                if (view.getNamePlayer(view.getPlayerTower()).equals(json.get("CurrentPlayer").getAsString())) {
+                System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower "+json.get("CurrentPlayer").getAsString());
+                if (view.getNamePlayer(view.getPlayerTower()).equalsIgnoreCase(json.get("CurrentPlayer").getAsString())) {
                     view.setActiveView(true);
                 } else {
                     view.setActiveView(false);

@@ -88,7 +88,7 @@ public abstract class GameOrchestrator extends Listenable {
             currentPhase = PhaseEnum.PLANNING;
             System.out.println("GAMEORHCESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
             notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
-            System.out.println("GAMEORHCESTRATOR NOTIFY: new phase" + currentPhase.name());
+            System.out.println("GAMEORHCESTRATOR NOTIFY: new phase " + currentPhase.name());
             notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
         }
         currentPhase = PhaseEnum.PLANNING;
