@@ -75,6 +75,7 @@ public abstract class GameOrchestrator extends Listenable {
                     gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
                 }
             }
+            gameBoard.setListenerAndClients(modelListener,clients);
         } catch (Exception exc) {
             exc.printStackTrace();
         }

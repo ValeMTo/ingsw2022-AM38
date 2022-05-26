@@ -1,10 +1,12 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Cloud {
+public class Cloud extends Listenable {
     private final int studentLimit;
     private Map<Color, Integer> counter;
 
@@ -54,6 +56,24 @@ public class Cloud {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns a copy of the student's map
+     * @return a copy of the student's map
+     */
+    public Map<Color, Integer> getStudents(){
+        Map<Color,Integer> returnMap = new HashMap<>();
+        returnMap.putAll(this.counter);
+        return returnMap;
+    }
+
+    /**
+     * Returns the limit of students
+     * @return the limit of students
+     */
+    public int getLimit(){
+        return this.studentLimit;
     }
 
     /**

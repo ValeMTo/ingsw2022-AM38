@@ -62,10 +62,21 @@ public abstract class GameBoard extends Listenable {
      * @param modelListener : the modelListener
      * @param clients : the clients to notify
      */
-    public void setListenerAndClients(ModelListener modelListener, List<ClientHandler> clients){
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
         this.modelListener = modelListener;
         this.clients = new ArrayList<>();
         this.clients.addAll(clients);
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("GAME BOARD - notify the archipelago");
+            notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
+            System.out.println("GAME BOARD - notify the archipelago");
+            for(int i=0;i<clouds.length;i++)
+            notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
+            for(Island island:islands)
+                island.setListenerAndClients(modelListener,clients);
+
+        }
+
     }
 
     /**
