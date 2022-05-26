@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.client.view.ViewState;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.messages.AnswerTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.MessageTypeEnum;
@@ -36,6 +37,7 @@ public class ViewMessageParser {
                 view.useAssistantCard(tower, json.get("LastUsed").getAsInt());
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
                 System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower "+json.get("CurrentPlayer").getAsString());
+                view.setActivePlayer(Tower.toTower(json.get("CurrentPlayer").getAsString()));
                 if (view.getNamePlayer(view.getPlayerTower()).equalsIgnoreCase(json.get("CurrentPlayer").getAsString())) {
                     view.setActiveView(true);
                 } else {
@@ -49,6 +51,11 @@ public class ViewMessageParser {
                 }
 
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
+            }
+
+            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal())
+            {
+                view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
             }
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {

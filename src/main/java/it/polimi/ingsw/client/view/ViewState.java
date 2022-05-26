@@ -32,12 +32,14 @@ public class ViewState {
 
     private String nickName = null;
 
+    private Tower activePlayer;
+
     public ViewState(){
         isTheCommander = false;
         this.usableCards = new ArrayList<Integer>();
         this.players = new HashMap<>();
         this.isExpert = false;
-        activeView = true;
+        activeView = false;
         currentPhase = PhaseEnum.CREATING_GAME;
         professors = new HashMap<>();
         islands = new ArrayList<>();
@@ -49,7 +51,7 @@ public class ViewState {
     }
 
 
-    public void setViewState(Map<String, Tower> players, boolean isExpert) {
+    public synchronized void setViewState(Map<String, Tower> players, boolean isExpert) {
         for(String player:players.keySet())
             System.out.println("VIEW STATE - ADDING PLAYERS - Player "+player+" with tower "+players.get(player));
 
@@ -60,7 +62,7 @@ public class ViewState {
         this.players.putAll(players);
         this.isExpert = isExpert;
         activeView = true;
-        currentPhase = PhaseEnum.PLANNING;
+        currentPhase = PhaseEnum.CREATING_GAME;
         professors = new HashMap<>();
         islands = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
@@ -83,14 +85,29 @@ public class ViewState {
         playerTower = players.get(this.nickName);
     }
 
-    public List<Integer> getUsableCards() {
+    /**
+     * Sets the active player
+     * @param activePlayer : the active player to set
+     */
+    public synchronized void setActivePlayer(Tower activePlayer){
+        this.activePlayer = activePlayer;
+    }
+
+    /**
+     * Returns the active player
+     * @return the tower of the active player
+     */
+    public synchronized Tower getActivePlayer(){
+        return this.getPlayerTower();
+    }
+    public synchronized List<Integer> getUsableCards() {
         return new ArrayList<Integer>(usableCards);
     }
 
     public void setNamePlayer(String nickname){
         this.nickName = nickname;
     }
-    public String getNamePlayer(Tower towerPlayer){
+    public synchronized String getNamePlayer(Tower towerPlayer){
         System.out.println("VIEW STATE - Requested tower player "+towerPlayer);
         for (String name : players.keySet()){
             if (players.get(name).equals(towerPlayer)){
@@ -100,24 +117,24 @@ public class ViewState {
         System.out.println("VIEW STATE - GetNamePlayer - OH NO");
         return null;
     }
-    public void setUsableCards(List<Integer> usableCards) {
+    public synchronized void setUsableCards(List<Integer> usableCards) {
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
 
     }
-    public void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
+    public synchronized void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
     }
 
-    public boolean isEndOfMatch() {
+    public synchronized boolean isEndOfMatch() {
         return isEndOfMatch;
     }
 
-    public void setEndOfMatch(boolean endOfMatch) {
+    public synchronized void setEndOfMatch(boolean endOfMatch) {
         isEndOfMatch = endOfMatch;
     }
 
-    public Map<Color, Tower> getProfessors() {
+    public synchronized Map<Color, Tower> getProfessors() {
         return new HashMap<>(professors);
     }
 
@@ -125,36 +142,40 @@ public class ViewState {
         this.professors = new HashMap<>(professors);
     }
 
-    public PhaseEnum getCurrentPhase() {
+    public synchronized PhaseEnum getCurrentPhase() {
         synchronized (this) {
             return this.currentPhase;
         }
     }
 
-    public void setCurrentPhase(PhaseEnum currentPhase) {
+    public synchronized void setCurrentPhase(PhaseEnum currentPhase) {
         synchronized (this) {
             System.out.println("VIEW - Changing phase from: "+this.currentPhase+" to: "+currentPhase);
             this.currentPhase = currentPhase;
+            if(this.activePlayer.equals(this.playerTower))
+                this.activeView = true;
+            else
+                this.activeView = false;
         }
     }
 
-    public boolean isActiveView() {
+    public synchronized boolean isActiveView() {
         return activeView;
     }
 
-    public void setActiveView(boolean activeView) {
+    public synchronized void setActiveView(boolean activeView) {
         this.activeView = activeView;
     }
 
-    public int getMotherNature() {
+    public synchronized int getMotherNature() {
         return motherNature;
     }
 
-    public void setMotherNature(int motherNature) {
+    public synchronized void setMotherNature(int motherNature) {
         this.motherNature = motherNature;
     }
 
-    public List<IslandView> getIslands() {
+    public synchronized List<IslandView> getIslands() {
         return new ArrayList<>(islands);
     }
 

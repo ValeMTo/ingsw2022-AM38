@@ -7,5 +7,5 @@ public enum PhaseEnum{
     ACTION_MOVE_MOTHER_NATURE,
     ACTION_CHOOSE_CLOUD,
     SPECIAL_CARD_USAGE,
-    END
+    END;
 }

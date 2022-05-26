@@ -703,6 +703,7 @@ public class MessageGenerator {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.PHASE_UPDATE.ordinal());
+        json.put("CurrentPhase",phase.ordinal());
         return json + "\n";
     }
 

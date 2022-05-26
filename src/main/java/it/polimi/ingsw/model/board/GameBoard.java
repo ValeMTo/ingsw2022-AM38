@@ -1,13 +1,20 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.ModelListener;
 import it.polimi.ingsw.exceptions.*;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.player.PlayerBoard;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
-public abstract class GameBoard {
+public abstract class GameBoard extends Listenable {
+    private Listener modelListener;
+    private List<ClientHandler> clients = null;
     protected final int initialIslandNumber = 12;
     protected int playerNumber;
     protected int currentPlayer; // The position in the array which has the active player.
@@ -48,6 +55,17 @@ public abstract class GameBoard {
             clouds[i] = new Cloud(cloudStudentsLimit);
         numRound = 1;
         motherNature = 1;
+    }
+
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(ModelListener modelListener, List<ClientHandler> clients){
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        this.clients.addAll(clients);
     }
 
     /**

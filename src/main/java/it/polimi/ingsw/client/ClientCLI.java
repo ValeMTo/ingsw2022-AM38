@@ -22,6 +22,7 @@ import java.util.*;
 public class ClientCLI {
     private static String hostName;
     private static int portNumber;
+    private boolean YourTurnShown;
     private final PrintStream out;
     private final String CLICyan = "\033[36;1m";
     private final String CLIRed = "\033[31;1m";
@@ -99,7 +100,7 @@ public class ClientCLI {
      * Start Game models the recursive phase of printing coherent menus and interface and waits for correct inputs
      */
     public void startGame() {
-        boolean YourTurnShown = false;
+        YourTurnShown = false;
         while (!viewState.isEndOfMatch()) {
             if (!viewState.isActiveView()) {
                 if (!YourTurnShown){
@@ -116,10 +117,13 @@ public class ClientCLI {
                     connectionSocket.updateNewPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
                     showActionMoveStudentsInstruction();
+                    YourTurnShown = true;
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
                     showMoveMotherNatureInstruction();
+                    YourTurnShown = true;
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
                     showCloudChoiceInstruction();
+                    YourTurnShown = true;
                 }
             }
             //Not put cleaner here
