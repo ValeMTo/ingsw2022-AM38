@@ -224,10 +224,11 @@ public class ConnectionSocket {
             socket = new Socket(serverIP, serverPort);
         } catch (IOException e) {
             System.out.println("ERROR - Connection NOT established");
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            // logger.log(Level.SEVERE, e.getMessage(), e);
+            return null;
 
         }
-        System.out.println("Connection established");
+        // System.out.println("Connection established");
         return socket;
     }
 

@@ -42,25 +42,21 @@ public class ClientCLI {
     private ViewState viewState;
     private Scanner in = null;
     private String nickname;
+    private boolean isConnected;
 
     public ClientCLI() {
 
         in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
         this.isRunning = true;
+        this.isConnected = false;
         viewState = new ViewState();
 
     }
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Insert the server IP address:");
-        hostName = scanner.nextLine();
-        System.out.println("Insert the server port");
-        portNumber = scanner.nextInt();
         ClientCLI cli = new ClientCLI();
-        System.out.println("Information set: IP " + hostName + " port " + portNumber);
         cli.login();
         cli.startGame();
     }
@@ -70,7 +66,7 @@ public class ClientCLI {
      * Login phase of a new player.
      */
     public void login() {
-        this.connectionSocket = createConnectionWithServer(hostName, portNumber);
+        requestConnection();
         sendNickname();
         viewState.setNamePlayer(this.nickname);
         cleaner();
@@ -94,6 +90,23 @@ public class ClientCLI {
             }
         }
 
+    }
+
+    private void requestConnection() {
+        boolean isConnected = false;
+
+        while(!isConnected) {
+            //Scanner input = new Scanner(System.in);
+            System.out.println("Insert the server IP address:");
+            hostName = in.nextLine();
+            System.out.println("Insert the server port");
+            portNumber = Integer.parseInt(in.nextLine());
+            System.out.println("Information set: IP " + hostName + " port " + portNumber);
+            this.connectionSocket = createConnectionWithServer(hostName, portNumber);
+            if(connectionSocket != null)
+                isConnected = true;
+        }
+        return;
     }
 
     /**
@@ -228,8 +241,9 @@ public class ClientCLI {
         this.connectionSocket = new ConnectionSocket(hostName, portNumber, viewState);
         try {
             if (!connectionSocket.setup()) {
-                System.err.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
-                System.err.println("Please try again!");
+                System.out.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
+                System.out.println("Please try again!");
+                return null;
             }
             System.out.println("Socket Connection setup completed!");
         } catch (FunctionNotImplementedException e) {
@@ -237,6 +251,7 @@ public class ClientCLI {
         }
         return connectionSocket;
     }
+
 
     /**
      * CLI view to ask the nickname to the server
