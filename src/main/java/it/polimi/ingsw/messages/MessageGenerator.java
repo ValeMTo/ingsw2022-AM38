@@ -578,7 +578,10 @@ public class MessageGenerator {
         json.put("UpdateType", UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal());
         json.put("position", position);
         json.put("StudentsMap", studentsMap);
-        json.put("TowerColor", towerColor.ordinal());
+        if(towerColor!=null)
+            json.put("TowerColor", towerColor.ordinal());
+        else
+            json.put("TowerColor","null");
         json.put("NumOfTowers", numTower);
         json.put("IsDisabled", isDisabled);
         return json + "\n";
