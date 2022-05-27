@@ -75,6 +75,7 @@ public class Server {
     }
 
     public static boolean blockPlayerName(String nickname) throws NicknameAlreadyTakenException {
+        System.out.println("blockPlayerName before sync");
         synchronized (allPlayers) {
             System.out.println("SERVER ADD PLAYER - enter synchronized part");
             if (allPlayers.keySet().contains(nickname)) throw new NicknameAlreadyTakenException();
@@ -100,14 +101,20 @@ public class Server {
         return lobby.getNumOfActiveUsers();
     }
 
-    public static void setLobbySettings(boolean gamemode, int numPlayers) {
+    public static void setLobbySettings(boolean gamemode) {
         synchronized (lobby) {
-            lobby.setNumOfPlayers(numPlayers);
             lobby.setIsExpert(gamemode);
         }
     }
 
+    public static void setLobbySettings(int numPlayers) {
+        synchronized (lobby) {
+            lobby.setNumOfPlayers(numPlayers);
+        }
+    }
+
     public static void addPlayerInLobby(ClientHandler client) {
+        System.out.println("SERVER: ADD PLAYER IN LOBBY");
         synchronized (lobby) {
             lobby.addPlayer(client);
         }
@@ -136,5 +143,9 @@ public class Server {
         synchronized (lobby) {
             return lobby.getMessageParser(client);
         }
+    }
+
+    public static void removePlayer(String name){
+        allPlayers.remove(name);
     }
 }

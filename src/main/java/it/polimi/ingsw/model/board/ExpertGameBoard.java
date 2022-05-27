@@ -300,8 +300,8 @@ public class ExpertGameBoard extends GameBoard {
     public boolean disableInfluence(int position) throws IslandOutOfBoundException {
         if (position > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
-        if (islands[position].isInfluenceEnabled()) {
-            islands[position].disableInfluence();
+        if (islands[position-1].isInfluenceEnabled()) {
+            islands[position-1].disableInfluence();
             return true;
         }
         return false;
@@ -450,14 +450,12 @@ public class ExpertGameBoard extends GameBoard {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
     @Override
-    public boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException {
+    public Integer getSpecialCardCost(SpecialCardName specialCardName) throws FunctionNotImplementedException {
         for (SpecialCard specialCard : specialCards) {
             if (specialCard.getName().equals(specialCardName)) {
-                cost = specialCard.getCostCoin();
-                return true;
+                return specialCard.getCostCoin();
             }
         }
-        cost = null;
-        return false;
+        return null;
     }
 }

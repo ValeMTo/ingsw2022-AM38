@@ -3,6 +3,7 @@ package it.polimi.ingsw.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.client.view.ViewState;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Tower;
@@ -80,26 +81,22 @@ public class ConnectionSocket {
 
     /**
      * Ask the server if it is the first player in the lobby room.
-     * True if it is the first player, otherwise false.
-     *
-     * @return isTheFirst boolean to understand if this player is the first player in the room
      */
-    public Boolean isTheFirst() {
+    public void isTheFirst() {
         socketOut.print(MessageGenerator.lobbyRequestMessage());
         socketOut.flush();
         System.out.println("SEND REQUEST - Sending: " + MessageGenerator.lobbyRequestMessage());
-        JsonObject json = getMessage();
-        if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
-            if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
-                return(json.get("numOfPlayers").getAsInt() == 0);
-            }
-        }
-        return null;
     }
 
     public void acceptRules() {
         System.out.println("ACCEPT RULES - Sending: " + MessageGenerator.okRulesGameMessage());
         socketOut.print(MessageGenerator.okRulesGameMessage());
+        socketOut.flush();
+    }
+
+    public void refuseRules() {
+        System.out.println("ACCEPT RULES - Sending: " + MessageGenerator.nackRulesGameMessage());
+        socketOut.print(MessageGenerator.nackRulesGameMessage());
         socketOut.flush();
     }
 
@@ -203,17 +200,10 @@ public class ConnectionSocket {
      *
      * @return the new ViewState created using the setup message fields
      */
-    public ViewState startGame() {
-        Gson gson = new Gson();
-        JsonObject json;
-        //Take messages until the setup message is correctly received
-        do {
-            json = getMessage();
-        }
-        while (!(json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) || !(json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()));
-        Map<String, Tower> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
-        this.viewState.setViewState(players, json.get("isExpertMode").getAsBoolean());
-        return this.viewState;
+    public void startGame() {
+        socketOut.print(MessageGenerator.startGameRequestMessage());
+        System.out.println(MessageGenerator.startGameRequestMessage());
+        socketOut.flush();
     }
 
     public void setAssistantCard(int numberOfCard) {
@@ -234,10 +224,11 @@ public class ConnectionSocket {
             socket = new Socket(serverIP, serverPort);
         } catch (IOException e) {
             System.out.println("ERROR - Connection NOT established");
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            // logger.log(Level.SEVERE, e.getMessage(), e);
+            return null;
 
         }
-        System.out.println("Connection established");
+        // System.out.println("Connection established");
         return socket;
     }
 
@@ -265,6 +256,12 @@ public class ConnectionSocket {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public void updateNewPhase(PhaseEnum phase){
+        socketOut.print(MessageGenerator.phaseUpdateMessage(phase));
+        socketOut.flush();
+        System.out.println("CHANGE PHASE " + MessageGenerator.phaseUpdateMessage(phase));
     }
 
 

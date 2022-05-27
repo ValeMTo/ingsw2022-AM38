@@ -50,7 +50,7 @@ public abstract class GameOrchestrator extends Listenable {
         this.specialCardAlreadyUsed = false;
         this.studentMovesLeft = maxStudentMoves;
         for (int i = 0; i < players.size(); i++) {
-            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i);
+            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i+" "+players.get(i));
             planningOrder[i] = players.get(i);
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
@@ -75,12 +75,23 @@ public abstract class GameOrchestrator extends Listenable {
                     gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
                 }
             }
+            gameBoard.setListenerAndClients(modelListener,clients);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
 
         gameBoard.fillClouds();
-
+        if(clients!=null&&modelListener!=null) {
+            System.out.println("GAMEORHCESTRATOR NOTIFY: SETUP OF THE VIEW STATES");
+            Map<String, Tower> sendMap = new HashMap<>();
+            sendMap.putAll(this.playersTower);
+            notify(modelListener, MessageGenerator.setupUpdateMessage(sendMap, playersTower.size(), isExpert), clients);
+            currentPhase = PhaseEnum.PLANNING;
+            System.out.println("GAMEORHCESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
+            notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
+            System.out.println("GAMEORHCESTRATOR NOTIFY: new phase " + currentPhase.name());
+            notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
+        }
         currentPhase = PhaseEnum.PLANNING;
     }
 
@@ -137,7 +148,7 @@ public abstract class GameOrchestrator extends Listenable {
                 this.currentPhase = PhaseEnum.END;
             else this.currentPhase = updatePhase;
         }
-        notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
+        if (clients != null) notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
     }
 
     /**
@@ -164,7 +175,8 @@ public abstract class GameOrchestrator extends Listenable {
                         return false;
                     }
                     studentMovesLeft--;
-                    notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM), clients);
+                    if (clients != null)
+                        notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM), clients);
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                     return true;
                 }
@@ -200,7 +212,8 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                     studentMovesLeft--;
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
-                    notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
+                    if (clients != null)
+                        notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
                     return true;
                 }
                 return false;
@@ -229,8 +242,8 @@ public abstract class GameOrchestrator extends Listenable {
             try {
                 Set<Integer> usableCards = gameBoard.getUsableAssistantCard(gameBoard.getPlayerTower(getActivePlayer())).keySet();
                 usableCards.removeAll(playedAssistantCard);
-                for (Integer i : usableCards)
-                    System.out.println("Usable card of " + getActivePlayer() + " " + i);
+                //for (Integer i : usableCards)
+                //    System.out.println("Usable card of " + getActivePlayer() + " " + i);
                 // If the player has other cards to use other than the one played by other have to play another card
                 if (usableCards.size() > 0 && !usableCards.contains(priority))
                     throw new AlreadyUsedException(usableCards);
@@ -243,10 +256,11 @@ public abstract class GameOrchestrator extends Listenable {
                 nextStep();
                 try {
                     ArrayList<Integer> usableCards = new ArrayList<>();
-                    for ( Integer card : gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()){
+                    for (Integer card : gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()) {
                         usableCards.add(card);
                     }
-                    notify(modelListener, MessageGenerator.useAssistantCardMessage(priority), clients);
+                    if (clients != null)
+                        notify(modelListener, MessageGenerator.useAssistantCardMessage(priority), clients);
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
@@ -257,9 +271,9 @@ public abstract class GameOrchestrator extends Listenable {
     }
 
     //TODO: maybe remove
-    private ClientHandler findClient(List<ClientHandler> clients, String nickname){
-        for( ClientHandler client : clients){
-            if(client.getNickName().equals(nickname)){
+    private ClientHandler findClient(List<ClientHandler> clients, String nickname) {
+        for (ClientHandler client : clients) {
+            if (client.getNickName().equals(nickname)) {
                 return client;
             }
         }
@@ -281,7 +295,8 @@ public abstract class GameOrchestrator extends Listenable {
             if (gameBoard.moveMotherNature(destinationIsland)) {
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
-                notify(modelListener, MessageGenerator.moveMotherNatureMessage(destinationIsland), clients);
+                if (clients != null)
+                    notify(modelListener, MessageGenerator.moveMotherNatureMessage(destinationIsland), clients);
                 return true;
             }
             return false;
@@ -315,7 +330,8 @@ public abstract class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
                 return false;
             }
-            notify(modelListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
+            if (clients != null)
+                notify(modelListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
             nextStep();
             return true;
         }
@@ -333,7 +349,7 @@ public abstract class GameOrchestrator extends Listenable {
      * If the active player is the last player of the action phase, controls the ending conditions and the nr. of rounds.
      * If the game continues, sets the order of the successive phase and sets the active player.
      */
-    private void nextStep() {
+    public void nextStep() {
         synchronized (phaseBlocker) {
             try {
                 if (getCurrentPhase() == PhaseEnum.PLANNING) {
@@ -385,7 +401,9 @@ public abstract class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
             }
         }
-        notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
+        if (clients != null)
+            notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
+        System.out.println(MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
     }
 
 

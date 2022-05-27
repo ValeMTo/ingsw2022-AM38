@@ -1,8 +1,19 @@
 package it.polimi.ingsw.model.board;
 
-import java.util.HashMap;
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.ModelListener;
+import it.polimi.ingsw.messages.MessageGenerator;
+import it.polimi.ingsw.server.ClientHandler;
 
-public class Island {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Island extends Listenable {
+    private Listener modelListener;
+    private List<ClientHandler> clients = null;
     protected HashMap<Color, Integer> influence;
     protected int position;
     protected boolean influenceIsEnabled = true;
@@ -17,6 +28,24 @@ public class Island {
     public Island(int position) {
         influence = new HashMap<Color, Integer>();
         this.position = position;
+    }
+
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        this.clients.addAll(clients);
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("ISLAND "+this.position+" - notify my existence!");
+            Map<Color,Integer> returnMap = new HashMap<>();
+            returnMap.putAll(this.influence);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+        }
+
     }
 
     /**

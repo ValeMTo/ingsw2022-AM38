@@ -1,18 +1,28 @@
 package it.polimi.ingsw.client;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.messages.MessageGenerator;
+import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.*;
 
 public class ClientCLI {
     private static String hostName;
     private static int portNumber;
+    private boolean YourTurnShown;
     private final PrintStream out;
     private final String CLICyan = "\033[36;1m";
     private final String CLIRed = "\033[31;1m";
@@ -31,26 +41,22 @@ public class ClientCLI {
     ConnectionSocket connectionSocket;
     private ViewState viewState;
     private Scanner in = null;
+    private String nickname;
+    private boolean isConnected;
 
     public ClientCLI() {
 
         in = new Scanner(System.in);
         this.out = new PrintStream(System.out);
         this.isRunning = true;
+        this.isConnected = false;
         viewState = new ViewState();
-
 
     }
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Insert the server IP address:");
-        hostName = scanner.nextLine();
-        System.out.println("Insert the server port");
-        portNumber = scanner.nextInt();
         ClientCLI cli = new ClientCLI();
-        System.out.println("Information set: IP " + hostName + " port " + portNumber);
         cli.login();
         cli.startGame();
     }
@@ -60,64 +66,80 @@ public class ClientCLI {
      * Login phase of a new player.
      */
     public void login() {
-        // TODO: remove this things
-        this.viewState = new ViewState();
-        Map<String,Tower> mapPlayers = new HashMap<>();
-        mapPlayers.put("Nick",Tower.WHITE);
-        mapPlayers.put("Vale",Tower.BLACK);
-        mapPlayers.put("Fra",Tower.GRAY);
-
-        viewState.setViewState(mapPlayers,false);
-        viewState.setPlayerTower(Tower.WHITE);
-        Map<Color, Integer> mapOccupancy = new HashMap<>();
-        mapOccupancy.put(Color.BLUE,2);
-        viewState.setDiningRoomOccupancy(Tower.WHITE,mapOccupancy);
-        viewState.setDiningRoomOccupancy(Tower.BLACK,mapOccupancy);
-        viewState.setDiningRoomOccupancy(Tower.GRAY,mapOccupancy);
-        mapOccupancy.put(Color.YELLOW,4);
-        viewState.setSchoolEntranceOccupancy(Tower.GRAY,mapOccupancy);
-        Map<Color, Integer> dini = viewState.getDiningRoomOccupancy(Tower.WHITE);
-        printArchipelago();
-        printAssistantCards();
-        // Until here
-        printPlayerBoard();
-        this.connectionSocket = createConnectionWithServer(hostName, portNumber);
+        requestConnection();
         sendNickname();
+        viewState.setNamePlayer(this.nickname);
         cleaner();
-        if (connectionSocket.isTheFirst()) {
+        connectionSocket.isTheFirst();
+
+        //TODO: listener that waits the no null value of GameSetting
+        while (viewState.getGameSettings() == null){}
+
+        System.out.println("GameSettings" + viewState.getGameSettings().getActualClients());
+        if (viewState.getGameSettings().getActualClients() <= 0) {
             sendGameMode();
             sendNumOfPlayers();
         } else {
             if (acceptSettingsOfTheGame()) {
+                System.out.println("You have accepted previous rules");
+                cleaner();
+                connectionSocket.startGame();
             } else {
                 connectionSocket.disconnect();
+                System.out.println("See you next time!!");
             }
         }
-        cleaner();
-        this.viewState = connectionSocket.startGame();
+
+    }
+
+    private void requestConnection() {
+        boolean isConnected = false;
+
+        while(!isConnected) {
+            //Scanner input = new Scanner(System.in);
+            System.out.println("Insert the server IP address:");
+            hostName = in.nextLine();
+            System.out.println("Insert the server port");
+            portNumber = Integer.parseInt(in.nextLine());
+            System.out.println("Information set: IP " + hostName + " port " + portNumber);
+            this.connectionSocket = createConnectionWithServer(hostName, portNumber);
+            if(connectionSocket != null)
+                isConnected = true;
+        }
+        return;
     }
 
     /**
      * Start Game models the recursive phase of printing coherent menus and interface and waits for correct inputs
      */
     public void startGame() {
+        YourTurnShown = false;
         while (!viewState.isEndOfMatch()) {
             if (!viewState.isActiveView()) {
-                showNotYoutTurnView();
+                if (!YourTurnShown){
+                    showNotYoutTurnView();
+                    YourTurnShown = true;
+                }
             } else {
+                YourTurnShown= false;
                 if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
                     printAssistantCards();
                     int card = showPlanningInstructionAndGetCard();
                     connectionSocket.setAssistantCard(card);
+                    viewState.setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS); //TODO: maybe change
+                    connectionSocket.updateNewPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
                     showActionMoveStudentsInstruction();
+                    YourTurnShown = true;
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
                     showMoveMotherNatureInstruction();
+                    YourTurnShown = true;
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
                     showCloudChoiceInstruction();
+                    YourTurnShown = true;
                 }
             }
-            cleaner();
+            //Not put cleaner here
         }
     }
 
@@ -219,8 +241,9 @@ public class ClientCLI {
         this.connectionSocket = new ConnectionSocket(hostName, portNumber, viewState);
         try {
             if (!connectionSocket.setup()) {
-                System.err.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
-                System.err.println("Please try again!");
+                System.out.println("ERROR - The entered IP/port doesn't match any active server or the server is not running.");
+                System.out.println("Please try again!");
+                return null;
             }
             System.out.println("Socket Connection setup completed!");
         } catch (FunctionNotImplementedException e) {
@@ -229,12 +252,13 @@ public class ClientCLI {
         return connectionSocket;
     }
 
+
     /**
      * CLI view to ask the nickname to the server
      */
     private void sendNickname() {
         boolean confirmation = false;
-        String nickname = null;
+        nickname = null;
         while (!confirmation) {
             System.out.println(">Insert your nickname: ");
             nickname = in.nextLine();
@@ -302,8 +326,8 @@ public class ClientCLI {
         boolean confirmation = false;
         while (!confirmation) {
             System.out.println("The rules are already set...");
-            System.out.println("numOfPlayers: " + connectionSocket.getNumberOfPlayers().toString());
-            if (connectionSocket.getGameMode()) {
+            System.out.println("numOfPlayers: " + viewState.getGameSettings().getNumPlayers());
+            if (viewState.getGameSettings().getExpert()) {
                 System.out.println("GameMode: expert");
             } else {
                 System.out.println("GameMode: easy");
@@ -319,7 +343,7 @@ public class ClientCLI {
                 confirmation = true;
             }
         }
-        connectionSocket.refuse();
+        connectionSocket.refuseRules();
         return false;
     }
 
@@ -355,25 +379,81 @@ public class ClientCLI {
     }
 
     /**
-     * Prints the usable special cards
+     * Prints the usable special cards with their texts, does not print anything if it is easy game mode
      */
     private void printSpecialCards() {
-        System.out.println(CLIBlack + " - Special cards - "+CLIEffectReset);
-        String[] rows = new String[3];
-        for (int i = 0; i < 7; i++)
-            rows[i] = "";
-        for (Integer i : viewState.getUsableCards()) {
+        if(viewState.isExpert()) {
+            Gson parser = new Gson();
+            try {
+                JsonObject json = parser.fromJson(new FileReader("src/main/resources/json/SpecialCardsEffectsDescription.json"),JsonObject.class);
+                System.out.println(CLIBlack + "         - Special cards - \n" + CLIEffectReset);
+                String[] rows = new String[6];
+                for (int i = 0; i < 6; i++)
+                    rows[i] = "";
+                for (SpecialCardName specialCardName : viewState.getUsableSpecialCards().keySet()) {
+                    for (int i = 0; i < 6; i++)
+                        rows[i] = "";
+                    rows[0] += "  ┌─────────────┐ ";
+                    rows[1] += "  │ " + CLIRed + specialCardName.name() + CLIEffectReset;
+                    for (int i = specialCardName.name().length(); i < 12; i++)
+                        rows[1] += " ";
+                    rows[1] += "│ ";
 
-            rows[0] += "  ┌─────────────┐ ";
-            if (i >= 10)
-                rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + " │ ";
-            else
-                rows[1] += "  │ " + CLIRed + "Priority:" + CLIEffectReset + i + "  │ ";
-            rows[3] += "  │ " + CLIGreen + "Steps:" + CLIEffectReset  + "     │ ";
-            for (int j = 2; j < 6; j++)
-                if (j != 3)
-                    rows[j] += "  │             │ ";
-            rows[6] += "  └─────────────┘ ";
+                    rows[3] += "  │ " + CLIGreen + "Cost: " + viewState.getUsableSpecialCards().get(specialCardName)+ CLIEffectReset + "     │ ";
+                    for (int j = 2; j < 5; j++)
+                        if (j != 3)
+                            rows[j] += "  │             │ ";
+                    rows[5] += "  └─────────────┘ ";
+                    if(json.get(specialCardName.name())!=null) {
+                        List<String> message = parser.fromJson(json.get(specialCardName.name()),List.class);
+                        int maxWordPerRow = 150;
+                        // Set the message on the right of the special card
+                        if (message != null) {
+                            for (int i = 0; i < 5&&i<message.size(); i++) {
+                                rows[i+1] += message.get(i);
+                            }
+                        }
+                    }
+                    printVector(rows);
+                }
+            }
+            catch (FileNotFoundException exc){
+                exc.printStackTrace(); }
+            catch (FunctionNotImplementedException exc) {
+                System.out.println(CLIPink + "EXCEPTION : The print of the special cards is for expert game mode only!" + CLIEffectReset);
+            }
+        }
+        else{
+            System.out.println(CLIPink+"NO SPECIAL CARDS FOR EASY GAME MODE"+CLIEffectReset);
+        }
+    }
+
+    private void printClouds(){
+        System.out.println(CLIBlack + "         - Clouds - \n" + CLIEffectReset);
+        String[] rows = new String[8];
+        for (int i = 0; i < 8; i++)
+            rows[i] = "";
+        Map<Cloud,Integer> clouds = viewState.getClouds();
+        for(Cloud cloud: clouds.keySet()){
+            rows[0] += " " + CLICyan + "    Position : " + clouds.get(cloud) + CLIEffectReset + "     .";
+            rows[1] += "      ░░░░░░░░░░      .";
+            int counter=0;
+            rows[2] += "     ░";
+            rows[3] += "   ░░░";
+            rows[4] += " ░░░░░";
+            rows[5] += "   ░░░";
+            rows[6] += "     ░";
+
+            for(Color color:Color.values()) {
+                rows[2+counter] += "░ " + getColorAbbreviationWithInitialAnsiiCode(color) + ":"+cloud.countStudent(color)+CLIEffectReset+" "+createCubesString(color,cloud.countStudent(color),4)+CLIEffectReset+"";
+                counter++;
+            }
+            rows[2] += "░     .";
+            rows[3] += "░░░   .";
+            rows[4] += "░░░░░ .";
+            rows[5] += "░░░   .";
+            rows[6] += "░     .";
+            rows[7] += "      ░░░░░░░░░░      .";
         }
         printVector(rows);
     }
@@ -424,9 +504,9 @@ public class ClientCLI {
         }
     }
 
-    private String createCubesString(Color color, int number){
+    private String createCubesString(Color color, int number,int max){
         String cubes ="";
-        for(int i =10;i>=1;i--){
+        for(int i =max;i>=1;i--){
             if(i<=number){
                 cubes += getAnsiStringFromColor(color)+"¤"+CLIEffectReset;
             }
@@ -483,31 +563,31 @@ public class ClientCLI {
             rows[4] += "  "+effectSchoolBoard+"│     " + CLIBlue + "BLUE" + CLIEffectReset + "   ";
             else
             rows[4] += "  "+effectSchoolBoard+"│            ";
-            rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE)) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
+            rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE),10) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
             rows[5] += effectSchoolBoard+"  │     " + CLIGreen + "GREEN" + CLIEffectReset + "  ";
             else
             rows[5] += effectSchoolBoard+"  │            ";
-            rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN)) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
+            rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN),10) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
                 rows[6] += effectSchoolBoard+"  │    " + CLIYellow + "YELLOW" + CLIEffectReset + "  ";
             else
                 rows[6] +=effectSchoolBoard+ "  │            ";
-            rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
+            rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW),10) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
                 rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK" + CLIEffectReset + "  ";
             else
                 rows[7] += effectSchoolBoard+"  │            ";
-            rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK)) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
+            rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK),10) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
                 rows[8] += effectSchoolBoard+"  │    " + CLIRed + "Red" + CLIEffectReset + "  ";
             else
                 rows[8] += effectSchoolBoard+"  │            ";
-            rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED)) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
+            rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED),10) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
             rows[9] += effectSchoolBoard+"  └────────────┴────────────────┴─────────────────┘  "+CLIEffectReset;
 
         }
@@ -563,6 +643,22 @@ public class ClientCLI {
                 return "BK";
             case GRAY:
                 return "GR";
+        }
+        return "";
+    }
+
+    private String getColorAbbreviationWithInitialAnsiiCode(Color color) {
+        switch (color) {
+            case BLUE:
+                return CLIBlue+"B";
+            case GREEN:
+                return CLIGreen+"G";
+            case YELLOW:
+                return CLIYellow+"Y";
+            case PINK:
+                return CLIPink+"P";
+            case RED:
+                return CLIRed+"R";
         }
         return "";
     }

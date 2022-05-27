@@ -1,13 +1,20 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.ModelListener;
 import it.polimi.ingsw.exceptions.*;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.player.PlayerBoard;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
-public abstract class GameBoard {
+public abstract class GameBoard extends Listenable {
+    private Listener modelListener;
+    private List<ClientHandler> clients = null;
     protected final int initialIslandNumber = 12;
     protected int playerNumber;
     protected int currentPlayer; // The position in the array which has the active player.
@@ -48,6 +55,28 @@ public abstract class GameBoard {
             clouds[i] = new Cloud(cloudStudentsLimit);
         numRound = 1;
         motherNature = 1;
+    }
+
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        if(clients!=null)
+        this.clients.addAll(clients);
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("GAME BOARD - notify the archipelago");
+            notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
+            System.out.println("GAME BOARD - notify the archipelago");
+            for(int i=0;i<clouds.length;i++)
+            notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
+            for(Island island:islands)
+                island.setListenerAndClients(modelListener,clients);
+        }
+
     }
 
     /**
@@ -634,7 +663,7 @@ public abstract class GameBoard {
      * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
      */
 
-    public abstract boolean getSpecialCardCost(SpecialCardName specialCardName, Integer cost) throws FunctionNotImplementedException;
+    public abstract Integer getSpecialCardCost(SpecialCardName specialCardName) throws FunctionNotImplementedException;
 
     /**
      * Disable the towerInfluence in order to not count the towers in the influence score computation

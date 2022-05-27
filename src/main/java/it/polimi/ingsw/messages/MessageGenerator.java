@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,6 +99,26 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the error message for IslandOutOfBound with the additional fields that informs on the allowed range
+     * of values for the input.
+     *
+     * @param errorString : String of the particular error to send
+     * @param minVal      : the minimum allowed value for the input
+     * @param maxVal      : the maximum allowed value for the input
+     * @return : json String of the error message
+     */
+    public static String errorIslandOutOfBoundInputMessage(String errorString, int minVal, int maxVal) {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ERROR.ordinal());
+        json.addProperty("ErrorType", ErrorTypeEnum.ISLAND_OUT_OF_BOUND.ordinal());
+        json.addProperty("errorString", errorString);
+        json.addProperty("minVal", minVal);
+        json.addProperty("maxVal", maxVal);
+
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates an error message caused by using an action that cannot be used in the current phase of the turn
      *
      * @param actualPhase actual phase that is now set
@@ -177,6 +198,18 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates a String formatted in json for request the start of the game
+     *
+     * @return : json String for request lobby number of players
+     */
+    public static String startGameRequestMessage() {
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.REQUEST.ordinal());
+        json.addProperty("RequestType", RequestTypeEnum.START_GAME.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates a String formatted in json to accept rules game
      *
      * @return : json String with an ok
@@ -205,10 +238,12 @@ public class MessageGenerator {
      *
      * @return : json String with number of players in the lobby
      */
-    public static String numberPlayerlobbyMessage(int numOfPlayers) {
+    public static String answerlobbyMessage(int actualPlayer, boolean isExpert,int numOfPlayers ) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
         json.addProperty("AnswerType", AnswerTypeEnum.LOBBY_ANSWER.ordinal());
+        json.addProperty("actualPlayers", actualPlayer);
+        json.addProperty("isExpert", isExpert);
         json.addProperty("numOfPlayers", numOfPlayers);
         return gson.toJson(json) + "\n";
     }
@@ -500,11 +535,13 @@ public class MessageGenerator {
         json.put("UpdateType", UpdateTypeEnum.SETUP_UPDATE.ordinal());
         json.put("NumberOfPlayers", numPlayers);
         json.put("isExpertMode", isExpertMode);
+        Map<String, String> playerStringMap = new HashMap<>();
+        for(String s:playersMapping.keySet())
+            playerStringMap.put(s,playersMapping.get(s).name());
         json.put("PlayersMapping", playersMapping);
 
         return json + "\n";    // using the toString() on a JSONObject instead of using toJson
     }
-
 
     /**
      * Generates the CloudViewUpdate message, used to notify the updated status of a given cloud.
@@ -541,7 +578,10 @@ public class MessageGenerator {
         json.put("UpdateType", UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal());
         json.put("position", position);
         json.put("StudentsMap", studentsMap);
-        json.put("TowerColor", towerColor.ordinal());
+        if(towerColor!=null)
+            json.put("TowerColor", towerColor.ordinal());
+        else
+            json.put("TowerColor","null");
         json.put("NumOfTowers", numTower);
         json.put("IsDisabled", isDisabled);
         return json + "\n";
@@ -666,7 +706,7 @@ public class MessageGenerator {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.PHASE_UPDATE.ordinal());
-        json.put("CurrentPhase", phase.ordinal());
+        json.put("CurrentPhase",phase.ordinal());
         return json + "\n";
     }
 
@@ -735,6 +775,7 @@ public class MessageGenerator {
         json.put("Leaderboard", leaderboard);
         return json + "\n";
     }
+
 
 
 }
