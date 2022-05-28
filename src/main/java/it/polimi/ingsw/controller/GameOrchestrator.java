@@ -181,9 +181,9 @@ public abstract class GameOrchestrator extends Listenable {
                         return false;
                     }
                     studentMovesLeft--;
-                    if (clients != null)
-                        notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM), clients);
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
+                    if (clients != null)
+                        notifyPhaseAndCurrentPlayer();
                     return true;
                 }
                 return false;

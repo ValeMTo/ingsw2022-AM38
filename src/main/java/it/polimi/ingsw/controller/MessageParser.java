@@ -151,7 +151,7 @@ public class MessageParser{
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - The given command is not for the phase");
         try {
             if (json.get("From").getAsInt() == StudentCounter.SCHOOLENTRANCE.ordinal()) {
-                if (json.get("To").getAsInt() == StudentCounter.PLAYER.ordinal()) {
+                if (json.get("To").getAsInt() == StudentCounter.DININGROOM.ordinal()) {
                     if (gameOrchestrator.moveStudent(Color.values()[json.get("Color").getAsInt()])) {
                         return MessageGenerator.okMessage();
                     } else

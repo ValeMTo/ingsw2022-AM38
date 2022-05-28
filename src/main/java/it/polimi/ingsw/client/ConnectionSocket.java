@@ -223,6 +223,16 @@ public class ConnectionSocket {
         socketOut.flush();
     }
 
+
+    /**
+     * Sends the message to move mother nature
+     * @param position
+     */
+    public void moveMotherNature(int position){
+        socketOut.print(MessageGenerator.moveMotherNatureMessage(position));
+        socketOut.flush();
+    }
+
     /**
      * Send the message to move a particular student from its schoolEntrance to the DiningRoom
      * @param color : student to move

@@ -147,16 +147,22 @@ public class ClientCLI {
                     StudentCounter location = showStudentMovementDiningOrIsland();
                     if(location.equals(StudentCounter.ISLAND)){//TODO
                         System.out.println("CLIENT CLI - YOU CHOOSE ISLAND");
+                        int position = showIslandChoiseInstructionAndGetPosition();
+                        connectionSocket.moveStudentToIsland(colorToMove,position);
                     }
                     else
                     {//TODO
                         System.out.println("CLIENT CLI - YOU CHOOSE DINING ROOM");
+                        connectionSocket.moveStudentToDiningRoom(colorToMove);
                     }
                     viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
                     System.out.println("CLIENT CLI - mother nature set");
+                    printArchipelago();
                     showMoveMotherNatureInstruction();
+                    int position = getMotherNatureMove();
                     viewState.setTurnShown(true);
+                    connectionSocket.moveMotherNature(position);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
                     System.out.println("CLIENT CLI - choice cloud");
                     showCloudChoiceInstruction();
@@ -183,6 +189,15 @@ public class ClientCLI {
         }
     }
 
+    /**
+     * GEEts the mothenaure movement
+     * @return
+     */
+    public int getMotherNatureMove(){
+        System.out.println(CLICyan+"Choose a position where to move motherNature. You cannot move more than the steps of your last used card"+CLIEffectReset);
+        String input = in.nextLine();
+        return Integer.parseInt(input);
+    }
 
     /**
      * Shows the possible commands and what to do in the planning phase.
@@ -239,6 +254,12 @@ public class ClientCLI {
         System.out.println(CLICyan+" Choice a student color: "+CLIBlue+"B"+CLIEffectReset+" for "+CLIBlue+"BLUE"+CLIEffectReset+", "+CLIGreen+"G"+CLIEffectReset+" for "+CLIGreen+"GREEN"+CLIEffectReset+", "+CLIYellow+"Y"+CLIEffectReset+" for "+CLIYellow+"YELLOW"+CLIEffectReset+", "+CLIPink+"P"+CLIEffectReset+" for "+CLIPink+"PINK"+CLIEffectReset+", "+CLIRed+"R"+CLIEffectReset+" for "+CLIRed+"RED"+CLIEffectReset+" ");
         String input = in.nextLine();
         return Color.fromAbbreviationToColor(input);
+    }
+
+    private int showIslandChoiseInstructionAndGetPosition(){
+        System.out.println(CLICyan+" Choice an island position to move the student on: "+CLIEffectReset);
+        String input = in.nextLine();
+        return Integer.parseInt(input);
     }
 
     /**
@@ -546,11 +567,26 @@ public class ClientCLI {
                 rows[3] += "   ┌┘ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + " TW" + CLIEffectReset + " └┐    .";
             else
                 rows[3] += "   ┌┘ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + " TW(" + island.getTowerNumber() + "N)" + CLIEffectReset + " └┐ .";
+            if(students.get(Color.BLUE)>0)
             rows[4] += "  ┌┘  " + CLIBlue + "B:" + students.get(Color.BLUE) + CLIEffectReset +     "  └┐  .";
+            else
+            rows[4] += "  ┌┘       └┐  .";
+            if(students.get(Color.GREEN)>0)
             rows[5] += " ┌┘   " + CLIGreen + "G:" + students.get(Color.GREEN) + CLIEffectReset +   "   └┐ .";
+            else
+            rows[5] += " ┌┘         └┐ .";
+            if(students.get(Color.YELLOW)>0)
             rows[6] += " │    " + CLIYellow + "Y:" + students.get(Color.YELLOW) + CLIEffectReset + "    │ .";
+            else
+            rows[6] += " │           │ .";
+            if(students.get(Color.PINK)>0)
             rows[7] += " └┐   " + CLIPink + "P:" + students.get(Color.PINK) + CLIEffectReset +     "   ┌┘ .";
+            else
+            rows[7] += " └┐         ┌┘ .";
+            if(students.get(Color.RED)>0)
             rows[8] += "  └┐  " + CLIRed + "R:" + students.get(Color.RED) + CLIEffectReset +       "  ┌┘  .";
+            else
+                rows[8] += "  └┐       ┌┘  .";
             if (viewState.getMotherNature() != island.getPosition())
             rows[9] += "   └┐     ┌┘   .";
             else

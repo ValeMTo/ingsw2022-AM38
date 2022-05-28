@@ -238,6 +238,7 @@ public class PlayerBoard extends Listenable {
         addResult = schoolBoard.addStudentDiningRoom(studentColor);
         if (addResult && countStudentsDiningRoom(studentColor) % 3 == 0 && countStudentsDiningRoom(studentColor) != 0)
             increaseCoinBudget();
+        notifyPlayerBoard();
         return addResult;
 
     }
@@ -250,8 +251,10 @@ public class PlayerBoard extends Listenable {
      * @return outcome of the addition.
      */
     public boolean addStudentEntrance(Color studentColor) {
-        return schoolBoard.addStudentEntrance(studentColor);
-
+        boolean returnValue = schoolBoard.addStudentEntrance(studentColor);
+        if(returnValue)
+            notifyPlayerBoard();
+        return returnValue;
     }
 
     /**
@@ -262,7 +265,10 @@ public class PlayerBoard extends Listenable {
      * @return outcome of the removal
      */
     public boolean removeStudentDiningRoom(Color studentColor) {
-        return schoolBoard.removeStudentDiningRoom(studentColor);
+        boolean returnValue =schoolBoard.removeStudentDiningRoom(studentColor);
+        if(returnValue)
+            notifyPlayerBoard();
+        return returnValue;
     }
 
     /**

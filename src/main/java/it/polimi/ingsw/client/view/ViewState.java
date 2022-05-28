@@ -62,12 +62,18 @@ public class ViewState {
         this.awaitingCLI = awaitingCLI;
     }
 
+
     /**
      * Sets the flag that tells the CLI has correctly shown the options and menues
      * @param turnShown
      */
     public synchronized void setTurnShown(boolean turnShown){
         this.turnShown = turnShown;
+        if(awaitingCLI!=null)
+            synchronized (awaitingCLI) {
+                System.out.println("VIEW STATE - setActivePlayerAndPhase - Hey CLI, it's time to wake up!");
+                awaitingCLI.notifyAll();
+            }
     }
 
     /**
