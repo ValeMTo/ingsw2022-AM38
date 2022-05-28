@@ -52,11 +52,12 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         messageParser = new MessageParser(this);
+        messageParser.setName(this.playerName);
         String message;
         while (true) {
-            System.out.println(playerName);
+            System.out.println("CLIENT HANDLER - player "+playerName+" waiting for message");
             message = inputReader.nextLine();
-            System.out.println("MESSAGE PARSER - player "+this.getNickName()+" got message "+message);
+            System.out.println("CLIENT HANDLER - player "+this.getNickName()+" got message "+message);
             System.out.println(message);
             writer.print(messageParser.parseMessageToAction(message));
         }
@@ -157,6 +158,7 @@ public class ClientHandler implements Runnable {
             this.playerName = nickname;
             System.out.println("Sending: " + MessageGenerator.okMessage());
             writer.print(MessageGenerator.okMessage());
+            this.messageParser.setName(this.playerName);
             writer.flush();
         } catch (NicknameAlreadyTakenException e) {
             writer.print(MessageGenerator.errorWithStringMessage(NICKNAME_ALREADY_TAKEN, "Already taken nickname"));
@@ -243,9 +245,12 @@ public class ClientHandler implements Runnable {
     }
 
     public void setGameOrchestrator(GameOrchestrator gameOrchestrator){
+        System.out.println("CLIENT HANDLER of" + playerName + " - Got GameOrchestrator! "+gameOrchestrator);
         messageParser.setGameOrchestrator(gameOrchestrator);
-
+        messageParser.setName(this.playerName);
     }
+
+
 
 
 }

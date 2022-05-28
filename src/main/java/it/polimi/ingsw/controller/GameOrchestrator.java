@@ -254,6 +254,7 @@ public abstract class GameOrchestrator extends Listenable {
             }
             // The player plays the chosen card and if it is correctly played update the card used and go to the next phase wit nextStep
             if (gameBoard.useAssistantCard(gameBoard.getCurrentPlayer(), priority)) {
+                System.out.println("GAME ORCHESTRATOR NOTIFY - chooseCard - player "+gameBoard.getCurrentPlayer()+" correctly used card"+priority);
                 this.playedAssistantCard.add(priority);
                 nextStep();
                 try {
@@ -266,6 +267,7 @@ public abstract class GameOrchestrator extends Listenable {
                 }
                 return true;
             }
+            System.out.println("GAME ORCHESTRATOR NOTIFY - chooseCard - player "+gameBoard.getCurrentPlayer()+" cannot use card"+priority);
             return false;
         }
     }
@@ -337,6 +339,10 @@ public abstract class GameOrchestrator extends Listenable {
         }
     }
 
+    private void notifyPhaseAndCurrentPlayer(){
+
+    }
+
     /**
      * Updates to the successive player of the planning phase
      *
@@ -349,7 +355,7 @@ public abstract class GameOrchestrator extends Listenable {
      * If the active player is the last player of the action phase, controls the ending conditions and the nr. of rounds.
      * If the game continues, sets the order of the successive phase and sets the active player.
      */
-    public void nextStep() {
+    private void nextStep() {
         synchronized (phaseBlocker) {
             try {
                 if (getCurrentPhase() == PhaseEnum.PLANNING) {
@@ -396,6 +402,12 @@ public abstract class GameOrchestrator extends Listenable {
                     else {
                         setCurrentPhase(PhaseEnum.END);
                     }
+                }
+                if(clients!=null&&modelListener!=null) {
+                    System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
+                    notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
+                    System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep -  New phase " + currentPhase.name());
+                    notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();

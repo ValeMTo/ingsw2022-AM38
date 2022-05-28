@@ -30,7 +30,7 @@ public class MessageParser{
         return name;
     }
 
-    public void setName(){
+    public void setName(String name){
         this.name = name;
     }
 
@@ -45,11 +45,11 @@ public class MessageParser{
      * @return : a String (json) that is the answer message from the server
      */
     public String parseMessageToAction(String message) {
-        System.out.println("MessageParser");
+        System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - parse message to action");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
         if ( gameOrchestrator!= null &&!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName())) {
-            System.out.println("MESSAGE PARSER - ERROR - This is not his/her turn");
-            System.out.println("MESSAGE PARSER - ERROR - current player is "+gameOrchestrator.getActivePlayer());
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - ERROR - This is not his/her turn");
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - ERROR - current player is "+gameOrchestrator.getActivePlayer());
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
         }
         String returnMessage = null;
@@ -75,11 +75,6 @@ public class MessageParser{
                 System.out.println("Lobby");
                 client.lobbyRequestHandler();
                 System.out.println("Lobby answer sent");
-            } else if (json.get("RequestType").getAsInt() == RequestTypeEnum.START_GAME.ordinal()){
-                System.out.println("START GAME");
-                gameOrchestrator.setCurrentPhase(PhaseEnum.PLANNING);
-                System.out.println("SET PLANNING PHASE");
-                gameOrchestrator.nextStep();
             }
             return MessageGenerator.okMessage();
 
@@ -94,16 +89,11 @@ public class MessageParser{
         }else if (json.get("MessageType").getAsInt() == MessageTypeEnum.CONNECTION.ordinal()){
             if (json.get("MessageType").getAsInt() == ConnectionTypeEnum.CLOSE_CONNECTION.ordinal()){
                 client.disconnectionManager();
+                System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - DISCONNECTING");
             }
             return MessageGenerator.okMessage();
 
-        }else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()){
-            if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()){
-                gameOrchestrator.nextStep();
-            }
-            return MessageGenerator.okMessage();
-
-        } else if(json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
+        }else if(json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
             if (json.get("SetType").getAsInt() == SetTypeEnum.SET_NICKNAME.ordinal()) {
                 client.confirmNickname(json.get("nickname").getAsString());
 
@@ -120,7 +110,7 @@ public class MessageParser{
             }
             return MessageGenerator.okMessage();
         }
-
+        System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - ERROR - Generic error! ");
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - generic error, bad request or wrong message");
     }
 
@@ -133,15 +123,20 @@ public class MessageParser{
     private String useAssistantCard(JsonObject json) {
         try {
             if (gameOrchestrator.chooseCard(json.get("CardPriority").getAsInt())){
+                System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - Using correctly card "+json.get("CardPriority").getAsInt());
                 return MessageGenerator.okMessage();
             }
         } catch (IndexOutOfBoundsException exc) {
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - ERROR - invalid input card "+json.get("CardPriority").getAsInt());
             return MessageGenerator.errorInvalidInputMessage("ERROR - Invalid input, out of bound", 1, 10);
         } catch (AlreadyUsedException exc) {
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - ERROR - already used card "+json.get("CardPriority").getAsInt());
             return MessageGenerator.errorWithUsableValues(ErrorTypeEnum.ALREADY_USED_ASSISTANT_CARD, "ERROR - The card has been already used", exc.getUsableIndexes());
         } catch (IncorrectPhaseException exc) {
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - ERROR - incorrect phase: "+exc.getActualPhase());
             return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
+        System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - ERROR - generic error");
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - Generic error using assistant card");
     }
 

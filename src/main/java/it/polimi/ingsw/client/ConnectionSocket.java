@@ -209,7 +209,7 @@ public class ConnectionSocket {
     }
 
     public void setAssistantCard(int numberOfCard) {
-        System.out.println("CONNECTION SOCKET - setAssistantCard - sending MessageGenerator.useAssistantCardMessage(numberOfCard)");
+        System.out.println("CONNECTION SOCKET - setAssistantCard - sending "+MessageGenerator.useAssistantCardMessage(numberOfCard));
         socketOut.print(MessageGenerator.useAssistantCardMessage(numberOfCard));
         socketOut.flush();
     }
