@@ -528,7 +528,7 @@ public class ClientCLI {
             rows[i] = "";
         int maxIslandsPerRow = 12;
         int counter = 0;
-        Map students;
+        Map<Color,Integer> students;
         for (IslandView island : viewState.getIslands()) {
             students = island.getStudentMap();
             if (island.getTowerNumber() <= 1)

@@ -84,6 +84,32 @@ public class Island extends Listenable {
     }
 
     /**
+     * Returns a copy of the student map of this island
+     * @return
+     */
+    public Map<Color,Integer> getStudentMap(){
+        Map<Color,Integer> studentMap = new HashMap<>();
+        studentMap.putAll(this.influence);
+        return studentMap;
+    }
+
+    /**
+     * Adds in block students from a Map
+     * @param studentsToAdd
+     * @return
+     */
+    public boolean addStudent(Map<Color,Integer> studentsToAdd){
+        for(Color color: studentsToAdd.keySet()){
+            if (!influence.containsKey(color))
+                influence.put(color, studentsToAdd.get(color));
+            else
+                influence.put(color, influence.get(color) + studentsToAdd.get(color));
+        }
+        notifySomethingHasChanged();
+        return true;
+    }
+
+    /**
      * Sets the block to the influence computation
      * sets influenceIsEnabled to false
      */

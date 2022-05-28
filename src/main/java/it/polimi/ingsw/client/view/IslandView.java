@@ -27,7 +27,9 @@ public class IslandView extends Island {
      * @return the Map of students contained on the Island
      */
     public Map<Color, Integer> getStudentMap() {
-        return new HashMap<>(this.influence);
+        Map<Color, Integer> returnMap = new HashMap<>();
+        returnMap.putAll(this.influence);
+        return returnMap;
     }
 
     /**

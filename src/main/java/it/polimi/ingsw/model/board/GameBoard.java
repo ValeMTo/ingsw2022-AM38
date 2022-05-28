@@ -57,6 +57,18 @@ public abstract class GameBoard extends Listenable {
         motherNature = 1;
     }
 
+    private void notifyClouds(){
+        if(this.clients!=null && this.modelListener!=null){
+            for(int i=0;i<clouds.length;i++)
+                notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
+        }
+    }
+
+    private void notifyArchipelago(){
+        if(clients!=null && modelListener!=null)
+        notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
+    }
+
     /**
      * Sets the listener and clients for the update and notify for changes
      * @param modelListener : the modelListener
@@ -68,6 +80,13 @@ public abstract class GameBoard extends Listenable {
         if(clients!=null)
         this.clients.addAll(clients);
         if(this.clients!=null && this.modelListener!=null){
+            for(Island island:islands)
+            {
+                island.setListenerAndClients(modelListener,clients);
+            }
+            for(PlayerBoard playerBoard: players){
+                playerBoard.setListenerAndClients(modelListener,clients);
+            }
             System.out.println("GAME BOARD - notify the archipelago");
             notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
             System.out.println("GAME BOARD - notify the archipelago");
@@ -94,10 +113,7 @@ public abstract class GameBoard extends Listenable {
             // We update the number of tower on the island adding the Towers of the island merging
             islandReceiver.setTowerNumber(towersNumber);
             // We transfer all the student to the island that have the group Island's properties
-            for (Color color : Color.values()) {
-                for (int i = 0; i < islandGiver.studentNumber(color); i++)
-                    islandReceiver.addStudent(color);
-            }
+            islandReceiver.addStudent(islandGiver.getStudentMap());
             if (motherNature == islandGiver.getPosition()) motherNature = islandReceiver.getPosition();
             return true;
         }

@@ -10,6 +10,8 @@ import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
+import static it.polimi.ingsw.controller.PhaseEnum.PLANNING;
+
 public abstract class GameOrchestrator extends Listenable {
     protected final int maxStudentMoves = 3;
     protected final Map<String, Tower> playersTower;
@@ -36,7 +38,15 @@ public abstract class GameOrchestrator extends Listenable {
         this.clients = new ArrayList<>();
         if(clients != null)
             this.clients.addAll(clients);
-
+        // TODO: better this. It is hardcode...
+        System.out.println("GAME MODE NOTIFY: SETUP OF THE VIEW STATES");
+        Map<String, Tower> sendMap = new HashMap<>();
+        sendMap.put(players.get(0), Tower.WHITE);
+        sendMap.put(players.get(1), Tower.BLACK);
+        if (players.size() >= 3)
+            sendMap.put(players.get(2), Tower.GRAY);
+        if(clients != null)
+            notify(modelListener, MessageGenerator.setupUpdateMessage(sendMap, players.size(),isExpert),clients);
         this.isExpert = isExpert;
         System.out.println("GAMEORCHESTRATOR - SETTING");
         if (isExpert) this.gameBoard = new ExpertGameBoard(players.size(), players);
@@ -73,7 +83,6 @@ public abstract class GameOrchestrator extends Listenable {
             else limit = 9;
             for (int j = 0; j < players.size(); j++) {
                 for (int idx = 0; idx < limit; idx++) {
-
                     gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
                 }
             }
@@ -84,17 +93,13 @@ public abstract class GameOrchestrator extends Listenable {
 
         gameBoard.fillClouds();
         if(clients!=null&&modelListener!=null) {
-            System.out.println("GAMEORHCESTRATOR NOTIFY: SETUP OF THE VIEW STATES");
-            Map<String, Tower> sendMap = new HashMap<>();
-            sendMap.putAll(this.playersTower);
-            notify(modelListener, MessageGenerator.setupUpdateMessage(sendMap, playersTower.size(), isExpert), clients);
-            currentPhase = PhaseEnum.PLANNING;
+            currentPhase = PLANNING;
             System.out.println("GAMEORHCESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
             notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
             System.out.println("GAMEORHCESTRATOR NOTIFY: new phase " + currentPhase.name());
             notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
         }
-        currentPhase = PhaseEnum.PLANNING;
+        currentPhase = PLANNING;
     }
 
     /**
@@ -104,7 +109,7 @@ public abstract class GameOrchestrator extends Listenable {
      */
     public String getActivePlayer() {
         synchronized (phaseBlocker) {
-            if (getCurrentPhase().equals(PhaseEnum.PLANNING)) return this.planningOrder[activePlayer];
+            if (getCurrentPhase().equals(PLANNING)) return this.planningOrder[activePlayer];
             return this.actionOrder[activePlayer];
         }
     }
@@ -150,7 +155,6 @@ public abstract class GameOrchestrator extends Listenable {
                 this.currentPhase = PhaseEnum.END;
             else this.currentPhase = updatePhase;
         }
-        if (clients != null) notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
     }
 
     /**
@@ -240,7 +244,7 @@ public abstract class GameOrchestrator extends Listenable {
     public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
         synchronized (actionBlocker) {
             // If the current phase is incorrect
-            if (getCurrentPhase() != PhaseEnum.PLANNING) throw new IncorrectPhaseException(this.getCurrentPhase());
+            if (getCurrentPhase() != PLANNING) throw new IncorrectPhaseException(this.getCurrentPhase());
             try {
                 Set<Integer> usableCards = gameBoard.getUsableAssistantCard(gameBoard.getPlayerTower(getActivePlayer())).keySet();
                 usableCards.removeAll(playedAssistantCard);
@@ -265,9 +269,10 @@ public abstract class GameOrchestrator extends Listenable {
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
+                notifyPhaseAndCurrentPlayer();
                 return true;
             }
-            System.out.println("GAME ORCHESTRATOR NOTIFY - chooseCard - player "+gameBoard.getCurrentPlayer()+" cannot use card"+priority);
+            notifyPhaseAndCurrentPlayer();
             return false;
         }
     }
@@ -340,8 +345,19 @@ public abstract class GameOrchestrator extends Listenable {
     }
 
     private void notifyPhaseAndCurrentPlayer(){
+        if(clients!=null&&modelListener!=null) {
+            System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer])+" phase "+this.getCurrentPhase());
+            if(currentPhase==PLANNING) {
+                System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer]), this.getCurrentPhase()), clients);
+            }
+            else {
+                System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase()), clients);
+            }
+        }
+        }
 
-    }
 
     /**
      * Updates to the successive player of the planning phase
@@ -358,7 +374,7 @@ public abstract class GameOrchestrator extends Listenable {
     private void nextStep() {
         synchronized (phaseBlocker) {
             try {
-                if (getCurrentPhase() == PhaseEnum.PLANNING) {
+                if (getCurrentPhase() == PLANNING) {
                     //Goes to the next player and set it into the gameBoard
                     activePlayer++;
                     if (activePlayer < players.size()) {
@@ -368,10 +384,8 @@ public abstract class GameOrchestrator extends Listenable {
                     else {
                         this.setActionOrder();
                         activePlayer = 0;
-
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
                         System.out.println("GAME ORCHESTRATOR - Setting as current player: " + actionOrder[activePlayer] + " with tower " + gameBoard.getPlayerTower(actionOrder[activePlayer]));
-
                         this.studentMovesLeft = maxStudentMoves;
                         setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                     }
@@ -392,7 +406,7 @@ public abstract class GameOrchestrator extends Listenable {
                         activePlayer = 0;
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
                         this.specialCardAlreadyUsed = false;
-                        setCurrentPhase(PhaseEnum.PLANNING);
+                        setCurrentPhase(PLANNING);
                         gameBoard.increaseRound();
                         gameBoard.fillClouds();
                         playedAssistantCard.clear();
@@ -403,8 +417,15 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                 }
                 if(clients!=null&&modelListener!=null) {
-                    System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer])+" phase "+this.getCurrentPhase());
-                    notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer]),this.getCurrentPhase()), clients);
+                    if(getCurrentPhase()==PLANNING) {
+                        System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - PLANNING PHASE - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                        notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer]), this.getCurrentPhase()), clients);
+                    }
+                    else {
+                        System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - ACTION Phase - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                        notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase()), clients);
+                    }
+
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();

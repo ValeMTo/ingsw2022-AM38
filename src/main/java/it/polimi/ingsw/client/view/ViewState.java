@@ -15,21 +15,21 @@ import java.util.*;
  * ViewState contains all the information to visualize the current state of the gameBoard
  */
 public class ViewState {
-    private Map<String, Tower> players;
-    private List<IslandView> islands;
-    private Map<Cloud, Integer> clouds;
-    private List<SchoolBoardState> schoolBoards;
+    private Map<String, Tower> players = new HashMap<>();
+    private List<IslandView> islands = new ArrayList<>();
+    private Map<Cloud, Integer> clouds = new HashMap<>();
+    private List<SchoolBoardState> schoolBoards = new ArrayList<>();
     private boolean isExpert;
     private boolean isTheCommander;
     private PhaseEnum currentPhase;
     private boolean activeView;
-    private List<Integer> usableCards;
+    private List<Integer> usableCards = new ArrayList<>();
     private Tower playerTower;
-    private Map<Color, Tower> professors;
+    private Map<Color, Tower> professors = new HashMap<>();
     private int motherNature;
     private boolean isEndOfMatch = false;
     private GameSettings gameSettings;
-    private Map<SpecialCardName,Integer> usableSpecialCards;
+    private Map<SpecialCardName,Integer> usableSpecialCards = new HashMap<>();
 
     private String nickName = null;
 
@@ -82,34 +82,23 @@ public class ViewState {
     public synchronized void setViewState(Map<String, Tower> players, boolean isExpert) {
         for(String player:players.keySet())
             System.out.println("VIEW STATE - ADDING PLAYERS - Player "+player+" with tower "+players.get(player));
-
         this.clouds = new HashMap<>();
         this.usableSpecialCards = new HashMap<>();
-        this.usableCards = new ArrayList<Integer>();
+        this.usableCards = new ArrayList<>();
         this.players = new HashMap<>();
         this.players.putAll(players);
         this.isExpert = isExpert;
         activeView = true;
         currentPhase = PhaseEnum.CREATING_GAME;
-        professors = new HashMap<>();
-        islands = new ArrayList<>();
-        for (int i = 1; i <= 12; i++) {
-            islands.add(new IslandView(i));
-        }
-
-        schoolBoards = new ArrayList<>();
-        for (Tower playerPerson : players.values()){
-            schoolBoards.add(new SchoolBoardState(playerPerson));
-        }
-
-        for (Color color : Color.values()) {
-            professors.put(color, null);
-
-        }
-        motherNature = 1;
         for (int i = 1; i < 11; i++)
             usableCards.add(i);
-
+        this.schoolBoards = new ArrayList<>();
+        for(Tower tower:players.values())
+        {
+            SchoolBoardState schoolBoardState = new SchoolBoardState(tower);
+            this.schoolBoards.add(schoolBoardState);
+            System.out.println("VIEW STATE - setViewState - adding new SchoolBoard "+schoolBoardState+" of "+schoolBoardState.getPlayer());
+        }
         playerTower = players.get(this.nickName);
         if(awaitingCLI!=null)
         synchronized (awaitingCLI) {
@@ -210,7 +199,7 @@ public class ViewState {
         return new HashMap<>(professors);
     }
 
-    public void setProfessors(Map<Color, Tower> professors) {
+    public synchronized void setProfessors(Map<Color, Tower> professors) {
         this.professors = new HashMap<>(professors);
     }
 
@@ -272,7 +261,7 @@ public class ViewState {
         this.playerTower = playerTower;
     }
 
-    private SchoolBoardState findSchoolBoard(Tower player){
+    private synchronized SchoolBoardState findSchoolBoard(Tower player){
         for (SchoolBoardState schoolboard: schoolBoards){
             if (schoolboard.getPlayer().equals(player)){
                 return schoolboard;

@@ -70,7 +70,17 @@ public class PlayerBoard extends Listenable {
         if(clients!=null)
             this.clients.addAll(clients);
         notifyUsablesCards();
+        notifyPlayerBoard();
+    }
 
+    private void notifyPlayerBoard(){
+        if(this.clients!=null && this.modelListener!=null) {
+            Map<Color, Integer> diningRoom = new HashMap<>();
+            Map<Color, Integer> schoolEntrance = new HashMap<>();
+            diningRoom.putAll(this.schoolBoard.getDiningRoomOccupancy());
+            schoolEntrance.putAll(this.schoolBoard.getSchoolEntranceOccupancy());
+            notify(modelListener,MessageGenerator.schoolBoardViewUpdate(diningRoom,schoolEntrance,this.towerColor,this.towers,this.coin),clients);
+        }
     }
 
     /**
