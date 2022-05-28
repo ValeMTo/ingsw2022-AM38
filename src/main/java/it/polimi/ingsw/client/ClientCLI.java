@@ -10,6 +10,7 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
@@ -22,7 +23,6 @@ import java.util.*;
 public class ClientCLI {
     private static String hostName;
     private static int portNumber;
-    private boolean YourTurnShown;
     private final PrintStream out;
     private final String CLICyan = "\033[36;1m";
     private final String CLIRed = "\033[31;1m";
@@ -58,6 +58,7 @@ public class ClientCLI {
 
         ClientCLI cli = new ClientCLI();
         cli.login();
+        cli.setAwaitingCLI();
         cli.startGame();
     }
 
@@ -110,38 +111,76 @@ public class ClientCLI {
     }
 
     /**
+     * Sets this CLI as the one that waits the ViewState
+     */
+    public void setAwaitingCLI(){
+        this.viewState.setAwaitingCLI(this);
+    }
+
+    /**
      * Start Game models the recursive phase of printing coherent menus and interface and waits for correct inputs
      */
     public void startGame() {
-        YourTurnShown = false;
         while (!viewState.isEndOfMatch()) {
             if (!viewState.isActiveView()) {
-                if (!YourTurnShown){
+                if (!viewState.getTurnShown()){
+                    System.out.println("CLIENTCLI - not your turn");
                     showNotYoutTurnView();
-                    YourTurnShown = true;
+                    viewState.setTurnShown(true);
                 }
-            } else {
-                YourTurnShown= false;
+            } else if(viewState.getTurnShown()==false){
                 if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
+                    System.out.println("CLIENTCLI - assistant card print");
                     printAssistantCards();
                     int card = showPlanningInstructionAndGetCard();
                     connectionSocket.setAssistantCard(card);
-                    viewState.setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS); //TODO: maybe change
-                    connectionSocket.updateNewPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
+                    viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
+                    System.out.println("CLIENTCLI - student move");
                     showActionMoveStudentsInstruction();
-                    YourTurnShown = true;
+                    Color colorToMove = showColorChoiseInstructionAndGetColor();
+                    while(colorToMove==null){
+                        colorToMove = showColorChoiseInstructionAndGetColor();
+                    }
+                    StudentCounter location = showStudentMovementDiningOrIsland();
+                    if(location.equals(StudentCounter.ISLAND)){//TODO
+                        System.out.println("CLIENTCLI - YOU CHOOSE ISLAND");
+                    }
+                    else
+                    {//TODO
+                        System.out.println("CLIENTCLI - YOU CHOOSE DINING ROOM");
+                    }
+                    viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
+                    System.out.println("CLIENTCLI - mother nature set");
                     showMoveMotherNatureInstruction();
-                    YourTurnShown = true;
+                    viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
+                    System.out.println("CLIENTCLI - choice cloud");
                     showCloudChoiceInstruction();
-                    YourTurnShown = true;
+                    viewState.setTurnShown(true);
                 }
+            }
+            if(viewState.getTurnShown()==true)
+            {
+                synchronized (this)
+                {
+                    try {
+                        System.out.println("CLIENT CLI - I am sleepy, I'll take a nap");
+                        this.wait();
+                    }
+                    catch (InterruptedException exc){
+                        exc.printStackTrace();
+                        viewState.setTurnShown(false);
+                    }
+                    System.out.println("CLIENT CLI - Mhhhh... A god nap, let's get to work now");
+                }
+
             }
             //Not put cleaner here
         }
     }
+
 
     /**
      * Shows the possible commands and what to do in the planning phase.
@@ -192,6 +231,28 @@ public class ClientCLI {
      */
     private void showNotYoutTurnView() {
         System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
+    }
+
+    private Color showColorChoiseInstructionAndGetColor(){
+        System.out.println(CLICyan+" Choice a student color: "+CLIBlue+"B"+CLIEffectReset+" for "+CLIBlue+"BLUE"+CLIEffectReset+", "+CLIGreen+"G"+CLIEffectReset+" for "+CLIGreen+"GREEN"+CLIEffectReset+", "+CLIYellow+"Y"+CLIEffectReset+" for "+CLIYellow+"YELLOW"+CLIEffectReset+", "+CLIPink+"P"+CLIEffectReset+" for "+CLIPink+"PINK"+CLIEffectReset+", "+CLIRed+"R"+CLIEffectReset+" for "+CLIRed+"RED"+CLIEffectReset+" ");
+        String input = in.nextLine();
+        return Color.fromAbbreviationToColor(input);
+    }
+
+    /**
+     * Shows the message of choice between place to diningRoom or Island adn get the choice
+     * @return
+     */
+    private StudentCounter showStudentMovementDiningOrIsland(){
+        while(true){
+            System.out.println(CLICyan+"Choise if place where the Student from the SchoolEntrance will go. Enter D for DiningRoom, I for Island");
+            String input = in.nextLine();
+            if(input.equalsIgnoreCase("D"))
+                return StudentCounter.DININGROOM;
+            if(input.equalsIgnoreCase("I"))
+                return StudentCounter.ISLAND;
+            System.out.println(CLIPink+"Incorrect value! Try again, D is for DiningRoom, I for Island");
+        }
     }
 
     //TODO : support to sending message in base of the current phase

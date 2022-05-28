@@ -22,6 +22,9 @@ public abstract class Listenable<T> {
     }
 
     public void notify(Listener listener, String message, List<ClientHandler> clients){
+        for(ClientHandler client:clients){
+            System.out.println("NOTIFY - I am gonna notify "+client.getNickName());
+        }
         listener.update(message, clients);
     }
 }

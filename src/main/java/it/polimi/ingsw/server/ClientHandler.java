@@ -56,9 +56,9 @@ public class ClientHandler implements Runnable {
         while (true) {
             System.out.println(playerName);
             message = inputReader.nextLine();
+            System.out.println("MESSAGE PARSER - player "+this.getNickName()+" got message "+message);
             System.out.println(message);
             writer.print(messageParser.parseMessageToAction(message));
-            System.out.println("/n");
         }
     }
 

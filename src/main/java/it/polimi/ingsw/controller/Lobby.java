@@ -37,7 +37,6 @@ public class Lobby {
     }
 
     public void addPlayer(ClientHandler client) {
-
         queue.add(client);
         players.add(client.getNickName());
         System.out.println("LOBBY - Adding new player named "+client.getNickName()+" (" + queue.size() + " of " + numOfPlayers + ")");

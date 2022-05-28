@@ -18,10 +18,14 @@ public class Reader implements Runnable {
 
     @Override
     public void run(){
+        String input;
         while(true)
         {
             try {
-                viewHandler.parse(inputReader.readLine());
+                System.out.println("READER - waiting for message");
+                input = inputReader.readLine();
+                System.out.println("READER - got message "+input);
+                viewHandler.parse(input);
             } catch (IOException e) {
                 e.printStackTrace();
             }

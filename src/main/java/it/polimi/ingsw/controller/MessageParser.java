@@ -48,7 +48,8 @@ public class MessageParser{
         System.out.println("MessageParser");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
         if ( gameOrchestrator!= null &&!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName())) {
-            System.out.println("ERROR - This is not his/her turn");
+            System.out.println("MESSAGE PARSER - ERROR - This is not his/her turn");
+            System.out.println("MESSAGE PARSER - ERROR - current player is "+gameOrchestrator.getActivePlayer());
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
         }
         String returnMessage = null;

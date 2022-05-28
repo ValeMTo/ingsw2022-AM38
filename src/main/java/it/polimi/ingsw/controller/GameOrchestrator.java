@@ -33,7 +33,8 @@ public abstract class GameOrchestrator extends Listenable {
 
     public GameOrchestrator(List<String> players, boolean isExpert, int id, List<ClientHandler> clients) {
         createListeners();
-        this.clients = clients;
+        this.clients = new ArrayList<>();
+        this.clients.addAll(clients);
 
         this.isExpert = isExpert;
         System.out.println("GAMEORCHESTRATOR - SETTING");
@@ -259,8 +260,6 @@ public abstract class GameOrchestrator extends Listenable {
                     for (Integer card : gameBoard.getUsableAssistantCard(gameBoard.getCurrentPlayer()).keySet()) {
                         usableCards.add(card);
                     }
-                    if (clients != null)
-                        notify(modelListener, MessageGenerator.useAssistantCardMessage(priority), clients);
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
@@ -364,7 +363,7 @@ public abstract class GameOrchestrator extends Listenable {
                         activePlayer = 0;
 
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
-                        System.out.println("Setting as current player: " + actionOrder[activePlayer] + " with tower " + gameBoard.getPlayerTower(actionOrder[activePlayer]));
+                        System.out.println("GAME ORCHESTRATOR - Setting as current player: " + actionOrder[activePlayer] + " with tower " + gameBoard.getPlayerTower(actionOrder[activePlayer]));
 
                         this.studentMovesLeft = maxStudentMoves;
                         setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
@@ -403,7 +402,7 @@ public abstract class GameOrchestrator extends Listenable {
         }
         if (clients != null)
             notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
-        System.out.println(MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
+        System.out.println("GAME ORCHESTRATOR - Sending current player update: "+MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
     }
 
 

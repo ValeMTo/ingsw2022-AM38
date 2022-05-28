@@ -35,12 +35,13 @@ public class ViewMessageParser {
     public void parse(String jsonFromServer) {
 
         if (jsonFromServer != null) {
-            System.out.println("Got message " + jsonFromServer);
+            System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
         }
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").equals(MessageTypeEnum.ERROR.ordinal())) {
             System.out.println(json.get("ErrorType") + " - " + json.get("errorString"));
+            view.setTurnShown(false);
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
@@ -49,18 +50,12 @@ public class ViewMessageParser {
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
                 System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower "+json.get("CurrentPlayer").getAsString());
                 view.setActivePlayer(Tower.toTower(json.get("CurrentPlayer").getAsString()));
-                if (view.getNamePlayer(view.getPlayerTower()).equalsIgnoreCase(json.get("CurrentPlayer").getAsString())) {
-                    view.setActiveView(true);
-                } else {
-                    view.setActiveView(false);
-                }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()){
                 Map<String, String> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
                 Map<String, Tower> playersWithTower = new HashMap<>();
                 for(String s:players.keySet()){
                     playersWithTower.put(s,Tower.toTower(players.get(s)));
                 }
-
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
             }
 
@@ -78,8 +73,8 @@ public class ViewMessageParser {
                 for(IslandView island:islands)
                     if(island.getPosition()==islandToAdd.getPosition()) {
                         islands.remove(island);
-                        islands.add(islandToAdd);
                     }
+                islands.add(islandToAdd);
             }
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
