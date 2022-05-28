@@ -130,13 +130,15 @@ public class ClientCLI {
                 }
             } else if(viewState.getTurnShown()==false){
                 if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
-                    System.out.println("CLIENTCLI - assistant card print");
+                    System.out.println("CLIENT CLI - assistant card print");
                     printAssistantCards();
                     int card = showPlanningInstructionAndGetCard();
                     connectionSocket.setAssistantCard(card);
                     viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
-                    System.out.println("CLIENTCLI - student move");
+                    System.out.println("CLIENT CLI - student move");
+                    printArchipelago();
+                    printPlayerBoard();
                     showActionMoveStudentsInstruction();
                     Color colorToMove = showColorChoiseInstructionAndGetColor();
                     while(colorToMove==null){
@@ -144,19 +146,19 @@ public class ClientCLI {
                     }
                     StudentCounter location = showStudentMovementDiningOrIsland();
                     if(location.equals(StudentCounter.ISLAND)){//TODO
-                        System.out.println("CLIENTCLI - YOU CHOOSE ISLAND");
+                        System.out.println("CLIENT CLI - YOU CHOOSE ISLAND");
                     }
                     else
                     {//TODO
-                        System.out.println("CLIENTCLI - YOU CHOOSE DINING ROOM");
+                        System.out.println("CLIENT CLI - YOU CHOOSE DINING ROOM");
                     }
                     viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
-                    System.out.println("CLIENTCLI - mother nature set");
+                    System.out.println("CLIENT CLI - mother nature set");
                     showMoveMotherNatureInstruction();
                     viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
-                    System.out.println("CLIENTCLI - choice cloud");
+                    System.out.println("CLIENT CLI - choice cloud");
                     showCloudChoiceInstruction();
                     viewState.setTurnShown(true);
                 }

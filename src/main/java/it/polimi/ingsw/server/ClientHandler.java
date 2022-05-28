@@ -84,6 +84,7 @@ public class ClientHandler implements Runnable {
                 System.out.println("CLIENT HANDLER of" + playerName + "- Waiting for messageParser");
                 synchronized (this) {
                     this.messageParser = Server.getMessageParserFromLobby(this);
+                    System.out.println("CLIENT HANDLER of" + playerName + "- Got a messageParser"+this.messageParser);
                     if (this.messageParser == null) {
                         this.wait();
                         this.messageParser = Server.getMessageParserFromLobby(this);

@@ -165,6 +165,30 @@ public class ViewState {
         System.out.println("VIEW STATE - GetNamePlayer - OH NO");
         return null;
     }
+
+    /**
+     * Sets the active player and the phase together to avoid situations when the current phase is changed but not the player and vice-versa
+     * @param currentPlayer
+     * @param phase
+     */
+    public synchronized void setActivePlayerAndPhase(Tower currentPlayer, PhaseEnum phase){
+        this.activePlayer = currentPlayer;
+        this.currentPhase = phase;
+        if(this.activePlayer.equals(this.playerTower)) {
+            this.activeView = true;
+            this.turnShown = false;
+            System.out.println("VIEW STATE - setActivePlayerAndPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
+        }
+        else {
+            this.activeView = false;
+            System.out.println("VIEW STATE - setActivePlayerAndPhase - I am not the chosen one I am  "+this.playerTower+" not "+this.activePlayer);
+        }
+        if(awaitingCLI!=null)
+            synchronized (awaitingCLI) {
+                System.out.println("VIEW STATE - setActivePlayerAndPhase - Hey CLI, it's time to wake up!");
+                awaitingCLI.notifyAll();
+            }
+    }
     public synchronized void setUsableCards(List<Integer> usableCards) {
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);

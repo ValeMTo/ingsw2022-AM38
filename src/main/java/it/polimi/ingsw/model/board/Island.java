@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.board;
 
+import com.sun.jdi.PrimitiveValue;
 import it.polimi.ingsw.controller.mvc.Listenable;
 import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.controller.mvc.ModelListener;
@@ -45,7 +46,15 @@ public class Island extends Listenable {
             returnMap.putAll(this.influence);
             notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
         }
+    }
 
+    private void notifySomethingHasChanged(){
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("ISLAND "+this.position+" - notify a change!");
+            Map<Color,Integer> returnMap = new HashMap<>();
+            returnMap.putAll(this.influence);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+        }
     }
 
     /**
@@ -70,6 +79,7 @@ public class Island extends Listenable {
             influence.put(color, 1);
         else
             influence.put(color, influence.get(color) + 1);
+        notifySomethingHasChanged();
         return true;
     }
 
@@ -79,6 +89,7 @@ public class Island extends Listenable {
      */
     public void disableInfluence() {
         influenceIsEnabled = false;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -86,6 +97,7 @@ public class Island extends Listenable {
      */
     public void enableInfluence() {
         influenceIsEnabled = true;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -134,6 +146,7 @@ public class Island extends Listenable {
      */
     public void setTower(Tower tower) {
         this.towerColor = tower;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -143,6 +156,7 @@ public class Island extends Listenable {
      */
     public void setTowerNumber(int towerNum) {
         this.towerNumber = towerNum;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -152,6 +166,7 @@ public class Island extends Listenable {
      */
     public void setPosition(int pos) {
         this.position = pos;
+        notifySomethingHasChanged();
     }
 
     /**

@@ -390,7 +390,6 @@ public abstract class GameOrchestrator extends Listenable {
                     else if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.NoEndOfMatch)) {
                         this.setPlanningOrder();
                         activePlayer = 0;
-
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
                         this.specialCardAlreadyUsed = false;
                         setCurrentPhase(PhaseEnum.PLANNING);
@@ -404,18 +403,13 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                 }
                 if(clients!=null&&modelListener!=null) {
-                    System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
-                    notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
-                    System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep -  New phase " + currentPhase.name());
-                    notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
+                    System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer])+" phase "+this.getCurrentPhase());
+                    notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer]),this.getCurrentPhase()), clients);
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();
             }
         }
-        if (clients != null)
-            notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()), clients);
-        System.out.println("GAME ORCHESTRATOR - Sending current player update: "+MessageGenerator.currentPlayerUpdateMessage(gameBoard.getCurrentPlayer()));
     }
 
 

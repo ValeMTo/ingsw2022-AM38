@@ -76,6 +76,11 @@ public class ViewMessageParser {
                     }
                 islands.add(islandToAdd);
             }
+            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()){
+                synchronized (view){
+                    view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()),PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
+                }
+            }
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
