@@ -34,7 +34,8 @@ public abstract class GameOrchestrator extends Listenable {
     public GameOrchestrator(List<String> players, boolean isExpert, int id, List<ClientHandler> clients) {
         createListeners();
         this.clients = new ArrayList<>();
-        this.clients.addAll(clients);
+        if(clients != null)
+            this.clients.addAll(clients);
 
         this.isExpert = isExpert;
         System.out.println("GAMEORCHESTRATOR - SETTING");
