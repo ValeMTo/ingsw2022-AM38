@@ -42,14 +42,17 @@ public class ViewMessageParser {
         }
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
-        if (json.get("MessageType").equals(MessageTypeEnum.ERROR.ordinal())) {
-            System.out.println("READER - "+json.get("ErrorType") + " - " + json.get("errorString"));
+        if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
+            System.out.println("READER - GOT ERROR MESSAGE - "+json.get("ErrorType") + " - " + json.get("errorString"));
             view.setTurnShown(false);
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
                 Tower tower = Tower.toTower(json.get("PlayerTower").getAsString());
-                if (json.get("LastUsed") != null)
-                    view.useAssistantCard(tower, json.get("LastUsed").getAsInt());
+                List<Number> usableAssistantCardNum = gson.fromJson(json.get("AvailableCards"),ArrayList.class);
+                List<Integer> usableAssistantCardInt = new ArrayList<>();
+                for(Number num: usableAssistantCardNum)
+                    usableAssistantCardInt.add(num.intValue());
+                view.setUsableCards(usableAssistantCardInt);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
                 System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower " + json.get("CurrentPlayer").getAsString());
                 view.setActivePlayer(Tower.toTower(json.get("CurrentPlayer").getAsString()));

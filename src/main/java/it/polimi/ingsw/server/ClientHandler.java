@@ -60,6 +60,7 @@ public class ClientHandler implements Runnable {
             System.out.println("CLIENT HANDLER - player "+this.getNickName()+" got message "+message);
             System.out.println(message);
             writer.print(messageParser.parseMessageToAction(message));
+            writer.flush();
         }
     }
 

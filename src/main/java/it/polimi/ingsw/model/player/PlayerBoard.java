@@ -279,7 +279,11 @@ public class PlayerBoard extends Listenable {
      * @return outcome of the removal
      */
     public boolean removeStudentEntrance(Color studentColor) {
-        return schoolBoard.removeStudentEntrance(studentColor);
+        boolean returnValue = schoolBoard.removeStudentEntrance(studentColor);
+        if(returnValue)
+            notifyPlayerBoard();
+        return returnValue;
+
     }
 
     /**

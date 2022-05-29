@@ -391,7 +391,6 @@ public abstract class GameBoard extends Listenable {
 
             case SCHOOLENTRANCE:
                 if (position >= 0 && position < playerNumber)
-
                     return players[position].removeStudentEntrance(student);
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 

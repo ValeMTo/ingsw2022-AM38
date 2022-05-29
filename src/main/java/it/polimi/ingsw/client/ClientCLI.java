@@ -110,6 +110,24 @@ public class ClientCLI {
         return;
     }
 
+    public void printForMoveStudents(){
+        System.out.println("CLIENT CLI - student move");
+        printArchipelago();
+        printPlayerBoard();
+        showActionMoveStudentsInstruction();
+        showColorChoiseInstruction();
+    }
+
+    public void printForMoveMotherNature(){
+        System.out.println("CLIENT CLI - mother nature set");
+        printArchipelago();
+        showMoveMotherNatureInstruction();
+    }
+
+    public void printForAssistantCardChoice(){
+        System.out.println("CLIENT CLI - assistant card print");
+        printAssistantCards();
+    }
     /**
      * Sets this CLI as the one that waits the ViewState
      */
@@ -122,44 +140,40 @@ public class ClientCLI {
      */
     public void startGame() {
         while (!viewState.isEndOfMatch()) {
-            if (!viewState.isActiveView()) {
-                if (!viewState.getTurnShown()){
+            if (!viewState.isActiveView()&&!viewState.getTurnShown()) {
                     System.out.println("CLIENTCLI - not your turn");
+                    viewState.setTurnShown(true);
                     showNotYoutTurnView();
-                    viewState.setTurnShown(true);
-                }
-            } else if(viewState.getTurnShown()==false){
+            } else if(!viewState.getTurnShown()){
                 if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
-                    System.out.println("CLIENT CLI - assistant card print");
-                    printAssistantCards();
+                    printForAssistantCardChoice();
                     int card = showPlanningInstructionAndGetCard();
-                    connectionSocket.setAssistantCard(card);
                     viewState.setTurnShown(true);
+                    connectionSocket.setAssistantCard(card);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_STUDENTS) {
-                    System.out.println("CLIENT CLI - student move");
-                    printArchipelago();
-                    printPlayerBoard();
-                    showActionMoveStudentsInstruction();
-                    Color colorToMove = showColorChoiseInstructionAndGetColor();
+                    printForMoveStudents();
+                    Color colorToMove = null;
                     while(colorToMove==null){
-                        colorToMove = showColorChoiseInstructionAndGetColor();
+                        String input = in.nextLine();
+                        colorToMove = Color.fromAbbreviationToColor(input);;
                     }
                     StudentCounter location = showStudentMovementDiningOrIsland();
                     if(location.equals(StudentCounter.ISLAND)){//TODO
                         System.out.println("CLIENT CLI - YOU CHOOSE ISLAND");
-                        int position = showIslandChoiseInstructionAndGetPosition();
+                        showIslandChoiseInstruction();
+                        String input = in.nextLine();
+                        int position =  Integer.parseInt(input);
+                        viewState.setTurnShown(true);
                         connectionSocket.moveStudentToIsland(colorToMove,position);
                     }
                     else
                     {//TODO
                         System.out.println("CLIENT CLI - YOU CHOOSE DINING ROOM");
+                        viewState.setTurnShown(true);
                         connectionSocket.moveStudentToDiningRoom(colorToMove);
                     }
-                    viewState.setTurnShown(true);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) {
-                    System.out.println("CLIENT CLI - mother nature set");
-                    printArchipelago();
-                    showMoveMotherNatureInstruction();
+                    printForMoveMotherNature();
                     int position = getMotherNatureMove();
                     viewState.setTurnShown(true);
                     connectionSocket.moveMotherNature(position);
@@ -172,22 +186,19 @@ public class ClientCLI {
                     connectionSocket.chooseCloud(num);
                 }
             }
-            if(viewState.getTurnShown()==true)
-            {
-                synchronized (this)
-                {
-                    try {
-                        System.out.println("CLIENT CLI - I am sleepy, I'll take a nap");
-                        this.wait();
+                if (viewState.getTurnShown()) {
+                    synchronized (this) {
+                        try {
+                            System.out.println("CLIENT CLI - I am sleepy, I'll take a nap");
+                            this.wait();
+                        } catch (InterruptedException exc) {
+                            exc.printStackTrace();
+                            viewState.setTurnShown(false);
+                        }
+                        System.out.println("CLIENT CLI - Mhhhh... A god nap, let's get to work now");
                     }
-                    catch (InterruptedException exc){
-                        exc.printStackTrace();
-                        viewState.setTurnShown(false);
-                    }
-                    System.out.println("CLIENT CLI - Mhhhh... A god nap, let's get to work now");
                 }
 
-            }
             //Not put cleaner here
         }
     }
@@ -225,6 +236,8 @@ public class ClientCLI {
             } catch (InputMismatchException e) {
                 System.out.println("Please, insert a number.");
             }
+            if(numOfCard <= 0 || numOfCard > 10)
+                System.out.println(CLIPink+"Incorrect range, assistant card values are from 1 to 10"+CLIEffectReset);
         }
 
         return numOfCard;
@@ -259,16 +272,12 @@ public class ClientCLI {
         System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
     }
 
-    private Color showColorChoiseInstructionAndGetColor(){
+    public void showColorChoiseInstruction(){
         System.out.println(CLICyan+" Choice a student color: "+CLIBlue+"B"+CLIEffectReset+" for "+CLIBlue+"BLUE"+CLIEffectReset+", "+CLIGreen+"G"+CLIEffectReset+" for "+CLIGreen+"GREEN"+CLIEffectReset+", "+CLIYellow+"Y"+CLIEffectReset+" for "+CLIYellow+"YELLOW"+CLIEffectReset+", "+CLIPink+"P"+CLIEffectReset+" for "+CLIPink+"PINK"+CLIEffectReset+", "+CLIRed+"R"+CLIEffectReset+" for "+CLIRed+"RED"+CLIEffectReset+" ");
-        String input = in.nextLine();
-        return Color.fromAbbreviationToColor(input);
     }
 
-    private int showIslandChoiseInstructionAndGetPosition(){
+    public void showIslandChoiseInstruction(){
         System.out.println(CLICyan+" Choice an island position to move the student on: "+CLIEffectReset);
-        String input = in.nextLine();
-        return Integer.parseInt(input);
     }
 
     /**
@@ -691,7 +700,7 @@ public class ClientCLI {
             rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW),10) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.PINK)))
-                rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK " + CLIEffectReset + "  ";
+                rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK  " + CLIEffectReset + "  ";
             else
                 rows[7] += effectSchoolBoard+"  │            ";
             rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK),10) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";

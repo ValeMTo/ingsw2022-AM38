@@ -209,6 +209,9 @@ public class MessageParser{
         } catch (IncorrectPhaseException exc) {
             return MessageGenerator.errorWrongPhase(exc.getActualPhase());
         }
+        catch (IndexOutOfBoundsException exc) {
+            return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.INVALID_INPUT, "ERROR - No cloud has the given position");
+        }
     }
 
 
