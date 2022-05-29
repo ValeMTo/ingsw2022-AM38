@@ -39,6 +39,7 @@ public class Island extends Listenable {
     public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
         this.modelListener = modelListener;
         this.clients = new ArrayList<>();
+        if(clients!=null)
         this.clients.addAll(clients);
         if(this.clients!=null && this.modelListener!=null){
             System.out.println("ISLAND "+this.position+" - notify my existence!");
