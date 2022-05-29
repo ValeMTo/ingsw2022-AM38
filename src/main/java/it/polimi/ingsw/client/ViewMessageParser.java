@@ -67,7 +67,8 @@ public class ViewMessageParser {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
                 IslandView islandToAdd = new IslandView(json.get("position").getAsInt());
-                islandToAdd.setTower(Tower.toTower(json.get("TowerColor").getAsString()));
+                if(json.get("TowerColor").getAsString()!=null&&!json.get("TowerColor").getAsString().equalsIgnoreCase("null"))
+                    islandToAdd.setTower(Tower.values()[json.get("TowerColor").getAsInt()]);
                 islandToAdd.setTowerNumber(json.get("NumOfTowers").getAsInt());
                 Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
                 islandToAdd.setStudentMap(getStudentMapFromStringAndNumberMap(students));
@@ -82,7 +83,7 @@ public class ViewMessageParser {
                 view.setIslands(transformedIslands);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()) {
                 view.setMotherNature(json.get("MotherNaturePosition").getAsInt());
-                //TODO set island number
+                view.setIslandNumber(json.get("NumOfIslands").getAsInt());
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);

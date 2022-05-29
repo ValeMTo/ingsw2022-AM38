@@ -212,7 +212,7 @@ public class ViewState {
 
     public synchronized void setProfessors(Map<Color, Tower> professors) {
         this.professors = new HashMap<>(professors);
-        if(this.currentPhase==PhaseEnum.ACTION_MOVE_STUDENTS)
+        if(this.currentPhase==PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
             if(awaitingCLI!=null)
                 awaitingCLI.printForMoveStudents();
     }
@@ -257,9 +257,9 @@ public class ViewState {
     public synchronized void setMotherNature(int motherNature) {
         this.motherNature = motherNature;
         if(awaitingCLI!=null) {
-            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS)
+            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveStudents();
-            else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE)
+            else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveMotherNature();
         }
     }
@@ -272,9 +272,9 @@ public class ViewState {
         this.islands.clear();
         this.islands.addAll(islands);
         if(awaitingCLI!=null) {
-            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS)
+            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveStudents();
-            else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE)
+            else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveMotherNature();
         }
     }
@@ -299,7 +299,7 @@ public class ViewState {
     public synchronized void setDiningRoomOccupancy(Tower player, Map<Color, Integer> diningRoomOccupancy) {
         findSchoolBoard(player).fillDiningRoom(diningRoomOccupancy);
         if(awaitingCLI!=null) {
-            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS)
+            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveStudents();
         }
     }
@@ -307,7 +307,7 @@ public class ViewState {
     public synchronized void setSchoolEntranceOccupancy(Tower player, Map<Color, Integer> schoolEntranceOccupancy) {
         findSchoolBoard(player).fillSchoolEntrance(schoolEntranceOccupancy);
         if(awaitingCLI!=null) {
-            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS)
+            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveStudents();
         }
     }
@@ -386,5 +386,26 @@ public class ViewState {
     }
     public synchronized GameSettings getGameSettings(){
         return gameSettings;
+    }
+
+    /**
+     * Sets the number of islands and remove the islands
+     * @param numIslands
+     */
+    public synchronized void setIslandNumber(int numIslands){
+        List<IslandView> islandsToModify = new ArrayList<>();
+        islandsToModify.addAll(islands);
+        for(IslandView island:islands)
+        {
+            if (island.getPosition()>numIslands)
+                islandsToModify.remove(island);
+        }
+        islands = islandsToModify;
+        if(awaitingCLI!=null) {
+            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
+                awaitingCLI.printForMoveStudents();
+            else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE)
+                awaitingCLI.printForMoveMotherNature();
+        }
     }
 }

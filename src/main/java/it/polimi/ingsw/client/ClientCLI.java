@@ -158,7 +158,7 @@ public class ClientCLI {
                         colorToMove = Color.fromAbbreviationToColor(input);;
                     }
                     StudentCounter location = showStudentMovementDiningOrIsland();
-                    if(location.equals(StudentCounter.ISLAND)){//TODO
+                    if(location.equals(StudentCounter.ISLAND)){
                         System.out.println("CLIENT CLI - YOU CHOOSE ISLAND");
                         showIslandChoiseInstruction();
                         String input = in.nextLine();
@@ -167,7 +167,7 @@ public class ClientCLI {
                         connectionSocket.moveStudentToIsland(colorToMove,position);
                     }
                     else
-                    {//TODO
+                    {
                         System.out.println("CLIENT CLI - YOU CHOOSE DINING ROOM");
                         viewState.setTurnShown(true);
                         connectionSocket.moveStudentToDiningRoom(colorToMove);
@@ -576,9 +576,9 @@ public class ClientCLI {
                     island = islands.get(j);
             students = island.getStudentMap();
             if (island.getTowerNumber() <= 1)
-                rows[0] += "                    ";
+                rows[0] += "                ";
             else
-                rows[0] += " " + CLICyan + "GROUP OF " + island.getTowerNumber() + " ISLANDS  " + CLIEffectReset;
+                rows[0] += "" + CLICyan + "GROUP X" + island.getTowerNumber() + " ISLANDS " + CLIEffectReset;
             if (island.getPosition() >= 10)
                 rows[1] += " " + CLICyan + " Position : " + island.getPosition() + CLIEffectReset + " ";
             else
@@ -586,10 +586,10 @@ public class ClientCLI {
             rows[2] += "    ┌─────┐    .";
             if (!island.isTaken())
                 rows[3] += "   ┌┘     └┐   .";
-            else if (island.isTaken() && island.getTowerNumber() <= 1)
-                rows[3] += "   ┌┘ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + " TW" + CLIEffectReset + " └┐    .";
+            else if ( island.getTowerNumber() <= 1)
+                rows[3] += "   ┌┘ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + "" + CLIEffectReset + "  └┐   .";
             else
-                rows[3] += "   ┌┘ " + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + " TW(" + island.getTowerNumber() + "N)" + CLIEffectReset + " └┐ .";
+                rows[3] += "   ┌┘" + getAnsiStringFromTower(island.getTower()) + getTowerAbbreviation(island.getTower()) + "(" + island.getTowerNumber() + ")" + CLIEffectReset + "└┐   .";
             if(students.get(Color.BLUE)>0)
             rows[4] += "  ┌┘  " + CLIBlue + "B:" + students.get(Color.BLUE) + CLIEffectReset +     "  └┐  .";
             else
