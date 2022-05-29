@@ -264,7 +264,6 @@ public class ExpertGameBoard extends GameBoard {
      * between the player specified and others players, the professor will be updated as controlled by this player
      */
     public void updateProfessorOwnershipIfTie() {
-        this.updateProfessorOwnership(); //We reset as usual the professors.
         PlayerBoard playerUpdate = players[currentPlayer];
         Tower playerTower;
         int tieValue, playerStudentsByColor;
