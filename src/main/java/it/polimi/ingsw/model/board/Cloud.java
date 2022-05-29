@@ -68,6 +68,11 @@ public class Cloud extends Listenable {
         return returnMap;
     }
 
+    public void setStudents(Map<Color, Integer> students){
+        this.counter.clear();
+        this.counter.putAll(students);
+    }
+
     /**
      * Returns the limit of students
      * @return the limit of students
@@ -138,7 +143,9 @@ public class Cloud extends Listenable {
      */
 
     public int countStudent(Color color) {
-        return this.counter.get(color);
+        if(this.counter.get(color)!=null)
+            return this.counter.get(color);
+        return 0;
     }
 
     public int getStudentLimit(){

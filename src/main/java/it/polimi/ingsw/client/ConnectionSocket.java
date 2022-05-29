@@ -234,6 +234,15 @@ public class ConnectionSocket {
     }
 
     /**
+     * Sends the message to choose a cloud
+     * @param cloud
+     */
+    public void chooseCloud(int cloud){
+        socketOut.print(MessageGenerator.chooseCloudMessage(cloud));
+        socketOut.flush();
+    }
+
+    /**
      * Send the message to move a particular student from its schoolEntrance to the DiningRoom
      * @param color : student to move
      */

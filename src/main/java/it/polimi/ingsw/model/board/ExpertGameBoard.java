@@ -4,6 +4,7 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.exceptions.LocationNotAllowedException;
 import it.polimi.ingsw.exceptions.NotLastCardUsedException;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.player.PlayerBoard;
 import it.polimi.ingsw.model.specialCards.Herbalist;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
@@ -288,6 +289,11 @@ public class ExpertGameBoard extends GameBoard {
                 }
             }
         }
+        System.out.println("EXPERT GAME BOARD - updateProfessorOwnershipIfTie - notify the professor ownership");
+        Map<Color,Tower> profMap = new HashMap<>();
+        profMap.putAll(professors);
+        if(modelListener!=null && clients!=null)
+            notify(modelListener, MessageGenerator.professorsUpdateMessage(profMap),clients);
     }
 
     /**
@@ -307,6 +313,16 @@ public class ExpertGameBoard extends GameBoard {
         return false;
     }
 
+    /**
+     * Overrides the updateProfessorOwnerShip to use the tie effect
+     */
+    @Override
+    public void updateProfessorOwnership(){
+        if(!professorsUpdateTieEffect)
+            super.updateProfessorOwnership();
+        else
+            updateProfessorOwnershipIfTie();
+    }
     /**
      * Set the flag that increase the influence score for a particular player during the influence computation
      */
@@ -392,6 +408,8 @@ public class ExpertGameBoard extends GameBoard {
             return true;
         } else if (destinationIsland <= motherNature && (islands[islands.length - 1].getPosition() - destinationIsland + motherNature) <= maxMovement) {
             motherNature = destinationIsland;
+            System.out.println("EXPERT GAME BOARD - moveMotherNature - mother nature moved correctly");
+            notifyArchipelago();
             return true;
         }
         return false;

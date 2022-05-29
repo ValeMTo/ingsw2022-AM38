@@ -13,8 +13,8 @@ import it.polimi.ingsw.server.ClientHandler;
 import java.util.*;
 
 public abstract class GameBoard extends Listenable {
-    private Listener modelListener;
-    private List<ClientHandler> clients = null;
+    protected Listener modelListener;
+    protected List<ClientHandler> clients = null;
     protected final int initialIslandNumber = 12;
     protected int playerNumber;
     protected int currentPlayer; // The position in the array which has the active player.
@@ -64,9 +64,10 @@ public abstract class GameBoard extends Listenable {
         }
     }
 
-    private void notifyArchipelago(){
+    protected void notifyArchipelago(){
+        System.out.println("GAME BOARD - notifyArchipelago - notify the change on the archipelago "+MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature));
         if(clients!=null && modelListener!=null)
-        notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
+            notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
     }
 
     /**
@@ -89,7 +90,7 @@ public abstract class GameBoard extends Listenable {
             }
             System.out.println("GAME BOARD - notify the archipelago");
             notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
-            System.out.println("GAME BOARD - notify the archipelago");
+            System.out.println("GAME BOARD - notify the clouds");
             for(int i=0;i<clouds.length;i++)
             notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
             for(Island island:islands)
@@ -115,6 +116,7 @@ public abstract class GameBoard extends Listenable {
             // We transfer all the student to the island that have the group Island's properties
             islandReceiver.addStudent(islandGiver.getStudentMap());
             if (motherNature == islandGiver.getPosition()) motherNature = islandReceiver.getPosition();
+            notifyArchipelago();
             return true;
         }
         return false;
@@ -230,6 +232,8 @@ public abstract class GameBoard extends Listenable {
 
         if ((motherNature <= destinationIsland && destinationIsland - motherNature <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland <= cardSteps)) {
             motherNature = destinationIsland;
+            System.out.println("GAME BOARD - moveMotherNature - motherNature correctly moved to "+destinationIsland+" notifying the clients");
+            notifyArchipelago();
             return true;
         }
         return false;
@@ -242,6 +246,7 @@ public abstract class GameBoard extends Listenable {
         for (Cloud cloud : clouds) {
             while (!cloud.isFull() && !bag.isEmpty()) cloud.addStudent(bag.drawStudent());
         }
+        notifyClouds();
     }
 
     /**
@@ -257,7 +262,9 @@ public abstract class GameBoard extends Listenable {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                return players[currentPlayer].addStudentDiningRoom(student);
+                boolean retValue = players[currentPlayer].addStudentDiningRoom(student);
+                updateProfessorOwnership();
+                return retValue;
             case SCHOOLENTRANCE:
                 return players[currentPlayer].addStudentEntrance(student);
             default:
@@ -279,7 +286,11 @@ public abstract class GameBoard extends Listenable {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                if (position >= 0 && position < playerNumber) return players[position].addStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber) {
+                    boolean retValue = players[position].addStudentDiningRoom(student);
+                    updateProfessorOwnership();
+                    return retValue;
+                }
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case SCHOOLENTRANCE:
@@ -310,7 +321,9 @@ public abstract class GameBoard extends Listenable {
     public boolean removeStudent(StudentCounter location, Color student) throws LocationNotAllowedException, FunctionNotImplementedException {
         switch (location) {
             case DININGROOM:
-                return players[currentPlayer].removeStudentDiningRoom(student);
+                boolean retValue = players[currentPlayer].removeStudentDiningRoom(student);
+                updateProfessorOwnership();
+                return retValue;
             case SCHOOLENTRANCE:
                 return players[currentPlayer].removeStudentEntrance(student);
             default:
@@ -369,15 +382,17 @@ public abstract class GameBoard extends Listenable {
     public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException, IndexOutOfBoundsException {
         switch (location) {
             case DININGROOM:
-                if (position >= 0 && position < playerNumber)
-
-                    return players[currentPlayer].removeStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber) {
+                    boolean retValue = players[position].removeStudentDiningRoom(student);
+                    updateProfessorOwnership();
+                    return retValue;
+                }
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case SCHOOLENTRANCE:
                 if (position >= 0 && position < playerNumber)
 
-                    return players[currentPlayer].removeStudentEntrance(student);
+                    return players[position].removeStudentEntrance(student);
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case CLOUD:
@@ -550,6 +565,11 @@ public abstract class GameBoard extends Listenable {
                 professors.put(color, playerTowerWithMaxValue);
             }
         }
+        System.out.println("GAME BOARD - updateProfessorOwnership - notify the professor ownership");
+        Map<Color,Tower> profMap = new HashMap<>();
+        profMap.putAll(professors);
+        if(modelListener!=null && clients!=null)
+            notify(modelListener,MessageGenerator.professorsUpdateMessage(profMap),clients);
     }
 
     /**

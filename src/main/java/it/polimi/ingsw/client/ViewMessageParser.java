@@ -9,6 +9,7 @@ import it.polimi.ingsw.messages.AnswerTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.messages.MessageTypeEnum;
 import it.polimi.ingsw.messages.UpdateTypeEnum;
+import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 
@@ -42,32 +43,27 @@ public class ViewMessageParser {
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").equals(MessageTypeEnum.ERROR.ordinal())) {
-            System.out.println(json.get("ErrorType") + " - " + json.get("errorString"));
+            System.out.println("READER - "+json.get("ErrorType") + " - " + json.get("errorString"));
             view.setTurnShown(false);
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
                 Tower tower = Tower.toTower(json.get("PlayerTower").getAsString());
-                if(json.get("LastUsed")!=null)
+                if (json.get("LastUsed") != null)
                     view.useAssistantCard(tower, json.get("LastUsed").getAsInt());
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
-                System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower "+json.get("CurrentPlayer").getAsString());
+                System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower " + json.get("CurrentPlayer").getAsString());
                 view.setActivePlayer(Tower.toTower(json.get("CurrentPlayer").getAsString()));
-            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()){
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()) {
                 Map<String, String> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
                 Map<String, Tower> playersWithTower = new HashMap<>();
-                for(String s:players.keySet()){
-                    playersWithTower.put(s,Tower.toTower(players.get(s)));
+                for (String s : players.keySet()) {
+                    playersWithTower.put(s, Tower.toTower(players.get(s)));
                 }
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
-            }
-
-            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal())
-            {
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
-            }
-            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal())
-            {
-                IslandView islandToAdd= new IslandView(json.get("position").getAsInt());
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
+                IslandView islandToAdd = new IslandView(json.get("position").getAsInt());
                 islandToAdd.setTower(Tower.toTower(json.get("TowerColor").getAsString()));
                 islandToAdd.setTowerNumber(json.get("NumOfTowers").getAsInt());
                 Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
@@ -75,37 +71,52 @@ public class ViewMessageParser {
                 List<IslandView> islands = view.getIslands();
                 List<IslandView> transformedIslands = new ArrayList<>();
                 transformedIslands.addAll(islands);
-                for(IslandView island:islands)
-                    if(island.getPosition()==islandToAdd.getPosition()) {
+                for (IslandView island : islands)
+                    if (island.getPosition() == islandToAdd.getPosition()) {
                         transformedIslands.remove(island);
                     }
                 transformedIslands.add(islandToAdd);
                 view.setIslands(transformedIslands);
-            }
-            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()){
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()) {
                 view.setMotherNature(json.get("MotherNaturePosition").getAsInt());
                 //TODO set island number
-            }
-
-            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()){
-                synchronized (view){
-                    view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()),PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
+                synchronized (view) {
+                    view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
                 }
-            }
-            else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()){
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()) {
                 Map<String, Number> students = gson.fromJson(json.get("SchoolEntranceMap"), HashMap.class);
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
                 students = gson.fromJson(json.get("DiningRoomMap"), HashMap.class);
                 view.setDiningRoomOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
                 //TODO: other sets
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal()) {
+                Map<Cloud, Integer> clouds = view.getClouds();
+                Map<Cloud, Integer> modifiedClouds = view.getClouds();
+                Cloud cloudToAdd = new Cloud(json.get("StudentsLimit").getAsInt());
+                Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
+                cloudToAdd.setStudents(getStudentMapFromStringAndNumberMap(students));
+                for (Cloud cloud : clouds.keySet()) {
+                    if (clouds.get(cloud) == json.get("position").getAsInt()) {
+                        modifiedClouds.remove(cloud);
+                    }
+                }
+                modifiedClouds.put(cloudToAdd, json.get("position").getAsInt());
+                view.setCloud(modifiedClouds);
             }
-
-
-            } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
+         else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PROFESSORS_UPDATE.ordinal()) {
+             Map<String, String> professorStringMap = gson.fromJson(json.get("ProfessorsMap"),HashMap.class);
+             Map<Color,Tower> professors = new HashMap<>();
+             for(String color:professorStringMap.keySet())
+             {
+                 professors.put(Color.toColor(color),Tower.toTower(professorStringMap.get(color)));
+             }
+             view.setProfessors(professors);
+            }
+        } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
                 view.setGameSettings(json.get("actualPlayers").getAsInt(), json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
             }
         }
-
     }
 }

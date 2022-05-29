@@ -219,7 +219,7 @@ public abstract class GameOrchestrator extends Listenable {
                     studentMovesLeft--;
                     if (studentMovesLeft == 0) setCurrentPhase(PhaseEnum.ACTION_MOVE_MOTHER_NATURE);
                     if (clients != null)
-                        notify(modelListener, MessageGenerator.moveStudentMessage(color, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, island), clients);
+                        notifyPhaseAndCurrentPlayer();
                     return true;
                 }
                 return false;
@@ -302,8 +302,10 @@ public abstract class GameOrchestrator extends Listenable {
             if (gameBoard.moveMotherNature(destinationIsland)) {
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
-                if (clients != null)
-                    notify(modelListener, MessageGenerator.moveMotherNatureMessage(destinationIsland), clients);
+                if (clients != null) {
+                    notify(modelListener, MessageGenerator.archipelagoViewUpdateMessage(gameBoard.getIslandNumber(),destinationIsland), clients);
+                    notifyPhaseAndCurrentPlayer();
+                }
                 return true;
             }
             return false;

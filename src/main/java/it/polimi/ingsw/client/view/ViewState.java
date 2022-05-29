@@ -69,9 +69,11 @@ public class ViewState {
      */
     public synchronized void setTurnShown(boolean turnShown){
         this.turnShown = turnShown;
+        if(!turnShown&&this.playerTower.equals(this.activePlayer))
+            setActiveView(true);
         if(awaitingCLI!=null)
             synchronized (awaitingCLI) {
-                System.out.println("VIEW STATE - setActivePlayerAndPhase - Hey CLI, it's time to wake up!");
+                System.out.println("VIEW STATE - setTurnShown - Hey CLI, it's time to wake up!");
                 awaitingCLI.notifyAll();
             }
     }
@@ -342,6 +344,7 @@ public class ViewState {
      * @param clouds : the Map with the clouds and their position
      */
     public synchronized void setCloud(Map<Cloud,Integer> clouds){
+        System.out.println("VIEW STATE - setCloud - Updating the clouds "+clouds.size()+" clouds updating");
         this.clouds.clear();
         this.clouds.putAll(clouds);
     }

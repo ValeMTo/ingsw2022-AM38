@@ -165,8 +165,11 @@ public class ClientCLI {
                     connectionSocket.moveMotherNature(position);
                 } else if (viewState.getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
                     System.out.println("CLIENT CLI - choice cloud");
+                    printClouds();
                     showCloudChoiceInstruction();
+                    int num = getCloud();
                     viewState.setTurnShown(true);
+                    connectionSocket.chooseCloud(num);
                 }
             }
             if(viewState.getTurnShown()==true)
@@ -195,6 +198,12 @@ public class ClientCLI {
      */
     public int getMotherNatureMove(){
         System.out.println(CLICyan+"Choose a position where to move motherNature. You cannot move more than the steps of your last used card"+CLIEffectReset);
+        String input = in.nextLine();
+        return Integer.parseInt(input);
+    }
+
+    private int getCloud(){
+        System.out.println(CLICyan + "Choose a cloud to fill your school entrance" + CLIEffectReset);
         String input = in.nextLine();
         return Integer.parseInt(input);
     }
@@ -550,7 +559,12 @@ public class ClientCLI {
         int maxIslandsPerRow = 12;
         int counter = 0;
         Map<Color,Integer> students;
-        for (IslandView island : viewState.getIslands()) {
+        List<IslandView> islands = viewState.getIslands();
+        for (int i=0;i<islands.size();i++) {
+            IslandView island = islands.get(0);
+            for(int j=0;j<islands.size();j++)
+                if(islands.get(j).getPosition()==i+1)
+                    island = islands.get(j);
             students = island.getStudentMap();
             if (island.getTowerNumber() <= 1)
                 rows[0] += "                    ";
@@ -659,31 +673,31 @@ public class ClientCLI {
             rows[2] += "  "+effectSchoolBoard+"│ " + CLIBlack + "PROFESSORS" + CLIEffectReset +effectSchoolBoard+ " │   " + CLIBlack + "DINING ROOM" + CLIEffectReset +effectSchoolBoard+ "  │ " + CLIBlack + "SCHOOL ENTRANCE" + CLIEffectReset +effectSchoolBoard+ " │  ";
             rows[3] += "  "+effectSchoolBoard+"│            │                │                 │  ";
             if (playerTower.equals(viewState.getProfessors().get(Color.BLUE)))
-            rows[4] += "  "+effectSchoolBoard+"│     " + CLIBlue + "BLUE" + CLIEffectReset + "   ";
+            rows[4] += "  "+effectSchoolBoard+"│    " + CLIBlue + "BLUE " + CLIEffectReset + "   ";
             else
             rows[4] += "  "+effectSchoolBoard+"│            ";
             rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE),10) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
-            rows[5] += effectSchoolBoard+"  │     " + CLIGreen + "GREEN" + CLIEffectReset + "  ";
+            rows[5] += effectSchoolBoard+"  │    " + CLIGreen + "GREEN " + CLIEffectReset + "  ";
             else
             rows[5] += effectSchoolBoard+"  │            ";
             rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN),10) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
 
-            if (playerTower.equals(professors.get(Color.GREEN)))
+            if (playerTower.equals(professors.get(Color.YELLOW)))
                 rows[6] += effectSchoolBoard+"  │    " + CLIYellow + "YELLOW" + CLIEffectReset + "  ";
             else
                 rows[6] +=effectSchoolBoard+ "  │            ";
             rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW),10) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
 
-            if (playerTower.equals(professors.get(Color.GREEN)))
-                rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK" + CLIEffectReset + "  ";
+            if (playerTower.equals(professors.get(Color.PINK)))
+                rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK " + CLIEffectReset + "  ";
             else
                 rows[7] += effectSchoolBoard+"  │            ";
             rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK),10) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
 
-            if (playerTower.equals(professors.get(Color.GREEN)))
-                rows[8] += effectSchoolBoard+"  │    " + CLIRed + "Red" + CLIEffectReset + "  ";
+            if (playerTower.equals(professors.get(Color.RED)))
+                rows[8] += effectSchoolBoard+"  │    " + CLIRed + "RED   " + CLIEffectReset + "  ";
             else
                 rows[8] += effectSchoolBoard+"  │            ";
             rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED),10) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";

@@ -122,8 +122,12 @@ public class Island extends Listenable {
      * Enable the influence computation
      */
     public void enableInfluence() {
+        boolean notify=false;
+        if(!influenceIsEnabled)
+            notify = true;
         influenceIsEnabled = true;
-        notifySomethingHasChanged();
+        if(notify)
+            notifySomethingHasChanged();
     }
 
     /**
