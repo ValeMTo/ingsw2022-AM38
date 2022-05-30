@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 /**
  *  Each scene has its own controller.
- *  The currentScene is changed
+ *  The currentScene is changed after
  */
 
 
@@ -30,7 +30,7 @@ public class MainGUI extends Application {
 
     private final ViewState viewState;
     private Stage primaryStage;
-    private Scene currentScene;
+    private Scene runningScene;
 
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
     private final HashMap<String, GUIController> guiControllersMap = new HashMap<>();
@@ -49,7 +49,6 @@ public class MainGUI extends Application {
 
 
 
-
     @Override
     public void start(Stage primaryStage) {
         loadScenes();
@@ -57,8 +56,6 @@ public class MainGUI extends Application {
         runStage();
 
     }
-
-
 
 
     @Override
@@ -74,7 +71,7 @@ public class MainGUI extends Application {
 
     public void runStage() {
         primaryStage.setTitle("Eriantys");
-        primaryStage.setScene(currentScene);
+        primaryStage.setScene(runningScene);
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/graphics/logos/Eriantys_logo-180x180.png")));
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -111,7 +108,7 @@ public class MainGUI extends Application {
         String fxmlHomeMenu = HOME_SCENE;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui_fxml/" + fxmlHomeMenu));
-            currentScene = new Scene(loader.load());
+            runningScene = new Scene(loader.load());
             GUIController guiController = loader.getController();
             guiController.setGuiToController(this);
 
@@ -130,8 +127,8 @@ public class MainGUI extends Application {
      *
      */
     public void setNextStage(String newScene) {
-        currentScene = guiScenesMap.get(newScene);
-        primaryStage.setScene(currentScene);
+        runningScene = guiScenesMap.get(newScene);
+        primaryStage.setScene(runningScene);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
