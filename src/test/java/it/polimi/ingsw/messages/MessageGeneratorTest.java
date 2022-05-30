@@ -9,11 +9,12 @@ import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.ref.ReferenceQueue;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,8 +68,8 @@ public class MessageGeneratorTest {
     public void errorWithUsableValuesTest() {
         Set<Integer> list = new HashSet<>();
         list.add(1);
-        for( ErrorTypeEnum error: ErrorTypeEnum.values()) {
-            String message = MessageGenerator.errorWithUsableValues(error, "errorString",list);
+        for (ErrorTypeEnum error : ErrorTypeEnum.values()) {
+            String message = MessageGenerator.errorWithUsableValues(error, "errorString", list);
             JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
             assertEquals(MessageTypeEnum.ERROR.ordinal(), json.get("MessageType").getAsInt());
@@ -82,7 +83,7 @@ public class MessageGeneratorTest {
     @Test
     public void errorInvalidInputMessageTest() {
 
-        String message = MessageGenerator.errorInvalidInputMessage("errorString",1, 2);
+        String message = MessageGenerator.errorInvalidInputMessage("errorString", 1, 2);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ERROR.ordinal(), json.get("MessageType").getAsInt());
@@ -98,7 +99,7 @@ public class MessageGeneratorTest {
     @Test
     public void errorIslandOutOfBoundInputTest() {
 
-        String message = MessageGenerator.errorIslandOutOfBoundInputMessage("errorString",1, 2);
+        String message = MessageGenerator.errorIslandOutOfBoundInputMessage("errorString", 1, 2);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ERROR.ordinal(), json.get("MessageType").getAsInt());
@@ -113,7 +114,7 @@ public class MessageGeneratorTest {
      */
     @Test
     public void errorWrongPhaseTest() {
-        String message=null;
+        String message = null;
         for (PhaseEnum phase : PhaseEnum.values()) {
             message = MessageGenerator.errorWrongPhase(phase);
             JsonObject json = new Gson().fromJson(message, JsonObject.class);
@@ -130,7 +131,7 @@ public class MessageGeneratorTest {
      */
     @Test
     public void errorNumOfPlayersAlreadySetTest() {
-        String message=null;
+        String message = null;
         message = MessageGenerator.errorNumOfPlayersAlreadySetMessage("errorString", 3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -144,8 +145,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for pingMessage
      */
     @Test
-    public void pingTest(){
-        String message=null;
+    public void pingTest() {
+        String message = null;
         message = MessageGenerator.pingMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -157,8 +158,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for pongMessage
      */
     @Test
-    public void pongTest(){
-        String message=null;
+    public void pongTest() {
+        String message = null;
         message = MessageGenerator.pongMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -170,8 +171,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for connectionMessage
      */
     @Test
-    public void connectionTest(){
-        String message=null;
+    public void connectionTest() {
+        String message = null;
         for (ConnectionTypeEnum connection : ConnectionTypeEnum.values()) {
             message = MessageGenerator.connectionMessage(connection);
             JsonObject json = new Gson().fromJson(message, JsonObject.class);
@@ -185,8 +186,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for lobbyRequestMessage
      */
     @Test
-    public void lobbyRequestTest(){
-        String message=null;
+    public void lobbyRequestTest() {
+        String message = null;
         message = MessageGenerator.lobbyRequestMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -198,8 +199,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for lobbyRequestMessage
      */
     @Test
-    public void startGameRequestTest(){
-        String message=null;
+    public void startGameRequestTest() {
+        String message = null;
         message = MessageGenerator.startGameRequestMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -211,8 +212,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for okRulesGameMessage
      */
     @Test
-    public void okRulesGametTest(){
-        String message=null;
+    public void okRulesGametTest() {
+        String message = null;
         message = MessageGenerator.okRulesGameMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -224,8 +225,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for nackRulesGameMessage
      */
     @Test
-    public void nackRulesGametTest(){
-        String message=null;
+    public void nackRulesGametTest() {
+        String message = null;
         message = MessageGenerator.nackRulesGameMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -237,8 +238,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for answerLobbyMessage
      */
     @Test
-    public void answerLobbyTest(){
-        String message=null;
+    public void answerLobbyTest() {
+        String message = null;
         message = MessageGenerator.answerlobbyMessage(2, true, 3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -253,8 +254,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for gamemodeRequestMessage
      */
     @Test
-    public void gamemodeRequestTest(){
-        String message=null;
+    public void gamemodeRequestTest() {
+        String message = null;
         message = MessageGenerator.gamemodeRequestMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -266,8 +267,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for gamemodeRequestMessage
      */
     @Test
-    public void gamemodeMessageTest(){
-        String message=null;
+    public void gamemodeMessageTest() {
+        String message = null;
         message = MessageGenerator.gamemodeMessage(true);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -280,8 +281,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for numberOfPlayerRequestMessage
      */
     @Test
-    public void numberOfPlayerRequestTest(){
-        String message=null;
+    public void numberOfPlayerRequestTest() {
+        String message = null;
         message = MessageGenerator.numberOfPlayerRequestMessage();
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -293,8 +294,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for numberOfPlayerMessage
      */
     @Test
-    public void numberOfPlayerTest(){
-        String message=null;
+    public void numberOfPlayerTest() {
+        String message = null;
         message = MessageGenerator.numberOfPlayerMessage(3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -307,8 +308,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for useAssistantCardMessage
      */
     @Test
-    public void useAssistantCardMessageTest(){
-        String message=null;
+    public void useAssistantCardMessageTest() {
+        String message = null;
         message = MessageGenerator.useAssistantCardMessage(3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -321,8 +322,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for specialCardAnswerMessage
      */
     @Test
-    public void specialCardAnswerTest(){
-        String message=null;
+    public void specialCardAnswerTest() {
+        String message = null;
         for (SpecialCardRequiredAction cardAction : SpecialCardRequiredAction.values()) {
             message = MessageGenerator.specialCardAnswer(cardAction, true);
             JsonObject json = new Gson().fromJson(message, JsonObject.class);
@@ -338,9 +339,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for moveStudentMessageMessage
      */
     @Test
-    public void moveStudentMessageTest(){
-        String message=null;
-        message = MessageGenerator.moveStudentMessage(Color.BLUE, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, 3 );
+    public void moveStudentMessageTest() {
+        String message = null;
+        message = MessageGenerator.moveStudentMessage(Color.BLUE, StudentCounter.SCHOOLENTRANCE, StudentCounter.ISLAND, 3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ACTION.ordinal(), json.get("MessageType").getAsInt());
@@ -355,9 +356,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for moveStudentMessageMessage without position input
      */
     @Test
-    public void moveStudentMessage2Test(){
-        String message=null;
-        message = MessageGenerator.moveStudentMessage(Color.BLUE, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM );
+    public void moveStudentMessage2Test() {
+        String message = null;
+        message = MessageGenerator.moveStudentMessage(Color.BLUE, StudentCounter.SCHOOLENTRANCE, StudentCounter.DININGROOM);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ACTION.ordinal(), json.get("MessageType").getAsInt());
@@ -371,9 +372,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for moveMotherNatureMessage
      */
     @Test
-    public void moveMotherNatureTest(){
-        String message=null;
-        message = MessageGenerator.moveMotherNatureMessage(3 );
+    public void moveMotherNatureTest() {
+        String message = null;
+        message = MessageGenerator.moveMotherNatureMessage(3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ACTION.ordinal(), json.get("MessageType").getAsInt());
@@ -385,9 +386,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for chooseCloudMessage
      */
     @Test
-    public void chooseCloudTest(){
-        String message=null;
-        message = MessageGenerator.chooseCloudMessage(3 );
+    public void chooseCloudTest() {
+        String message = null;
+        message = MessageGenerator.chooseCloudMessage(3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ACTION.ordinal(), json.get("MessageType").getAsInt());
@@ -399,9 +400,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for ChooseTilePositionMessage
      */
     @Test
-    public void chooseTilePositionTest(){
-        String message=null;
-        message = MessageGenerator.chooseTilePositionMessage(3 );
+    public void chooseTilePositionTest() {
+        String message = null;
+        message = MessageGenerator.chooseTilePositionMessage(3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ACTION.ordinal(), json.get("MessageType").getAsInt());
@@ -413,9 +414,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for ChooseColorMessage
      */
     @Test
-    public void chooseColorTest(){
-        String message=null;
-        message = MessageGenerator.chooseColorMessage(Color.BLUE );
+    public void chooseColorTest() {
+        String message = null;
+        message = MessageGenerator.chooseColorMessage(Color.BLUE);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ACTION.ordinal(), json.get("MessageType").getAsInt());
@@ -427,9 +428,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for nickNameMessage
      */
     @Test
-    public void nickNameTest(){
-        String message=null;
-        message = MessageGenerator.nickNameMessage("vale" );
+    public void nickNameTest() {
+        String message = null;
+        message = MessageGenerator.nickNameMessage("vale");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.SET.ordinal(), json.get("MessageType").getAsInt());
@@ -440,9 +441,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for selectNumberOfPlayersMessage
      */
     @Test
-    public void selectNumberOfPlayersTest(){
-        String message=null;
-        message = MessageGenerator.selectNumberOfPlayersMessage(3 );
+    public void selectNumberOfPlayersTest() {
+        String message = null;
+        message = MessageGenerator.selectNumberOfPlayersMessage(3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.SET.ordinal(), json.get("MessageType").getAsInt());
@@ -454,9 +455,9 @@ public class MessageGeneratorTest {
      * Test the jsonschema for setGameModeMessage
      */
     @Test
-    public void setGameModeTest(){
-        String message=null;
-        message = MessageGenerator.setGameModeMessage(true );
+    public void setGameModeTest() {
+        String message = null;
+        message = MessageGenerator.setGameModeMessage(true);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.SET.ordinal(), json.get("MessageType").getAsInt());
@@ -468,8 +469,8 @@ public class MessageGeneratorTest {
      * Test the jsonschema for endOfGameMessage
      */
     @Test
-    public void endOfGameMessageTest(){
-        String message=null;
+    public void endOfGameMessageTest() {
+        String message = null;
         message = MessageGenerator.endOfGameMessage("endString");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
@@ -579,9 +580,6 @@ public class MessageGeneratorTest {
             assertEquals(8, json.get("LastUsed").getAsInt());
         }
     }
-
-
-
 
 
 }
