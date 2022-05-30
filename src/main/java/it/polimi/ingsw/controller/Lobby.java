@@ -36,8 +36,7 @@ public class Lobby {
         this.numOfPlayers = numOfPlayers;
     }
 
-    public void addPlayer(ClientHandler client) {
-
+    public synchronized void addPlayer(ClientHandler client) {
         queue.add(client);
         players.add(client.getNickName());
         System.out.println("LOBBY - Adding new player named "+client.getNickName()+" (" + queue.size() + " of " + numOfPlayers + ")");
@@ -49,6 +48,16 @@ public class Lobby {
                 if (isExpert) gameOrchestrator = new ExpertGameOrchestrator(players, id, queue);
                 else gameOrchestrator = new EasyGameOrchestrator(players, id, queue);
                 System.out.println("LOBBY - Created gameOrchestrator!");
+                for (ClientHandler clientParser : queue) {
+                    System.out.println("LOBBY - Gonna create a messageParser for "+clientParser.getNickName()+"!");
+                    MessageParser messageParserToAdd = new MessageParser(clientParser);
+                    messageParserToAdd.setName(clientParser.getNickName());
+                    messageParserToAdd.setGameOrchestrator(this.gameOrchestrator);
+                    messageParsers.add(messageParserToAdd);
+                    System.out.println("LOBBY - Gonna set a messageParser for "+clientParser.getNickName()+"!");
+                    clientParser.setMessageParser(messageParserToAdd);
+                }
+
                 for (ClientHandler clients : queue) {
                     System.out.println("LOBBY - Gonna WakeUp clientHandlers!");
                     client.setIDGame(id);
@@ -60,15 +69,21 @@ public class Lobby {
                 id++;
                 emptyLobby();
             }
+
         }
     }
 
-    public MessageParser getMessageParser(ClientHandler client){
+    public synchronized MessageParser getMessageParser(ClientHandler client){
         for (MessageParser parser : messageParsers){
             if (parser.getName().equals(client.getNickName())){
+                System.out.println("LOBBY - getMessageParser - giving a messageParser "+parser+" to "+client.getNickName());
                 queue.remove(client);
                 return parser;
             }
+        }
+        if(queue.size()<=0) {
+            id++;
+            emptyLobby();
         }
         return null;
     }

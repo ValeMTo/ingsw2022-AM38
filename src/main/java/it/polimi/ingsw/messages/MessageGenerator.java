@@ -760,6 +760,22 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the CurrentPlayerAndPhaseUpdate message, used to notify the new current player and the phase at the same time.
+     *
+     * @param nickname : the nickname of the current active player.
+     * @return : json string of the CurrentPlayerUpdate message
+     */
+    public static String currentPlayerAndPhaseUpdateMessage(Tower nickname, PhaseEnum phase) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal());
+        json.put("CurrentPlayer", nickname);
+        json.put("CurrentPhase",phase.ordinal());
+        return json + "\n";
+    }
+
+
+    /**
      * Generates the LeaderboardUpdate message, used to notify the current leaderboard status,
      * It is also used at the end of the game with the final results.
      *

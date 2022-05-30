@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.board;
 
+import com.sun.jdi.PrimitiveValue;
 import it.polimi.ingsw.controller.mvc.Listenable;
 import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.controller.mvc.ModelListener;
@@ -38,6 +39,7 @@ public class Island extends Listenable {
     public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
         this.modelListener = modelListener;
         this.clients = new ArrayList<>();
+        if(clients!=null)
         this.clients.addAll(clients);
         if(this.clients!=null && this.modelListener!=null){
             System.out.println("ISLAND "+this.position+" - notify my existence!");
@@ -45,7 +47,15 @@ public class Island extends Listenable {
             returnMap.putAll(this.influence);
             notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
         }
+    }
 
+    private void notifySomethingHasChanged(){
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("ISLAND "+this.position+" - notify a change!");
+            Map<Color,Integer> returnMap = new HashMap<>();
+            returnMap.putAll(this.influence);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+        }
     }
 
     /**
@@ -70,6 +80,33 @@ public class Island extends Listenable {
             influence.put(color, 1);
         else
             influence.put(color, influence.get(color) + 1);
+        notifySomethingHasChanged();
+        return true;
+    }
+
+    /**
+     * Returns a copy of the student map of this island
+     * @return
+     */
+    public Map<Color,Integer> getStudentMap(){
+        Map<Color,Integer> studentMap = new HashMap<>();
+        studentMap.putAll(this.influence);
+        return studentMap;
+    }
+
+    /**
+     * Adds in block students from a Map
+     * @param studentsToAdd
+     * @return
+     */
+    public boolean addStudent(Map<Color,Integer> studentsToAdd){
+        for(Color color: studentsToAdd.keySet()){
+            if (!influence.containsKey(color))
+                influence.put(color, studentsToAdd.get(color));
+            else
+                influence.put(color, influence.get(color) + studentsToAdd.get(color));
+        }
+        notifySomethingHasChanged();
         return true;
     }
 
@@ -79,13 +116,19 @@ public class Island extends Listenable {
      */
     public void disableInfluence() {
         influenceIsEnabled = false;
+        notifySomethingHasChanged();
     }
 
     /**
      * Enable the influence computation
      */
     public void enableInfluence() {
+        boolean notify=false;
+        if(!influenceIsEnabled)
+            notify = true;
         influenceIsEnabled = true;
+        if(notify)
+            notifySomethingHasChanged();
     }
 
     /**
@@ -134,6 +177,7 @@ public class Island extends Listenable {
      */
     public void setTower(Tower tower) {
         this.towerColor = tower;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -143,6 +187,7 @@ public class Island extends Listenable {
      */
     public void setTowerNumber(int towerNum) {
         this.towerNumber = towerNum;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -152,6 +197,7 @@ public class Island extends Listenable {
      */
     public void setPosition(int pos) {
         this.position = pos;
+        notifySomethingHasChanged();
     }
 
     /**
