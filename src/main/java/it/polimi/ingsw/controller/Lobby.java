@@ -69,7 +69,7 @@ public class Lobby {
                 id++;
                 emptyLobby();
             }
-
+            notifyAll();
         }
     }
 
@@ -92,7 +92,11 @@ public class Lobby {
     public void emptyLobby() {
 
         for (ClientHandler client : queue) {
-            client.setGameOrchestrator(gameOrchestrator);
+            if (gameOrchestrator !=null){
+                client.setGameOrchestrator(gameOrchestrator);
+            } else {
+                System.err.println("GameOrchestrator is null. If it is a test, don't worry.");
+            }
             queue.remove(client);
             System.out.println("LOBBY - client removed correctly returning a new message parser");
             //Reset the lobby as inactive

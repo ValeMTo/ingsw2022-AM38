@@ -71,8 +71,12 @@ public class ClientHandler implements Runnable {
      */
     public void asyncSend(String message){
         System.out.println("ASYNC MESSAGE - Sending: " + message);
-        writer.print(message);
-        writer.flush();
+        if(writer != null) {
+            writer.print(message);
+            writer.flush();
+        }else {
+            System.out.println("Printer not available");
+        }
     }
 
     /**
@@ -157,7 +161,7 @@ public class ClientHandler implements Runnable {
         try {
             System.out.println("confirmNickname");
             Server.blockPlayerName(nickname);
-            this.playerName = nickname;
+            setNickname(nickname);
             System.out.println("Sending: " + MessageGenerator.okMessage());
             writer.print(MessageGenerator.okMessage());
             this.messageParser.setName(this.playerName);
@@ -167,6 +171,13 @@ public class ClientHandler implements Runnable {
             writer.flush();
         }
 
+    }
+
+    /**
+     * Set nickname
+     */
+    public void setNickname(String nickname){
+        this.playerName = nickname;
     }
 
     /**
