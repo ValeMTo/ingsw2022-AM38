@@ -31,6 +31,9 @@ public class ViewState {
     private boolean isEndOfMatch = false;
     private GameSettings gameSettings;
     private Map<SpecialCardName,Integer> usableSpecialCards = new HashMap<>();
+    private Map<SpecialCardName,Map<Color,Integer>> specialCardWithStudents = new HashMap<>();
+    private int herbalistTiles = 0;
+
 
     private String nickName = null;
 
@@ -71,7 +74,7 @@ public class ViewState {
      */
     public synchronized void setTurnShown(boolean turnShown){
         this.turnShown = turnShown;
-        if(!turnShown&&this.playerTower.equals(this.activePlayer)) {
+        if(!turnShown&&this.playerTower!=null&&this.playerTower.equals(this.activePlayer)) {
             //System.out.println("VIEW STATE - setTurnShown - The view is active!");
             setActiveView(true);
         }
@@ -81,6 +84,57 @@ public class ViewState {
                 awaitingCLI.notifyAll();
             }
         }
+    }
+
+    /**
+     * Sets the Herbalist tiles number
+     * @param numOfTiles
+     */
+    public synchronized void setHerbalistTiles(int numOfTiles){
+        this.herbalistTiles = numOfTiles;
+    }
+
+    /**
+     * Gets the herbalist tiles number
+     * @return
+     */
+    public synchronized int getHerbalistTiles(){
+        return this.herbalistTiles;
+    }
+
+    /**
+     * Sets the student map of the special card with students
+     */
+    public void setSpecialCardWithStudents(SpecialCardName specialCard, Map<Color,Integer> studentMap){
+        if(this.specialCardWithStudents==null)
+            this.specialCardWithStudents = new HashMap<>();
+        Map<Color,Integer> studentsToAdd = new HashMap<>();
+        if(studentMap!=null)
+            studentsToAdd.putAll(studentMap);
+        this.specialCardWithStudents.put(specialCard,studentsToAdd);
+    }
+
+    /**
+     * Gets the map of a particular special card
+     * @param specialCard
+     * @return
+     */
+    public Map<Color,Integer> getSpecialCardStudents(SpecialCardName specialCard){
+        Map<Color,Integer> studentsToReturn = new HashMap<>();
+        if(this.specialCardWithStudents.get(specialCard)!=null)
+            studentsToReturn.putAll(this.specialCardWithStudents.get(specialCard));
+        return studentsToReturn;
+    }
+
+    /**
+     * Returns the map with the special cards that contains students and the students map
+     * @return
+     */
+    public Map<SpecialCardName,Map<Color,Integer>> getSpecialCardWithStudents(){
+        Map<SpecialCardName,Map<Color,Integer>> specialCardNameMapToReturn = new HashMap<>();
+        if(this.specialCardWithStudents!=null)
+            specialCardNameMapToReturn.putAll(this.specialCardWithStudents);
+        return specialCardNameMapToReturn;
     }
 
     /**
@@ -419,14 +473,16 @@ public class ViewState {
         isTheCommander= true;
     }
 
-    public synchronized void useAssistantCard(Tower player, int numCard){
-        if (player.equals(playerTower)){
-            //System.out.println("VIEW STATE - This player has used card "+numCard);
-            usableCards.remove(numCard);
-        }
-        findSchoolBoard(player).setLastAssistantCardUsed(numCard);
+    /**
+     * Sets the last used assistant card
+     * @param tower
+     * @param lastCardUsed
+     */
+    public void setLastCardUsed(Tower tower, int lastCardUsed){
+        SchoolBoardState schoolBoardState = this.findSchoolBoard(tower);
+        if(schoolBoardState!=null)
+            schoolBoardState.setLastAssistantCardUsed(lastCardUsed);
     }
-
     public boolean isExpert(){
         return this.isExpert;
     }

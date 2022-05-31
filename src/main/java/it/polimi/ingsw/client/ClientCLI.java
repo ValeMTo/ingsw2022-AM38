@@ -143,6 +143,7 @@ public class ClientCLI {
     public void startGame() {
         while (!viewState.isEndOfMatch()) {
             cleaner();
+            printSpecialCards();
             if (!viewState.isActiveView()&&!viewState.getTurnShown()) {
                     System.out.println("CLIENTCLI - not your turn");
                     viewState.setTurnShown(true);
@@ -555,7 +556,15 @@ public class ClientCLI {
                     rows[3] += "  │ " + CLIGreen + "Cost: " + viewState.getUsableSpecialCards().get(specialCardName)+ CLIEffectReset + "     │ ";
                     for (int j = 2; j < 5; j++)
                         if (j != 3)
+                            if(SpecialCardName.getSpecialCardsWithStudents().contains(specialCardName))
                             rows[j] += "  │             │ ";
+                            else if(specialCardName.equals(SpecialCardName.HERBALIST))
+                            rows[j] += "  │ TILES: "+viewState.getHerbalistTiles()+"    │ ";
+                            else {
+                                String blocks = this.createCubesString(viewState.getSpecialCardStudents(specialCardName),6);
+                                rows[j] += "  │   "+blocks+"    │ ";
+
+                            }
                     rows[5] += "  └─────────────┘ ";
                     if(json.get(specialCardName.name())!=null) {
                         List<String> message = parser.fromJson(json.get(specialCardName.name()),List.class);
@@ -686,6 +695,29 @@ public class ClientCLI {
             else
                 cubes += "░";
         }
+        return cubes;
+    }
+
+    /**
+     * Gets consecutive colorful blocks for the students contained in the map
+     * @param students
+     * @param max
+     * @return
+     */
+    private String createCubesString(Map<Color,Integer> students,int max){
+        String cubes ="";
+        int i = 0,counter = 0;
+        if(students!=null) {
+            for (Color color : Color.values()) {
+                i = 1;
+                if (students.get(color)!=null && i <= students.get(color)) {
+                    cubes += getAnsiStringFromColor(color) + "¤" + CLIEffectReset;
+                    counter++;
+                }
+            }
+        }
+        for(i=counter;i<max;i++)
+            cubes+=" ";
         return cubes;
     }
 

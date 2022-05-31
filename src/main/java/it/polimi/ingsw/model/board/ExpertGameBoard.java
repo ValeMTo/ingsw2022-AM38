@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.exceptions.LocationNotAllowedException;
@@ -10,6 +11,7 @@ import it.polimi.ingsw.model.specialCards.Herbalist;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import it.polimi.ingsw.model.specialCards.SpecialCardWithStudent;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
@@ -126,6 +128,24 @@ public class ExpertGameBoard extends GameBoard {
                     }
                     break;
             }
+        }
+    }
+
+    /**
+     * Override of the setListenerAndClients to propagate the set to the Special Cards
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    @Override
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        super.setListenerAndClients(modelListener,clients);
+        if(clients!=null && modelListener!= null) {
+            Map<SpecialCardName, Integer> specialCardNameIntegerMap = new HashMap<>();
+            for(SpecialCard specialCard:specialCards)
+                specialCardNameIntegerMap.put(specialCard.getName(),specialCard.getCostCoin());
+            notify(modelListener,MessageGenerator.specialCardUpdateMessage(specialCardNameIntegerMap),clients);
+            for (SpecialCard specialCard : specialCards)
+                specialCard.setListenerAndClients(modelListener, clients);
         }
     }
 

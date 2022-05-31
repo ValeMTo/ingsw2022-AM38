@@ -96,7 +96,6 @@ public abstract class GameBoard extends Listenable {
             for(Island island:islands)
                 island.setListenerAndClients(modelListener,clients);
         }
-
     }
 
     /**

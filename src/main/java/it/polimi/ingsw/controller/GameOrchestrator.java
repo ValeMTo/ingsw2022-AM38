@@ -358,14 +358,8 @@ public abstract class GameOrchestrator extends Listenable {
                 notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase()), clients);
             }
         }
-        }
+    }
 
-
-    /**
-     * Updates to the successive player of the planning phase
-     *
-     * @return : true if now the activePlayer has been updated, false if the phase is incorrect or if we have finished the passive phase
-     */
 
     /**
      * Set the next player.

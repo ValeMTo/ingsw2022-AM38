@@ -10,10 +10,7 @@ import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 // See the implementation below for the exact names of fields in the generated json (overrides the names in the GoogleDoc).
 
@@ -678,6 +675,17 @@ public class MessageGenerator {
         JSONObject json = new JSONObject();
         json = specialCardStandardMessage(name, coinCost);
         json.put("StudentsMap", studentsMap);
+        return json + "\n";
+    }
+
+    public static String specialCardUpdateMessage(Map<SpecialCardName,Integer> specialCardNameListWithCost){
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal());
+        Map<String,Integer> numericalMap = new HashMap<>();
+        for(SpecialCardName specialCardName:specialCardNameListWithCost.keySet())
+            numericalMap.put(specialCardName.name(),specialCardNameListWithCost.get(specialCardName));
+        json.put("SpecialCardsMap",numericalMap);
         return json + "\n";
     }
 
