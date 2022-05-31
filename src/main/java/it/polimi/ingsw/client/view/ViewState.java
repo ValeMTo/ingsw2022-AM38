@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.ClientCLI;
 import it.polimi.ingsw.client.GameSettings;
 import it.polimi.ingsw.controller.PhaseEnum;
+import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
@@ -36,6 +37,7 @@ public class ViewState {
     private Tower activePlayer;
     private boolean turnShown;
     private ClientCLI awaitingCLI;
+    private SpecialCardRequiredAction specialCardRequiredAction;//TODO !!!
 
     public ViewState(){
         this.turnShown = false;
@@ -70,15 +72,48 @@ public class ViewState {
     public synchronized void setTurnShown(boolean turnShown){
         this.turnShown = turnShown;
         if(!turnShown&&this.playerTower.equals(this.activePlayer)) {
-            System.out.println("VIEW STATE - setTurnShown - The view is active!");
+            //System.out.println("VIEW STATE - setTurnShown - The view is active!");
             setActiveView(true);
         }
         if(awaitingCLI!=null&&!turnShown) {
-            System.out.println("VIEW STATE - setTurnShown - Hey CLI, it's time to wake up!");
+            //System.out.println("VIEW STATE - setTurnShown - Hey CLI, it's time to wake up!");
             synchronized (awaitingCLI) {
                 awaitingCLI.notifyAll();
             }
         }
+    }
+
+    /**
+     * Gets the special card required action
+     * @return
+     */
+    public synchronized SpecialCardRequiredAction getSpecialPhase(){
+        return this.specialCardRequiredAction;
+    }
+
+    /**
+     * Sets the current phase and the required action fot the use of the special card
+     * @param phase
+     * @param specialCardRequiredAction
+     */
+    public synchronized void setSpecialCardPhase(PhaseEnum phase, SpecialCardRequiredAction specialCardRequiredAction){
+        this.currentPhase = phase;
+        this.specialCardRequiredAction = specialCardRequiredAction;
+        this.setTurnShown(false);
+    }
+
+    /**
+     *
+     * @return true if the player has enough coins to use at least one special card
+     */
+    public synchronized boolean playerHasCoinsToUseASpecialCard(){
+        if(usableSpecialCards==null)
+            return false;
+        int coins = getPlayerCoins();
+        for(Integer cost:usableSpecialCards.values())
+            if(coins>cost)
+                return true;
+        return false;
     }
 
     /**
@@ -91,8 +126,8 @@ public class ViewState {
 
 
     public synchronized void setViewState(Map<String, Tower> players, boolean isExpert) {
-        for(String player:players.keySet())
-            System.out.println("VIEW STATE - ADDING PLAYERS - Player "+player+" with tower "+players.get(player));
+        //for(String player:players.keySet())
+            //System.out.println("VIEW STATE - ADDING PLAYERS - Player "+player+" with tower "+players.get(player));
         this.clouds = new HashMap<>();
         this.usableSpecialCards = new HashMap<>();
         this.usableCards = new ArrayList<>();
@@ -108,12 +143,12 @@ public class ViewState {
         {
             SchoolBoardState schoolBoardState = new SchoolBoardState(tower);
             this.schoolBoards.add(schoolBoardState);
-            System.out.println("VIEW STATE - setViewState - adding new SchoolBoard "+schoolBoardState+" of "+schoolBoardState.getPlayer());
+            //System.out.println("VIEW STATE - setViewState - adding new SchoolBoard "+schoolBoardState+" of "+schoolBoardState.getPlayer());
         }
         playerTower = players.get(this.nickName);
         if(awaitingCLI!=null)
         synchronized (awaitingCLI) {
-            System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
+            //System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
             awaitingCLI.notifyAll();
         }
     }
@@ -127,16 +162,16 @@ public class ViewState {
         this.turnShown = false;
         if(!this.activePlayer.equals(this.playerTower)) {
             this.activeView = false;
-            System.out.println("VIEW STATE - I am not the active player");
+            //System.out.println("VIEW STATE - I am not the active player");
         }
         else {
             this.activeView = true;
             this.turnShown = false;
-            System.out.println("VIEW STATE - I am the active player");
+            //System.out.println("VIEW STATE - I am the active player");
         }
         if(awaitingCLI!=null)
             synchronized (awaitingCLI) {
-                System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
+                //System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
                 awaitingCLI.notifyAll();
         }
     }
@@ -156,13 +191,13 @@ public class ViewState {
         this.nickName = nickname;
     }
     public synchronized String getNamePlayer(Tower towerPlayer){
-        System.out.println("VIEW STATE - Requested tower player "+towerPlayer);
+        //System.out.println("VIEW STATE - Requested tower player "+towerPlayer);
         for (String name : players.keySet()){
             if (players.get(name).equals(towerPlayer)){
                 return name;
             }
         }
-        System.out.println("VIEW STATE - GetNamePlayer - OH NO");
+        //System.out.println("VIEW STATE - GetNamePlayer - OH NO");
         return null;
     }
 
@@ -177,15 +212,15 @@ public class ViewState {
         if(this.activePlayer.equals(this.playerTower)) {
             this.activeView = true;
             this.turnShown = false;
-            System.out.println("VIEW STATE - setActivePlayerAndPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
+            //System.out.println("VIEW STATE - setActivePlayerAndPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
         }
         else {
             this.activeView = false;
-            System.out.println("VIEW STATE - setActivePlayerAndPhase - I am not the chosen one I am  "+this.playerTower+" not "+this.activePlayer);
+            //System.out.println("VIEW STATE - setActivePlayerAndPhase - I am not the chosen one I am  "+this.playerTower+" not "+this.activePlayer);
         }
         if(awaitingCLI!=null)
             synchronized (awaitingCLI) {
-                System.out.println("VIEW STATE - setActivePlayerAndPhase - Hey CLI, it's time to wake up!");
+                //System.out.println("VIEW STATE - setActivePlayerAndPhase - Hey CLI, it's time to wake up!");
                 awaitingCLI.notifyAll();
             }
     }
@@ -224,20 +259,20 @@ public class ViewState {
     }
 
     public synchronized void setCurrentPhase(PhaseEnum currentPhase) {
-            System.out.println("VIEW - Changing phase from: "+this.currentPhase+" to: "+currentPhase);
+            //System.out.println("VIEW - Changing phase from: "+this.currentPhase+" to: "+currentPhase);
             this.currentPhase = currentPhase;
             if(this.activePlayer.equals(this.playerTower)) {
                 this.activeView = true;
                 this.turnShown = false;
-                System.out.println("VIEW STATE - SetCurrentPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
+                //System.out.println("VIEW STATE - SetCurrentPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
             }
             else {
                 this.activeView = false;
-                System.out.println("VIEW STATE - SetCurrentPhase - I am not the chosen one I am  "+this.playerTower+" not "+this.activePlayer);
+                //System.out.println("VIEW STATE - SetCurrentPhase - I am not the chosen one I am  "+this.playerTower+" not "+this.activePlayer);
             }
         if(awaitingCLI!=null)
             synchronized (awaitingCLI) {
-            System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
+            //System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
             awaitingCLI.notifyAll();
         }
     }
@@ -276,6 +311,58 @@ public class ViewState {
                 awaitingCLI.printForMoveStudents();
             else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveMotherNature();
+        }
+    }
+
+    /**
+     * Gets in upper case, as a list of Strings, the special card names of this game
+     * @return
+     * @throws FunctionNotImplementedException : if it not the expert game mode
+     */
+    public synchronized List<String> getUpperCaseSpecialCards() throws FunctionNotImplementedException{
+        if(!isExpert)
+            throw new FunctionNotImplementedException();
+        if(usableSpecialCards!=null)
+        {
+            List<String> returnList = new ArrayList<>();
+            for(SpecialCardName specialCard : usableSpecialCards.keySet())
+                returnList.add(specialCard.name().toUpperCase());
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Returns the coins owned by this player
+     * @return the coins owned by this player
+     */
+    public synchronized int getPlayerCoins(){
+        SchoolBoardState schoolBoardState = findSchoolBoard(this.playerTower);
+        if(schoolBoardState!=null)
+        {
+            return schoolBoardState.getCoins();
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the coins owned by the specified player
+     * @return the coins owned by the specified  player
+     */
+    public synchronized int getPlayerCoins(Tower player){
+        SchoolBoardState schoolBoardState = findSchoolBoard(player);
+        if(schoolBoardState!=null)
+        {
+            return schoolBoardState.getCoins();
+        }
+        return 0;
+    }
+
+    public synchronized void setCoins(Tower player, int coins)
+    {
+        SchoolBoardState schoolBoardState = findSchoolBoard(player);
+        if(schoolBoardState!=null)
+        {
+            schoolBoardState.setCoins(coins);
         }
     }
 
@@ -334,7 +421,7 @@ public class ViewState {
 
     public synchronized void useAssistantCard(Tower player, int numCard){
         if (player.equals(playerTower)){
-            System.out.println("VIEW STATE - This player has used card "+numCard);
+            //System.out.println("VIEW STATE - This player has used card "+numCard);
             usableCards.remove(numCard);
         }
         findSchoolBoard(player).setLastAssistantCardUsed(numCard);
@@ -370,7 +457,7 @@ public class ViewState {
      * @param clouds : the Map with the clouds and their position
      */
     public synchronized void setCloud(Map<Cloud,Integer> clouds){
-        System.out.println("VIEW STATE - setCloud - Updating the clouds "+clouds.size()+" clouds updating");
+        //System.out.println("VIEW STATE - setCloud - Updating the clouds "+clouds.size()+" clouds updating");
         this.clouds.clear();
         this.clouds.putAll(clouds);
     }

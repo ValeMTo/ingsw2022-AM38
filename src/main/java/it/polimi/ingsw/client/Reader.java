@@ -22,9 +22,9 @@ public class Reader implements Runnable {
         while(true)
         {
             try {
-                System.out.println("READER - waiting for message");
+                //System.out.println("READER - waiting for message");
                 input = inputReader.readLine();
-                System.out.println("READER - got message "+input);
+                //System.out.println("READER - got message "+input);
                 viewHandler.parse(input);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -774,6 +774,20 @@ public class MessageGenerator {
         return json + "\n";
     }
 
+    /**
+     * Generates the specialCardPhaseMessage message, used to notify the new current special card requirement phase and the phase at the same time.
+     *
+     * @return : json string of the CurrentPlayerUpdate message
+     */
+    public static String specialCardUpdatePhaseMessage(PhaseEnum phase, SpecialCardRequiredAction specialCardRequiredAction){
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal());
+        json.put("CurrentPhase",phase.ordinal());
+        json.put("CurrentSpecialCardPhase",specialCardRequiredAction.ordinal());
+        return json + "\n";
+    }
+
 
     /**
      * Generates the LeaderboardUpdate message, used to notify the current leaderboard status,

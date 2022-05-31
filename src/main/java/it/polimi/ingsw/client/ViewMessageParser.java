@@ -31,19 +31,19 @@ public class ViewMessageParser {
         for(String s:students.keySet()){
             studentsWithColors.put(Color.toColor(s),students.get(s).intValue());
         }
-        for(Color color:studentsWithColors.keySet())
-            System.out.println("VIEW MESSAGE PARSER - getStudentMapFromJson - Map - Color "+color+" has nr of students: "+studentsWithColors.get(color));
+        //for(Color color:studentsWithColors.keySet())
+            //System.out.println("VIEW MESSAGE PARSER - getStudentMapFromJson - Map - Color "+color+" has nr of students: "+studentsWithColors.get(color));
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
 
         if (jsonFromServer != null) {
-            System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
+            //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
         }
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
-            System.out.println("READER - GOT ERROR MESSAGE - "+json.get("ErrorType") + " - " + json.get("errorString"));
+            //System.out.println("READER - GOT ERROR MESSAGE - "+json.get("ErrorType") + " - " + json.get("errorString"));
             view.setTurnShown(false);
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
@@ -54,7 +54,7 @@ public class ViewMessageParser {
                     usableAssistantCardInt.add(num.intValue());
                 view.setUsableCards(usableAssistantCardInt);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
-                System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower " + json.get("CurrentPlayer").getAsString());
+                //System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower " + json.get("CurrentPlayer").getAsString());
                 view.setActivePlayer(Tower.toTower(json.get("CurrentPlayer").getAsString()));
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()) {
                 Map<String, String> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
@@ -93,6 +93,7 @@ public class ViewMessageParser {
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
                 students = gson.fromJson(json.get("DiningRoomMap"), HashMap.class);
                 view.setDiningRoomOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
+                view.setCoins(Tower.values()[json.get("TowerColor").getAsInt()],json.get("coins").getAsInt());
                 //TODO: other sets
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal()) {
                 Map<Cloud, Integer> clouds = view.getClouds();

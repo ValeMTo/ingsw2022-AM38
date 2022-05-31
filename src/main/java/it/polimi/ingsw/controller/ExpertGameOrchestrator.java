@@ -79,6 +79,14 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
         }
     }
 
+    private void setSpecialCardPhase(SpecialCardRequiredAction specialCardRequiredAction){
+         synchronized (phaseBlocker){
+             this.expectingPhase = specialCardRequiredAction;
+             if(clients!=null && modelListener!=null)
+                 notify(modelListener,MessageGenerator.specialCardUpdatePhaseMessage(PhaseEnum.SPECIAL_CARD_USAGE,specialCardRequiredAction),clients);
+         }
+    }
+
     /**
      * Brings back to the nominal turn phase that was set before the Special card usage
      */
@@ -126,11 +134,11 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 switch (convertedName) {
                     case PRIEST, PRINCESS:
                         this.specialCardAlreadyUsed = true;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_CARD;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_CARD);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_CARD, false);
                     case JUGGLER:
                         this.specialCardAlreadyUsed = true;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_CARD;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_CARD);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_CARD, true);
                     case CHEESEMAKER:
                         this.specialCardAlreadyUsed = true;
@@ -144,7 +152,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         return MessageGenerator.okMessage();
                     case HERALD:
                         this.specialCardAlreadyUsed = true;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_ISLAND;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_ISLAND);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_ISLAND, false);
                     case HERBALIST:
                         if (specialCardsArray[getPositionSpecialCard()].isEmptyOfTiles()) {
@@ -152,7 +160,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.ALL_TILES_USED, "ERROR - The herbalist special card has no usable tiles");
                         }
                         this.specialCardAlreadyUsed = true;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_ISLAND;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_ISLAND);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_ISLAND, false);
                     case POSTMAN:
                         this.specialCardAlreadyUsed = true;
@@ -166,11 +174,11 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         return MessageGenerator.okMessage();
                     case COOKER, GAMBLER:
                         this.specialCardAlreadyUsed = true;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR, false);
                     case BARD:
                         this.specialCardAlreadyUsed = true;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, false);
                 }
             } catch (Exception e) {
@@ -216,7 +224,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_STUDENT_ON_SPECIAL_CARD, "ERROR - the student color specified is not contained on the card, try another color");
                         }
                         pendingColor = color;
-                        this.expectingPhase = SpecialCardRequiredAction.CHOOSE_ISLAND;
+                        setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_ISLAND);
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_ISLAND, false);
                     case JUGGLER:
                         // If it is the moment to choose the color to remove from the card tries to remove it and save it in pendingColor
@@ -225,7 +233,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_STUDENT_ON_SPECIAL_CARD, "ERROR - the student color specified is not contained on the card, try another color");
                             }
                             pendingColor = color;
-                            this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE;
+                            setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE);
                             return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, false);
                         } else {
                             // If it is not the choice of the color from the card but with what color substitute it does the swap
@@ -244,7 +252,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             }
                             // Requires another (optional) swap
                             else {
-                                this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_CARD;
+                                setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_CARD);
                                 return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_CARD, true);
                             }
                         }
@@ -260,7 +268,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_STUDENT_IN_SCHOOL_ENTRANCE, "ERROR - the student color specified is not contained on the schoolEntrance, try another color");
                             }
                             pendingColor = color;
-                            this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM;
+                            setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM);
                             return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM, true);
                         } else {
                             // If the phase requires to remove the player from the Dining Room and place the selected.
@@ -271,7 +279,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             if (!gameBoard.addStudent(StudentCounter.DININGROOM, pendingColor)) {
                                 gameBoard.addStudent(StudentCounter.DININGROOM, color);
                                 gameBoard.addStudent(StudentCounter.CARD, pendingColor, position);
-                                this.expectingPhase = SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE;
+                                setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE);
                                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.DINING_ROOM_COLOR_FULL, "ERROR - the student color chosen cannot be added to the diningRoom since it is full, try another color");
                             }
                             // The student is moved correctly
