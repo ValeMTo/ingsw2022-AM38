@@ -158,7 +158,7 @@ public class ClientHandler implements Runnable {
             System.out.println("confirmNickname");
             Server.blockPlayerName(nickname);
             this.playerName = nickname;
-            System.out.println("Sending: " + MessageGenerator.okMessage());
+            System.out.println("Sending: " + MessageGenerator.okMessage()); //TODO: change
             writer.print(MessageGenerator.okMessage());
             this.messageParser.setName(this.playerName);
             writer.flush();

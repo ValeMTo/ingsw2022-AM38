@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.gui;
 
+import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.gui.controllers.GUIController;
 import it.polimi.ingsw.client.view.ViewState;
 import javafx.application.Application;
@@ -31,12 +32,13 @@ public class MainGUI extends Application {
     private final ViewState viewState;
     private Stage primaryStage;
     private Scene runningScene;
-
+    private ConnectionSocket connectionSocket;
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
     private final HashMap<String, GUIController> guiControllersMap = new HashMap<>();
 
     private final Logger logger = Logger.getLogger(getClass().getName());
     private boolean isRunning;
+
 
     /**
      * MainGUI  default constructor
@@ -133,9 +135,13 @@ public class MainGUI extends Application {
         primaryStage.show();
     }
 
-
     public ViewState getViewState() {
         return viewState;
     }
+
+    public void setConnectionSocket(ConnectionSocket connectionSocket) {
+        this.connectionSocket = connectionSocket;
+    }
+
 
 }

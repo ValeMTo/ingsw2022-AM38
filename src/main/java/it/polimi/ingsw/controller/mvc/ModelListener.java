@@ -6,6 +6,7 @@ import java.util.List;
 
 public class ModelListener implements Listener {
 
+    // Updates all the clients
     @Override
     public void update(String message, List<ClientHandler> clients) {
         for( ClientHandler client : clients){
@@ -13,6 +14,7 @@ public class ModelListener implements Listener {
         }
     }
 
+    // Updates one specific client
     public void update(String message, ClientHandler client) {
         client.asyncSend(message);
     }

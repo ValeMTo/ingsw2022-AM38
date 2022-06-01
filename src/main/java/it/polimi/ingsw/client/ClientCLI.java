@@ -373,6 +373,8 @@ public class ClientCLI {
             }
         }
         connectionSocket.sendNickname(nickname);
+
+        
     }
 
     /**

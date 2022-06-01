@@ -4,7 +4,9 @@ import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -52,7 +54,7 @@ public class loginMenuController implements GUIController  {
         return this.messageBox;
     }
 
-
+    // On click on expertToggle
     public void setExpertMode() {
         if(expertToggle.isSelected()) {
             expertToggle.setStyle("-fx-background-color: #46b9e7; ");
@@ -65,6 +67,7 @@ public class loginMenuController implements GUIController  {
 
     }
 
+    // On click on numPlayersToggle
     public void changeNumPlayers() {
         if(numPlayersToggle.isSelected()) {
             numPlayersToggle.setText("3");
@@ -95,8 +98,13 @@ public class loginMenuController implements GUIController  {
 
         // controlli sul formato dei text inseriti
         // ....
+        messageBox.setText("");
         messageBox.setText("trying connecting to Server ...");
         this.connectionSocket = createConnectionWithServer(address.getText(), Integer.parseInt(port.getText()), gui.getViewState());
+        gui.setConnectionSocket(connectionSocket);
+        if(connectionSocket != null)
+            setNickName();
+
 
 
     }
@@ -123,7 +131,14 @@ public class loginMenuController implements GUIController  {
     }
 
 
+    private boolean setNickName() {
+            connectionSocket.sendNickname(nickname.getText());
 
+        }
+        catch (NicknameAlreadyTakenException) {
+
+        }
+    }
 
 
 
