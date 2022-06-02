@@ -1,12 +1,23 @@
 package it.polimi.ingsw.model.specialCards;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.board.Island;
+import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.server.ClientHandler;
 
-public class SpecialCard {
-    private final SpecialCardName name;
-    private int cost;
-    private boolean firstUse;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SpecialCard extends Listenable {
+    protected final SpecialCardName name;
+    protected int cost;
+    protected boolean firstUse;
+    protected Listener modelListener = null;
+    protected List<ClientHandler> clients = new ArrayList<>();
 
     public SpecialCard(SpecialCardName name) {
         this.name = name;
@@ -18,7 +29,19 @@ public class SpecialCard {
         } else {
             this.cost = 3;
         }
+    }
 
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        System.out.println("SPECIAL CARD "+this.name+" I HAVE NOW SET THE LISTENERS");
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        if(clients!=null)
+            this.clients.addAll(clients);
     }
 
     /**
@@ -39,6 +62,9 @@ public class SpecialCard {
         if (!firstUse) {
             this.cost += 1;
             firstUse = true;
+        }
+        if(modelListener!=null&&clients!=null){
+            notify(modelListener,MessageGenerator.specialCardUpdateMessage(this.name, this.cost),clients);
         }
     }
 

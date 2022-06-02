@@ -10,10 +10,7 @@ import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 // See the implementation below for the exact names of fields in the generated json (overrides the names in the GoogleDoc).
 
@@ -432,21 +429,6 @@ public class MessageGenerator {
     }
 
     /**
-     * Generates the chooseIslandPosition Action message, used to choose the Island for a special card effect.
-     *
-     * @param islandPosition : the index representing the specific Island where to apply the special card effect.
-     * @return : json String of the Action message ChooseCloud
-     */
-    public static String chooseIslandPositionMessage(int islandPosition) {
-        JsonObject json = new JsonObject();
-        json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
-        json.addProperty("ActionType", ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal());
-        json.addProperty("IslandPosition", islandPosition);
-
-        return gson.toJson(json) + "\n";
-    }
-
-    /**
      * Generates the ChooseColor Action message, used to choose a specific Color within an interaction with the Server.
      *
      * @param color : the chosen Color
@@ -696,6 +678,17 @@ public class MessageGenerator {
         return json + "\n";
     }
 
+    public static String specialCardUpdateMessage(Map<SpecialCardName,Integer> specialCardNameListWithCost){
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal());
+        Map<String,Integer> numericalMap = new HashMap<>();
+        for(SpecialCardName specialCardName:specialCardNameListWithCost.keySet())
+            numericalMap.put(specialCardName.name(),specialCardNameListWithCost.get(specialCardName));
+        json.put("SpecialCardsMap",numericalMap);
+        return json + "\n";
+    }
+
     /**
      * Generates the PhaseUpdate message, used to notify the change of phase in the game.
      *
@@ -771,6 +764,20 @@ public class MessageGenerator {
         json.put("UpdateType", UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal());
         json.put("CurrentPlayer", nickname);
         json.put("CurrentPhase",phase.ordinal());
+        return json + "\n";
+    }
+
+    /**
+     * Generates the specialCardPhaseMessage message, used to notify the new current special card requirement phase and the phase at the same time.
+     *
+     * @return : json string of the CurrentPlayerUpdate message
+     */
+    public static String specialCardUpdatePhaseMessage(PhaseEnum phase, SpecialCardRequiredAction specialCardRequiredAction){
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal());
+        json.put("CurrentPhase",phase.ordinal());
+        json.put("CurrentSpecialCardPhase",specialCardRequiredAction.ordinal());
         return json + "\n";
     }
 

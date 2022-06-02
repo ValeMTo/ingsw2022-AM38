@@ -12,6 +12,7 @@ public class SchoolBoardState {
     private Map<Color, Integer> schoolEntranceOccupancy;
     private Map<Color, Integer> diningRoomOccupancy;
     private int lastAssistantCardUsed;
+    private int coins;
 
     public SchoolBoardState(Tower player){
 
@@ -30,8 +31,8 @@ public class SchoolBoardState {
             this.diningRoomOccupancy.put(color, 0);
         }
         this.diningRoomOccupancy.putAll(diningRoomOccupancy);
-        for(Color color:this.diningRoomOccupancy.keySet())
-            System.out.println("Color in dining room "+color+" have "+this.diningRoomOccupancy.get(color)+" students");
+        //for(Color color:this.diningRoomOccupancy.keySet())
+            //System.out.println("Color in dining room "+color+" have "+this.diningRoomOccupancy.get(color)+" students");
     }
 
     public void fillSchoolEntrance(Map<Color, Integer> schoolEntranceOccupancy){
@@ -64,5 +65,20 @@ public class SchoolBoardState {
 
     public int getLastAssistantCardUsed(){
         return lastAssistantCardUsed;
+    }
+
+    /**
+     * Sets the coin owned by this player
+     */
+    public void setCoins(int coins){
+        this.coins = coins;
+    }
+
+    /**
+     * Returns the coin owned by this player
+     * @return the coin owned by this player
+     */
+    public int getCoins(){
+        return this.coins;
     }
 }

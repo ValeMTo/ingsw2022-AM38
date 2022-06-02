@@ -48,8 +48,8 @@ public class ConnectionSocket {
      */
     public boolean setup() throws FunctionNotImplementedException {
 
-        System.out.println("CONNECTION SOCKET - Trying to connect with the socket...");
-        System.out.println("CONNECTION SOCKET - Opening a socket server communication on port " + serverPort);
+        //System.out.println("CONNECTION SOCKET - Trying to connect with the socket...");
+        //System.out.println("CONNECTION SOCKET - Opening a socket server communication on port " + serverPort);
 
         if (socket == null) socket = establishConnection(serverIP, serverPort);
         if (socket == null) return false;
@@ -67,14 +67,14 @@ public class ConnectionSocket {
         boolean error = false;
         JsonObject json;
         do {
-            System.out.println("CONNECTION SOCKET - waiting for message");
+            //System.out.println("CONNECTION SOCKET - waiting for message");
             String jsonFromServer = null;
             try {
                 jsonFromServer = socketIn.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (jsonFromServer != null) System.out.println("CONNECTION SOCKET - Got message " + jsonFromServer);
+            //if (jsonFromServer != null) System.out.println("CONNECTION SOCKET - Got message " + jsonFromServer);
             json = gson.fromJson(jsonFromServer, JsonObject.class);
             error = json == null || !json.has("MessageType");
         } while (error);
@@ -87,23 +87,23 @@ public class ConnectionSocket {
     public void isTheFirst() {
         socketOut.print(MessageGenerator.lobbyRequestMessage());
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.lobbyRequestMessage());
+        //System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.lobbyRequestMessage());
     }
 
     public void acceptRules() {
-        System.out.println("CONNECTION SOCKET - ACCEPT RULES - Sending: " + MessageGenerator.okRulesGameMessage());
+        //System.out.println("CONNECTION SOCKET - ACCEPT RULES - Sending: " + MessageGenerator.okRulesGameMessage());
         socketOut.print(MessageGenerator.okRulesGameMessage());
         socketOut.flush();
     }
 
     public void refuseRules() {
-        System.out.println("CONNECTION SOCKET - ACCEPT RULES - Sending: " + MessageGenerator.nackRulesGameMessage());
+        //System.out.println("CONNECTION SOCKET - ACCEPT RULES - Sending: " + MessageGenerator.nackRulesGameMessage());
         socketOut.print(MessageGenerator.nackRulesGameMessage());
         socketOut.flush();
     }
 
     public void refuse() {
-        System.out.println("CONNECTION SOCKET - REFUSE - Sending: " + MessageGenerator.nackMessage());
+        //System.out.println("CONNECTION SOCKET - REFUSE - Sending: " + MessageGenerator.nackMessage());
         socketOut.print(MessageGenerator.nackMessage());
         socketOut.flush();
     }
@@ -111,7 +111,7 @@ public class ConnectionSocket {
     public void sendNickname(String nickname) {
         socketOut.print(MessageGenerator.nickNameMessage(nickname));
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - SEND NICKNAME - Sending: " + MessageGenerator.nickNameMessage(nickname));
+        //System.out.println("CONNECTION SOCKET - SEND NICKNAME - Sending: " + MessageGenerator.nickNameMessage(nickname));
     }
 
     /**
@@ -121,7 +121,7 @@ public class ConnectionSocket {
      * @return answer of the server
      */
     public void setNumberOfPlayers(int numOfPlayers) {
-        System.out.println("CONNECTION SOCKET - SEND NICKNAME - Sending: " + MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
+        //System.out.println("CONNECTION SOCKET - SEND NICKNAME - Sending: " + MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         socketOut.print(MessageGenerator.selectNumberOfPlayersMessage(numOfPlayers));
         socketOut.flush();
     }
@@ -133,7 +133,7 @@ public class ConnectionSocket {
      */
     public void setGameMode(boolean isExpert) {
         socketOut.print(MessageGenerator.setGameModeMessage(isExpert));
-        System.out.println("SET GAME MODE - Sending: " + MessageGenerator.setGameModeMessage(isExpert));
+        //System.out.println("SET GAME MODE - Sending: " + MessageGenerator.setGameModeMessage(isExpert));
         socketOut.flush();
     }
 
@@ -145,7 +145,7 @@ public class ConnectionSocket {
     public Boolean getGameMode() {
         socketOut.print(MessageGenerator.gamemodeRequestMessage());
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.gamemodeRequestMessage());
+        //System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.gamemodeRequestMessage());
         JsonObject json = getMessage();
 
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
@@ -166,7 +166,7 @@ public class ConnectionSocket {
     public Integer getNumberOfPlayers() {
         socketOut.print(MessageGenerator.numberOfPlayerRequestMessage());
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.numberOfPlayerRequestMessage());
+        //System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.numberOfPlayerRequestMessage());
         JsonObject json = getMessage();
 
         if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
@@ -184,7 +184,7 @@ public class ConnectionSocket {
     public void sendOk() {
         socketOut.print(MessageGenerator.okMessage());
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - OK/Confirm message send " + MessageGenerator.okMessage());
+        //System.out.println("CONNECTION SOCKET - OK/Confirm message send " + MessageGenerator.okMessage());
     }
 
     /**
@@ -193,7 +193,7 @@ public class ConnectionSocket {
     public void disconnect() {
         socketOut.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - DISCONNECTION " + MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
+        //System.out.println("CONNECTION SOCKET - DISCONNECTION " + MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
     }
 
     /**
@@ -204,12 +204,12 @@ public class ConnectionSocket {
      */
     public void startGame() {
         socketOut.print(MessageGenerator.startGameRequestMessage());
-        System.out.println(MessageGenerator.startGameRequestMessage());
+        //System.out.println(MessageGenerator.startGameRequestMessage());
         socketOut.flush();
     }
 
     public void setAssistantCard(int numberOfCard) {
-        System.out.println("CONNECTION SOCKET - setAssistantCard - sending "+MessageGenerator.useAssistantCardMessage(numberOfCard));
+        //System.out.println("CONNECTION SOCKET - setAssistantCard - sending "+MessageGenerator.useAssistantCardMessage(numberOfCard));
         socketOut.print(MessageGenerator.useAssistantCardMessage(numberOfCard));
         socketOut.flush();
     }
@@ -252,6 +252,15 @@ public class ConnectionSocket {
     }
 
     /**
+     * Sends the message to choose the special card to play
+     * @param specialCardName : the special card name.
+     */
+    public void chooseSpecialCard(String specialCardName){
+        socketOut.print(MessageGenerator.useSpecialCard(specialCardName.toUpperCase()));
+        socketOut.flush();
+    }
+
+    /**
      * Establishes the connection with the server
      *
      * @param serverIP   : Ip of the server
@@ -263,7 +272,7 @@ public class ConnectionSocket {
         try {
             socket = new Socket(serverIP, serverPort);
         } catch (IOException e) {
-            System.out.println("CONNECTION SOCKET - ERROR - Connection NOT established");
+            //System.out.println("CONNECTION SOCKET - ERROR - Connection NOT established");
             // logger.log(Level.SEVERE, e.getMessage(), e);
             return null;
 
@@ -301,7 +310,7 @@ public class ConnectionSocket {
     public void updateNewPhase(PhaseEnum phase){
         socketOut.print(MessageGenerator.phaseUpdateMessage(phase));
         socketOut.flush();
-        System.out.println("CONNECTION SOCKET - CHANGE PHASE " + MessageGenerator.phaseUpdateMessage(phase));
+        //System.out.println("CONNECTION SOCKET - CHANGE PHASE " + MessageGenerator.phaseUpdateMessage(phase));
     }
 
 

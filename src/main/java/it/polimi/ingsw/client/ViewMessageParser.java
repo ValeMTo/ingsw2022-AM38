@@ -12,6 +12,7 @@ import it.polimi.ingsw.messages.UpdateTypeEnum;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,19 +32,19 @@ public class ViewMessageParser {
         for(String s:students.keySet()){
             studentsWithColors.put(Color.toColor(s),students.get(s).intValue());
         }
-        for(Color color:studentsWithColors.keySet())
-            System.out.println("VIEW MESSAGE PARSER - getStudentMapFromJson - Map - Color "+color+" has nr of students: "+studentsWithColors.get(color));
+        //for(Color color:studentsWithColors.keySet())
+            //System.out.println("VIEW MESSAGE PARSER - getStudentMapFromJson - Map - Color "+color+" has nr of students: "+studentsWithColors.get(color));
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
 
         if (jsonFromServer != null) {
-            System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
+            //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
         }
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
-            System.out.println("READER - GOT ERROR MESSAGE - "+json.get("ErrorType") + " - " + json.get("errorString"));
+            //System.out.println("READER - GOT ERROR MESSAGE - "+json.get("ErrorType") + " - " + json.get("errorString"));
             view.setTurnShown(false);
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
@@ -53,8 +54,12 @@ public class ViewMessageParser {
                 for(Number num: usableAssistantCardNum)
                     usableAssistantCardInt.add(num.intValue());
                 view.setUsableCards(usableAssistantCardInt);
-            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
-                System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower " + json.get("CurrentPlayer").getAsString());
+            }
+            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.LAST_USED_ASSISTANT_CARD_UPDATE.ordinal()) {
+                view.setLastCardUsed(Tower.values()[json.get("PlayerTower").getAsInt()],json.get("LastUsed").getAsInt());
+            }
+            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CURRENT_PLAYER_UPDATE.ordinal()) {
+                //System.out.println("VIEW MESSAGE PARSER - CURRENT PLAYER UPDATE to tower " + json.get("CurrentPlayer").getAsString());
                 view.setActivePlayer(Tower.toTower(json.get("CurrentPlayer").getAsString()));
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SETUP_UPDATE.ordinal()) {
                 Map<String, String> players = gson.fromJson(json.get("PlayersMapping"), HashMap.class);
@@ -93,6 +98,7 @@ public class ViewMessageParser {
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
                 students = gson.fromJson(json.get("DiningRoomMap"), HashMap.class);
                 view.setDiningRoomOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
+                view.setCoins(Tower.values()[json.get("TowerColor").getAsInt()],json.get("coins").getAsInt());
                 //TODO: other sets
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal()) {
                 Map<Cloud, Integer> clouds = view.getClouds();
@@ -116,6 +122,24 @@ public class ViewMessageParser {
                  professors.put(Color.toColor(color),Tower.toTower(professorStringMap.get(color)));
              }
              view.setProfessors(professors);
+            }
+            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal()) {
+                if(json.has("StudentsMap")) {
+                    Map<String, Number> students = new HashMap<>(gson.fromJson(json.get("StudentsMap"), HashMap.class));
+                    view.setSpecialCardWithStudents(SpecialCardName.values()[json.get("Name").getAsInt()], this.getStudentMapFromStringAndNumberMap(students));
+                }
+                if(json.has("NumTiles")){
+                    view.setHerbalistTiles(json.get("NumTiles").getAsInt());
+                }
+                if(json.has("SpecialCardsMap")){
+                    Map<String,Number> numMap = new HashMap<>(gson.fromJson(json.get("SpecialCardsMap"), HashMap.class));
+                    Map<SpecialCardName,Integer> specialCards = new HashMap<>();
+                    for(String card: numMap.keySet())
+                    {
+                        specialCards.put(SpecialCardName.convertFromStringToEnum(card), numMap.get(card).intValue());
+                    }
+                    view.setUsableSpecialCard(specialCards);
+                }
             }
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
