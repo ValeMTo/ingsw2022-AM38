@@ -241,7 +241,7 @@ public class ViewState {
         return new ArrayList<Integer>(usableCards);
     }
 
-    public synchronized void setNamePlayer(String nickname){
+    public synchronized void setNickname(String nickname){
         this.nickName = nickname;
     }
     public synchronized String getNamePlayer(Tower towerPlayer){
@@ -285,6 +285,9 @@ public class ViewState {
     }
     public synchronized void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
+        synchronized (awaitingCLI){
+            awaitingCLI.notifyAll();
+        }
     }
 
     public synchronized boolean isEndOfMatch() {
@@ -549,6 +552,16 @@ public class ViewState {
                 awaitingCLI.printForMoveStudents();
             else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE)
                 awaitingCLI.printForMoveMotherNature();
+        }
+    }
+
+    public synchronized String getNickname(){
+        return nickName;
+    }
+
+    public void wakeCLI(){
+        synchronized (awaitingCLI) {
+            awaitingCLI.notifyAll();
         }
     }
 }

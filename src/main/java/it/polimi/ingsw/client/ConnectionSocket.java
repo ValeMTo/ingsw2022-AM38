@@ -87,6 +87,7 @@ public class ConnectionSocket {
     public void isTheFirst() {
         socketOut.print(MessageGenerator.lobbyRequestMessage());
         socketOut.flush();
+
         //System.out.println("CONNECTION SOCKET - SEND REQUEST - Sending: " + MessageGenerator.lobbyRequestMessage());
     }
 

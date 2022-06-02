@@ -161,12 +161,14 @@ public class ClientHandler implements Runnable {
         try {
             System.out.println("confirmNickname");
             Server.blockPlayerName(nickname);
+            System.out.println("IL MIO NICKNAME è "+ nickname + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             setNickname(nickname);
             System.out.println("Sending: " + MessageGenerator.okMessage());
-            writer.print(MessageGenerator.okMessage());
+            writer.print(MessageGenerator.okNicknameAnswer(nickname));
             this.messageParser.setName(this.playerName);
             writer.flush();
         } catch (NicknameAlreadyTakenException e) {
+            System.out.println("EXP Sending: " + MessageGenerator.errorWithStringMessage(NICKNAME_ALREADY_TAKEN, "Already taken nickname"));
             writer.print(MessageGenerator.errorWithStringMessage(NICKNAME_ALREADY_TAKEN, "Already taken nickname"));
             writer.flush();
         }

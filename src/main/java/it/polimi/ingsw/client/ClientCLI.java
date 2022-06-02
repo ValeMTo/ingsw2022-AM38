@@ -2,19 +2,16 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
-import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
-import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -39,9 +36,9 @@ public class ClientCLI {
     private final String horizontalLine = "─";
     private final String horizontalLinex10 = "──────────";
     private final boolean isRunning;
-    ConnectionSocket connectionSocket;
+    static ConnectionSocket connectionSocket;
     private ViewState viewState;
-    private Scanner in = null;
+    private static Scanner in = null;
     private String nickname;
     private boolean isConnected;
 
@@ -58,8 +55,9 @@ public class ClientCLI {
     public static void main(String[] args) {
 
         ClientCLI cli = new ClientCLI();
+        cli.setAwaitingCLI(); //Give to the viewstate the reference to wake up the cli
+        cli.requestConnection();
         cli.login();
-        cli.setAwaitingCLI();
         cli.startGame();
     }
 
@@ -67,15 +65,20 @@ public class ClientCLI {
     /**
      * Login phase of a new player.
      */
-    public void login() {
-        requestConnection();
-        sendNickname();
-        viewState.setNamePlayer(this.nickname);
+    public synchronized void login() {
+        boolean confirmation=false;
+        while (!confirmation){
+            confirmation = sendNickname();
+        }
+
         cleaner();
         connectionSocket.isTheFirst();
 
-        //TODO: listener that waits the no null value of GameSetting
-        while (viewState.getGameSettings() == null){}
+        try {
+            this.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("GameSettings" + viewState.getGameSettings().getActualClients());
         if (viewState.getGameSettings().getActualClients() <= 0) {
@@ -410,7 +413,8 @@ public class ClientCLI {
     /**
      * CLI view to ask the nickname to the server
      */
-    private void sendNickname() {
+    private boolean sendNickname() {
+        viewState.setNickname(null);
         boolean confirmation = false;
         nickname = null;
         while (!confirmation) {
@@ -425,8 +429,19 @@ public class ClientCLI {
             }
         }
         connectionSocket.sendNickname(nickname);
+        try {
+            this.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        
+        System.out.println("NICKNAME when awaken: "+ viewState.getNickname());
+        if (viewState.getNickname() != null){
+            return true;
+        }
+        return false;
+
+
     }
 
     /**

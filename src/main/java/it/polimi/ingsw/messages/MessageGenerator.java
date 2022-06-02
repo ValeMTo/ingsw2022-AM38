@@ -219,6 +219,20 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates a String formatted in json to accept nickname
+     *
+     * @return : json String with an ok
+     */
+    public static String okNicknameAnswer(String nickname) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.ANSWER.ordinal());
+        json.put("AnswerType", AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal());
+        json.put("nickname", nickname );
+
+        return json + "\n";
+    }
+
+    /**
      * Generates a String formatted in json to refuse rules game
      *
      * @return : json String with an ok

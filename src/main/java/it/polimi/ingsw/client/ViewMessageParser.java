@@ -6,7 +6,7 @@ import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.messages.AnswerTypeEnum;
-import it.polimi.ingsw.messages.MessageGenerator;
+import it.polimi.ingsw.messages.ErrorTypeEnum;
 import it.polimi.ingsw.messages.MessageTypeEnum;
 import it.polimi.ingsw.messages.UpdateTypeEnum;
 import it.polimi.ingsw.model.board.Cloud;
@@ -37,6 +37,7 @@ public class ViewMessageParser {
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
+        System.out.println(jsonFromServer);
 
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
@@ -113,8 +114,7 @@ public class ViewMessageParser {
                 }
                 modifiedClouds.put(cloudToAdd, json.get("position").getAsInt());
                 view.setCloud(modifiedClouds);
-            }
-         else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PROFESSORS_UPDATE.ordinal()) {
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PROFESSORS_UPDATE.ordinal()) {
              Map<String, String> professorStringMap = gson.fromJson(json.get("ProfessorsMap"),HashMap.class);
              Map<Color,Tower> professors = new HashMap<>();
              for(String color:professorStringMap.keySet())
@@ -122,8 +122,7 @@ public class ViewMessageParser {
                  professors.put(Color.toColor(color),Tower.toTower(professorStringMap.get(color)));
              }
              view.setProfessors(professors);
-            }
-            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal()) {
+            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal()) {
                 if(json.has("StudentsMap")) {
                     Map<String, Number> students = new HashMap<>(gson.fromJson(json.get("StudentsMap"), HashMap.class));
                     view.setSpecialCardWithStudents(SpecialCardName.values()[json.get("Name").getAsInt()], this.getStudentMapFromStringAndNumberMap(students));
@@ -144,7 +143,19 @@ public class ViewMessageParser {
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
                 view.setGameSettings(json.get("actualPlayers").getAsInt(), json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
+
+            } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
+                view.setNickname(json.get("nickname").getAsString());
+                view.wakeCLI();
             }
+        } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() ){
+            if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
+                System.out.println("Your nickname has already been taken, so please choose another one.");
+                view.setNickname(null);
+                view.wakeCLI();
+
+            }
+
         }
     }
 }

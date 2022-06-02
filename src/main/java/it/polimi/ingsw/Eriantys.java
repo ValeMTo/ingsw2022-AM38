@@ -3,7 +3,6 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.client.ClientCLI;
 import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.server.Server;
-import it.polimi.ingsw.client.gui.HelloApplication;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;

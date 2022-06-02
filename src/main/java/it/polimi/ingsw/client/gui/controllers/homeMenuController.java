@@ -8,11 +8,9 @@ import javafx.stage.Stage;
 
 import java.util.Optional;
 
-public class homeMenuController implements GUIController  {
+public class homeMenuController extends GUIController  {
 
     private MainGUI gui;
-
-
 
     /** Method startPlay changes the stage scene to the login scene when the button "Play" is pressed.
      *
@@ -37,21 +35,6 @@ public class homeMenuController implements GUIController  {
             System.exit(0);
         }
 
-    }
-
-
-    @Override
-    public void setGuiToController(MainGUI gui) {
-        this.gui = gui;
-    }
-
-    @Override
-    public void showErrorAlert(String errorTitle, String errorString) {
-        Alert errorWindow = new Alert(Alert.AlertType.ERROR);
-        errorWindow.setTitle("Error");
-        errorWindow.setHeaderText(errorTitle);
-        errorWindow.setContentText(errorString);
-        errorWindow.showAndWait();
     }
 
 

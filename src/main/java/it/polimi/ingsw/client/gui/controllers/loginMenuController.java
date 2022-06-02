@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import static java.lang.Integer.valueOf;
 
-public class loginMenuController implements GUIController  {
+public class loginMenuController extends GUIController  {
 
     private MainGUI gui;
     ConnectionSocket connectionSocket;
@@ -32,23 +32,6 @@ public class loginMenuController implements GUIController  {
     private int numOfPlayers = 2;
 
     private final String CONNECTION_ERROR = "ERROR - The entered IP/port doesn't match any active server or the server is not running.\n Please try with different address or port";
-
-
-
-    @Override
-    public void setGuiToController(MainGUI gui) {
-        this.gui = gui;
-    }
-
-    @Override
-    public void showErrorAlert(String errorTitle, String errorString) {
-        Alert errorWindow = new Alert(Alert.AlertType.ERROR);
-        errorWindow.setTitle("Error");
-        errorWindow.setHeaderText(errorTitle);
-        //errorWindow.setContentText(errorString);
-        errorWindow.getDialogPane().setContent( new Label(errorString));
-        errorWindow.showAndWait();
-    }
 
     private Label getMessageBox() {
         return this.messageBox;
@@ -131,15 +114,9 @@ public class loginMenuController implements GUIController  {
     }
 
 
-    private boolean setNickName() {
-            connectionSocket.sendNickname(nickname.getText());
-
-        }
-        catch (NicknameAlreadyTakenException) {
-
-        }
+    private void setNickName() {
+        connectionSocket.sendNickname(nickname.getText());
     }
-
 
 
 }
