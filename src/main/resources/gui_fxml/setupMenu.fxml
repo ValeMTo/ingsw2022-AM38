@@ -1,14 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
 
+<AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.setupMenuController">
+    <children>
+
+        <Label layoutX="488.0" layoutY="49.0" text="Login and setup" textFill="#46b9e7">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
+
+        <AnchorPane layoutX="272.0" layoutY="146.0" prefHeight="314.0" prefWidth="500.0" style="-fx-background-color: black; " VBox.vgrow="ALWAYS">
+
+            <TextField fx:id="address" layoutX="276.0" layoutY="76.0" />
+            <TextField fx:id="port" layoutX="276.0" layoutY="122.0" />
+            <TextField fx:id="nickname" layoutX="276.0" layoutY="164.0" />
+            <Label layoutX="20.0" layoutY="78.0" text="Insert your IP address:" textFill="#46b9e7">
+                <font>
+                    <Font size="18.0" />
+                </font></Label>
+            <Label layoutX="20.0" layoutY="124.0" text="Insert a server port :" textFill="#46b9e7">
+                <font>
+                    <Font size="18.0" />
+                </font></Label>
+            <Label layoutX="20.0" layoutY="166.0" text="Insert your nickname :" textFill="#46b9e7">
+                <font>
+                    <Font size="18.0" />
+                </font></Label>
+            <ToggleButton fx:id="expertToggle" layoutX="307.0" layoutY="222.0" mnemonicParsing="false" onAction="#setExpertMode" style="-fx-background-color: GRAY;" text="Expert mode" />
+            <Label layoutX="20.0" layoutY="224.0" prefHeight="27.0" prefWidth="245.0" text="Enable / disable Expert mode :" textFill="#46b9e7">
+                <font>
+                    <Font size="18.0" />
+                </font>
+            </Label>
+            <Label layoutX="20.0" layoutY="272.0" text="Click to change number of players :" textFill="#46b9e7">
+                <font>
+                    <Font size="18.0" />
+                </font>
+            </Label>
+            <ToggleButton fx:id="numPlayersToggle" layoutX="325.0" layoutY="270.0" mnemonicParsing="false" onAction="#changeNumPlayers" style="-fx-text-fill: WHITE; -fx-background-color: #787aef;" text="2" textFill="WHITE">
+                <font>
+                    <Font size="14.0" />
+                </font>
+            </ToggleButton>
+
+        </AnchorPane>
+        <Button layoutX="624.0" layoutY="490.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="QUIT" />
+        <Button layoutX="482.0" layoutY="490.0" mnemonicParsing="false" onMouseClicked="#startLogin" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="ENTER" />
+
+
+        <Label fx:id="messageBox" layoutX="510.0" layoutY="569.0" text="display message" textFill="#46b9e7">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+
+
+    </children>
 </AnchorPane>
+

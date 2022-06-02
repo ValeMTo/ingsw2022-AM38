@@ -25,17 +25,5 @@ public class homeMenuController extends GUIController  {
         }
     }
 
-    public void quit() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit game");
-        alert.setHeaderText("Are you sure you want to exit the game ?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            System.out.println("Thanks for playing with Eriantys. Bye!");
-            System.exit(0);
-        }
-
-    }
-
 
 }

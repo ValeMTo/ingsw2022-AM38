@@ -4,78 +4,38 @@ import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
-import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
-import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 
-import java.sql.Connection;
-import java.util.Optional;
-
-import static java.lang.Integer.valueOf;
-
-public class loginMenuController extends GUIController  {
-
-    private MainGUI gui;
-    ConnectionSocket connectionSocket;
-    @FXML private TextField nickname;
-    @FXML private TextField address;
-    @FXML private TextField port;
-    @FXML private Label messageBox;
-    @FXML private ToggleButton expertToggle;
-    @FXML private ToggleButton numPlayersToggle;
-
-    // If the user doesn't change the settings, the default ones are  Easy mode and 2 players
-    private boolean isExpert = false;
-    private int numOfPlayers = 2;
+public class loginMenuController extends GUIController {
 
     private final String CONNECTION_ERROR = "ERROR - The entered IP/port doesn't match any active server or the server is not running.\n Please try with different address or port";
+    ConnectionSocket connectionSocket;
+    private MainGUI gui;
+    @FXML
+    private TextField nickname;
+    @FXML
+    private TextField address;
+    @FXML
+    private TextField port;
+    @FXML
+    private Label messageBox;
+    @FXML private AnchorPane ipAndPort;
+
+    @FXML private AnchorPane nicknameBox ;
 
     private Label getMessageBox() {
         return this.messageBox;
     }
 
-    // On click on expertToggle
-    public void setExpertMode() {
-        if(expertToggle.isSelected()) {
-            expertToggle.setStyle("-fx-background-color: #46b9e7; ");
-            isExpert = true;
-        }
-        else {
-            expertToggle.setStyle("-fx-background-color: GRAY; ");
-            isExpert = false;
-        }
 
+    @FXML
+    public void initialize() {
+        ipAndPort.setVisible(true);
+        nicknameBox.setVisible(false);
     }
-
-    // On click on numPlayersToggle
-    public void changeNumPlayers() {
-        if(numPlayersToggle.isSelected()) {
-            numPlayersToggle.setText("3");
-            numOfPlayers = 3;
-        }
-        else {
-            numPlayersToggle.setText("2");
-            numOfPlayers = 2;
-        }
-
-    }
-
-
-    public void quit() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit game");
-        alert.setHeaderText("Are you sure you want to exit the game ?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            System.out.println("Thanks for playing with Eriantys. Bye!");
-            System.exit(0);
-        }
-    }
-
-
 
     public void startLogin() {
 
@@ -83,27 +43,24 @@ public class loginMenuController extends GUIController  {
         // ....
         messageBox.setText("");
         messageBox.setText("trying connecting to Server ...");
-        this.connectionSocket = createConnectionWithServer(address.getText(), Integer.parseInt(port.getText()), gui.getViewState());
-        gui.setConnectionSocket(connectionSocket);
-        if(connectionSocket != null)
-            setNickName();
+        gui.setConnectionSocket(createConnectionWithServer(address.getText(), Integer.parseInt(port.getText()), gui.getViewState()));
+        if (gui.getConnectionSocket() != null) {
+            gui.getConnectionSocket().sendNickname(nickname.getText());
 
+        }
 
 
     }
 
 
-
-
-        private ConnectionSocket createConnectionWithServer(String hostName, int portNumber, ViewState viewState) {
-        ConnectionSocket connectionSocket = new ConnectionSocket(hostName, portNumber, viewState );
+    private ConnectionSocket createConnectionWithServer(String hostName, int portNumber, ViewState viewState) {
+        ConnectionSocket connectionSocket = new ConnectionSocket(hostName, portNumber, viewState);
         try {
             if (!connectionSocket.setup()) {
                 getMessageBox().setText("Connection error");
                 showErrorAlert("Connection Error", CONNECTION_ERROR);
 
-            }
-            else if(connectionSocket.setup()) {
+            } else if (connectionSocket.setup()) {
                 getMessageBox().setText("Socket Connection setup completed!");
                 getMessageBox().setText("Connected to Server !");
             }
@@ -111,11 +68,6 @@ public class loginMenuController extends GUIController  {
             e.printStackTrace();
         }
         return connectionSocket;
-    }
-
-
-    private void setNickName() {
-        connectionSocket.sendNickname(nickname.getText());
     }
 
 

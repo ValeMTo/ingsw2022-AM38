@@ -18,8 +18,8 @@ import java.util.logging.Logger;
 
 
 /**
- *  Each scene has its own controller.
- *  The currentScene is changed after
+ * Each scene has its own controller.
+ * The currentScene is changed after
  */
 
 
@@ -27,16 +27,16 @@ public class MainGUI extends Application {
 
     public static final String HOME_SCENE = "homeMenu.fxml";
     public static final String LOGIN_SCENE = "loginMenu.fxml";
+    public static final String SETUP_SCENE = "setupMenu.fxml";
 
     private final ViewState viewState;
+    private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
+    private final HashMap<String, GUIController> guiControllersMap = new HashMap<>();
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private Stage primaryStage;
     private Scene runningScene;
     private ConnectionSocket connectionSocket;
-    private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
-    private final HashMap<String, GUIController> guiControllersMap = new HashMap<>();
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private boolean isRunning;
+    private final boolean isRunning;
 
 
     /**
@@ -47,8 +47,9 @@ public class MainGUI extends Application {
         this.viewState = new ViewState();
     }
 
-
-
+    public static void main(String[] args) {
+        launch();
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -58,17 +59,10 @@ public class MainGUI extends Application {
 
     }
 
-
     @Override
     public void stop() {
         System.exit(0);
     }
-
-
-    public static void main(String[] args) {
-        launch();
-    }
-
 
     public void runStage() {
         primaryStage.setTitle("Eriantys");
@@ -82,7 +76,6 @@ public class MainGUI extends Application {
     /**
      * Fills the two maps (for the scenes and for their controllers, linking them to the fxml files), then  loads the
      * HOME_MENU scene, which is the first scene to be displayed.
-     *
      */
     public void loadScenes() {
 
@@ -90,6 +83,7 @@ public class MainGUI extends Application {
 
         fxmlScenes.add(HOME_SCENE);
         fxmlScenes.add(LOGIN_SCENE);
+        fxmlScenes.add(SETUP_SCENE);
 
         try {
             for (String fxmlName : fxmlScenes) {
@@ -98,12 +92,12 @@ public class MainGUI extends Application {
                 guiScenesMap.put(fxmlName, loadedScene);
                 GUIController guiController = loader.getController();
                 guiController.setGuiToController(this);
+                guiController.setViewstate(viewState);
                 guiControllersMap.put(fxmlName, guiController);
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-
 
 
         String fxmlHomeMenu = HOME_SCENE;
@@ -118,14 +112,13 @@ public class MainGUI extends Application {
         }
 
 
-
     }
 
 
     /**
-     *  Changes the stage launching the new desired scene.
-     * @param newScene : the new scene that has to be displayed
+     * Changes the stage launching the new desired scene.
      *
+     * @param newScene : the new scene that has to be displayed
      */
     public void setNextStage(String newScene) {
         runningScene = guiScenesMap.get(newScene);
@@ -142,5 +135,8 @@ public class MainGUI extends Application {
         this.connectionSocket = connectionSocket;
     }
 
+    public ConnectionSocket getConnectionSocket(){
+        return connectionSocket;
+    }
 
 }
