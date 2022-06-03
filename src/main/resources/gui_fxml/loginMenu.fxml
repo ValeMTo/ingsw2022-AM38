@@ -10,7 +10,7 @@
 <AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.loginMenuController">
    <children>
 
-      <Label layoutX="488.0" layoutY="49.0" text="Login and setup" textFill="#46b9e7">
+      <Label layoutX="534.0" layoutY="49.0" text="Login menu" textFill="#46b9e7">
          <font>
             <Font size="32.0" />
          </font>
@@ -32,16 +32,16 @@
          </Label>
 
       </AnchorPane>
-      <Button layoutX="624.0" layoutY="490.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="QUIT" />
-      <Button layoutX="482.0" layoutY="490.0" mnemonicParsing="false" onMouseClicked="#startLogin" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="ENTER" />
+      <Button layoutX="652.0" layoutY="495.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="QUIT" />
+      <Button fx:id="enterButton" layoutX="510.0" layoutY="495.0" mnemonicParsing="false" onMouseClicked="#startLogin" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="ENTER" />
 
    
-         <Label fx:id="messageBox" layoutX="510.0" layoutY="569.0" text="display message" textFill="#46b9e7">
+         <Label fx:id="messageBox" layoutX="545.0" layoutY="572.0" text="testo di prova" textFill="#46b9e7">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <AnchorPane fx:id="nicknameBox" layoutX="291.0" layoutY="378.0">
+      <AnchorPane fx:id="nicknameBox" layoutX="291.0" layoutY="378.0" prefHeight="27.0" prefWidth="643.0">
          <children>
             <Label text="Insert your nickname :" textFill="#46b9e7">
                <font>
@@ -49,6 +49,7 @@
                </font>
             </Label>
             <TextField fx:id="nickname" layoutX="259.0" layoutY="1.0" />
+            <Button fx:id="confirmNicknameButton" layoutX="446.0" mnemonicParsing="false" onMouseClicked="#setNickname" prefHeight="27.0" prefWidth="135.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="Confirm nicknakme" />
          </children>
       </AnchorPane>
 

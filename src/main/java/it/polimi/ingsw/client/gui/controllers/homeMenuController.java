@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public class homeMenuController extends GUIController  {
 
-    private MainGUI gui;
-
     /** Method startPlay changes the stage scene to the login scene when the button "Play" is pressed.
      *
      **/
@@ -27,3 +25,5 @@ public class homeMenuController extends GUIController  {
 
 
 }
+
+

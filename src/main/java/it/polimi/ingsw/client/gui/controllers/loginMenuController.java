@@ -5,6 +5,7 @@ import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -12,8 +13,7 @@ import javafx.scene.layout.AnchorPane;
 public class loginMenuController extends GUIController {
 
     private final String CONNECTION_ERROR = "ERROR - The entered IP/port doesn't match any active server or the server is not running.\n Please try with different address or port";
-    ConnectionSocket connectionSocket;
-    private MainGUI gui;
+    //private MainGUI gui;
     @FXML
     private TextField nickname;
     @FXML
@@ -25,6 +25,7 @@ public class loginMenuController extends GUIController {
     @FXML private AnchorPane ipAndPort;
 
     @FXML private AnchorPane nicknameBox ;
+    @FXML private Button enterButton;
 
     private Label getMessageBox() {
         return this.messageBox;
@@ -37,6 +38,11 @@ public class loginMenuController extends GUIController {
         nicknameBox.setVisible(false);
     }
 
+    /**
+     * Firstly the login controller tries to establish a connection with the server by creating a connectionSocket in the MainGUI class.
+     * If the connection is established, the controller then asks to set a nickname.
+     * Then the controller checks the viewState the nickname is valid and not already taken, then
+     */
     public void startLogin() {
 
         // controlli sul formato dei text inseriti
@@ -45,9 +51,13 @@ public class loginMenuController extends GUIController {
         messageBox.setText("trying connecting to Server ...");
         gui.setConnectionSocket(createConnectionWithServer(address.getText(), Integer.parseInt(port.getText()), gui.getViewState()));
         if (gui.getConnectionSocket() != null) {
-            gui.getConnectionSocket().sendNickname(nickname.getText());
+            enterButton.setVisible(false);
+            nicknameBox.setVisible(true);
+           // if(!setNickname());
+
 
         }
+
 
 
     }
@@ -59,6 +69,7 @@ public class loginMenuController extends GUIController {
             if (!connectionSocket.setup()) {
                 getMessageBox().setText("Connection error");
                 showErrorAlert("Connection Error", CONNECTION_ERROR);
+                connectionSocket = null;
 
             } else if (connectionSocket.setup()) {
                 getMessageBox().setText("Socket Connection setup completed!");
@@ -71,4 +82,13 @@ public class loginMenuController extends GUIController {
     }
 
 
+    public boolean setNickname() {
+        gui.getConnectionSocket().sendNickname(nickname.getText());
+        return true;   // just a test
+    }
+
+
+
 }
+
+

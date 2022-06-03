@@ -8,7 +8,7 @@ import javafx.scene.control.ToggleButton;
 public class setupMenuController extends GUIController{
 
     ConnectionSocket connectionSocket;
-    private MainGUI gui;
+    //private MainGUI gui;
     @FXML
     private ToggleButton expertToggle;
     @FXML

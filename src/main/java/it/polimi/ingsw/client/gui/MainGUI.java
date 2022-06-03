@@ -35,7 +35,7 @@ public class MainGUI extends Application {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private Stage primaryStage;
     private Scene runningScene;
-    private ConnectionSocket connectionSocket;
+    private ConnectionSocket connectionSocket = null;
     private final boolean isRunning;
 
 
