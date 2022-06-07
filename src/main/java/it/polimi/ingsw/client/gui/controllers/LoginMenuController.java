@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.client.ConnectionSocket;
-import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import javafx.fxml.FXML;
@@ -10,10 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
-public class loginMenuController extends GUIController {
+public class LoginMenuController extends GUIController {
 
     private final String CONNECTION_ERROR = "ERROR - The entered IP/port doesn't match any active server or the server is not running.\n Please try with different address or port";
-    //private MainGUI gui;
     @FXML
     private TextField nickname;
     @FXML
@@ -22,10 +20,12 @@ public class loginMenuController extends GUIController {
     private TextField port;
     @FXML
     private Label messageBox;
-    @FXML private AnchorPane ipAndPort;
-
-    @FXML private AnchorPane nicknameBox ;
-    @FXML private Button enterButton;
+    @FXML
+    private AnchorPane ipAndPort;
+    @FXML
+    private AnchorPane nicknameBox;
+    @FXML
+    private Button enterButton;
 
     private Label getMessageBox() {
         return this.messageBox;
@@ -53,12 +53,44 @@ public class loginMenuController extends GUIController {
         if (gui.getConnectionSocket() != null) {
             enterButton.setVisible(false);
             nicknameBox.setVisible(true);
-           // if(!setNickname());
-
-
+            ipAndPort.setVisible(false);
         }
 
 
+    }
+
+    public synchronized void confirmNickname(){
+        messageBox.setText("");
+        messageBox.setText("Checking the uniqueness of the name...");
+        gui.getConnectionSocket().sendNickname(nickname.getText());
+        try {
+            this.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (gui.getViewState().getNickname() != null){
+            messageBox.setText("Your name is unique");
+            isTheFirst();
+        } else {
+            messageBox.setText("Your name has been already chosen.\nInsert another one.");
+        }
+
+    }
+
+    private void isTheFirst(){
+        gui.getConnectionSocket().isTheFirst();
+        try {
+            this.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (gui.getViewState().getGameSettings().getActualClients() <= 0) {
+            gui.setNextStage("setupMenu.fxml");
+        }else{
+            gui.setNextStage("acceptConditionsMenu.fxml");
+        }
 
     }
 
@@ -78,16 +110,9 @@ public class loginMenuController extends GUIController {
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
+        gui.getViewState().setAwaitingGUI(this);
         return connectionSocket;
     }
-
-
-    public boolean setNickname() {
-        gui.getConnectionSocket().sendNickname(nickname.getText());
-        return true;   // just a test
-    }
-
-
 
 }
 

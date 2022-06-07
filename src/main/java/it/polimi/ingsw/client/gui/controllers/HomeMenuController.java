@@ -1,14 +1,11 @@
 package it.polimi.ingsw.client.gui.controllers;
 
-import it.polimi.ingsw.client.gui.MainGUI;
-import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
 
 import java.util.Optional;
 
-public class homeMenuController extends GUIController  {
+public class HomeMenuController extends GUIController  {
 
     /** Method startPlay changes the stage scene to the login scene when the button "Play" is pressed.
      *
@@ -19,6 +16,7 @@ public class homeMenuController extends GUIController  {
         alert.setHeaderText("Do you want to start a new game ?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
+
             gui.setNextStage("loginMenu.fxml");
         }
     }

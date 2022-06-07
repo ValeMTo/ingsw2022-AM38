@@ -48,7 +48,7 @@ public class ClientCLI {
         this.out = new PrintStream(System.out);
         this.isRunning = true;
         this.isConnected = false;
-        viewState = new ViewState();
+        viewState = new ViewState(true);
 
     }
 

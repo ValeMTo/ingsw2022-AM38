@@ -143,16 +143,16 @@ public class ViewMessageParser {
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
                 view.setGameSettings(json.get("actualPlayers").getAsInt(), json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
+                view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
                 view.setNickname(json.get("nickname").getAsString());
-                view.wakeCLI();
+                view.wake();
             }
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() ){
             if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
-                System.out.println("Your nickname has already been taken, so please choose another one.");
                 view.setNickname(null);
-                view.wakeCLI();
+                view.wake();
 
             }
 

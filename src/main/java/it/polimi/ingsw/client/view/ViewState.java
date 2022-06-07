@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.ClientCLI;
 import it.polimi.ingsw.client.GameSettings;
+import it.polimi.ingsw.client.gui.controllers.GUIController;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
@@ -40,9 +41,12 @@ public class ViewState {
     private Tower activePlayer;
     private boolean turnShown;
     private ClientCLI awaitingCLI;
+    private GUIController awaitingGUI;
+    private boolean isCli;
     private SpecialCardRequiredAction specialCardRequiredAction;//TODO !!!
 
-    public ViewState(){
+    public ViewState(boolean isCli){
+        this.isCli = isCli;
         this.turnShown = false;
         isTheCommander = false;
         this.usableCards = new ArrayList<Integer>();
@@ -65,6 +69,14 @@ public class ViewState {
      */
     public synchronized void setAwaitingCLI(ClientCLI awaitingCLI){
         this.awaitingCLI = awaitingCLI;
+    }
+
+    /**
+     * Sets the GUI to be notify from wait
+     * @param awaitingGUI
+     */
+    public synchronized void setAwaitingGUI(GUIController awaitingGUI){
+        this.awaitingGUI = awaitingGUI;
     }
 
 
@@ -559,9 +571,15 @@ public class ViewState {
         return nickName;
     }
 
-    public void wakeCLI(){
-        synchronized (awaitingCLI) {
-            awaitingCLI.notifyAll();
+    public void wake(){
+        if (isCli = true){
+            synchronized (awaitingCLI) {
+                awaitingCLI.notifyAll();
+            }
+        } else {
+            synchronized (awaitingGUI){
+                awaitingGUI.notifyAll();
+            }
         }
     }
 }

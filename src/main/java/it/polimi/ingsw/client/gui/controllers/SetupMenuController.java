@@ -1,14 +1,12 @@
 package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.client.ConnectionSocket;
-import it.polimi.ingsw.client.gui.MainGUI;
 import javafx.fxml.FXML;
 import javafx.scene.control.ToggleButton;
 
-public class setupMenuController extends GUIController{
+public class SetupMenuController extends GUIController{
 
     ConnectionSocket connectionSocket;
-    //private MainGUI gui;
     @FXML
     private ToggleButton expertToggle;
     @FXML
@@ -34,6 +32,10 @@ public class setupMenuController extends GUIController{
             expertToggle.setStyle("-fx-background-color: GRAY; ");
             isExpert = false;
         }
+
+    }
+
+    public void startLogin(){
 
     }
 
