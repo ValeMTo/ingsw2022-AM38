@@ -16,7 +16,6 @@ public class HomeMenuController extends GUIController  {
         alert.setHeaderText("Do you want to start a new game ?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-
             gui.setNextStage("loginMenu.fxml");
         }
     }

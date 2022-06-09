@@ -65,6 +65,7 @@ public class LoginMenuController extends GUIController {
         gui.getConnectionSocket().sendNickname(nickname.getText());
         synchronized (gui) {
             try {
+                gui.getViewState().setNickname(null);
                 gui.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -72,10 +73,12 @@ public class LoginMenuController extends GUIController {
         }
 
         if (gui.getViewState().getNickname() != null){
+            System.out.println("Set nickname");
             getMessageBox().setText("Your name is unique");
             isTheFirst();
         } else {
-            getMessageBox().setText("Your name has been already chosen.\nInsert another one.");
+            System.out.println("Nickname already chosen");
+            showErrorAlert("Nickname already taken", "Your name has been already chosen.\nInsert another one.");
         }
 
     }
@@ -93,6 +96,11 @@ public class LoginMenuController extends GUIController {
         if (gui.getViewState().getGameSettings().getActualClients() <= 0) {
             gui.setNextStage("setupMenu.fxml");
         }else{
+            try {
+                gui.getController("acceptConditionsMenu.fxml").showSettings();
+            } catch (FunctionNotImplementedException e) {
+                e.printStackTrace();
+            }
             gui.setNextStage("acceptConditionsMenu.fxml");
         }
 
@@ -117,7 +125,6 @@ public class LoginMenuController extends GUIController {
         gui.getViewState().setAwaitingGUI(gui);
         return connectionSocket;
     }
-
 }
 
 

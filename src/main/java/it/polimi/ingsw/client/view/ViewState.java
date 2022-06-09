@@ -299,6 +299,7 @@ public class ViewState {
     }
     public synchronized void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
+        this.isExpert = gameSettings.getExpert();
     }
 
     public synchronized boolean isEndOfMatch() {

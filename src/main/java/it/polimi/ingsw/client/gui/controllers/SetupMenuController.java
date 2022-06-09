@@ -1,16 +1,20 @@
 package it.polimi.ingsw.client.gui.controllers;
 
-import it.polimi.ingsw.client.ConnectionSocket;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 
 public class SetupMenuController extends GUIController{
 
-    ConnectionSocket connectionSocket;
     @FXML
     private ToggleButton expertToggle;
     @FXML
     private ToggleButton numPlayersToggle;
+    @FXML
+    private Button acceptButton;
+    @FXML
+    private Button quitButton;
 
     // If the user doesn't change the settings, the default ones are  Easy mode and 2 players
     private boolean isExpert = false;
@@ -21,6 +25,8 @@ public class SetupMenuController extends GUIController{
     public void initialize() {
         isExpert = false;
         numOfPlayers = 2;
+        acceptButton.setOnAction(this::acceptPlay);
+        quitButton.setOnAction(this::quitGame);
     }
 
     // On click on expertToggle
@@ -35,11 +41,18 @@ public class SetupMenuController extends GUIController{
 
     }
 
-    public void startLogin(){
-
+    @FXML
+    private void acceptPlay(ActionEvent event){
+        gui.getConnectionSocket().setGameMode(isExpert);
+        gui.getConnectionSocket().setNumberOfPlayers(numOfPlayers);
+        gui.setNextStage("lobbyScene.fxml");
     }
 
-    // On click on numPlayersToggle
+    public void quitGame(ActionEvent event){
+        quit();
+    }
+
+    // Pick number of players
     public void changeNumPlayers() {
         if (numPlayersToggle.isSelected()) {
             numPlayersToggle.setText("3");

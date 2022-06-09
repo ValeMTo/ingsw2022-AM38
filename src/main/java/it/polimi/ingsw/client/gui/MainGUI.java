@@ -28,6 +28,8 @@ public class MainGUI extends Application {
     public static final String HOME_SCENE = "homeMenu.fxml";
     public static final String LOGIN_SCENE = "loginMenu.fxml";
     public static final String SETUP_SCENE = "setupMenu.fxml";
+    public static final String ACCEPT_CONDITIONS_SCENE = "acceptConditionsMenu.fxml";
+    public static final String LOBBY_SCENE = "lobbyScene.fxml";
 
     private final ViewState viewState;
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
@@ -84,6 +86,8 @@ public class MainGUI extends Application {
         fxmlScenes.add(HOME_SCENE);
         fxmlScenes.add(LOGIN_SCENE);
         fxmlScenes.add(SETUP_SCENE);
+        fxmlScenes.add(ACCEPT_CONDITIONS_SCENE);
+        fxmlScenes.add(LOBBY_SCENE);
 
         try {
             for (String fxmlName : fxmlScenes) {
@@ -92,7 +96,6 @@ public class MainGUI extends Application {
                 guiScenesMap.put(fxmlName, loadedScene);
                 GUIController guiController = loader.getController();
                 guiController.setGuiToController(this);
-                guiController.setViewstate(viewState);
                 guiControllersMap.put(fxmlName, guiController);
             }
         } catch (IOException e) {
@@ -137,6 +140,10 @@ public class MainGUI extends Application {
 
     public ConnectionSocket getConnectionSocket(){
         return connectionSocket;
+    }
+
+    public GUIController getController(String fxmlName){
+        return guiControllersMap.get(fxmlName);
     }
 
 }

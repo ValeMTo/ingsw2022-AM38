@@ -37,7 +37,7 @@ public class ViewMessageParser {
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
-        System.out.println(jsonFromServer);
+        System.out.println("viewMessageParser receive..." + jsonFromServer);
 
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
@@ -45,8 +45,12 @@ public class ViewMessageParser {
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
-            //System.out.println("READER - GOT ERROR MESSAGE - "+json.get("ErrorType") + " - " + json.get("errorString"));
             view.setTurnShown(false);
+            if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
+                System.out.println("NICKNAME ALREADY TAKEN");
+                view.setNickname(null);
+                view.wake();
+            }
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
                 Tower tower = Tower.toTower(json.get("PlayerTower").getAsString());
@@ -143,6 +147,7 @@ public class ViewMessageParser {
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
                 view.setGameSettings(json.get("actualPlayers").getAsInt(), json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
+                System.out.println("LOBBY ANSWER");
                 view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
@@ -150,13 +155,6 @@ public class ViewMessageParser {
                 view.setNickname(json.get("nickname").getAsString());
                 view.wake();
             }
-        } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ERROR.ordinal() ){
-            if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
-                view.setNickname(null);
-                view.wake();
-
-            }
-
         }
     }
 }

@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.client.view.ViewState;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -31,6 +32,16 @@ abstract public class GUIController {
         errorWindow.showAndWait();
     }
 
+    public Alert showInfoAlert(String infoTitle, String infoString) {
+        Alert infoWindow = new Alert(Alert.AlertType.INFORMATION);
+        infoWindow.setTitle("Info");
+        infoWindow.setHeaderText(infoTitle);
+        infoWindow.setContentText(infoString);
+        infoWindow.showAndWait();
+        return infoWindow;
+    }
+
+
     /**
      * Method to exit from Eriantys gui
      */
@@ -49,4 +60,7 @@ abstract public class GUIController {
         this.viewState = viewState;
     }
 
+    public void showSettings() throws FunctionNotImplementedException {
+        throw new FunctionNotImplementedException();
+    };
 }

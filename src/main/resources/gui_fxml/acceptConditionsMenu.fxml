@@ -7,40 +7,46 @@
 
 <AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.AcceptConditionsMenuController">
     <children>
-
-        <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="313.0" layoutY="150.0" text="Do you want do accept the following rules?" textFill="#46b9e7">
-            <font>
-                <Font size="32.0" />
-            </font>
-        </Label>
-        <Button fx:id="acceptButton" layoutX="465.0" layoutY="412.0" mnemonicParsing="false" onMouseClicked="#acceptPlay" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: GREEN;" text="ACCEPT" AnchorPane.leftAnchor="465.0">
-            <font>
-                <Font size="18.0" />
-            </font></Button>
-        <Button fx:id="quitButton" layoutX="655.0" layoutY="412.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: RED;" text="REFUSE" AnchorPane.rightAnchor="435.0">
-            <font>
-                <Font size="18.0" />
-            </font></Button>
-      <Label layoutX="419.0" layoutY="234.0" prefHeight="45.0" prefWidth="291.0" text="Number Of Players:" textFill="#9f9f9f">
-         <font>
-            <Font size="30.0" />
-         </font>
-      </Label>
-      <Label fx:id="numberOfPlayersBox" layoutX="698.0" layoutY="228.0" prefHeight="30.0" prefWidth="48.0" text="##" textFill="#46b9e7">
-         <font>
-            <Font size="40.0" />
-         </font>
-      </Label>
-      <Label fx:id="gamemodeBox" layoutX="513.0" layoutY="296.0" prefHeight="58.0" prefWidth="213.0" text="Gamemode" textFill="#46b9e7">
-         <font>
-            <Font size="40.0" />
-         </font>
-      </Label>
-      <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="652.0" layoutY="487.0" text="If you refuse, you will be disconnected " textFill="#46b9e7">
-         <font>
-            <Font size="11.0" />
-         </font>
-      </Label>
+      <AnchorPane fx:id="settingsBox" layoutX="313.0" layoutY="150.0">
+         <children>
+      
+              <Label id="home_title" fx:id="messageBox" alignment="TOP_CENTER" contentDisplay="CENTER" text="Do you want do accept the following rules?" textFill="#46b9e7">
+                  <font>
+                      <Font size="32.0" />
+                  </font>
+              </Label>
+              <Button fx:id="acceptButton" layoutX="152.0" layoutY="262.0" mnemonicParsing="false" onMouseClicked="#acceptPlay" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: GREEN;" text="ACCEPT">
+                  <font>
+                      <Font size="18.0" />
+                  </font>
+            </Button>
+              <Button fx:id="quitButton" layoutX="342.0" layoutY="262.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: RED;" text="REFUSE">
+                  <font>
+                      <Font size="18.0" />
+                  </font>
+            </Button>
+            <Label layoutX="106.0" layoutY="84.0" prefHeight="45.0" prefWidth="291.0" text="Number Of Players:" textFill="#46b9e7">
+               <font>
+                  <Font size="30.0" />
+               </font>
+            </Label>
+            <Label fx:id="numberOfPlayersBox" layoutX="385.0" layoutY="78.0" prefHeight="30.0" prefWidth="48.0" text="##" textFill="#46b9e7">
+               <font>
+                  <Font size="40.0" />
+               </font>
+            </Label>
+            <Label fx:id="gamemodeBox" layoutX="106.0" layoutY="146.0" prefHeight="58.0" prefWidth="213.0" text="Gamemode" textFill="#46b9e7">
+               <font>
+                  <Font size="40.0" />
+               </font>
+            </Label>
+            <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="152.0" layoutY="388.0" text="Note: If you refuse, you will be disconnected " textFill="#46b9e7">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
     </children>
 
 </AnchorPane>
