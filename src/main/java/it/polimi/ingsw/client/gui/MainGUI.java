@@ -44,7 +44,7 @@ public class MainGUI extends Application {
      */
     public MainGUI() {
         this.isRunning = true;
-        this.viewState = new ViewState(true);
+        this.viewState = new ViewState(false);
     }
 
     public static void main(String[] args) {

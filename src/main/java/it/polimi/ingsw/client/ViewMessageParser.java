@@ -146,6 +146,7 @@ public class ViewMessageParser {
                 view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
+                System.out.println("ACCEPT NICKNAME REQUEST");
                 view.setNickname(json.get("nickname").getAsString());
                 view.wake();
             }

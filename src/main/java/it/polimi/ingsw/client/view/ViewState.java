@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.ClientCLI;
 import it.polimi.ingsw.client.GameSettings;
+import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.client.gui.controllers.GUIController;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
@@ -10,6 +11,7 @@ import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import javafx.application.Platform;
 
 import java.util.*;
 
@@ -41,7 +43,7 @@ public class ViewState {
     private Tower activePlayer;
     private boolean turnShown;
     private ClientCLI awaitingCLI;
-    private GUIController awaitingGUI;
+    private MainGUI awaitingGUI;
     private boolean isCli;
     private SpecialCardRequiredAction specialCardRequiredAction;//TODO !!!
 
@@ -75,7 +77,7 @@ public class ViewState {
      * Sets the GUI to be notify from wait
      * @param awaitingGUI
      */
-    public synchronized void setAwaitingGUI(GUIController awaitingGUI){
+    public synchronized void setAwaitingGUI(MainGUI awaitingGUI){
         this.awaitingGUI = awaitingGUI;
     }
 
@@ -297,9 +299,6 @@ public class ViewState {
     }
     public synchronized void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
-        synchronized (awaitingCLI){
-            awaitingCLI.notifyAll();
-        }
     }
 
     public synchronized boolean isEndOfMatch() {
@@ -572,12 +571,14 @@ public class ViewState {
     }
 
     public void wake(){
-        if (isCli = true){
+        if (isCli == true){
             synchronized (awaitingCLI) {
+                System.out.println("Waking the CLI");
                 awaitingCLI.notifyAll();
             }
         } else {
             synchronized (awaitingGUI){
+                System.out.println("Waking the GUI");
                 awaitingGUI.notifyAll();
             }
         }

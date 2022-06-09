@@ -95,7 +95,9 @@ public class MessageParser{
 
         }else if(json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
             if (json.get("SetType").getAsInt() == SetTypeEnum.SET_NICKNAME.ordinal()) {
-                client.confirmNickname(json.get("nickname").getAsString());
+                System.out.println("SET NICKNAME");
+                return client.confirmNickname(json.get("nickname").getAsString());
+
 
             } else if (json.get("SetType").getAsInt()==SetTypeEnum.SET_GAME_MODE.ordinal()){
                 if (Server.getLobbyNumberOfActivePlayers() == 0) {

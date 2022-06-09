@@ -47,8 +47,8 @@ public class LoginMenuController extends GUIController {
 
         // controlli sul formato dei text inseriti
         // ....
-        messageBox.setText("");
-        messageBox.setText("trying connecting to Server ...");
+        getMessageBox().setText("");
+        getMessageBox().setText("trying connecting to Server ...");
         gui.setConnectionSocket(createConnectionWithServer(address.getText(), Integer.parseInt(port.getText()), gui.getViewState()));
         if (gui.getConnectionSocket() != null) {
             enterButton.setVisible(false);
@@ -59,31 +59,35 @@ public class LoginMenuController extends GUIController {
 
     }
 
-    public synchronized void confirmNickname(){
-        messageBox.setText("");
-        messageBox.setText("Checking the uniqueness of the name...");
+    public void confirmNickname(){
+        getMessageBox().setText("");
+        getMessageBox().setText("Checking the uniqueness of the name...");
         gui.getConnectionSocket().sendNickname(nickname.getText());
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (gui) {
+            try {
+                gui.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (gui.getViewState().getNickname() != null){
-            messageBox.setText("Your name is unique");
+            getMessageBox().setText("Your name is unique");
             isTheFirst();
         } else {
-            messageBox.setText("Your name has been already chosen.\nInsert another one.");
+            getMessageBox().setText("Your name has been already chosen.\nInsert another one.");
         }
 
     }
 
     private void isTheFirst(){
         gui.getConnectionSocket().isTheFirst();
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (gui) {
+            try {
+                gui.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (gui.getViewState().getGameSettings().getActualClients() <= 0) {
@@ -110,7 +114,7 @@ public class LoginMenuController extends GUIController {
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
-        gui.getViewState().setAwaitingGUI(this);
+        gui.getViewState().setAwaitingGUI(gui);
         return connectionSocket;
     }
 
