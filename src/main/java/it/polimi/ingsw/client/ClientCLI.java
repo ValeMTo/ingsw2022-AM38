@@ -453,12 +453,12 @@ public class ClientCLI {
         String mode;
         Boolean isExpert = null;
         while (!confirmation||isExpert==null) {
-            System.out.println(">Insert the game mode [E/D]: ");
+            System.out.println(">Insert the game mode [Ea/Ex]: ");
             mode = in.nextLine();
-            if (mode.equalsIgnoreCase("E")) {
+            if (mode.equalsIgnoreCase("Ex")) {
                 System.out.println("You have chosen the expert mode");
                 isExpert = true;
-            } else if (mode.equalsIgnoreCase("D")) {
+            } else if (mode.equalsIgnoreCase("Ea")) {
                 System.out.println("You have chosen the easy mode");
                 isExpert = false;
             }
