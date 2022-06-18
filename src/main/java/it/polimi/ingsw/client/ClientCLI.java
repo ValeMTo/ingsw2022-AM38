@@ -145,7 +145,6 @@ public class ClientCLI {
     public void startGame() {
         while (!viewState.isEndOfMatch()) {
             cleaner();
-            printSpecialCards();
             if (!viewState.isActiveView()&&!viewState.getTurnShown()) {
                     System.out.println("CLIENTCLI - not your turn");
                     viewState.setTurnShown(true);
