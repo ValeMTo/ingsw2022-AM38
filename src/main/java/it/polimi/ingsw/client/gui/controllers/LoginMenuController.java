@@ -45,7 +45,7 @@ public class LoginMenuController extends GUIController {
      */
     public void startLogin() {
 
-        // controlli sul formato dei text inseriti
+        // controlli sul formato dei text inseriti ??
         // ....
         getMessageBox().setText("");
         getMessageBox().setText("trying connecting to Server ...");

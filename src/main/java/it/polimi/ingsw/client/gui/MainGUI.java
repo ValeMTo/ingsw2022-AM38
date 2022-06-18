@@ -30,6 +30,7 @@ public class MainGUI extends Application {
     public static final String SETUP_SCENE = "setupMenu.fxml";
     public static final String ACCEPT_CONDITIONS_SCENE = "acceptConditionsMenu.fxml";
     public static final String LOBBY_SCENE = "lobbyScene.fxml";
+    public static final String CREDITS_SCENE = "creditsScene.fxml";
 
     private final ViewState viewState;
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
@@ -88,6 +89,7 @@ public class MainGUI extends Application {
         fxmlScenes.add(SETUP_SCENE);
         fxmlScenes.add(ACCEPT_CONDITIONS_SCENE);
         fxmlScenes.add(LOBBY_SCENE);
+        fxmlScenes.add(CREDITS_SCENE);
 
         try {
             for (String fxmlName : fxmlScenes) {
