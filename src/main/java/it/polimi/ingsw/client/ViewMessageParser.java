@@ -76,9 +76,8 @@ public class ViewMessageParser {
 
             } else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PLAYER_UPDATE.ordinal()){
                 view.addOnlinePlayer(json.get("Nickname").getAsString());
-                System.out.println("SONO IN PLAYER UPDATE");
                 view.addNicknamelobby(json.get("Nickname").getAsString());
-                System.out.println("DOVREI AVER UPDATATO IL NOME");
+
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
