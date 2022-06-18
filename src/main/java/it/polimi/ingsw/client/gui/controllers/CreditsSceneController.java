@@ -17,7 +17,7 @@ public class CreditsSceneController extends GUIController {
     @FXML
     private Label creditsLabel;
 
-    
+
 
     @FXML
     public void initialize() {

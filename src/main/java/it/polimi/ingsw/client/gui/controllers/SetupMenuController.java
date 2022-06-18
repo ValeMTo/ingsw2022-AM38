@@ -45,6 +45,8 @@ public class SetupMenuController extends GUIController{
     private void acceptPlay(ActionEvent event){
         gui.getConnectionSocket().setGameMode(isExpert);
         gui.getConnectionSocket().setNumberOfPlayers(numOfPlayers);
+        LobbyMenuController controller = (LobbyMenuController) gui.getController("lobbyScene.fxml");
+        controller.setNicknameInLobby(gui.getViewState().getNickname());
         gui.setNextStage("lobbyScene.fxml");
     }
 

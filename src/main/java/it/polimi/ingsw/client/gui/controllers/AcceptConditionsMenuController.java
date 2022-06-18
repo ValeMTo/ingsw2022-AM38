@@ -33,6 +33,8 @@ public class AcceptConditionsMenuController extends GUIController{
     @FXML
     private void  acceptPlay(ActionEvent event){
         gui.getConnectionSocket().acceptRules();
+        LobbyMenuController controller = (LobbyMenuController) gui.getController("lobbyScene.fxml");
+        controller.setNicknameInLobby(gui.getViewState().getNickname());
         gui.setNextStage("lobbyScene.fxml");
     }
 
