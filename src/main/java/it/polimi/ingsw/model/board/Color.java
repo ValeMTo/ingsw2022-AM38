@@ -27,4 +27,19 @@ public enum Color {
         return null;
     }
 
+    /**
+     * Returns the abbreviation given the color
+     * @return
+     */
+    public static String getAbbreviation(Color color){
+        switch (color) {
+            case YELLOW: return "Y";
+            case BLUE: return "B";
+            case RED: return "R";
+            case GREEN: return "G";
+            case PINK: return "P";
+            default: return "";
+        }
+    }
+
 }

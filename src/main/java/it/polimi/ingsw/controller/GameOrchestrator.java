@@ -242,10 +242,13 @@ public abstract class GameOrchestrator extends Listenable {
      * @throws IncorrectPhaseException   if the phase is not planning phase
      */
     public boolean chooseCard(int priority) throws IndexOutOfBoundsException, AlreadyUsedException, IncorrectPhaseException {
+        System.out.println("GAME ORCHESTRATOR NOTIFY - chooseCard - player "+gameBoard.getCurrentPlayer()+" want to choose card "+priority);
+        System.out.flush();
         synchronized (actionBlocker) {
             // If the current phase is incorrect
             if (getCurrentPhase() != PLANNING) throw new IncorrectPhaseException(this.getCurrentPhase());
             try {
+                System.out.println("GAME ORCHESTRATOR NOTIFY - chooseCard - player "+gameBoard.getCurrentPlayer()+" choosing card "+priority);
                 Set<Integer> usableCards = gameBoard.getUsableAssistantCard(gameBoard.getPlayerTower(getActivePlayer())).keySet();
                 usableCards.removeAll(playedAssistantCard);
                 //for (Integer i : usableCards)
@@ -434,7 +437,7 @@ public abstract class GameOrchestrator extends Listenable {
      * Sets the array of the planning phase order, using the original List of players for the clockwise order and the last used cards
      */
     private void setPlanningOrder() {
-        synchronized (actionOrder) {
+        synchronized (phaseBlocker) {
             planningOrder[0] = actionOrder[0];
             int firstPlayer = players.indexOf(actionOrder[0]);
             int index = 1;
@@ -455,7 +458,7 @@ public abstract class GameOrchestrator extends Listenable {
      * Sets the array of the action phase order, using the original List of players for the clockwise order and the last used cards
      */
     private void setActionOrder() {
-        synchronized (actionOrder) {
+        synchronized (phaseBlocker) {
             int index = 0;
             try {
                 for (Integer value : playedAssistantCard) {

@@ -124,6 +124,7 @@ public class MessageParser{
      */
     private String useAssistantCard(JsonObject json) {
         try {
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - Try to use card "+json.get("CardPriority").getAsInt());
             if (gameOrchestrator.chooseCard(json.get("CardPriority").getAsInt())){
                 System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - Using correctly card "+json.get("CardPriority").getAsInt());
                 return MessageGenerator.okMessage();

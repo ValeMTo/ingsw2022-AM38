@@ -47,11 +47,14 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
             do {
                 try {
                     specialCardsArray[i].countStudents();
-                    drawnColor = gameBoard.drawFromBag();
-                    flag = gameBoard.addStudent(StudentCounter.CARD, drawnColor,i);
-                    // If the student cannot be added to the bag is added back to it
-                    if(!flag)
-                        gameBoard.addStudent(StudentCounter.BAG,drawnColor);
+                    // Adds all the students to the card
+                    do {
+                        drawnColor = gameBoard.drawFromBag();
+                        flag = gameBoard.addStudent(StudentCounter.CARD, drawnColor, i);
+                        // If the student cannot be added to the bag is added back to it
+                        if (!flag)
+                            gameBoard.addStudent(StudentCounter.BAG, drawnColor);
+                    }while(flag);
                 }
                 // If the count is not implemented is because it cannot contain students
                 catch (FunctionNotImplementedException e)

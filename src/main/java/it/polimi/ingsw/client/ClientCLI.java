@@ -13,9 +13,8 @@ import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.PrintStream;
+import java.io.*;
+import java.io.Reader;
 import java.util.*;
 
 public class ClientCLI {
@@ -249,13 +248,16 @@ public class ClientCLI {
         String input;
         try{
             do {
-                System.out.println(CLICyan + "It seems that you have enough coins to play a special card, do you want to play one fo them (Y/N)" + CLIEffectReset);
+                System.out.println(CLICyan + "It seems that you have enough coins to play a special card, do you want to play one of them (Y/N)" + CLIEffectReset);
                 input = in.nextLine();
             } while (!input.equalsIgnoreCase("y") && !input.equalsIgnoreCase("n"));
             if (input.equalsIgnoreCase("n"))
                 return false;
             do {
                 System.out.println(CLICyan + "Choose an usable special card (enter 'n' to exit), write its name and press enter (choose wisely and be aware that the cost will increase next round)" + CLIEffectReset);
+                System.out.println(CLICyan + "Usable special cards "+CLIEffectReset);
+                for(String usableCardName: viewState.getUpperCaseSpecialCards())
+                    System.out.println(usableCardName);
                 input = in.nextLine();
                 if(!viewState.getUpperCaseSpecialCards().contains(input.toUpperCase()))
                     System.out.println(CLIPink + "This special card is not contained into the 3 usable special cards of this game or is misspelled" + CLIEffectReset);
@@ -556,7 +558,8 @@ public class ClientCLI {
         if(viewState.isExpert()) {
             Gson parser = new Gson();
             try {
-                JsonObject json = parser.fromJson(new FileReader("src/main/resources/json/SpecialCardsEffectsDescription.json"),JsonObject.class);
+                JsonObject json = parser.fromJson(new InputStreamReader(getClass().getResourceAsStream("/json/SpecialCardsEffectsDescription.json")) {
+                }, JsonObject.class);
                 System.out.println(CLIBlack + "         - Special cards - \n" + CLIEffectReset);
                 String[] rows = new String[6];
                 for (int i = 0; i < 6; i++)
@@ -571,17 +574,21 @@ public class ClientCLI {
                     rows[1] += "│ ";
 
                     rows[3] += "  │ " + CLIGreen + "Cost: " + viewState.getUsableSpecialCards().get(specialCardName)+ CLIEffectReset + "     │ ";
-                    for (int j = 2; j < 5; j++)
-                        if (j != 3)
-                            if(SpecialCardName.getSpecialCardsWithStudents().contains(specialCardName))
-                            rows[j] += "  │             │ ";
-                            else if(specialCardName.equals(SpecialCardName.HERBALIST))
-                            rows[j] += "  │ TILES: "+viewState.getHerbalistTiles()+"    │ ";
+                    for (int j = 2; j < 5; j++) {
+                        if (j == 4) {
+                            if (SpecialCardName.getSpecialCardsWithStudents().contains(specialCardName)) {
+                                String blocks = this.createCubesString(viewState.getSpecialCardStudents(specialCardName), 6);
+                                rows[j] += "  │   " + blocks + "    │ ";
+                            } else if (specialCardName.equals(SpecialCardName.HERBALIST))
+                                rows[j] += "  │ TILES: " + viewState.getHerbalistTiles() + "    │ ";
                             else {
-                                String blocks = this.createCubesString(viewState.getSpecialCardStudents(specialCardName),6);
-                                rows[j] += "  │   "+blocks+"    │ ";
+                                rows[j] += "  │             │ ";
 
                             }
+                        } else if(j!=3)
+                            rows[j] += "  │             │ ";
+                    }
+
                     rows[5] += "  └─────────────┘ ";
                     if(json.get(specialCardName.name())!=null) {
                         List<String> message = parser.fromJson(json.get(specialCardName.name()),List.class);
@@ -596,8 +603,6 @@ public class ClientCLI {
                     printVector(rows);
                 }
             }
-            catch (FileNotFoundException exc){
-                exc.printStackTrace(); }
             catch (FunctionNotImplementedException exc) {
                 System.out.println(CLIPink + "EXCEPTION : The print of the special cards is for expert game mode only!" + CLIEffectReset);
             }
@@ -723,13 +728,14 @@ public class ClientCLI {
      */
     private String createCubesString(Map<Color,Integer> students,int max){
         String cubes ="";
-        int i = 0,counter = 0;
+        int i,counter = 0;
         if(students!=null) {
             for (Color color : Color.values()) {
                 i = 1;
-                if (students.get(color)!=null && i <= students.get(color)) {
-                    cubes += getAnsiStringFromColor(color) + "¤" + CLIEffectReset;
+                while (students.get(color)!=null && i <= students.get(color)) {
+                    cubes += getAnsiStringFromColor(color) + Color.getAbbreviation(color) + CLIEffectReset;
                     counter++;
+                    i++;
                 }
             }
         }
