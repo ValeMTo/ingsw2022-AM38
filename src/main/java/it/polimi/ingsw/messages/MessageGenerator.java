@@ -249,11 +249,12 @@ public class MessageGenerator {
      *
      * @return : json String with number of players in the lobby
      */
-    public static String answerlobbyMessage(int actualPlayer, boolean isExpert,int numOfPlayers ) {
+    public static String answerlobbyMessage(String player1, String player2, boolean isExpert,int numOfPlayers ) {
         JsonObject json = new JsonObject();
         json.addProperty("MessageType", MessageTypeEnum.ANSWER.ordinal());
         json.addProperty("AnswerType", AnswerTypeEnum.LOBBY_ANSWER.ordinal());
-        json.addProperty("actualPlayers", actualPlayer);
+        json.addProperty("player1", player1);
+        json.addProperty("player2", player2);
         json.addProperty("isExpert", isExpert);
         json.addProperty("numOfPlayers", numOfPlayers);
         return gson.toJson(json) + "\n";
@@ -535,6 +536,20 @@ public class MessageGenerator {
         for(String s:playersMapping.keySet())
             playerStringMap.put(s,playersMapping.get(s).name());
         json.put("PlayersMapping", playersMapping);
+
+        return json + "\n";    // using the toString() on a JSONObject instead of using toJson
+    }
+
+    /**
+     * Generates a newPlayer update message
+     *
+     * @param nickname : the name o the new player.
+     */
+    public static String newPlayerUpdateMessage(String nickname) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PLAYER_UPDATE.ordinal());
+        json.put("Nickname", nickname);
 
         return json + "\n";    // using the toString() on a JSONObject instead of using toJson
     }

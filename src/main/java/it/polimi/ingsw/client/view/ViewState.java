@@ -3,7 +3,7 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.ClientCLI;
 import it.polimi.ingsw.client.GameSettings;
 import it.polimi.ingsw.client.gui.MainGUI;
-import it.polimi.ingsw.client.gui.controllers.GUIController;
+import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
@@ -22,6 +22,7 @@ public class ViewState {
     private Map<String, Tower> players = new HashMap<>();
     private List<IslandView> islands = new ArrayList<>();
     private Map<Cloud, Integer> clouds = new HashMap<>();
+    private List<String> onlinePlayers;
     private List<SchoolBoardState> schoolBoards = new ArrayList<>();
     private boolean isExpert;
     private boolean isTheCommander;
@@ -48,6 +49,7 @@ public class ViewState {
     private SpecialCardRequiredAction specialCardRequiredAction;//TODO !!!
 
     public ViewState(boolean isCli){
+        this.onlinePlayers =  new ArrayList<>();
         this.isCli = isCli;
         this.turnShown = false;
         isTheCommander = false;
@@ -64,6 +66,32 @@ public class ViewState {
         super();
         this.nickName = nickname;
     }
+
+
+
+    /**
+     * Add a new online player
+     */
+    public void addOnlinePlayer(String nickName){
+        onlinePlayers.add(nickName);
+    }
+
+    /**
+     * Return onlinePlayers list
+     */
+    public List<String> getOnlinePlayers(){
+        List<String> list = new ArrayList<>();
+        list.addAll(onlinePlayers);
+        return list;
+    }
+
+    /**
+     * Return the number of online players
+     */
+    public int getNumberOfOnlinePlayer(){
+        return onlinePlayers.size();
+    }
+
 
     /**
      * Sets the CLI to be notify from wait
@@ -297,7 +325,7 @@ public class ViewState {
         this.usableCards.addAll(usableCards);
 
     }
-    public synchronized void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
+    public synchronized void setGameSettings(List<String> actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
         this.isExpert = gameSettings.getExpert();
     }
@@ -569,6 +597,14 @@ public class ViewState {
 
     public synchronized String getNickname(){
         return nickName;
+    }
+
+    public void addNicknamelobby(String nickName){
+        if (isCli == false){
+            LobbyMenuController controller = (LobbyMenuController) awaitingGUI.getController("lobbyScene.fxml");
+            Platform.runLater(()->controller.addNicknameInLobby(nickName));
+            Platform.runLater(()->awaitingGUI.setNextStage("lobbyScene.fxml"));
+        }
     }
 
     public void wake(){

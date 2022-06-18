@@ -240,7 +240,7 @@ public class MessageGeneratorTest {
     @Test
     public void answerLobbyTest() {
         String message = null;
-        message = MessageGenerator.answerlobbyMessage(2, true, 3);
+        message = MessageGenerator.answerlobbyMessage("Valeria", "Nicola",  true, 3);
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
 
         assertEquals(MessageTypeEnum.ANSWER.ordinal(), json.get("MessageType").getAsInt());

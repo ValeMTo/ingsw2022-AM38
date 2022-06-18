@@ -1,5 +1,6 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.ArrayList;
@@ -20,8 +21,13 @@ public class Lobby {
     }
 
 
-    public int getNumOfActiveUsers() {
-        return queue.size();
+    public List<String> getActiveUsers() {
+        List<String> list = new ArrayList<>();
+        for (ClientHandler client : queue){
+            System.out.println("GET ACTIVE PLAYERS - LOBBY" + client.getNickName());
+            list.add(client.getNickName());
+        }
+        return list;
     }
 
     public void setIsExpert(boolean isExpert) {
@@ -40,6 +46,12 @@ public class Lobby {
         queue.add(client);
         players.add(client.getNickName());
         System.out.println("LOBBY - Adding new player named "+client.getNickName()+" (" + queue.size() + " of " + numOfPlayers + ")");
+
+        for( ClientHandler person : queue){
+            if (!person.getNickName().equals(client.getNickName())) {
+                person.asyncSend(MessageGenerator.newPlayerUpdateMessage(client.getNickName()));
+            }
+        }
         //Creates a new GameOrchestrator and relatives messageParsers for the players
         synchronized (this) {
             if (queue.size() == numOfPlayers && queue.size() > 1) {

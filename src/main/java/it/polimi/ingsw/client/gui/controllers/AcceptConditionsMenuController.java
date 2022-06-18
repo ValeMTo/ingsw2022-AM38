@@ -34,7 +34,10 @@ public class AcceptConditionsMenuController extends GUIController{
     private void  acceptPlay(ActionEvent event){
         gui.getConnectionSocket().acceptRules();
         LobbyMenuController controller = (LobbyMenuController) gui.getController("lobbyScene.fxml");
-        controller.setNicknameInLobby(gui.getViewState().getNickname());
+        controller.addNicknameInLobby(gui.getViewState().getNickname());
+        for(String name : gui.getViewState().getOnlinePlayers()){
+            controller.addNicknameInLobby(name);
+        }
         gui.setNextStage("lobbyScene.fxml");
     }
 

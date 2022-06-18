@@ -73,6 +73,12 @@ public class ViewMessageParser {
                     playersWithTower.put(s, Tower.toTower(players.get(s)));
                 }
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
+
+            } else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PLAYER_UPDATE.ordinal()){
+                view.addOnlinePlayer(json.get("Nickname").getAsString());
+                System.out.println("SONO IN PLAYER UPDATE");
+                view.addNicknamelobby(json.get("Nickname").getAsString());
+                System.out.println("DOVREI AVER UPDATATO IL NOME");
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
@@ -146,7 +152,16 @@ public class ViewMessageParser {
             }
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
-                view.setGameSettings(json.get("actualPlayers").getAsInt(), json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
+                List<String> listOfPlayers = new ArrayList<>();
+                if(json.get("player1") != null ){
+                    listOfPlayers.add(json.get("player1").getAsString());
+                    view.addOnlinePlayer(json.get("player1").getAsString());
+                }
+                if(json.get("player2") != null ){
+                    listOfPlayers.add(json.get("player2").getAsString());
+                    view.addOnlinePlayer(json.get("player2").getAsString());
+                }
+                view.setGameSettings(listOfPlayers, json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
                 System.out.println("LOBBY ANSWER");
                 view.wake();
 

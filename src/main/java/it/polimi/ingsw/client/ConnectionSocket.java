@@ -95,6 +95,7 @@ public class ConnectionSocket {
         //System.out.println("CONNECTION SOCKET - ACCEPT RULES - Sending: " + MessageGenerator.okRulesGameMessage());
         socketOut.print(MessageGenerator.okRulesGameMessage());
         socketOut.flush();
+
     }
 
     public void refuseRules() {
