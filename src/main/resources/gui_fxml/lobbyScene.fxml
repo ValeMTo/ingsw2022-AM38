@@ -4,11 +4,16 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 
 <AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.LobbyMenuController">
    <children>
-      <Label fx:id="welcomeLabel" alignment="CENTER" layoutY="78.0" prefHeight="27.0" prefWidth="1200.0" textFill="#46b9e7" />
+      <Label fx:id="welcomeLabel" alignment="CENTER" layoutY="78.0" prefHeight="27.0" prefWidth="1200.0" textFill="#46b9e7">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
       <Button fx:id="quitButton" layoutX="883.0" layoutY="559.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="QUIT" />
    </children>
 </AnchorPane>

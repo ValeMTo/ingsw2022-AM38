@@ -19,7 +19,6 @@ public class LobbyMenuController extends GUIController{
 
     @FXML
     public void initialize() {
-        welcomeLabel.setText("Hello " + nicknameInLobby + " !");
         quitButton.setOnAction(this::quitGame);
     }
 
@@ -31,6 +30,7 @@ public class LobbyMenuController extends GUIController{
 
     public void setNicknameInLobby(String nickname) {
         nicknameInLobby = nickname;
+        welcomeLabel.setText("Hello " + nicknameInLobby + " !");
     }
 
 }
