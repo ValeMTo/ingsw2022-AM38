@@ -10,7 +10,7 @@ public enum Color {
      */
     public static Color toColor(String colorString){
         for(Color color:Color.values())
-            if(colorString.equalsIgnoreCase(color.name()))
+            if(colorString.equalsIgnoreCase(color.name())||colorString.equalsIgnoreCase(getAbbreviation(color)))
                 return color;
         return null;
     }

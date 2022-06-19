@@ -400,6 +400,7 @@ public class ViewState {
             List<String> returnList = new ArrayList<>();
             for(SpecialCardName specialCard : usableSpecialCards.keySet())
                 returnList.add(specialCard.name().toUpperCase());
+            return returnList;
         }
         return new ArrayList<>();
     }
@@ -511,7 +512,9 @@ public class ViewState {
      * @param specialCard : the list of names of the usable special cards
      */
     public synchronized void setUsableSpecialCard(Map<SpecialCardName,Integer> specialCard){
-        if(usableSpecialCards!=null)
+        if(usableSpecialCards==null)
+            this.usableSpecialCards = new HashMap<>();
+        else
             this.usableSpecialCards.clear();
         this.usableSpecialCards.putAll(specialCard);
     }

@@ -153,11 +153,16 @@ public class ClientCLI {
                 // If it is not expertGame mode does not print special card usage, if it is yes and if the player uses the card
                 // does not continue with the normal phase
                 if (viewState.getCurrentPhase() == PhaseEnum.SPECIAL_CARD_USAGE) {
-                    if(viewState.getSpecialPhase()== SpecialCardRequiredAction.CHOOSE_COLOR_CARD){
-                        System.out.println(CLICyan+"Choose a color from the card"+CLIEffectReset);
+                    if(viewState.getSpecialPhase()== SpecialCardRequiredAction.CHOOSE_COLOR_CARD||viewState.getSpecialPhase()== SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE||viewState.getSpecialPhase()== SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM){
+                        viewState.setTurnShown(true);
+                        connectionSocket.chooseColor(this.chooseColorSpecialCard(viewState.getSpecialPhase()));
+                    }
+                    if(viewState.getSpecialPhase()== SpecialCardRequiredAction.CHOOSE_ISLAND){
+                        viewState.setTurnShown(true);
+                        connectionSocket.chooseIsland(this.chooseIslandSpecialCard());
                     }
                 }
-                if (!viewState.isExpert()||!specialCardUsage()) {
+                else if (!viewState.isExpert()||!specialCardUsage()) {
                     if (viewState.getCurrentPhase() == PhaseEnum.PLANNING) {
                         printForAssistantCardChoice();
                         int card = showPlanningInstructionAndGetCard();
@@ -254,7 +259,7 @@ public class ClientCLI {
                 return false;
             do {
                 System.out.println(CLICyan + "Choose an usable special card (enter 'n' to exit), write its name and press enter (choose wisely and be aware that the cost will increase next round)" + CLIEffectReset);
-                System.out.println(CLICyan + "Usable special cards "+CLIEffectReset);
+                System.out.println(CLICyan + "Usable special cards list "+viewState.getUpperCaseSpecialCards()+CLIEffectReset);
                 for(String usableCardName: viewState.getUpperCaseSpecialCards())
                     System.out.println(usableCardName);
                 input = in.nextLine();
@@ -269,6 +274,37 @@ public class ClientCLI {
         }
         connectionSocket.chooseSpecialCard(input);
         return true;
+    }
+
+    /**
+     * Requires the color for the special card usage
+     * @return the color chosen
+     */
+    private Color chooseColorSpecialCard(SpecialCardRequiredAction type){
+        if(type==SpecialCardRequiredAction.CHOOSE_COLOR_CARD)
+            System.out.println(CLICyan+"Choose a color from the card, colors abbreviations: "+getAllColorAbbreviations());
+        else if(type==SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)
+            System.out.println(CLICyan+"Choose a color from the schoolEntrance, colors abbreviations: "+getAllColorAbbreviations());
+        else if(type==SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM)
+            System.out.println(CLICyan+"Choose a color from the diningRoom, colors abbreviations: "+getAllColorAbbreviations());
+        String input;
+        input = in.nextLine();
+        while(!input.equalsIgnoreCase("B")&&!input.equalsIgnoreCase("G")&&!input.equalsIgnoreCase("Y")&&!input.equalsIgnoreCase("P")&&!input.equalsIgnoreCase("R"))
+        {
+            System.out.println(CLIPink+"Incorrect value, colors abbreviations are: "+getAllColorAbbreviations());
+        }
+        return Color.toColor(input);
+    }
+
+    /**
+     * Used to set an island to use for the special card effect
+     * @return the chosen island from the archipelago
+     */
+    public int chooseIslandSpecialCard(){
+        printArchipelago();
+        System.out.println(CLICyan+"Choose an island from the archipelago where you want to apply the effect of the chosen special card "+getAllColorAbbreviations());
+        String input = in.nextLine();
+        return Integer.parseInt(input);
     }
 
     /**
@@ -894,5 +930,16 @@ public class ClientCLI {
                 return CLIRed+"R";
         }
         return "";
+    }
+
+    /**
+     *
+     * @return all the color abbreviations with their color ansi code
+     */
+    private String getAllColorAbbreviations(){
+        String getAllColor = "";
+        for(Color color: Color.values())
+            getAllColor+=this.getColorAbbreviationWithInitialAnsiiCode(color);
+        return getAllColor+CLIEffectReset;
     }
 }

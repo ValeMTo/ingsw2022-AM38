@@ -314,5 +314,24 @@ public class ConnectionSocket {
         //System.out.println("CONNECTION SOCKET - CHANGE PHASE " + MessageGenerator.phaseUpdateMessage(phase));
     }
 
+    /**
+     * Needed to send the chosen color for special card usage
+     * @param color : the color chosen by the player
+     *
+     */
+    public void chooseColor(Color color){
+        socketOut.print(MessageGenerator.chooseColorMessage(color));
+        socketOut.flush();
+    }
+
+    /**
+     * Needed to send the chosen Island for special card usage
+     * @param position : the island's position chosen by the player
+     *
+     */
+    public void chooseIsland(int position){
+        socketOut.print(MessageGenerator.chooseIsland(position));
+        socketOut.flush();
+    }
 
 }

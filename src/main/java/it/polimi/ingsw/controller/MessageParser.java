@@ -229,7 +229,7 @@ public class MessageParser{
             if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal()) {
                 return gameOrchestrator.useSpecialCard(json.get("SpecialCardName").getAsString());
             }
-            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal()) {
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal())) {
                 return gameOrchestrator.chooseColor(Color.values()[json.get("Color").getAsInt()]);
             }
             if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal())

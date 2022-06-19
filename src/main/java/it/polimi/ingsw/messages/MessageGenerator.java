@@ -814,5 +814,17 @@ public class MessageGenerator {
     }
 
 
+    /**
+     * Creates the message for the island choice, for the special card usage
+     * @param position : position of the island
+     * @return : json string of the chooseIsland message
+     */
+    public static String chooseIsland(int position){
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.ACTION.ordinal());
+        json.put("ActionType", ActionTypeEnum.CHOOSE_ISLAND.ordinal());
+        json.put("position", position);
+        return json + "\n";
+    }
 
 }
