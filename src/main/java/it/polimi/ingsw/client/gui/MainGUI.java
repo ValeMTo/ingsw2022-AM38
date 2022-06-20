@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.gui;
 import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.gui.controllers.GUIController;
 import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
+import it.polimi.ingsw.client.gui.controllers.MyBoardGuiController;
 import it.polimi.ingsw.client.view.ViewState;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -155,6 +156,12 @@ public class MainGUI extends Application {
         setNextStage("lobbyScene.fxml");
     }
 
+    public void initBoard() {
+        MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
+        Platform.runLater(() -> {
+            controller.setupBoard();
+        } );
+    }
 
 
 

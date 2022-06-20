@@ -1,20 +1,32 @@
 package it.polimi.ingsw.client.gui.controllers;
 
+import it.polimi.ingsw.model.board.Tower;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+
 
 public class MyBoardGuiController extends GUIController {
 
+    private final String towersPath = "/graphics/board/towers/";
 
     @FXML
-    private AnchorPane deck;
+    private AnchorPane deckArea;
     @FXML
     private AnchorPane mySchoolBoard;
+    @FXML
+    private Button showSpecialCards;
+
+    @FXML
+    private ImageView assistant1;
 
     @FXML
     public void initialize(){
-
+        assistant1.setOnMouseClicked();
     }
+
 
 
     public void setupBoard() {
@@ -22,15 +34,24 @@ public class MyBoardGuiController extends GUIController {
         setupAssistantCards();
         setupMySchoolBoard();
 
+
     }
 
 
 
     private void setupAssistantCards(){
-        deck.setVisible(true);
+        deckArea.setVisible(true);
     }
 
     private void setupMySchoolBoard(){
+        Tower towerColor = gui.getViewState().getPlayerTower();
+        switch(towerColor) {
+            case WHITE:
+                setImage(new Image(getClass().getResourceAsStream(towersPath +"white")));
+            case BLACK:
+
+        }
+
 
     }
 

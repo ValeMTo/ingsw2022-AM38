@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -7,7 +8,8 @@
 
 <AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.MyBoardGuiController">
    <children>
-      <AnchorPane fx:id="deckArea" layoutX="41.0" layoutY="563.0" prefHeight="145.0" prefWidth="1129.0" styleClass="deck">
+      <Button fx:id="showSpecialCards" layoutX="1017.0" layoutY="32.0" mnemonicParsing="false" text="Show Special Cards" />
+      <AnchorPane fx:id="deckArea" layoutX="41.0" layoutY="570.0" prefHeight="145.0" prefWidth="1129.0" styleClass="deck">
          <children>
             <ImageView fitHeight="123.0" fitWidth="103.0" pickOnBounds="true" preserveRatio="true" styleClass="deck">
                <image>
@@ -66,9 +68,9 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="mySchoolboard" layoutX="52.0" layoutY="36.0" prefHeight="485.0" prefWidth="210.0">
+      <AnchorPane fx:id="mySchoolboard" layoutX="41.0" layoutY="36.0" prefHeight="485.0" prefWidth="210.0">
          <children>
-            <ImageView fitHeight="471.0" fitWidth="200.0" layoutX="-52.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true" style="-fx-rotate: 90;">
+            <ImageView fitHeight="471.0" fitWidth="540.0" layoutX="-149.0" layoutY="130.0" pickOnBounds="true" preserveRatio="true" style="-fx-rotate: 90;">
                <image>
                   <Image url="@../graphics/board/Plancia_DEF3.png" />
                </image>
