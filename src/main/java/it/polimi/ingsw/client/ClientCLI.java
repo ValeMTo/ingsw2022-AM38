@@ -79,8 +79,8 @@ public class ClientCLI {
             e.printStackTrace();
         }
 
-        System.out.println("GameSettings" + viewState.getGameSettings().getActualClients());
-        if (viewState.getGameSettings().getActualClients() <= 0) {
+        System.out.println("GameSettings" + viewState.getGameSettings().getNumberActualClients());
+        if (viewState.getGameSettings().getNumberActualClients() <= 0) {
             sendGameMode();
             sendNumOfPlayers();
         } else {

@@ -3,7 +3,7 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.ClientCLI;
 import it.polimi.ingsw.client.GameSettings;
 import it.polimi.ingsw.client.gui.MainGUI;
-import it.polimi.ingsw.client.gui.controllers.GUIController;
+import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
@@ -22,6 +22,7 @@ public class ViewState {
     private Map<String, Tower> players = new HashMap<>();
     private List<IslandView> islands = new ArrayList<>();
     private Map<Cloud, Integer> clouds = new HashMap<>();
+    private List<String> onlinePlayers;
     private List<SchoolBoardState> schoolBoards = new ArrayList<>();
     private boolean isExpert;
     private boolean isTheCommander;
@@ -46,6 +47,7 @@ public class ViewState {
     private boolean isSpecialCardUsed = false;
 
     public ViewState(boolean isCli){
+        this.onlinePlayers =  new ArrayList<>();
         this.isCli = isCli;
         this.turnShown = false;
         isTheCommander = false;
@@ -62,6 +64,32 @@ public class ViewState {
         super();
         this.nickName = nickname;
     }
+
+
+
+    /**
+     * Add a new online player to the online players list in the ViewState
+     */
+    public void addOnlinePlayer(String nickName){
+        onlinePlayers.add(nickName);
+    }
+
+    /**
+     * Return onlinePlayers list
+     */
+    public List<String> getOnlinePlayers(){
+        List<String> list = new ArrayList<>();
+        list.addAll(onlinePlayers);
+        return list;
+    }
+
+    /**
+     * Return the number of online players
+     */
+    public int getNumberOfOnlinePlayer(){
+        return onlinePlayers.size();
+    }
+
 
     /**
      * Sets the CLI to be notify from wait
@@ -104,7 +132,7 @@ public class ViewState {
      */
     public synchronized void setHerbalistTiles(int numOfTiles){
         this.herbalistTiles = numOfTiles;
-        wake();
+        wake(true);
     }
 
     /**
@@ -127,7 +155,7 @@ public class ViewState {
             studentsToAdd.putAll(studentMap);
         }
         this.specialCardWithStudents.put(specialCard,studentsToAdd);
-        wake();
+        wake(true);
     }
 
     /**
@@ -318,7 +346,7 @@ public class ViewState {
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
     }
-    public synchronized void setGameSettings(int actualPlayers, boolean isExpert, int numOfPlayers){
+    public synchronized void setGameSettings(List<String> actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
         this.isExpert = gameSettings.getExpert();
     }
@@ -609,6 +637,15 @@ public class ViewState {
         return nickName;
     }
 
+
+    public MainGUI getAwaitingGUI() {
+        return this.awaitingGUI;
+    }
+
+    public boolean isCli(){
+        return isCli;
+    }
+
     public void wake(){
         if (isCli == true){
             synchronized (awaitingCLI) {
@@ -619,6 +656,15 @@ public class ViewState {
             synchronized (awaitingGUI){
                 //System.out.println("Waking the GUI");
                 awaitingGUI.notifyAll();
+            }
+        }
+    }
+
+    public void wake(boolean onlyCli){
+        if (isCli == true) {
+            synchronized (awaitingCLI) {
+                System.out.println("Waking the CLI");
+                awaitingCLI.notifyAll();
             }
         }
     }

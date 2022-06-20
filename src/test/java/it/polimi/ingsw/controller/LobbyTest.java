@@ -17,7 +17,7 @@ public class LobbyTest {
      */
     @Test
     public void getNumberOfActiveUsers(){
-        assertEquals(0, lobby.getNumOfActiveUsers());
+        assertEquals(0, lobby.getActiveUsers().size());
 
     }
 

@@ -6,10 +6,12 @@ import it.polimi.ingsw.controller.GameOrchestrator;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 import it.polimi.ingsw.messages.*;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Suspendable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -194,8 +196,18 @@ public class ClientHandler implements Runnable {
      */
     public void lobbyRequestHandler() {
         System.out.println("I'm in lobbyRequestHandler");
-        writer.print(MessageGenerator.answerlobbyMessage(Server.getLobbyNumberOfActivePlayers(), Server.getGamemode(), Server.getNumOfPlayerGame()));
-        System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(Server.getLobbyNumberOfActivePlayers(), Server.getGamemode(), Server.getNumOfPlayerGame()));
+        List<String> list = Server.getLobbyOfActivePlayers();
+        System.out.println(list.size());
+        if (list.size() == 0){
+            System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(null, null, Server.getGamemode(), Server.getNumOfPlayerGame()));
+            writer.print(MessageGenerator.answerlobbyMessage(null, null , Server.getGamemode(), Server.getNumOfPlayerGame()));
+        } else if (list.size()==1){
+            System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(list.get(0),null, Server.getGamemode(), Server.getNumOfPlayerGame()));
+            writer.print(MessageGenerator.answerlobbyMessage(list.get(0), null, Server.getGamemode(), Server.getNumOfPlayerGame()));
+        } else if(list.size()==2){
+            System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(list.get(0), list.get(1), Server.getGamemode(), Server.getNumOfPlayerGame()));
+            writer.print(MessageGenerator.answerlobbyMessage(list.get(0), list.get(1) , Server.getGamemode(), Server.getNumOfPlayerGame()));
+        }
         writer.flush();
 
     }

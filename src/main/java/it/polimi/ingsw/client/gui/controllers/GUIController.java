@@ -52,6 +52,9 @@ abstract public class GUIController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             System.out.println("Thanks for playing with Eriantys. Bye!");
+            if(gui.getConnectionSocket() != null){
+                gui.getConnectionSocket().disconnect();
+            }
             System.exit(0);
         }
     }
@@ -63,4 +66,12 @@ abstract public class GUIController {
     public void showSettings() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     };
+
+    /**
+     * method used by each GUI controller to refresh its parameters. The controller gets each parameter from the gui's
+     * viewState and then sets its local JavaFX objects accordingly.
+     */
+    // public abstract void refreshSceneByController();
+
+
 }

@@ -45,7 +45,7 @@ public class LoginMenuController extends GUIController {
      */
     public void startLogin() {
 
-        // controlli sul formato dei text inseriti
+        // controlli sul formato dei text inseriti ??
         // ....
         getMessageBox().setText("");
         getMessageBox().setText("trying connecting to Server ...");
@@ -73,7 +73,7 @@ public class LoginMenuController extends GUIController {
         }
 
         if (gui.getViewState().getNickname() != null){
-            System.out.println("Set nickname");
+            System.out.println("Set nickname - ");
             getMessageBox().setText("Your name is unique");
             isTheFirst();
         } else {
@@ -93,7 +93,7 @@ public class LoginMenuController extends GUIController {
             }
         }
 
-        if (gui.getViewState().getGameSettings().getActualClients() <= 0) {
+        if (gui.getViewState().getGameSettings().getNumberActualClients() <= 0) {
             gui.setNextStage("setupMenu.fxml");
         }else{
             try {

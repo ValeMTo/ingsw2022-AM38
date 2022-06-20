@@ -10,9 +10,9 @@
       <AnchorPane fx:id="settingsBox" layoutX="313.0" layoutY="150.0">
          <children>
       
-              <Label id="home_title" fx:id="messageBox" alignment="TOP_CENTER" contentDisplay="CENTER" text="Do you want do accept the following rules?" textFill="#46b9e7">
+              <Label id="home_title" fx:id="messageBox" alignment="TOP_CENTER" contentDisplay="CENTER" text="Do you want to accept the following rules?" textFill="#46b9e7">
                   <font>
-                      <Font size="32.0" />
+                      <Font size="24.0" />
                   </font>
               </Label>
               <Button fx:id="acceptButton" layoutX="152.0" layoutY="262.0" mnemonicParsing="false" onMouseClicked="#acceptPlay" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: GREEN;" text="ACCEPT">
@@ -27,7 +27,7 @@
             </Button>
             <Label layoutX="106.0" layoutY="84.0" prefHeight="45.0" prefWidth="291.0" text="Number Of Players:" textFill="#46b9e7">
                <font>
-                  <Font size="30.0" />
+                  <Font size="24.0" />
                </font>
             </Label>
             <Label fx:id="numberOfPlayersBox" layoutX="385.0" layoutY="78.0" prefHeight="30.0" prefWidth="48.0" text="##" textFill="#46b9e7">
@@ -37,7 +37,7 @@
             </Label>
             <Label fx:id="gamemodeBox" layoutX="106.0" layoutY="146.0" prefHeight="58.0" prefWidth="213.0" text="Gamemode" textFill="#46b9e7">
                <font>
-                  <Font size="40.0" />
+                  <Font size="24.0" />
                </font>
             </Label>
             <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="152.0" layoutY="388.0" text="Note: If you refuse, you will be disconnected " textFill="#46b9e7">

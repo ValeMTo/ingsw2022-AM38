@@ -100,11 +100,11 @@ public class MessageParser{
 
 
             } else if (json.get("SetType").getAsInt()==SetTypeEnum.SET_GAME_MODE.ordinal()){
-                if (Server.getLobbyNumberOfActivePlayers() == 0) {
+                if (Server.getLobbyOfActivePlayers().size() == 0) {
                     Server.setLobbySettings(json.get("SetExpertGameMode").getAsBoolean());
                 }
             } else if (json.get("SetType").getAsInt()==SetTypeEnum.SELECT_NUMBER_OF_PLAYERS.ordinal()){
-                if (Server.getLobbyNumberOfActivePlayers() == 0) {
+                if (Server.getLobbyOfActivePlayers().size() == 0) {
                     Server.setLobbySettings(json.get("SetNumberOfPlayers").getAsInt());
                     Server.addPlayerInLobby(client); //TODO
                 }

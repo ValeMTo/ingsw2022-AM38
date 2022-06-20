@@ -36,7 +36,7 @@
       <Button fx:id="enterButton" layoutX="510.0" layoutY="495.0" mnemonicParsing="false" onMouseClicked="#startLogin" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="ENTER" />
 
    
-         <Label fx:id="messageBox" layoutX="545.0" layoutY="572.0" text="testo di prova" textFill="#46b9e7">
+         <Label fx:id="messageBox" layoutX="545.0" layoutY="572.0"  textFill="#46b9e7">
          <font>
             <Font size="24.0" />
          </font>

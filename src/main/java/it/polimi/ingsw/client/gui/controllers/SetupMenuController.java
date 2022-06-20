@@ -45,7 +45,14 @@ public class SetupMenuController extends GUIController{
     private void acceptPlay(ActionEvent event){
         gui.getConnectionSocket().setGameMode(isExpert);
         gui.getConnectionSocket().setNumberOfPlayers(numOfPlayers);
+        gui.getViewState().setGameSettings(null, isExpert, numOfPlayers);
+
+        /* Non usare il seguente approccio :  non è la  scena precedente che fa l'update della successiva, ma sarà
+        ViewMessage parser che aspetta l'update dal server e poi agggiorna la lobby scene
+
+        controller.addNicknameInLobby(gui.getViewState().getNickname());
         gui.setNextStage("lobbyScene.fxml");
+        */
     }
 
     public void quitGame(ActionEvent event){

@@ -97,8 +97,8 @@ public class Server {
         return clientSocket;
     }
 
-    public static int getLobbyNumberOfActivePlayers() {
-        return lobby.getNumOfActiveUsers();
+    public static List<String> getLobbyOfActivePlayers() {
+        return lobby.getActiveUsers();
     }
 
     public static void setLobbySettings(boolean gamemode) {

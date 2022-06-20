@@ -2,6 +2,7 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
@@ -14,6 +15,7 @@ import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import javafx.application.Platform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +76,19 @@ public class ViewMessageParser {
                     playersWithTower.put(s, Tower.toTower(players.get(s)));
                 }
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
+
+                if(!view.isCli()){
+                    Platform.runLater(()->view.getAwaitingGUI().setNextStage("myBoardScene.fxml"));
+                }
+
+            } else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PLAYER_UPDATE.ordinal()){
+                String newPlayerNickname = json.get("Nickname").getAsString();
+                view.addOnlinePlayer(newPlayerNickname);   // adds the player to the online players list in the ViewState
+
+                if(!view.isCli()){
+                    Platform.runLater(()->view.getAwaitingGUI().updateLobbyScene(newPlayerNickname));
+                }
+
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
@@ -163,7 +178,7 @@ public class ViewMessageParser {
                     view.addOnlinePlayer(json.get("player2").getAsString());
                 }
                 view.setGameSettings(listOfPlayers, json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
-                //System.out.println("mode: " + view.getGameSettings().getExpert().toString() + "\nplayers:"+ view.getGameSettings().getNumPlayers());
+                System.out.println("mode: " + view.getGameSettings().getExpert().toString() + "\nplayers:"+ view.getGameSettings().getNumPlayers());
                 view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
