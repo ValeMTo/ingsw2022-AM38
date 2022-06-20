@@ -789,7 +789,7 @@ public class MessageGenerator {
     public static String specialCardUpdatePhaseMessage(PhaseEnum phase, SpecialCardRequiredAction specialCardRequiredAction){
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
-        json.put("UpdateType", UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SPECIAL_CARD_USAGE_PHASE.ordinal());
         json.put("CurrentPhase",phase.ordinal());
         json.put("CurrentSpecialCardPhase",specialCardRequiredAction.ordinal());
         return json + "\n";

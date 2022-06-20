@@ -129,6 +129,8 @@ public class ClientHandler implements Runnable {
      */
     public void disconnectionManager() {
         Server.removePlayer(playerName);
+        inputReader.close();
+        writer.close();
         System.exit(1);
     }
 

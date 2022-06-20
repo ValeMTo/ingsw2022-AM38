@@ -349,7 +349,7 @@ public abstract class GameOrchestrator extends Listenable {
         }
     }
 
-    private void notifyPhaseAndCurrentPlayer(){
+    protected void notifyPhaseAndCurrentPlayer(){
         if(clients!=null&&modelListener!=null) {
             System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer])+" phase "+this.getCurrentPhase());
             if(currentPhase==PLANNING) {
