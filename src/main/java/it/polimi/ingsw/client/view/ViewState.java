@@ -134,7 +134,7 @@ public class ViewState {
      */
     public synchronized void setHerbalistTiles(int numOfTiles){
         this.herbalistTiles = numOfTiles;
-        wake();
+        wake(true);
     }
 
     /**
@@ -157,7 +157,7 @@ public class ViewState {
             studentsToAdd.putAll(studentMap);
         }
         this.specialCardWithStudents.put(specialCard,studentsToAdd);
-        wake();
+        wake(true);
     }
 
     /**
@@ -625,6 +625,15 @@ public class ViewState {
             synchronized (awaitingGUI){
                 System.out.println("Waking the GUI");
                 awaitingGUI.notifyAll();
+            }
+        }
+    }
+
+    public void wake(boolean onlyCli){
+        if (isCli == true) {
+            synchronized (awaitingCLI) {
+                System.out.println("Waking the CLI");
+                awaitingCLI.notifyAll();
             }
         }
     }
