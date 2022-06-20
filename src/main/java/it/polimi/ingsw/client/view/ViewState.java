@@ -70,7 +70,7 @@ public class ViewState {
 
 
     /**
-     * Add a new online player
+     * Add a new online player to the online players list in the ViewState
      */
     public void addOnlinePlayer(String nickName){
         onlinePlayers.add(nickName);
@@ -599,12 +599,13 @@ public class ViewState {
         return nickName;
     }
 
-    public void addNicknamelobby(String nickName){
-        if (isCli == false){
-            LobbyMenuController controller = (LobbyMenuController) awaitingGUI.getController("lobbyScene.fxml");
-            Platform.runLater(()->controller.addNicknameInLobby(nickName));
-            Platform.runLater(()->awaitingGUI.setNextStage("lobbyScene.fxml"));
-        }
+
+    public MainGUI getAwaitingGUI() {
+        return this.awaitingGUI;
+    }
+
+    public boolean isCli(){
+        return isCli;
     }
 
     public void wake(){

@@ -33,13 +33,21 @@ public class AcceptConditionsMenuController extends GUIController{
     @FXML
     private void  acceptPlay(ActionEvent event){
         gui.getConnectionSocket().acceptRules();
+        //gui.setNextStage("lobbyScene.fxml");
+        /* Non usare il seguente approccio :  non è la  scena precedente che fa l'update della successiva, ma sarà
+        ViewMessage parser che aspetta l'update dal server e poi agggiorna la lobby scene
+        */
+    /*
         LobbyMenuController controller = (LobbyMenuController) gui.getController("lobbyScene.fxml");
         controller.addNicknameInLobby(gui.getViewState().getNickname());
         for(String name : gui.getViewState().getOnlinePlayers()){
             controller.addNicknameInLobby(name);
         }
-        gui.setNextStage("lobbyScene.fxml");
+    */
+
+
     }
+
 
     @FXML
     private void  quitGame(ActionEvent event){

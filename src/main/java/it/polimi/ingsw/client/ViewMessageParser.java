@@ -2,6 +2,7 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
@@ -13,6 +14,7 @@ import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import javafx.application.Platform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,8 +77,12 @@ public class ViewMessageParser {
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
 
             } else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PLAYER_UPDATE.ordinal()){
-                view.addOnlinePlayer(json.get("Nickname").getAsString());
-                view.addNicknamelobby(json.get("Nickname").getAsString());
+                String newPlayerNickname = json.get("Nickname").getAsString();
+                view.addOnlinePlayer(newPlayerNickname);   // adds the player to the online players list in the ViewState
+
+                if(!view.isCli()){
+                    Platform.runLater(()->view.getAwaitingGUI().updateLobbyScene(newPlayerNickname));
+                }
 
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);

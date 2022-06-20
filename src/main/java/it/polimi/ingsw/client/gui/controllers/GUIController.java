@@ -63,4 +63,12 @@ abstract public class GUIController {
     public void showSettings() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
     };
+
+    /**
+     * method used by each GUI controller to refresh its parameters. The controller gets each parameter from the gui's
+     * viewState and then sets its local JavaFX objects accordingly.
+     */
+    // public abstract void refreshSceneByController();
+
+
 }

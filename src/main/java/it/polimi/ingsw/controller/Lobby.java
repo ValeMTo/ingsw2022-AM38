@@ -47,10 +47,8 @@ public class Lobby {
         players.add(client.getNickName());
         System.out.println("LOBBY - Adding new player named "+client.getNickName()+" (" + queue.size() + " of " + numOfPlayers + ")");
 
-        for( ClientHandler person : queue){
-            if (!person.getNickName().equals(client.getNickName())) {
+        for( ClientHandler person : queue){  //lo mando a tutti, compreso quello che si sta aggiungendo. Il caso viene poi gestito con  un if dentro a LobbyMenuController
                 person.asyncSend(MessageGenerator.newPlayerUpdateMessage(client.getNickName()));
-            }
         }
         //Creates a new GameOrchestrator and relatives messageParsers for the players
         synchronized (this) {

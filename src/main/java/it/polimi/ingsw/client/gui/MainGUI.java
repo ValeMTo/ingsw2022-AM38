@@ -2,8 +2,10 @@ package it.polimi.ingsw.client.gui;
 
 import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.gui.controllers.GUIController;
+import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.client.view.ViewState;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -132,6 +134,23 @@ public class MainGUI extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Updates the Lobby scene by telling the LobbyMenuController to updates its online players list.
+     * To get the new online players list, the LobbyMenuController uses getters from the ViewState.
+     *  If the newly added player is the player who owns this ViewMessageParser, it simply welcomes the player
+     *  in the lobby menu scene.  Otherwise, it tells the lobbyMenu controller to refresh and updates
+     *  the list of current online players in the lobby
+     */
+    public void updateLobbyScene(String newNickname) {
+        LobbyMenuController controller = (LobbyMenuController) getController("lobbyScene.fxml");
+        Platform.runLater(() -> controller.addNicknameInLobby(newNickname));
+        System.out.println("I'm updating the lobby scene with the new player: " + newNickname);
+        setNextStage("lobbyScene.fxml");
+    }
+
+
+
+
     public ViewState getViewState() {
         return viewState;
     }
@@ -147,5 +166,7 @@ public class MainGUI extends Application {
     public GUIController getController(String fxmlName){
         return guiControllersMap.get(fxmlName);
     }
+
+
 
 }

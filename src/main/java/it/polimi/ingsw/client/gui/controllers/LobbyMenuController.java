@@ -28,16 +28,20 @@ public class LobbyMenuController extends GUIController {
         quit();
     }
 
+
     public void addNicknameInLobby(String nickname) {
-        listOnlinePlayers.getItems().add(nickname);
+        // checks "welcome" vs  "just arrived"
         if (gui.getViewState().getNickname().equals(nickname)){
-            welcomeLabel.setText("Welcome in Eriantys lobby!");
+            welcomeLabel.setText("Hello " + nickname + "!  Welcome in Eriantys lobby!");
         } else {
-            welcomeLabel.setText(nickname + "just arrived!");
+            welcomeLabel.setText(nickname + " just arrived!");
         }
-        /*
-        * Settare tutti i nomi nella lobby in una tabella
-        */
+        listOnlinePlayers.getItems().clear();   // needed to refresh the list of online players before updating it
+        listOnlinePlayers.getItems().addAll(gui.getViewState().getOnlinePlayers());
     }
 
+
+
 }
+
+
