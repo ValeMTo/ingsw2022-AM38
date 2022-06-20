@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
+import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.messages.AnswerTypeEnum;
 import it.polimi.ingsw.messages.ErrorTypeEnum;
 import it.polimi.ingsw.messages.MessageTypeEnum;
@@ -43,7 +44,7 @@ public class ViewMessageParser {
 
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
-        }
+
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
@@ -109,8 +110,13 @@ public class ViewMessageParser {
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()) {
                 view.setMotherNature(json.get("MotherNaturePosition").getAsInt());
                 view.setIslandNumber(json.get("NumOfIslands").getAsInt());
-                //TODO : other else if for the special card update
-            } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
+
+            }
+            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SPECIAL_CARD_USAGE_PHASE.ordinal())
+            {
+                view.setSpecialCardPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()], SpecialCardRequiredAction.values()[json.get("CurrentSpecialCardPhase").getAsInt()]);
+            }
+            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
                 }
@@ -181,5 +187,6 @@ public class ViewMessageParser {
                 view.wake();
             }
         }
+    }
     }
 }
