@@ -245,7 +245,7 @@ public class ViewState {
      */
     public synchronized void setActivePlayer(Tower activePlayer){
         this.activePlayer = activePlayer;
-        this.turnShown = false;
+        this.setTurnShown(false);
         if(!this.activePlayer.equals(this.playerTower)) {
             this.activeView = false;
             this.isSpecialCardUsed = false;
@@ -253,7 +253,7 @@ public class ViewState {
         }
         else {
             this.activeView = true;
-            this.turnShown = false;
+            this.setTurnShown(false);
             //System.out.println("VIEW STATE - I am the active player");
         }
         if(awaitingCLI!=null)
@@ -294,15 +294,17 @@ public class ViewState {
      * @param phase
      */
     public synchronized void setActivePlayerAndPhase(Tower currentPlayer, PhaseEnum phase){
+        if(phase.equals(PhaseEnum.SPECIAL_CARD_USAGE)&&currentPlayer.equals(playerTower))
+            this.isSpecialCardUsed = true;
         this.activePlayer = currentPlayer;
         this.currentPhase = phase;
         if(this.activePlayer.equals(this.playerTower)) {
             this.activeView = true;
-            this.turnShown = false;
-            this.isSpecialCardUsed = false;
+            this.setTurnShown(false);
             //System.out.println("VIEW STATE - setActivePlayerAndPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
         }
         else {
+            this.isSpecialCardUsed = false;
             this.activeView = false;
             //System.out.println("VIEW STATE - setActivePlayerAndPhase - I am not the chosen one I am  "+this.playerTower+" not "+this.activePlayer);
         }
@@ -351,7 +353,7 @@ public class ViewState {
             this.currentPhase = currentPhase;
             if(this.activePlayer.equals(this.playerTower)) {
                 this.activeView = true;
-                this.turnShown = false;
+                this.setTurnShown(false);
                 //System.out.println("VIEW STATE - SetCurrentPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
             }
             else {
@@ -410,7 +412,7 @@ public class ViewState {
     public synchronized boolean visualize(){
         if(!this.getTurnShown() && (this.activePlayer==null || this.activePlayer.equals(this.playerTower)))
         {
-            this.turnShown = true;
+            this.setTurnShown(true);
             return true;
         }
         return false;
@@ -610,12 +612,12 @@ public class ViewState {
     public void wake(){
         if (isCli == true){
             synchronized (awaitingCLI) {
-                System.out.println("Waking the CLI");
+                //System.out.println("Waking the CLI");
                 awaitingCLI.notifyAll();
             }
         } else {
             synchronized (awaitingGUI){
-                System.out.println("Waking the GUI");
+                //System.out.println("Waking the GUI");
                 awaitingGUI.notifyAll();
             }
         }

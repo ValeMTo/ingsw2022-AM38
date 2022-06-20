@@ -48,7 +48,7 @@ public class ViewMessageParser {
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
             view.setTurnShown(false);
             if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
-                System.out.println("NICKNAME ALREADY TAKEN");
+                //System.out.println("NICKNAME ALREADY TAKEN");
                 view.setNickname(null);
                 view.wake();
             }
@@ -153,12 +153,21 @@ public class ViewMessageParser {
             }
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
-                view.setGameSettings(json.get("actualPlayers").getAsInt(), json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
-                System.out.println("LOBBY ANSWER");
+                List<String> listOfPlayers = new ArrayList<>();
+                if(json.get("player1") != null ){
+                    listOfPlayers.add(json.get("player1").getAsString());
+                    view.addOnlinePlayer(json.get("player1").getAsString());
+                }
+                if(json.get("player2") != null ){
+                    listOfPlayers.add(json.get("player2").getAsString());
+                    view.addOnlinePlayer(json.get("player2").getAsString());
+                }
+                view.setGameSettings(listOfPlayers, json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
+                //System.out.println("mode: " + view.getGameSettings().getExpert().toString() + "\nplayers:"+ view.getGameSettings().getNumPlayers());
                 view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
-                System.out.println("ACCEPT NICKNAME REQUEST");
+                //System.out.println("ACCEPT NICKNAME REQUEST");
                 view.setNickname(json.get("nickname").getAsString());
                 view.wake();
             }

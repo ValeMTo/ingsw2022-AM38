@@ -357,7 +357,9 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                     case HERBALIST:
                         // Disables an Island influence computation and remove the tile from the special card
                         if (gameBoard.disableInfluence(position)) {
-                            specialCardsArray[position].removeTile();
+                            for(SpecialCard specialCard: specialCardsArray)
+                                if(specialCard.getName().equals(SpecialCardName.HERBALIST))
+                                    specialCard.removeTile();
                         }
                         resetPhase();
                         return MessageGenerator.okMessage();

@@ -70,7 +70,7 @@ public class ClientCLI {
             confirmation = sendNickname();
         }
 
-        cleaner();
+        //cleaner();
         connectionSocket.isTheFirst();
 
         try {
@@ -86,7 +86,7 @@ public class ClientCLI {
         } else {
             if (acceptSettingsOfTheGame()) {
                 System.out.println("You have accepted previous rules");
-                cleaner();
+                //cleaner();
                 connectionSocket.startGame();
             } else {
                 connectionSocket.disconnect();
@@ -144,12 +144,14 @@ public class ClientCLI {
      */
     public void startGame() {
         while (!viewState.isEndOfMatch()) {
-            cleaner();
+            //System.out.println("CIENTCLI - Turn of event! While... turn shown? "+viewState.getTurnShown()+" current phase "+viewState.getCurrentPhase());
+            //cleaner();
             if (!viewState.isActiveView()&&viewState.visualize()) {
                     System.out.println("CLIENTCLI - not your turn");
                     viewState.setTurnShown(true);
                     showNotYoutTurnView();
             } else if(viewState.isActiveView()&&viewState.visualize()){
+                System.out.println("CLIENT CLI - vilsualizing now turn shown is "+viewState.getTurnShown());
                 // If it is not expertGame mode does not print special card usage, if it is yes and if the player uses the card
                 // does not continue with the normal phase
                 if (viewState.getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE)&&viewState.getSpecialPhase()!=null){
@@ -160,7 +162,7 @@ public class ClientCLI {
                         connectionSocket.chooseIsland(this.chooseIslandSpecialCard());
                     }
                 }
-                else if (!viewState.isExpert()||!specialCardUsage()) {
+                else if (!viewState.isExpert()||viewState.getSpecialCardUsage()||!specialCardUsage()) {
                     if (viewState.getCurrentPhase().equals(PhaseEnum.PLANNING) && viewState.getTurnShown()) {
                         printForAssistantCardChoice();
                         int card = showPlanningInstructionAndGetCard();
