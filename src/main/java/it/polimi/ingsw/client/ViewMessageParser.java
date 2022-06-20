@@ -77,6 +77,10 @@ public class ViewMessageParser {
                 }
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
 
+                if(!view.isCli()){
+                    Platform.runLater(()->view.getAwaitingGUI().setNextStage("myBoardScene.fxml"));
+                }
+
             } else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PLAYER_UPDATE.ordinal()){
                 String newPlayerNickname = json.get("Nickname").getAsString();
                 view.addOnlinePlayer(newPlayerNickname);   // adds the player to the online players list in the ViewState
