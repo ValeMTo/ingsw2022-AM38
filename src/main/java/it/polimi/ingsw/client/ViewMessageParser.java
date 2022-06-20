@@ -42,7 +42,7 @@ public class ViewMessageParser {
 
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
-        }
+
         JsonObject json = gson.fromJson(jsonFromServer, JsonObject.class);
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
@@ -163,5 +163,6 @@ public class ViewMessageParser {
                 view.wake();
             }
         }
+    }
     }
 }

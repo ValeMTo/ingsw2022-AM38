@@ -28,6 +28,7 @@ public class Reader implements Runnable {
                 viewHandler.parse(input);
             } catch (IOException e) {
                 e.printStackTrace();
+                System.exit(0);
             }
         }
     }
