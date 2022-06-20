@@ -52,6 +52,9 @@ abstract public class GUIController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             System.out.println("Thanks for playing with Eriantys. Bye!");
+            if(gui.getConnectionSocket() != null){
+                gui.getConnectionSocket().disconnect();
+            }
             System.exit(0);
         }
     }
