@@ -53,6 +53,7 @@ public class ClientHandler implements Runnable {
      */
     @Override
     public void run() {
+        String sendingMessage;
         messageParser = new MessageParser(this);
         messageParser.setName(this.playerName);
         String message;
@@ -61,7 +62,9 @@ public class ClientHandler implements Runnable {
             message = inputReader.nextLine();
             System.out.println("CLIENT HANDLER - player "+this.getNickName()+" got message "+message);
             System.out.println(message);
-            writer.print(messageParser.parseMessageToAction(message));
+            sendingMessage = messageParser.parseMessageToAction(message);
+            System.out.println("CLIENT HANDLER - sending "+sendingMessage);
+            writer.print(sendingMessage);
             writer.flush();
         }
     }

@@ -105,6 +105,7 @@ public class ViewMessageParser {
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()) {
                 view.setMotherNature(json.get("MotherNaturePosition").getAsInt());
                 view.setIslandNumber(json.get("NumOfIslands").getAsInt());
+                //TODO : other else if for the special card update
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);

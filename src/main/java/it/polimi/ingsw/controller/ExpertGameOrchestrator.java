@@ -34,24 +34,29 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
 
     public ExpertGameOrchestrator(List<String> players, int id, List<ClientHandler> clients) {
         super(players, true, id, clients);
+        System.out.println("EXPERT GAME ORCHESTRATOR - created simpler orchestrator");
         try {
             this.specialCardsArray = gameBoard.getArrayOfSpecialCard();
             this.specialCards = new HashSet<>(gameBoard.getSetOfSpecialCardNames());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("EXPERT GAME ORCHESTRATOR - Filling cards with students - "+specialCardsArray.length+" cards");
         // Fills the special cards with students if they have any
         for(int i=0;i<specialCardsArray.length;i++) {
             boolean flag = false;
             Color drawnColor = null;
-            do {
                 try {
                     specialCardsArray[i].countStudents();
-                    drawnColor = gameBoard.drawFromBag();
-                    flag = gameBoard.addStudent(StudentCounter.CARD, drawnColor,i);
-                    // If the student cannot be added to the bag is added back to it
-                    if(!flag)
-                        gameBoard.addStudent(StudentCounter.BAG,drawnColor);
+                    // Adds all the students to the card
+                    do {
+                        drawnColor = gameBoard.drawFromBag();
+                        flag = gameBoard.addStudent(StudentCounter.CARD, drawnColor, i);
+                        System.out.println("EXPERT GAME ORCHESTRATOR - Filling card "+i+" "+specialCardsArray[i].getName()+" with student - "+drawnColor+" and is added correctly or full card: "+flag);
+                        // If the student cannot be added to the bag is added back to it
+                        if (!flag)
+                            gameBoard.addStudent(StudentCounter.BAG, drawnColor);
+                    }while(flag);
                 }
                 // If the count is not implemented is because it cannot contain students
                 catch (FunctionNotImplementedException e)
@@ -61,7 +66,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 catch (LocationNotAllowedException e){
                     e.printStackTrace();
                 }
-            }while(!flag);
+
         }
     }
 

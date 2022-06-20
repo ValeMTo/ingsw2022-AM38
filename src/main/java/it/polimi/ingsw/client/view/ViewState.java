@@ -134,6 +134,7 @@ public class ViewState {
      */
     public synchronized void setHerbalistTiles(int numOfTiles){
         this.herbalistTiles = numOfTiles;
+        wake();
     }
 
     /**
@@ -147,13 +148,16 @@ public class ViewState {
     /**
      * Sets the student map of the special card with students
      */
-    public void setSpecialCardWithStudents(SpecialCardName specialCard, Map<Color,Integer> studentMap){
-        if(this.specialCardWithStudents==null)
+    public synchronized void setSpecialCardWithStudents(SpecialCardName specialCard, Map<Color,Integer> studentMap){
+        if(this.specialCardWithStudents==null) {
             this.specialCardWithStudents = new HashMap<>();
+        }
         Map<Color,Integer> studentsToAdd = new HashMap<>();
-        if(studentMap!=null)
+        if(studentMap!=null) {
             studentsToAdd.putAll(studentMap);
+        }
         this.specialCardWithStudents.put(specialCard,studentsToAdd);
+        wake();
     }
 
     /**
@@ -161,7 +165,7 @@ public class ViewState {
      * @param specialCard
      * @return
      */
-    public Map<Color,Integer> getSpecialCardStudents(SpecialCardName specialCard){
+    public synchronized Map<Color,Integer> getSpecialCardStudents(SpecialCardName specialCard){
         Map<Color,Integer> studentsToReturn = new HashMap<>();
         if(this.specialCardWithStudents.get(specialCard)!=null)
             studentsToReturn.putAll(this.specialCardWithStudents.get(specialCard));
@@ -172,7 +176,7 @@ public class ViewState {
      * Returns the map with the special cards that contains students and the students map
      * @return
      */
-    public Map<SpecialCardName,Map<Color,Integer>> getSpecialCardWithStudents(){
+    public synchronized Map<SpecialCardName,Map<Color,Integer>> getSpecialCardWithStudents(){
         Map<SpecialCardName,Map<Color,Integer>> specialCardNameMapToReturn = new HashMap<>();
         if(this.specialCardWithStudents!=null)
             specialCardNameMapToReturn.putAll(this.specialCardWithStudents);
@@ -424,6 +428,7 @@ public class ViewState {
             List<String> returnList = new ArrayList<>();
             for(SpecialCardName specialCard : usableSpecialCards.keySet())
                 returnList.add(specialCard.name().toUpperCase());
+            return returnList;
         }
         return new ArrayList<>();
     }
@@ -535,7 +540,9 @@ public class ViewState {
      * @param specialCard : the list of names of the usable special cards
      */
     public synchronized void setUsableSpecialCard(Map<SpecialCardName,Integer> specialCard){
-        if(usableSpecialCards!=null)
+        if(usableSpecialCards==null)
+            this.usableSpecialCards = new HashMap<>();
+        else
             this.usableSpecialCards.clear();
         this.usableSpecialCards.putAll(specialCard);
     }

@@ -124,6 +124,7 @@ public class MessageParser{
      */
     private String useAssistantCard(JsonObject json) {
         try {
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - Try to use card "+json.get("CardPriority").getAsInt());
             if (gameOrchestrator.chooseCard(json.get("CardPriority").getAsInt())){
                 System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - useAssistantCard - Using correctly card "+json.get("CardPriority").getAsInt());
                 return MessageGenerator.okMessage();
@@ -228,7 +229,7 @@ public class MessageParser{
             if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal()) {
                 return gameOrchestrator.useSpecialCard(json.get("SpecialCardName").getAsString());
             }
-            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal()) {
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal())) {
                 return gameOrchestrator.chooseColor(Color.values()[json.get("Color").getAsInt()]);
             }
             if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal())

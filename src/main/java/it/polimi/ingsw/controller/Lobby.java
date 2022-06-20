@@ -53,10 +53,17 @@ public class Lobby {
         //Creates a new GameOrchestrator and relatives messageParsers for the players
         synchronized (this) {
             if (queue.size() == numOfPlayers && queue.size() > 1) {
-                System.out.println("LOBBY - Creating Game");
-
-                if (isExpert) gameOrchestrator = new ExpertGameOrchestrator(players, id, queue);
-                else gameOrchestrator = new EasyGameOrchestrator(players, id, queue);
+                System.out.println("LOBBY - Creating Game flag isExpert: "+isExpert);
+                if (isExpert) {
+                    System.out.println("LOBBY - Creating expert Game");
+                    gameOrchestrator = new ExpertGameOrchestrator(players, id, queue);
+                    System.out.println("LOBBY - Expert Game created");
+                }
+                else {
+                    System.out.println("LOBBY - Creating easy Game");
+                    gameOrchestrator = new EasyGameOrchestrator(players, id, queue);
+                    System.out.println("LOBBY - Easy Game Created");
+                }
                 System.out.println("LOBBY - Created gameOrchestrator!");
                 for (ClientHandler clientParser : queue) {
                     System.out.println("LOBBY - Gonna create a messageParser for "+clientParser.getNickName()+"!");
