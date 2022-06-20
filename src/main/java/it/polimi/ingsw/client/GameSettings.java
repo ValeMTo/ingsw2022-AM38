@@ -10,7 +10,9 @@ public class GameSettings {
 
     public GameSettings(List<String> actualClients, Boolean isExpert, int numPlayers){
         this.actualClients = new ArrayList<>();
-        this.actualClients.addAll(actualClients);
+        if (actualClients != null){
+            this.actualClients.addAll(actualClients);
+        }
         this.isExpert=isExpert;
         this.numPlayers=numPlayers;
     }

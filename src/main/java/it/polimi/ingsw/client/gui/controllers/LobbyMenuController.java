@@ -44,7 +44,6 @@ public class LobbyMenuController extends GUIController {
     }
 
     public void addNicknameInLobby(String nickname) {
-        // checks "welcome" vs  "just arrived"
         if (gui.getViewState().getNickname().equals(nickname)){
             welcomeLabel.setText("Hello " + nickname + "!  Welcome in Eriantys lobby!");
         } else {
@@ -52,6 +51,7 @@ public class LobbyMenuController extends GUIController {
         }
         listOnlinePlayers.getItems().clear();   // needed to refresh the list of online players before updating it
         listOnlinePlayers.getItems().addAll(gui.getViewState().getOnlinePlayers());
+
     }
 
 
