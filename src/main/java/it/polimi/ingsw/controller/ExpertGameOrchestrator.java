@@ -78,8 +78,10 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
      */ protected void setCurrentPhase(PhaseEnum updatePhase) {
         synchronized (phaseBlocker) {
             if (updatePhase.equals(PhaseEnum.SPECIAL_CARD_USAGE)) {
-                this.oldPhase = getCurrentPhase();
+                if(getCurrentPhase()!=PhaseEnum.SPECIAL_CARD_USAGE)
+                    this.oldPhase = getCurrentPhase();
                 this.currentPhase = PhaseEnum.SPECIAL_CARD_USAGE;
+                notifyPhaseAndCurrentPlayer();
             } else super.setCurrentPhase(updatePhase);
         }
     }
@@ -96,8 +98,10 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
      * Brings back to the nominal turn phase that was set before the Special card usage
      */
     private void resetPhase() {
+        System.out.println("EXPERT GAME ORCHESTRATOR - END OF THE SPECIAL CARD USAGE PHASE RESET PHASE TO "+oldPhase);
         synchronized (phaseBlocker) {
-            setCurrentPhase(this.oldPhase);
+            super.setCurrentPhase(this.oldPhase);
+            notifyPhaseAndCurrentPlayer();
         }
     }
 
@@ -310,6 +314,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                                     gameBoard.addStudent(StudentCounter.BAG, color);
                             }
                         }
+                        resetPhase();
                         return MessageGenerator.okMessage();
                 }
             } catch (Exception exc) {

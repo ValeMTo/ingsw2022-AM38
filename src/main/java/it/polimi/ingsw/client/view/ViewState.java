@@ -37,16 +37,14 @@ public class ViewState {
     private Map<SpecialCardName,Integer> usableSpecialCards = new HashMap<>();
     private Map<SpecialCardName,Map<Color,Integer>> specialCardWithStudents = new HashMap<>();
     private int herbalistTiles = 0;
-
-
     private String nickName = null;
-
     private Tower activePlayer;
     private boolean turnShown;
     private ClientCLI awaitingCLI;
     private MainGUI awaitingGUI;
     private boolean isCli;
     private SpecialCardRequiredAction specialCardRequiredAction;//TODO !!!
+    private boolean isSpecialCardUsed = false;
 
     public ViewState(boolean isCli){
         this.onlinePlayers =  new ArrayList<>();
@@ -199,7 +197,23 @@ public class ViewState {
     public synchronized void setSpecialCardPhase(PhaseEnum phase, SpecialCardRequiredAction specialCardRequiredAction){
         this.currentPhase = phase;
         this.specialCardRequiredAction = specialCardRequiredAction;
+        this.isSpecialCardUsed = true;
         this.setTurnShown(false);
+    }
+
+    /**
+     * Set if a special card has been used in this turn
+     */
+    public synchronized void setSpecialCardUsage(boolean isUsed){
+        this.isSpecialCardUsed = isUsed;
+    }
+
+    /**
+     * Tells if the special card has been already used or not in this turn
+     * @return the usage (true if already used in this turn, false if not)
+     */
+    public synchronized boolean getSpecialCardUsage(){
+        return this.isSpecialCardUsed;
     }
 
     /**
@@ -211,7 +225,7 @@ public class ViewState {
             return false;
         int coins = getPlayerCoins();
         for(Integer cost:usableSpecialCards.values())
-            if(coins>cost)
+            if(coins>=cost)
                 return true;
         return false;
     }
@@ -262,6 +276,7 @@ public class ViewState {
         this.turnShown = false;
         if(!this.activePlayer.equals(this.playerTower)) {
             this.activeView = false;
+            this.isSpecialCardUsed = false;
             //System.out.println("VIEW STATE - I am not the active player");
         }
         else {
@@ -312,6 +327,7 @@ public class ViewState {
         if(this.activePlayer.equals(this.playerTower)) {
             this.activeView = true;
             this.turnShown = false;
+            this.isSpecialCardUsed = false;
             //System.out.println("VIEW STATE - setActivePlayerAndPhase - I am the chosen one I am  "+this.playerTower+" as "+this.activePlayer);
         }
         else {
@@ -327,7 +343,6 @@ public class ViewState {
     public synchronized void setUsableCards(List<Integer> usableCards) {
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
-
     }
     public synchronized void setGameSettings(List<String> actualPlayers, boolean isExpert, int numOfPlayers){
         this.gameSettings = new GameSettings(actualPlayers, isExpert, numOfPlayers);
@@ -413,6 +428,20 @@ public class ViewState {
             else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveMotherNature();
         }
+    }
+
+    /**
+     * Visualize in one move, controls the state of turnShown and then set as true turn shown in a unique move
+     * This is useful to avoid updates that not refresh the CLI since turnShown is set true after the update
+     * @return true if the turnShown is false and is setted as true, false otherwise
+     */
+    public synchronized boolean visualize(){
+        if(!this.getTurnShown() && (this.activePlayer==null || this.activePlayer.equals(this.playerTower)))
+        {
+            this.turnShown = true;
+            return true;
+        }
+        return false;
     }
 
     /**

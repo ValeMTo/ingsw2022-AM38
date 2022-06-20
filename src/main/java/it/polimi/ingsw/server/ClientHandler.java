@@ -25,7 +25,7 @@ public class ClientHandler implements Runnable {
     private String playerName;
     private MessageParser messageParser;
     private int id;
-
+    private boolean disconnected = false;
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
         gson = new Gson();
@@ -57,7 +57,7 @@ public class ClientHandler implements Runnable {
         messageParser = new MessageParser(this);
         messageParser.setName(this.playerName);
         String message;
-        while (true) {
+        while (true&&!disconnected) {
             System.out.println("CLIENT HANDLER - player "+playerName+" waiting for message");
             message = inputReader.nextLine();
             System.out.println("CLIENT HANDLER - player "+this.getNickName()+" got message "+message);
@@ -131,7 +131,9 @@ public class ClientHandler implements Runnable {
      */
     public void disconnectionManager() {
         Server.removePlayer(playerName);
-        System.exit(1);
+        inputReader.close();
+        writer.close();
+        this.disconnected = true;
     }
 
     private JsonObject getMessage() {

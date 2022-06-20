@@ -195,6 +195,15 @@ public class ConnectionSocket {
     public void disconnect() {
         socketOut.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
         socketOut.flush();
+        socketOut.close();
+        try {
+            socketIn.close();
+        }
+        catch (Exception exc)
+        {
+            System.out.println("SOCKET NOT CLOSED");
+        }
+        System.exit(0);
         //System.out.println("CONNECTION SOCKET - DISCONNECTION " + MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
     }
 
