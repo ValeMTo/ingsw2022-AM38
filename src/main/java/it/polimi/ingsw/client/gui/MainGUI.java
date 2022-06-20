@@ -135,7 +135,8 @@ public class MainGUI extends Application {
     }
 
     /**
-     * Updates the Lobby scene by telling the LobbyMenuController to updates its online players list.
+     * Updates the Lobby scene by telling the LobbyMenuController to updates its online players list and the
+     * game settings of that lobby.
      * To get the new online players list, the LobbyMenuController uses getters from the ViewState.
      *  If the newly added player is the player who owns this ViewMessageParser, it simply welcomes the player
      *  in the lobby menu scene.  Otherwise, it tells the lobbyMenu controller to refresh and updates
@@ -143,7 +144,11 @@ public class MainGUI extends Application {
      */
     public void updateLobbyScene(String newNickname) {
         LobbyMenuController controller = (LobbyMenuController) getController("lobbyScene.fxml");
-        Platform.runLater(() -> controller.addNicknameInLobby(newNickname));
+        Platform.runLater(() -> {
+            controller.addNicknameInLobby(newNickname);
+            controller.setLobbySettings();
+        } );
+
         System.out.println("I'm updating the lobby scene with the new player: " + newNickname);
         setNextStage("lobbyScene.fxml");
     }

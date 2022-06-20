@@ -168,7 +168,7 @@ public class ViewMessageParser {
                     view.addOnlinePlayer(json.get("player2").getAsString());
                 }
                 view.setGameSettings(listOfPlayers, json.get("isExpert").getAsBoolean(), json.get("numOfPlayers").getAsInt());
-                System.out.println("LOBBY ANSWER");
+                System.out.println("mode: " + view.getGameSettings().getExpert().toString() + "\nplayers:"+ view.getGameSettings().getNumPlayers());
                 view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {

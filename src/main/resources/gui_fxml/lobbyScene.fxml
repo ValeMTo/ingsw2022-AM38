@@ -9,12 +9,37 @@
 
 <AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.LobbyMenuController">
    <children>
+      <Label layoutX="219.0" layoutY="226.0" text="Current players in your lobby " textFill="#46b9e7">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
       <Label fx:id="welcomeLabel" alignment="CENTER" layoutY="78.0" prefHeight="27.0" prefWidth="1200.0" textFill="#46b9e7">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Button fx:id="quitButton" layoutX="883.0" layoutY="559.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="QUIT" />
-      <ListView fx:id="listOnlinePlayers" layoutX="219.0" layoutY="267.0" prefHeight="241.0" prefWidth="322.0" />
+      <Button fx:id="quitButton" layoutX="635.0" layoutY="552.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="79.0" style="-fx-background-color: #787aef; -fx-text-fill: WHITE;" text="QUIT" />
+      <ListView fx:id="listOnlinePlayers" layoutX="219.0" layoutY="267.0" prefHeight="154.0" prefWidth="236.0" style="-fx-background-color: #46b9e7;" />
+      <Label layoutX="582.0" layoutY="226.0" text="Current lobby settings :" textFill="#46b9e7">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="gameMode" layoutX="582.0" layoutY="267.0" prefHeight="27.0" prefWidth="185.0" text="&gt; GameMode : " textFill="#46b9e7">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="expectedPlayers" layoutX="582.0" layoutY="304.0" prefHeight="27.0" prefWidth="185.0" text="&gt; Expected players :" textFill="#46b9e7">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="219.0" layoutY="449.0" text="waiting for other players ..." textFill="#46b9e7">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

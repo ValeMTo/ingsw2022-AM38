@@ -16,6 +16,10 @@ public class LobbyMenuController extends GUIController {
     private Label welcomeLabel;
     @FXML
     private Button quitButton;
+    @FXML
+    private Label gameMode;
+    @FXML
+    private Label expectedPlayers;
 
     @FXML
     public void initialize() {
@@ -28,6 +32,16 @@ public class LobbyMenuController extends GUIController {
         quit();
     }
 
+    public void setLobbySettings(){
+        Integer numPlayers = gui.getViewState().getGameSettings().getNumPlayers();
+        expectedPlayers.setText("> Expected players :  " + numPlayers.toString());
+        if(gui.getViewState().isExpert()){
+            gameMode.setText("> GameMode :  " + "Expert");
+        }
+        else{
+            gameMode.setText("> GameMode :  " + "Easy");
+        }
+    }
 
     public void addNicknameInLobby(String nickname) {
         // checks "welcome" vs  "just arrived"
