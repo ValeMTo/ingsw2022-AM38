@@ -39,18 +39,20 @@ public class MyBoardGuiController extends GUIController {
 
 
 
-    private void setupAssistantCards(){
+    public void setupAssistantCards(){
         deckArea.setVisible(true);
     }
 
+    public void loadTowers() {
+        
+    }
+
+
     private void setupMySchoolBoard(){
-        Tower towerColor = gui.getViewState().getPlayerTower();
-        switch(towerColor) {
-            case WHITE:
-                setImage(new Image(getClass().getResourceAsStream(towersPath +"white")));
-            case BLACK:
+
 
         }
+
 
 
     }
