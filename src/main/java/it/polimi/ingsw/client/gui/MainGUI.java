@@ -146,21 +146,26 @@ public class MainGUI extends Application {
      *  the list of current online players in the lobby
      */
     public void updateLobbyScene(String newNickname) {
-        LobbyMenuController controller = (LobbyMenuController) getController("lobbyScene.fxml");
         Platform.runLater(() -> {
+            LobbyMenuController controller = (LobbyMenuController) getController("lobbyScene.fxml");
             controller.addNicknameInLobby(newNickname);
             controller.setLobbySettings();
-        } );
-
+        });
         System.out.println("I'm updating the lobby scene with the new player: " + newNickname);
         setNextStage("lobbyScene.fxml");
     }
 
     public void initBoard() {
-        MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
         Platform.runLater(() -> {
+            MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
             controller.setupBoard();
-        } );
+        });
+
+    }
+
+    public void updateBoard() {
+        MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
+
     }
 
 
