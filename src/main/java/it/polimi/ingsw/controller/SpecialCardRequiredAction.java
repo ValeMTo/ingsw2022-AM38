@@ -11,5 +11,17 @@ public enum SpecialCardRequiredAction {
     USED_CORRECTLY,
     NO_SUCH_COLOR,
     ALREADY_USED_IN_THIS_TURN,
-    NOT_ENOUGH_TILES
+    NOT_ENOUGH_TILES;
+
+    /**
+     * Returns true if the action requires a color
+     * @param specialCardRequiredAction : the action to control the requirement of a color
+     * @return true if the required action requires a color, otherwise false
+     */
+    public static boolean isColorChoise(SpecialCardRequiredAction specialCardRequiredAction){
+        switch (specialCardRequiredAction){
+            case CHOOSE_COLOR_CARD, CHOOSE_COLOR,CHOOSE_COLOR_DINING_ROOM, CHOOSE_COLOR_SCHOOL_ENTRANCE: return true;
+            default: return false;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.client.ClientCLI;
+import it.polimi.ingsw.client.CLI.ClientCLI;
 import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.server.Server;
 
@@ -35,7 +35,7 @@ public class Eriantys {
                 //case 2-> ClientGUI.main(null);
                 default -> System.err.println("Only 0/1/2 numbers admitted");
             }
-        } while (actionCode != 0 || actionCode != 1 || actionCode != 2);
+        } while (actionCode != 0 && actionCode != 1 && actionCode != 2);
 
     }
 

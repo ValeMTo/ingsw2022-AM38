@@ -1,8 +1,10 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.client.CLI;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.view.IslandView;
+import it.polimi.ingsw.client.view.SubPhaseEnum;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
@@ -14,23 +16,23 @@ import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.io.*;
-import java.io.Reader;
 import java.util.*;
 
 public class ClientCLI {
+    private KeyboardInputReader keyboardInputReader;
     private static String hostName;
     private static int portNumber;
     private final PrintStream out;
-    private final String CLICyan = "\033[36;1m";
-    private final String CLIRed = "\033[31;1m";
-    private final String CLIGreen = "\033[32;1m";
-    private final String CLIYellow = "\033[93;1m";
-    private final String CLIBlue = "\033[94;1m";
-    private final String CLIPink = "\033[95;1m";
-    private final String CLIEffectReset = "\033[0m";
-    private final String CLIBlack = "\033[30;107;1m";
-    private final String CLIGray = "\033[90;1m";
-    private final String CLIBoldWhite = "\033[1m";
+    static final String CLICyan = "\033[36;1m";
+    static final String CLIRed = "\033[31;1m";
+    static final String CLIGreen = "\033[32;1m";
+    static final String CLIYellow = "\033[93;1m";
+    static final String CLIBlue = "\033[94;1m";
+    static final String CLIPink = "\033[95;1m";
+    static final String CLIEffectReset = "\033[0m";
+    static final String CLIBlack = "\033[30;107;1m";
+    static final String CLIGray = "\033[90;1m";
+    static final String CLIBoldWhite = "\033[1m";
     private final String verticalLine = "│";
     private final String horizontalLine = "─";
     private final String horizontalLinex10 = "──────────";
@@ -52,7 +54,6 @@ public class ClientCLI {
     }
 
     public static void main(String[] args) {
-
         ClientCLI cli = new ClientCLI();
         cli.setAwaitingCLI(); //Give to the viewstate the reference to wake up the cli
         cli.requestConnection();
@@ -118,19 +119,15 @@ public class ClientCLI {
         printArchipelago();
         printPlayerBoard();
         showActionMoveStudentsInstruction();
-        showColorChoiseInstruction();
+        showColorChoiceInstruction();
     }
 
-    public void printForMoveMotherNature(){
+    public synchronized void printForMoveMotherNature(){
         System.out.println("CLIENT CLI - mother nature set");
         printArchipelago();
         showMoveMotherNatureInstruction();
     }
 
-    public void printForAssistantCardChoice(){
-        System.out.println("CLIENT CLI - assistant card print");
-        printAssistantCards();
-    }
 
     /**
      * Sets this CLI as the one that waits the ViewState
@@ -140,112 +137,23 @@ public class ClientCLI {
     }
 
     /**
-     * Start Game models the recursive phase of printing coherent menus and interface and waits for correct inputs
+     * Start Game just start the KeyboardInputReader for acquire the input, then it is viewState that prints everything
      */
     public void startGame() {
-        while (!viewState.isEndOfMatch()) {
-            //System.out.println("CIENTCLI - Turn of event! While... turn shown? "+viewState.getTurnShown()+" current phase "+viewState.getCurrentPhase());
-            //cleaner();
-            if (!viewState.isActiveView()&&viewState.visualize()) {
-                    System.out.println("CLIENTCLI - not your turn");
-                    viewState.setTurnShown(true);
-                    showNotYoutTurnView();
-            } else if(viewState.isActiveView()&&viewState.visualize()){
-                System.out.println("CLIENT CLI - vilsualizing now turn shown is "+viewState.getTurnShown());
-                // If it is not expertGame mode does not print special card usage, if it is yes and if the player uses the card
-                // does not continue with the normal phase
-                if (viewState.getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE)&&viewState.getSpecialPhase()!=null){
-                    if(viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD)||viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)||viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM)){
-                        connectionSocket.chooseColor(this.chooseColorSpecialCard(viewState.getSpecialPhase()));
-                    }
-                    if(viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_ISLAND)){
-                        connectionSocket.chooseIsland(this.chooseIslandSpecialCard());
-                    }
-                }
-                else if (!viewState.isExpert()||viewState.getSpecialCardUsage()||!specialCardUsage()) {
-                    if (viewState.getCurrentPhase().equals(PhaseEnum.PLANNING) && viewState.getTurnShown()) {
-                        printForAssistantCardChoice();
-                        int card = showPlanningInstructionAndGetCard();
-                        connectionSocket.setAssistantCard(card);
-                    } else if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS) && viewState.getTurnShown()) {
-                        printForMoveStudents();
-                        Color colorToMove = null;
-                        while (colorToMove == null) {
-                            String input = in.nextLine();
-                            colorToMove = Color.fromAbbreviationToColor(input);
-                        }
-                        StudentCounter location = showStudentMovementDiningOrIsland();
-                        if (location.equals(StudentCounter.ISLAND)) {
-                            System.out.println("CLIENT CLI - YOU CHOOSE ISLAND");
-                            showIslandChoiseInstruction();
-                            String input = in.nextLine();
-                            int position;
-                            try {
-                                position = Integer.parseInt(input);
-                            }
-                            catch (NumberFormatException exc){
-                                System.out.println(CLIPink+"WRONG INPUT! It is required a number"+CLIEffectReset);
-                                position = 0;
-                            }
-                            connectionSocket.moveStudentToIsland(colorToMove, position);
-                        } else {
-                            System.out.println("CLIENT CLI - YOU CHOOSE DINING ROOM");
-                            connectionSocket.moveStudentToDiningRoom(colorToMove);
-                        }
-                    } else if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE) && viewState.getTurnShown()) {
-                        printForMoveMotherNature();
-                        int position = getMotherNatureMove();
-                        connectionSocket.moveMotherNature(position);
-                    } else if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD) && viewState.getTurnShown()) {
-                        System.out.println("CLIENT CLI - choice cloud");
-                        printClouds();
-                        showCloudChoiceInstruction();
-                        int num = getCloud();
-                        connectionSocket.chooseCloud(num);
-                    }
-                }
-            }
-            else {
-                synchronized (this) {
-                    try {
-                        System.out.println("CLIENT CLI - I am sleepy, I'll take a nap");
-                        this.wait();
-                    } catch (InterruptedException exc) {
-                        exc.printStackTrace();
-                        viewState.setTurnShown(false);
-                    }
-                    System.out.println("CLIENT CLI - Mhhhh... A god nap, let's get to work now");
-                }
-            }
-            //Not put cleaner here
-        }
+        viewState.setAwaitingCLI(this);
+        this.keyboardInputReader = new KeyboardInputReader(connectionSocket,viewState,this,in);
+        Thread thread = new Thread(this.keyboardInputReader);
+        thread.start();
     }
+
 
     /**
-     * Gets the motherNature movement
-     * @return
+     * Print method to print special cards if sufficient money and command
      */
-    public int getMotherNatureMove(){
-        System.out.println(CLICyan+"Choose a position where to move motherNature. You cannot move more than the steps of your last used card"+CLIEffectReset);
-        String input = in.nextLine();
-        try{
-            return Integer.parseInt(input);
-        }
-        catch (NumberFormatException exc){
-            System.out.println(CLIPink+"WRONG INPUT! It is required a number, try again"+CLIEffectReset);
-            return getMotherNatureMove();
-        }
-    }
-
-    private int getCloud(){
-        System.out.println(CLICyan + "Choose a cloud to fill your school entrance" + CLIEffectReset);
-        String input = in.nextLine();
-        try {
-            return Integer.parseInt(input);
-        }
-        catch (NumberFormatException exc){
-        System.out.println(CLIPink+"WRONG INPUT! It is required a number, try again"+CLIEffectReset);
-        return getMotherNatureMove();
+    public void printForSpecialCardUsage() {
+        if (viewState.playerHasCoinsToUseASpecialCard()) {
+            printSpecialCards();
+            System.out.println(CLICyan + "It seems that you have enough coins to play a special card, do you want to play one of them (Y/N)" + CLIEffectReset);
         }
     }
 
@@ -300,28 +208,18 @@ public class ClientCLI {
      * Requires the color for the special card usage
      * @return the color chosen
      */
-    private Color chooseColorSpecialCard(SpecialCardRequiredAction type){
-        if(type==SpecialCardRequiredAction.CHOOSE_COLOR_CARD) {
+    private void chooseColorSpecialCardComand() {
+        if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD)) {
             // TODO : print the special card usable colors
             //printActiveSpecialCard();
             System.out.println(CLICyan + "Choose a color from the card, colors abbreviations: " + getAllColorAbbreviations());
-        }
-        else if(type==SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE) {
+        } else if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)) {
             printPlayerBoard();
             System.out.println(CLICyan + "Choose a color from the schoolEntrance, colors abbreviations: " + getAllColorAbbreviations());
-        }
-        else if(type==SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM) {
+        } else if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM)) {
             printPlayerBoard();
             System.out.println(CLICyan + "Choose a color from the diningRoom, colors abbreviations: " + getAllColorAbbreviations());
         }
-        String input;
-        input = in.nextLine();
-        while(!input.equalsIgnoreCase("B")&&!input.equalsIgnoreCase("G")&&!input.equalsIgnoreCase("Y")&&!input.equalsIgnoreCase("P")&&!input.equalsIgnoreCase("R"))
-        {
-            System.out.println(CLIPink+"Incorrect value, colors abbreviations are: "+getAllColorAbbreviations());
-            input = in.nextLine();
-        }
-        return Color.toColor(input);
     }
 
     /**
@@ -345,61 +243,47 @@ public class ClientCLI {
      * Shows the possible commands and what to do in the planning phase.
      * Then get the number of card from stdin
      */
-    private int showPlanningInstructionAndGetCard() {
+    public synchronized void showPlanningInstruction() {
+        printAssistantCards();
         System.out.println(CLICyan + "CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS (enter the Priority value)" + CLIEffectReset);
         System.out.println("Which card have you chosen?");
-
-        System.out.println("Insert a number");
-        Integer numOfCard = 0;
-        while ((numOfCard <= 0 || numOfCard > 10)) {
-            try {
-                numOfCard = in.nextInt();
-                System.out.println("You have chosen tha card with " + numOfCard + " priority");
-            } catch (InputMismatchException e) {
-                System.out.println("Please, insert a number.");
-                in.nextLine();
-            }
-            if(numOfCard <= 0 || numOfCard > 10)
-                System.out.println(CLIPink+"Incorrect range, assistant card values are from 1 to 10"+CLIEffectReset);
-        }
-
-        return numOfCard;
-
     }
 
     /**
      * Shows the possible commands and what to do in the action phase: move cloud choice subaction
      */
-    private void showCloudChoiceInstruction() {
-        System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOL ENTRANCE (enter the cloud number)" + CLIEffectReset);
+    public synchronized void showCloudChoiceInstruction() {
+        printClouds();
+        System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOL ENTRANCE WITH (enter the cloud number)" + CLIEffectReset);
     }
 
     /**
      * Shows the possible commands and what to do in the action phase: move mothernature subaction
      */
-    private void showMoveMotherNatureInstruction() {
+    public synchronized void showMoveMotherNatureInstruction() {
         System.out.println(CLICyan + "CHOICE WHERE TO MOVE THE MOTHER NATURE (enter the island destination island)" + CLIEffectReset);
     }
 
     /**
      * Shows the possible commands and what to do in the action phase: move students subaction
      */
-    private void showActionMoveStudentsInstruction() {
+    public synchronized void showActionMoveStudentsInstruction() {
         System.out.println(CLICyan + "CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)" + CLIEffectReset);
     }
 
     /**
      * Shows what to do in the not playing state
      */
-    private void showNotYoutTurnView() {
+    public synchronized void showNotYourTurnView() {
         System.out.println(CLICyan + " NOT YOUR TURN - WAIT UNTIL IS YOUR TURN" + CLIEffectReset);
     }
 
-    public void showColorChoiseInstruction(){
+    public synchronized void showColorChoiceInstruction(){
         System.out.println(CLICyan+" Choice a student color: "+CLIBlue+"B"+CLIEffectReset+" for "+CLIBlue+"BLUE"+CLIEffectReset+", "+CLIGreen+"G"+CLIEffectReset+" for "+CLIGreen+"GREEN"+CLIEffectReset+", "+CLIYellow+"Y"+CLIEffectReset+" for "+CLIYellow+"YELLOW"+CLIEffectReset+", "+CLIPink+"P"+CLIEffectReset+" for "+CLIPink+"PINK"+CLIEffectReset+", "+CLIRed+"R"+CLIEffectReset+" for "+CLIRed+"RED"+CLIEffectReset+" ");
     }
 
-    public void showIslandChoiseInstruction(){
+    public synchronized void showIslandChoiceInstruction(){
+        printArchipelago();
         System.out.println(CLICyan+" Choice an island position to move the student on: "+CLIEffectReset);
     }
 
@@ -407,21 +291,19 @@ public class ClientCLI {
      * Shows the message of choice between place to diningRoom or Island adn get the choice
      * @return
      */
-    private StudentCounter showStudentMovementDiningOrIsland(){
-        while(true){
-            System.out.println(CLICyan+"Choise if place where the Student from the SchoolEntrance will go. Enter D for DiningRoom, I for Island");
-            String input = in.nextLine();
-            if(input.equalsIgnoreCase("D"))
-                return StudentCounter.DININGROOM;
-            if(input.equalsIgnoreCase("I"))
-                return StudentCounter.ISLAND;
-            System.out.println(CLIPink+"Incorrect value! Try again, D is for DiningRoom, I for Island");
-        }
+    private void showStudentMovementDiningOrIsland(){
+            System.out.println(CLICyan+"Choice where to place the Student "+getAnsiStringFromColor(keyboardInputReader.getPendingColor())+keyboardInputReader.getPendingColor()+CLIEffectReset+" from the SchoolEntrance. Enter D for DiningRoom, I for Island");
     }
 
-    //TODO : support to sending message in base of the current phase
-    public void getInputAndSendMessage() {
-        String input = in.nextLine();
+    public synchronized void showMoveStudentPhase(){
+        printArchipelago();
+        printPlayerBoard();
+        if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR))
+            showColorChoiceInstruction();
+        else if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND))
+            showStudentMovementDiningOrIsland();
+        else if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_ISLAND))
+            showIslandChoiceInstruction();
     }
 
     /**
@@ -449,7 +331,7 @@ public class ClientCLI {
     /**
      * Cleans the CLI
      */
-    private void cleaner() {
+    public synchronized void cleaner() {
         System.out.println("\u001b[2J");
         System.out.flush();
         System.out.println("\033[H");
@@ -603,7 +485,7 @@ public class ClientCLI {
     /**
      * Prints the usable assistant card
      */
-    private void printAssistantCards() {
+    synchronized void printAssistantCards() {
         System.out.println(CLIBlack+" - Usable assistant cards - \n\t(Less priority = first in action order, Steps = steps that the motherNature can do)\n"+CLIEffectReset);
         String[] rows = new String[5];
         int steps;
@@ -628,7 +510,7 @@ public class ClientCLI {
     /**
      * Prints the usable special cards with their texts, does not print anything if it is easy game mode
      */
-    private void printSpecialCards() {
+    synchronized void printSpecialCards() {
         if(viewState.isExpert()) {
             Gson parser = new Gson();
             try {
@@ -686,7 +568,7 @@ public class ClientCLI {
         }
     }
 
-    private void printClouds(){
+    synchronized void printClouds(){
         System.out.println(CLIBlack + "         - Clouds - \n" + CLIEffectReset);
         String[] rows = new String[8];
         for (int i = 0; i < 8; i++)
@@ -716,7 +598,7 @@ public class ClientCLI {
         printVector(rows);
     }
 
-    private void printArchipelago() {
+    synchronized void printArchipelago() {
         System.out.println(CLIBlack+" - Archipelago - \n\t TW: tower on the island, M.N. : motherNature\n"+CLIEffectReset);
         String[] rows = new String[12];
         for (int i = 0; i < 12; i++)
@@ -830,6 +712,7 @@ public class ClientCLI {
         return cubes;
     }
 
+    //TODO
     private String getLastAssistantCardString(Tower playerTower){
         return "";
     }
@@ -837,7 +720,7 @@ public class ClientCLI {
     /**
      * Prints the playerBoard (SchoolBoard, DiningRoom and Professors owned)
      */
-    private void printPlayerBoard(){
+    synchronized void printPlayerBoard(){
         System.out.println(CLIBlack+" - PlayerBoard - \n\t PROFESSORS : owned professors, DINING ROOM: student in the dining room, needed to determine the owned professors,\n SCHOOL ENTRANCE: Movable students \n"+CLIEffectReset);
         String[] rows = new String[12];
         for(int i=0;i<12;i++)
@@ -955,7 +838,7 @@ public class ClientCLI {
         return "";
     }
 
-    private String getColorAbbreviationWithInitialAnsiiCode(Color color) {
+    static String getColorAbbreviationWithInitialAnsiiCode(Color color) {
         switch (color) {
             case BLUE:
                 return CLIBlue+"B";
@@ -975,10 +858,18 @@ public class ClientCLI {
      *
      * @return all the color abbreviations with their color ansi code
      */
-    private String getAllColorAbbreviations(){
+    static String getAllColorAbbreviations(){
         String getAllColor = "";
         for(Color color: Color.values())
-            getAllColor+=this.getColorAbbreviationWithInitialAnsiiCode(color);
+            getAllColor+=getColorAbbreviationWithInitialAnsiiCode(color);
         return getAllColor+CLIEffectReset;
+    }
+
+    /**
+     * Print this message for the special card input usage
+     */
+    private synchronized void specialCardDecision(){
+        if(viewState.isExpert())
+            System.out.println(ClientCLI.CLICyan+"(game mode is Expert, use V to visualize special cards, S to use a special card or just continue with the upper instructions)"+ClientCLI.CLIEffectReset);
     }
 }

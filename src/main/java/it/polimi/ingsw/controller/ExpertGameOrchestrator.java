@@ -341,6 +341,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose color");
             }
             Integer cardPosition = getPositionSpecialCard();
+            System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - position "+position+" pending color "+pendingColor+" activated card "+activatedSpecialCard);
             try {
                 switch (activatedSpecialCard) {
                     case PRIEST:
