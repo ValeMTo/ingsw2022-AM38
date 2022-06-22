@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.gui;
 import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.gui.controllers.GUIController;
 import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
+import it.polimi.ingsw.client.gui.controllers.MyBoardGuiController;
 import it.polimi.ingsw.client.view.ViewState;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -145,16 +146,27 @@ public class MainGUI extends Application {
      *  the list of current online players in the lobby
      */
     public void updateLobbyScene(String newNickname) {
-        LobbyMenuController controller = (LobbyMenuController) getController("lobbyScene.fxml");
         Platform.runLater(() -> {
+            LobbyMenuController controller = (LobbyMenuController) getController("lobbyScene.fxml");
             controller.addNicknameInLobby(newNickname);
             controller.setLobbySettings();
-        } );
-
+        });
         System.out.println("I'm updating the lobby scene with the new player: " + newNickname);
         setNextStage("lobbyScene.fxml");
     }
 
+    public void initBoard() {
+        Platform.runLater(() -> {
+            MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
+            controller.setupBoard();
+        });
+
+    }
+
+    public void updateBoard() {
+        MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
+
+    }
 
 
 

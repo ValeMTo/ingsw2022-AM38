@@ -78,6 +78,7 @@ public class ViewMessageParser {
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
 
                 if(!view.isCli()){
+                    Platform.runLater(()->view.getAwaitingGUI().initBoard());
                     Platform.runLater(()->view.getAwaitingGUI().setNextStage("myBoardScene.fxml"));
                 }
 

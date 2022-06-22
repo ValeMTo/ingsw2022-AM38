@@ -42,5 +42,6 @@
             <Font name="Britannic Bold" size="24.0" />
          </font>
       </Label>
+      <Button fx:id="demoBoard" layoutX="97.0" layoutY="535.0" mnemonicParsing="false" text="launch demo board" />
    </children>
 </AnchorPane>
