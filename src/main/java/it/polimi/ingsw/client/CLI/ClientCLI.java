@@ -125,6 +125,7 @@ public class ClientCLI {
     public synchronized void printForMoveMotherNature(){
         System.out.println("CLIENT CLI - mother nature set");
         printArchipelago();
+        System.out.println(CLICyan+"Last card used "+getLastAssistantCardString(viewState.getPlayerTower()));
         showMoveMotherNatureInstruction();
     }
 
@@ -161,43 +162,29 @@ public class ClientCLI {
      * Method to use the special cards, says if the player wants to play a special card, called if the coin are sufficient
      * @return true if the special card is accepted to be used, false otherwise
      */
-    public boolean specialCardUsage() {
+    public void specialCardUsage() {
         // The special card has been already used in this turn
-        if(viewState.getSpecialCardUsage())
-            return false;
+        if (viewState.getSpecialCardUsage())
+            return;
         if (!viewState.isExpert()) {
             //System.out.println(CLIRed + "The special card function is not implemented. It is only usable in expert game mode only!" + CLIEffectReset);
-            return false;
+            return;
         }
         // If the player has not enough coins to use at least one special card it does not print the special card and let choose one
-        if(!viewState.playerHasCoinsToUseASpecialCard())
-            return false;
-        printSpecialCards();
-        String input;
+        if (!viewState.playerHasCoinsToUseASpecialCard())
+            return;
         try{
-            do {
-                System.out.println(CLICyan + "It seems that you have enough coins to play a special card, do you want to play one of them (Y/N)" + CLIEffectReset);
-                input = in.nextLine();
-            } while (!input.equalsIgnoreCase("y") && !input.equalsIgnoreCase("n"));
-            if (input.equalsIgnoreCase("n"))
-                return false;
-            do {
-                System.out.println(CLICyan + "Choose an usable special card (enter 'n' to exit), write its name and press enter (choose wisely and be aware that the cost will increase next round)" + CLIEffectReset);
-                System.out.println(CLICyan + "Usable special cards list "+viewState.getUpperCaseSpecialCards()+CLIEffectReset);
-                for(String usableCardName: viewState.getUpperCaseSpecialCards())
-                    System.out.println(usableCardName);
-                input = in.nextLine();
-                if(!viewState.getUpperCaseSpecialCards().contains(input.toUpperCase()))
-                    System.out.println(CLIPink + "This special card is not contained into the 3 usable special cards of this game or is misspelled" + CLIEffectReset);
-            } while (!input.equalsIgnoreCase("n") && !viewState.getUpperCaseSpecialCards().contains(input.toUpperCase()));
+            printSpecialCards();
+            System.out.println(CLICyan + "It seems that you have enough coins to play a special card, do you want to play one of them? (PRESS N if not)" + CLIEffectReset);
+            System.out.println(CLICyan + "Choose an usable special card or enter 'n' if you do not want to play a card write its name and press enter (choose wisely and be aware that the cost will increase next round)" + CLIEffectReset);
+            System.out.println(CLICyan + "Usable special cards list " + viewState.getUpperCaseSpecialCards() + CLIEffectReset);
+            for (String usableCardName : viewState.getUpperCaseSpecialCards())
+                System.out.println(usableCardName);
+            System.out.println(CLIPink + "This special card is not contained into the 3 usable special cards of this game or is misspelled" + CLIEffectReset);
         }
-        catch(FunctionNotImplementedException exc)
-        {
+        catch (FunctionNotImplementedException exc) {
             System.out.println(CLIRed + "The special card function is not implemented. It is only usable in expert game mode only!" + CLIEffectReset);
-            return false;
         }
-        connectionSocket.chooseSpecialCard(input);
-        return true;
     }
 
     private void printActiveSpecialCardColors(){
@@ -262,6 +249,7 @@ public class ClientCLI {
      */
     public synchronized void showMoveMotherNatureInstruction() {
         System.out.println(CLICyan + "CHOICE WHERE TO MOVE THE MOTHER NATURE (enter the island destination island)" + CLIEffectReset);
+        specialCardDecision();
     }
 
     /**
@@ -269,6 +257,7 @@ public class ClientCLI {
      */
     public synchronized void showActionMoveStudentsInstruction() {
         System.out.println(CLICyan + "CHOICE A STUDENT TO MOVE (R,Y,B,P,G color) AND THEN CHOICE THE DESTINATION (D :your diningRoom, I: island)" + CLIEffectReset);
+        specialCardDecision();
     }
 
     /**
@@ -283,12 +272,11 @@ public class ClientCLI {
     }
 
     public synchronized void showIslandChoiceInstruction(){
-        printArchipelago();
         System.out.println(CLICyan+" Choice an island position to move the student on: "+CLIEffectReset);
     }
 
     /**
-     * Shows the message of choice between place to diningRoom or Island adn get the choice
+     * Shows the message of choice between place to diningRoom or Island and get the choice
      * @return
      */
     private void showStudentMovementDiningOrIsland(){
@@ -489,8 +477,8 @@ public class ClientCLI {
         System.out.println(CLIBlack+" - Usable assistant cards - \n\t(Less priority = first in action order, Steps = steps that the motherNature can do)\n"+CLIEffectReset);
         String[] rows = new String[5];
         int steps;
-        for (int i = 0; i < 5; i++)
-            rows[i] = "";
+        for (int j = 0; j < 5; j++)
+            rows[j] = "";
         for (Integer i : viewState.getUsableCards()) {
             steps = i / 2 + i % 2;
             rows[0] += "  ┌─────────────┐ ";
@@ -714,6 +702,8 @@ public class ClientCLI {
 
     //TODO
     private String getLastAssistantCardString(Tower playerTower){
+        if(viewState.getLastUsedCard(playerTower)!=null)
+            return "Priority: "+viewState.getLastUsedCard(playerTower)+" Steps: "+(viewState.getLastUsedCard(playerTower)/2+viewState.getLastUsedCard(playerTower)%2);
         return "";
     }
 
@@ -734,11 +724,14 @@ public class ClientCLI {
             diningRoomOccupancy = viewState.getDiningRoomOccupancy(playerTower);
             schoolEntranceOccupancy =  viewState.getSchoolEntranceOccupancy(playerTower);
             String effectSchoolBoard;
+            String lastcard = "";
+            if(viewState.getLastUsedCard(viewState.getPlayerTower())!=null)
+                lastcard = viewState.getLastUsedCard(viewState.getPlayerTower()).toString();
             if(playerTower.equals(viewState.getPlayerTower())) {
                 if(!viewState.isExpert())
-                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" - LAST CARD USED " + getLastAssistantCardString(playerTower) + "        "+ CLIEffectReset;
+                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" - LAST CARD USED " + lastcard + "        "+ CLIEffectReset;
                 else
-                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" - LAST CARD USED " + getLastAssistantCardString(playerTower) + " COINS "+viewState.getPlayerCoins(playerTower) + CLIEffectReset;
+                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" - LAST CARD USED " + lastcard + " COINS "+viewState.getPlayerCoins(playerTower) + CLIEffectReset;
                 effectSchoolBoard = CLIRed;
             }
             else {

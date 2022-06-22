@@ -5,7 +5,9 @@ import it.polimi.ingsw.client.view.SubPhaseEnum;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -22,7 +24,6 @@ public class KeyboardInputReader implements Runnable {
     private Scanner in;
     private String input;
     private Color pendingColor;
-    private boolean isDiningRoom;
 
 
     /**
@@ -56,7 +57,13 @@ public class KeyboardInputReader implements Runnable {
      * This method uses the input accordingly to the phase
      */
     private void consumeInput() {
-        if (viewState.getCurrentPhase().equals(PhaseEnum.PLANNING)) getFromInputCardPriorityAndSendMessage();
+        if(input.equalsIgnoreCase("V")||input.equalsIgnoreCase("S"))
+            specialCardInputDecision();
+        else if(viewState.getAcceptedUseSpecialCard())
+        {
+            specialCardActivation();
+        }
+        else if (viewState.getCurrentPhase().equals(PhaseEnum.PLANNING)) getFromInputCardPriorityAndSendMessage();
         else if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
             if (viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE) || (viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR)))
                 fromInputSetColor();
@@ -115,13 +122,11 @@ public class KeyboardInputReader implements Runnable {
      */
     private void fromInputSendIsDining() {
         if (input.equalsIgnoreCase("D")) {
-            isDiningRoom = true;
             if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
                 viewState.setSubPhase(SubPhaseEnum.NO_SUB_PHASE);
                 connectionSocket.moveStudentToDiningRoom(pendingColor);
             }
         } else if (input.equalsIgnoreCase("I")) {
-            isDiningRoom = false;
             viewState.setSubPhase(SubPhaseEnum.CHOOSE_ISLAND);
         } else
             System.out.println(ClientCLI.CLIPink + "Incorrect value, it is required D for DiningRoom or I for Island ( D / I )" + ClientCLI.CLIEffectReset);
@@ -175,8 +180,49 @@ public class KeyboardInputReader implements Runnable {
      * Print this message for the special card input usage
      */
     private void specialCardInputDecision() {
-        if (viewState.isExpert())
-            System.out.println(ClientCLI.CLICyan + "(game mode is Expert, use V to visualize special cards, S to use a special card or just continue with the upper instructions)" + ClientCLI.CLIEffectReset);
+        if(!viewState.isExpert()&&(viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)||(viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)&&(viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR))))) {
+            viewState.setAcceptedUseSpecialCard(false);
+            return;
+        }
+        if(input.equalsIgnoreCase("V")) {
+            clientCLI.printSpecialCards();
+            viewState.setAcceptedUseSpecialCard(false);
+        }
+        else if(input.equalsIgnoreCase("S"))
+        {
+            if(viewState.getSpecialCardUsage()) {
+                System.out.println(ClientCLI.CLIPink + "Already used a special card this turn! wait for next turn to use them" + ClientCLI.CLIEffectReset);
+                return;
+            }
+            clientCLI.specialCardUsage();
+            viewState.setAcceptedUseSpecialCard(true);
+        }
+    }
+
+    /**
+     * Expect the decided special card and send the message
+     */
+    private void specialCardActivation(){
+        try {
+            if(input.equalsIgnoreCase("N")) {
+                viewState.setAcceptedUseSpecialCard(false);
+                return;
+            }
+            for (String specialCardName : viewState.getUpperCaseSpecialCards())
+            {
+                if(specialCardName.equalsIgnoreCase(input)) {
+                    connectionSocket.chooseSpecialCard(input);
+                    viewState.setAcceptedUseSpecialCard(false);
+                    return;
+                }
+            }
+            System.out.println(ClientCLI.CLIPink + "Wrong input! No such special card name. Try again (ENTER 'N' to exit the choice)" + ClientCLI.CLIEffectReset);
+            viewState.setAcceptedUseSpecialCard(false);
+        }
+        catch (FunctionNotImplementedException exc)
+        {
+            System.out.println(ClientCLI.CLIPink + "Not allowed to use special cards" + ClientCLI.CLIEffectReset);
+        }
     }
 
     /**

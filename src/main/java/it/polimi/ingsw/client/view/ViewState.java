@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.exceptions.NotLastCardUsedException;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
@@ -44,6 +45,7 @@ public class ViewState {
     private SpecialCardRequiredAction specialCardRequiredAction;//TODO !!!
     private boolean isSpecialCardUsed = false;
     private SubPhaseEnum subPhaseEnum = SubPhaseEnum.NO_SUB_PHASE;
+    private boolean acceptedUseSpecialCard=false;
 
     public ViewState(boolean isCli) {
         this.onlinePlayers = new ArrayList<>();
@@ -726,6 +728,29 @@ public class ViewState {
         }
     }
 
+    /**
+     * Sets the flag that tells the player has accepted to use a special card
+     */
+    public void setAcceptedUseSpecialCard(boolean acceptedUseSpecialCard){
+        this.acceptedUseSpecialCard=acceptedUseSpecialCard;
+    }
+
+    public boolean getAcceptedUseSpecialCard(){
+        return this.acceptedUseSpecialCard;
+    }
+
+    /**
+     * @param tower : tower of the player
+     * @return the last assistant card used by the player
+     */
+    public Integer getLastUsedCard(Tower tower) {
+        SchoolBoardState schoolBoardState = findSchoolBoard(tower);
+        if(schoolBoardState!=null)
+        {
+            return schoolBoardState.getLastAssistantCardUsed();
+        }
+        return null;
+    }
 
     //TODO : complete implementation
 
@@ -734,13 +759,15 @@ public class ViewState {
      */
     private void refreshCLI() {
         if (awaitingCLI == null) return;
+        awaitingCLI.cleaner();
         if (!this.activeView) {
             awaitingCLI.showNotYourTurnView();
         } else {
-            if (this.currentPhase.equals(PhaseEnum.PLANNING)) awaitingCLI.showPlanningInstruction();
+            if(acceptedUseSpecialCard) awaitingCLI.specialCardUsage();
+            else if (this.currentPhase.equals(PhaseEnum.PLANNING)) awaitingCLI.showPlanningInstruction();
             else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) awaitingCLI.showMoveStudentPhase();
+            else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) awaitingCLI.printForMoveMotherNature();
             else if (this.currentPhase.equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) awaitingCLI.showCloudChoiceInstruction();
         }
-        awaitingCLI.cleaner();
     }
 }
