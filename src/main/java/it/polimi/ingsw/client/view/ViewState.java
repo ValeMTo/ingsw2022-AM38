@@ -262,7 +262,6 @@ public class ViewState {
             //System.out.println("VIEW STATE - Hey CLI, it's time to wake up!");
             awaitingCLI.notifyAll();
         }
-        refreshCLI();
     }
 
     /**
@@ -419,6 +418,11 @@ public class ViewState {
     }
 
     public synchronized List<IslandView> getIslands() {
+        System.out.println("VIEW STATE - getIslands - "+islands);
+        for(IslandView islandView:islands)
+        {
+            System.out.println("ISLAND "+islandView.getPosition()+" with "+islandView.getTowerNumber()+" tower "+islandView.getTower()+" and students "+islandView.getStudentMap());
+        }
         return new ArrayList<>(islands);
     }
 
@@ -641,12 +645,9 @@ public class ViewState {
         for (IslandView island : islands) {
             if (island.getPosition() > numIslands) islandsToModify.remove(island);
         }
-        islands = islandsToModify;
-        if (awaitingCLI != null) {
-            if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
-                awaitingCLI.printForMoveStudents();
-            else if (this.currentPhase == PhaseEnum.ACTION_MOVE_MOTHER_NATURE) awaitingCLI.printForMoveMotherNature();
-        }
+        islands.clear();
+        islands.addAll(islandsToModify);
+        System.out.println("VIEW STATE - setIslandNumber - now islands "+islands);
         refreshCLI();
     }
 
@@ -739,11 +740,11 @@ public class ViewState {
     /**
      * Sets the flag that tells the player has accepted to use a special card
      */
-    public void setAcceptedUseSpecialCard(boolean acceptedUseSpecialCard){
+    public synchronized void setAcceptedUseSpecialCard(boolean acceptedUseSpecialCard){
         this.acceptedUseSpecialCard=acceptedUseSpecialCard;
     }
 
-    public boolean getAcceptedUseSpecialCard(){
+    public synchronized boolean getAcceptedUseSpecialCard(){
         return this.acceptedUseSpecialCard;
     }
 
@@ -751,7 +752,7 @@ public class ViewState {
      * @param tower : tower of the player
      * @return the last assistant card used by the player
      */
-    public Integer getLastUsedCard(Tower tower) {
+    public synchronized Integer getLastUsedCard(Tower tower) {
         SchoolBoardState schoolBoardState = findSchoolBoard(tower);
         if(schoolBoardState!=null)
         {
@@ -764,7 +765,7 @@ public class ViewState {
      * Sets the tower left of that particular player
      * @param player
      */
-    public void setTowerLeft(Tower player, int towerLeft){
+    public synchronized void setTowerLeft(Tower player, int towerLeft){
         SchoolBoardState schoolBoardState = findSchoolBoard(player);
         if(schoolBoardState!=null)
         {
@@ -777,7 +778,7 @@ public class ViewState {
      * Gets the tower left of that particular player
      * @param player
      */
-    public Integer getTowerLeft(Tower player){
+    public synchronized Integer getTowerLeft(Tower player){
         SchoolBoardState schoolBoardState = findSchoolBoard(player);
         if(schoolBoardState!=null)
         {

@@ -84,7 +84,7 @@ public class PlayerBoard extends Listenable {
     }
 
     /**
-     * Notify to the player that played the card the change of its usable cards
+     * Notify to the player that played the card the change of its usable cards and the last card used
      */
     private void notifyUsablesCards(){
         if(this.clients!=null && this.modelListener!=null){
@@ -95,9 +95,13 @@ public class PlayerBoard extends Listenable {
                 if(!card.isUsed())
                     listOfUsableCards.add(card.getPriority());
             }
-            for(ClientHandler client:clients)
-                if(client.getNickName().equalsIgnoreCase(this.nickName))
-                    notify(modelListener,MessageGenerator.assistantCardUpdateMessage(this.towerColor,listOfUsableCards),clients);
+            for(ClientHandler client:clients) {
+                if (client.getNickName().equalsIgnoreCase(this.nickName)) {
+                    notify(modelListener, MessageGenerator.assistantCardUpdateMessage(this.towerColor, listOfUsableCards), clients);
+                }
+                if(lastUsed!=null)
+                    notify(modelListener, MessageGenerator.lastUsedAssistantCardUpdateMessage(this.towerColor, lastUsed), clients);
+            }
         }
     }
 

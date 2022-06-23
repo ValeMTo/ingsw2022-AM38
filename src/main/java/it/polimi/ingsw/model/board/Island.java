@@ -49,7 +49,7 @@ public class Island extends Listenable {
         }
     }
 
-    private void notifySomethingHasChanged(){
+    public void notifySomethingHasChanged(){
         if(this.clients!=null && this.modelListener!=null){
             System.out.println("ISLAND "+this.position+" - notify a change!");
             Map<Color,Integer> returnMap = new HashMap<>();
