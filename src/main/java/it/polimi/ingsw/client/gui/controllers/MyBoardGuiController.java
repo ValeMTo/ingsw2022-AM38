@@ -39,7 +39,13 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private AnchorPane controlsArea;
     @FXML
+    private AnchorPane showContentArea;
+    @FXML
+    private Label showContentLabel;
+    @FXML
     private ImageView testImg;
+    @FXML
+    private AnchorPane cloudsArea;
 
 
 
@@ -122,8 +128,31 @@ public class MyBoardGuiController extends GUIController {
 
 
     @FXML
+    private ImageView contentRed;
+    @FXML
+    private ImageView contentYellow;
+    @FXML
+    private ImageView contentPink;
+    @FXML
+    private ImageView contentBlue;
+    @FXML
+    private ImageView contentGreen;
+
+    @FXML
+    private Label num_contentRed;
+    @FXML
+    private Label num_contentYellow;
+    @FXML
+    private Label num_contentPink;
+    @FXML
+    private Label num_contentBlue;
+    @FXML
+    private Label num_contentGreen;
+
+
+
+    @FXML
     public void initialize() {
-        setupAssistantCards();
 
     }
 
@@ -197,6 +226,7 @@ public class MyBoardGuiController extends GUIController {
     public void updateMyPlayerBoard() {
         Map<Color, Integer> schoolEntranceOccupancy;
         Map<Color, Integer> diningRoomOccupancy;
+        System.out.println("HEY: my player color is: " + playerTowerColor.toString() + " Now let's get the occupancies...");
         diningRoomOccupancy = gui.getViewState().getDiningRoomOccupancy(playerTowerColor);
         schoolEntranceOccupancy =  gui.getViewState().getSchoolEntranceOccupancy(playerTowerColor);
 
@@ -206,7 +236,6 @@ public class MyBoardGuiController extends GUIController {
         for(Label label : entranceStudLabels){
             String str = label.getId();
             str = str.substring(7);
-            System.out.println(str);
             Color color = toColor(str.toUpperCase());
             label.setText("x " + schoolEntranceOccupancy.get(color).toString());
         }

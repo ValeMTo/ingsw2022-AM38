@@ -580,10 +580,10 @@ public class MessageGenerator {
      * @param studentsMap : the hashmap with the updated amounts of students for each color
      * @param towerColor  : the tower color of the player who has dominance on the given island
      * @param numTower    : the amount of towers on the island
-     * @param isDisabled: states whether the dominance computation on that island is disabled (true) or enabled (false)
+     * @param isEnabled: states whether the dominance computation on that island is disabled (true) or enabled (false)
      * @return : json string of the IslandViewUpdate message
      */
-    public static String islandViewUpdateMessage(int position, Map<Color, Integer> studentsMap, Tower towerColor, int numTower, boolean isDisabled) {
+    public static String islandViewUpdateMessage(int position, Map<Color, Integer> studentsMap, Tower towerColor, int numTower, boolean isEnabled) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal());
@@ -594,7 +594,7 @@ public class MessageGenerator {
         else
             json.put("TowerColor","null");
         json.put("NumOfTowers", numTower);
-        json.put("IsDisabled", isDisabled);
+        json.put("IsDisabled", !isEnabled);
         return json + "\n";
     }
 
