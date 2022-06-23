@@ -111,7 +111,6 @@ public class ViewMessageParser {
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()) {
                 view.setMotherNature(json.get("MotherNaturePosition").getAsInt());
                 view.setIslandNumber(json.get("NumOfIslands").getAsInt());
-
             }
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SPECIAL_CARD_USAGE_PHASE.ordinal())
             {

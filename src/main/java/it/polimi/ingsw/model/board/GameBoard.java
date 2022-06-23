@@ -109,6 +109,7 @@ public abstract class GameBoard extends Listenable {
     protected boolean transferIslandPossessionsIfSameTower(Island islandReceiver, Island islandGiver) {
         if (islandGiver == null || islandReceiver == null) return false;
         if (islandGiver.getTower() != null && islandReceiver.getTower() != null && islandReceiver.getTower().equals(islandGiver.getTower())) {
+            System.out.println("GAME BOARD - transferIslandPossessionsIfSameTower - from island "+islandGiver.getPosition()+" to "+islandReceiver.getPosition());
             int towersNumber = islandReceiver.getTowerNumber() + islandGiver.getTowerNumber();
             // We update the number of tower on the island adding the Towers of the island merging
             islandReceiver.setTowerNumber(towersNumber);
@@ -135,7 +136,7 @@ public abstract class GameBoard extends Listenable {
         // Search the island after the island considered, set the island with min position as the receiver
         if (island < islands.length - 1) {
             islandReceiver = currentIsland;
-            islandGiver = islands[island + 1];
+            islandGiver = islands[island];
         } else if (island == islands.length - 1 && islands.length >= 2) {
             islandReceiver = islands[0];
             islandGiver = currentIsland;
@@ -171,6 +172,10 @@ public abstract class GameBoard extends Listenable {
         for (int i = 1; i <= islands.length; i++) {
             islands[i - 1].setPosition(i);
             if (motherNaturePosition == islands[i - 1]) motherNature = i;
+        }
+        notifyArchipelago();
+        for (int i = 0; i < islands.length; i++) {
+            islands[i].notifySomethingHasChanged();
         }
     }
 

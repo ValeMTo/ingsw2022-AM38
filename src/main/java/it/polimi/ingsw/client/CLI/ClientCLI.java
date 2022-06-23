@@ -650,6 +650,8 @@ public class ClientCLI {
                     rows[j] = "";
             }
         }
+        if(counter!=0)
+            printVector(rows);
     }
 
     private String createCubesString(Color color, int number,int max){
@@ -700,6 +702,25 @@ public class ClientCLI {
         return cubes;
     }
 
+
+    /**
+     * Represents with cubes the towers on the playerBoard
+     * @param tower
+     * @param number
+     * @return
+     */
+    private String createTowersCubesString(Tower tower, int number){
+        String cubes =CLIEffectReset;
+        for(int i=1;i<=9;i++){
+            if(i<=number){
+                cubes += getAnsiStringFromTower(tower)+"¤"+CLIEffectReset;
+            }
+            else
+                cubes += " ";
+        }
+        return cubes;
+    }
+
     //TODO
     private String getLastAssistantCardString(Tower playerTower){
         if(viewState.getLastUsedCard(playerTower)!=null)
@@ -737,7 +758,7 @@ public class ClientCLI {
             else {
                 effectSchoolBoard = CLIEffectReset;
                 if(!viewState.isExpert())
-                rows[0] += CLICyan + "   PLAYER BOARD OF TOWER: " + getTowerAbbreviation(playerTower) + " LAST CARD USED " + getLastAssistantCardString(playerTower) + "          " + CLIEffectReset;
+                rows[0] += CLICyan + "   PLAYER BOARD TW: " + getTowerAbbreviation(playerTower) + " LAST CARD USED " + getLastAssistantCardString(playerTower) + "          " + CLIEffectReset;
                 else
                 rows[0] += CLICyan + "  PLAYER BOARD OF TOWER: " + getTowerAbbreviation(playerTower) + " LAST CARD USED " + getLastAssistantCardString(playerTower) + " COINS: "+viewState.getPlayerCoins(playerTower)+" " + CLIEffectReset;
             }rows[1] += effectSchoolBoard+"  ┌────────────┬────────────────┬─────────────────┐  "+CLIEffectReset;
@@ -772,7 +793,9 @@ public class ClientCLI {
             else
                 rows[8] += effectSchoolBoard+"  │            ";
             rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED),10) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
-            rows[9] += effectSchoolBoard+"  └────────────┴────────────────┴─────────────────┘  "+CLIEffectReset;
+            rows[9] += effectSchoolBoard+"  ├────────────┴────────────────┴─────────────────┤  "+CLIEffectReset;
+            rows[10] += "  "+effectSchoolBoard+"│     TOWERS LEFT:"+viewState.getTowerLeft(playerTower)+"   "+createTowersCubesString(playerTower,viewState.getTowerLeft(playerTower))+effectSchoolBoard+"                 │  ";
+            rows[11] += effectSchoolBoard+"  └───────────────────────────────────────────────┘  "+CLIEffectReset;
 
         }
             printVector(rows);
