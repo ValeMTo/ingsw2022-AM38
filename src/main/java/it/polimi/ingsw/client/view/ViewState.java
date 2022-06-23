@@ -507,6 +507,8 @@ public class ViewState {
         return playerTower;
     }
 
+
+
     public synchronized void setPlayerTower(Tower playerTower) {
         this.playerTower = playerTower;
     }
@@ -549,6 +551,12 @@ public class ViewState {
     public synchronized Collection<Tower> getTowers() {
         return this.players.values();
     }
+
+    /*
+    public synchronized int getNumOfTowers(Tower player) {
+        return
+    }
+*/
 
     public synchronized boolean isTheCommander() {
         return isTheCommander;

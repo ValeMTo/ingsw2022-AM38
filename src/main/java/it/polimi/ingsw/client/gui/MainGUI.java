@@ -155,6 +155,11 @@ public class MainGUI extends Application {
         setNextStage("lobbyScene.fxml");
     }
 
+    /**
+     * Initializes the first setup of the board at the beginning of the game.  This operation is triggered as soon as
+     * the "Setup Update message"  is received and parsed by the ViewMessageParser.
+     *
+     */
     public void initBoard() {
         Platform.runLater(() -> {
             MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
@@ -163,9 +168,9 @@ public class MainGUI extends Application {
 
     }
 
-    public void updateBoard() {
+    public void updatePlayerBoard() {
         MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
-
+        controller.updateMyPlayerBoard();
     }
 
 
