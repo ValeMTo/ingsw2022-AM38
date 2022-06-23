@@ -50,7 +50,7 @@ public class ViewMessageParser {
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
             view.setTurnShown(false);
             if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
-                System.out.println("NICKNAME ALREADY TAKEN");
+                //System.out.println("NICKNAME ALREADY TAKEN");
                 view.setNickname(null);
                 view.wake();
             }
@@ -187,7 +187,7 @@ public class ViewMessageParser {
                 view.wake();
 
             } else if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.ACCEPT_NICKNAME_ANSWER.ordinal()) {
-                System.out.println("ACCEPT NICKNAME REQUEST");
+                //System.out.println("ACCEPT NICKNAME REQUEST");
                 view.setNickname(json.get("nickname").getAsString());
                 view.wake();
             }

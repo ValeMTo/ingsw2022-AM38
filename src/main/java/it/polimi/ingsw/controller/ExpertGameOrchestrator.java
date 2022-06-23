@@ -341,6 +341,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose color");
             }
             Integer cardPosition = getPositionSpecialCard();
+            System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - position "+position+" pending color "+pendingColor+" activated card "+activatedSpecialCard);
             try {
                 switch (activatedSpecialCard) {
                     case PRIEST:
@@ -357,7 +358,9 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                     case HERBALIST:
                         // Disables an Island influence computation and remove the tile from the special card
                         if (gameBoard.disableInfluence(position)) {
-                            specialCardsArray[position].removeTile();
+                            for(SpecialCard specialCard: specialCardsArray)
+                                if(specialCard.getName().equals(SpecialCardName.HERBALIST))
+                                    specialCard.removeTile();
                         }
                         resetPhase();
                         return MessageGenerator.okMessage();
