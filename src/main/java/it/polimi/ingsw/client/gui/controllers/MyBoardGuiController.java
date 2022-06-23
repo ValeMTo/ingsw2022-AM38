@@ -1,21 +1,31 @@
 package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.model.board.Tower;
+import javafx.beans.DefaultProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 
 public class MyBoardGuiController extends GUIController {
 
     private final String towersPath = "/graphics/board/towers/";
     private final HashMap<Tower, Image> towersImgMap = new HashMap<>();
+    private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
 
 
     @FXML
@@ -57,7 +67,8 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     public void initialize() {
-        // assistant1.setOnMouseClicked();
+        setupAssistantCards();
+
     }
 
 
@@ -72,14 +83,41 @@ public class MyBoardGuiController extends GUIController {
 
 
     public void setupAssistantCards() {
+
+        deckArray.add(assistant1);
+        deckArray.add(assistant2);
+        deckArray.add(assistant3);
+        deckArray.add(assistant4);
+        deckArray.add(assistant5);
+        deckArray.add(assistant6);
+        deckArray.add(assistant7);
+        deckArray.add(assistant8);
+        deckArray.add(assistant9);
+        deckArray.add(assistant10);
+
         deckArea.setVisible(true);
+        for(ImageView img : deckArray) {
+            img.setOnMouseClicked(this::pickCard);
+        }
     }
+
+    private void pickCard(MouseEvent event){
+        ImageView clickedImg = (ImageView) event.getSource();
+        clickedImg.setEffect(createShadow());
+        clickedImg.setDisable(true);
+        int cardNum = deckArray.indexOf(clickedImg) +1 ;  // array indexes start at 0  whereas cards go from 1 to 10
+        System.out.println(cardNum);
+        gui.getConnectionSocket().setAssistantCard(cardNum);
+    }
+
 
     public void setupMySchoolBoard() {
 
     }
 
-
+    /**
+     * Initializes the tower icon in the board, according to the TowerColor assigned to the player.
+     */
     public void setupTowers() {
         towersImgMap.put(Tower.WHITE, new Image(getClass().getResourceAsStream(towersPath + "white_tower.png")));
         towersImgMap.put(Tower.BLACK, new Image(getClass().getResourceAsStream(towersPath + "black_tower.png")));
@@ -98,6 +136,18 @@ public class MyBoardGuiController extends GUIController {
                 towersInBoard.setImage(towersImgMap.get(Tower.GRAY));
                 break;
         }
+    }
+
+    /**
+     * Creates a shadow effect to be applied to the used AssistantCards
+     * @return the ColorAdjust effect element to be applied to the imageview of the assistantCard
+     */
+    private ColorAdjust createShadow(){
+        ColorAdjust colorAdjust = new ColorAdjust();
+        colorAdjust.setContrast(-0.32);
+        colorAdjust.setBrightness(-0.59);
+        colorAdjust.setSaturation(-1.0);
+        return colorAdjust;
     }
 
 
