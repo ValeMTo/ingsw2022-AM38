@@ -760,6 +760,32 @@ public class ViewState {
         return null;
     }
 
+    /**
+     * Sets the tower left of that particular player
+     * @param player
+     */
+    public void setTowerLeft(Tower player, int towerLeft){
+        SchoolBoardState schoolBoardState = findSchoolBoard(player);
+        if(schoolBoardState!=null)
+        {
+            schoolBoardState.setTowerLeft(towerLeft);
+        }
+    }
+
+
+    /**
+     * Gets the tower left of that particular player
+     * @param player
+     */
+    public Integer getTowerLeft(Tower player){
+        SchoolBoardState schoolBoardState = findSchoolBoard(player);
+        if(schoolBoardState!=null)
+        {
+            return schoolBoardState.getTowerLeft();
+        }
+        return null;
+    }
+
     //TODO : complete implementation
 
     /**
