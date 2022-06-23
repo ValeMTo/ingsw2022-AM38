@@ -232,7 +232,7 @@ public class MyBoardGuiController extends GUIController {
         towersImgMap.put(Tower.GRAY, new Image(getClass().getResourceAsStream(towersPath + "gray_tower.png")));
 
         playerTowerColor = gui.getViewState().getPlayerTower();   // sets the player's towerColor in the board
-        num_towersInBoard.setText(((Integer)gui.getViewState().getNumOfTowers().size()).toString());
+        //num_towersInBoard.setText(((Integer)gui.getViewState().getNumOfTowers().size()).toString());
 
         switch (playerTowerColor) {
             case WHITE:

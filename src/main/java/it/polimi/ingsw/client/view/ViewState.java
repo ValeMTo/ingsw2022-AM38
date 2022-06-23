@@ -548,6 +548,12 @@ public class ViewState {
         return this.players.values();
     }
 
+    /*
+    public synchronized int getNumOfTowers(Tower player) {
+        return
+    }
+*/
+
     public synchronized boolean isTheCommander() {
         return isTheCommander;
     }
