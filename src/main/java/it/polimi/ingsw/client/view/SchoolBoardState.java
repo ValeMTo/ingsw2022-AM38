@@ -13,6 +13,7 @@ public class SchoolBoardState {
     private Map<Color, Integer> diningRoomOccupancy;
     private Integer lastAssistantCardUsed;
     private int coins;
+    private int towerLeft;
 
     public SchoolBoardState(Tower player){
 
@@ -80,5 +81,13 @@ public class SchoolBoardState {
      */
     public int getCoins(){
         return this.coins;
+    }
+
+    public void setTowerLeft(int towerLeft) {
+        this.towerLeft = towerLeft;
+    }
+
+    public Integer getTowerLeft(){
+        return this.towerLeft;
     }
 }
