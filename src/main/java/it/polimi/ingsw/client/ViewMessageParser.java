@@ -127,6 +127,10 @@ public class ViewMessageParser {
                 students = gson.fromJson(json.get("DiningRoomMap"), HashMap.class);
                 view.setDiningRoomOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
                 view.setCoins(Tower.values()[json.get("TowerColor").getAsInt()],json.get("coins").getAsInt());
+                // Tells the gui to updates its board
+                if(!view.isCli()) {
+                    Platform.runLater(() -> view.getAwaitingGUI().updatePlayerBoard());
+                }
                 //TODO: other sets
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal()) {
                 Map<Cloud, Integer> clouds = view.getClouds();

@@ -168,9 +168,9 @@ public class MainGUI extends Application {
 
     }
 
-    public void updateBoard() {
+    public void updatePlayerBoard() {
         MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
-
+        controller.updateMyPlayerBoard();
     }
 
 

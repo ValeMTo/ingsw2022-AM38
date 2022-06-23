@@ -501,6 +501,8 @@ public class ViewState {
         return playerTower;
     }
 
+
+
     public synchronized void setPlayerTower(Tower playerTower) {
         this.playerTower = playerTower;
     }
