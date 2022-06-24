@@ -26,9 +26,8 @@ public class MyBoardGuiController extends GUIController {
     private final String towersPath = "/graphics/board/towers/";
     private final HashMap<Tower, Image> towersImgMap = new HashMap<>();
     private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
-    private final List<Label> entranceStudLabels = new ArrayList<Label>();
-    private final List<Label> diningRoomStudLabels = new ArrayList<Label>();
-    private Tower playerTowerColor;
+    private final ArrayList<Label> entranceStudLabels = new ArrayList<Label>();
+    private final ArrayList<Label> diningRoomStudLabels = new ArrayList<Label>();
     private Integer currentPlayerCoins;
 
 
@@ -153,16 +152,25 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     public void initialize() {
+        entranceStudLabels.add(num_entRed);
+        entranceStudLabels.add(num_entYellow);
+        entranceStudLabels.add(num_entPink);
+        entranceStudLabels.add(num_entBlue);
+        entranceStudLabels.add(num_entGreen);
 
+        diningRoomStudLabels.add(num_dinRed);
+        diningRoomStudLabels.add(num_dinYellow);
+        diningRoomStudLabels.add(num_dinPink);
+        diningRoomStudLabels.add(num_dinBlue);
+        diningRoomStudLabels.add(num_dinGreen);
     }
 
 
     public void setupBoard() {
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
+        System.out.println("executing setupBoard() ");
         setupAssistantCards();
         setupTowers();
-        setupMyPlayerBoard();  // setups the PlayerBoard (schoolboard) by creating it. At first the labels are "x0"
-
 
     }
 
@@ -199,22 +207,7 @@ public class MyBoardGuiController extends GUIController {
             card.setDisable(true);
     }
 
-    /**
-     * Creates the initial playerboard's arrayLists of labels (both for Entrance and DiningRoom).
-     */
-    public void setupMyPlayerBoard(){
-        entranceStudLabels.add(num_entRed);
-        entranceStudLabels.add(num_entYellow);
-        entranceStudLabels.add(num_entPink);
-        entranceStudLabels.add(num_entBlue);
-        entranceStudLabels.add(num_entGreen);
 
-        diningRoomStudLabels.add(num_dinRed);
-        diningRoomStudLabels.add(num_dinYellow);
-        diningRoomStudLabels.add(num_dinPink);
-        diningRoomStudLabels.add(num_dinBlue);
-        diningRoomStudLabels.add(num_dinGreen);
-    }
 
 
 
@@ -224,19 +217,26 @@ public class MyBoardGuiController extends GUIController {
      * by the player.
      */
     public void updateMyPlayerBoard() {
+
+        System.out.println("executing updateMyPlayerboard()" );
+
         Map<Color, Integer> schoolEntranceOccupancy;
         Map<Color, Integer> diningRoomOccupancy;
-        System.out.println("HEY: my player color is: " + playerTowerColor.toString() + " Now let's get the occupancies...");
+        Tower playerTowerColor = gui.getViewState().getPlayerTower();
+
         diningRoomOccupancy = gui.getViewState().getDiningRoomOccupancy(playerTowerColor);
         schoolEntranceOccupancy =  gui.getViewState().getSchoolEntranceOccupancy(playerTowerColor);
 
+
         currentPlayerCoins = gui.getViewState().getPlayerCoins(playerTowerColor);
         num_playerCoins.setText("x " + currentPlayerCoins);
+        num_towersInBoard.setText("x " + gui.getViewState().getTowerLeft(playerTowerColor));
 
         for(Label label : entranceStudLabels){
             String str = label.getId();
             str = str.substring(7);
-            Color color = toColor(str.toUpperCase());
+            Color color = Color.toColor(str);
+            System.out.println(color.toString());
             label.setText("x " + schoolEntranceOccupancy.get(color).toString());
         }
 
@@ -244,8 +244,9 @@ public class MyBoardGuiController extends GUIController {
             String str = label.getId();
             str = str.substring(7);
             Color color = toColor(str);
-            label.setText("x " + diningRoomOccupancy.get(color));
+            label.setText("x " + diningRoomOccupancy.get(color).toString());
         }
+
 
     }
 
@@ -260,7 +261,7 @@ public class MyBoardGuiController extends GUIController {
         towersImgMap.put(Tower.BLACK, new Image(getClass().getResourceAsStream(towersPath + "black_tower.png")));
         towersImgMap.put(Tower.GRAY, new Image(getClass().getResourceAsStream(towersPath + "gray_tower.png")));
 
-        playerTowerColor = gui.getViewState().getPlayerTower();   // sets the player's towerColor in the board
+        Tower playerTowerColor = gui.getViewState().getPlayerTower();   // sets the player's towerColor in the board
         //num_towersInBoard.setText(((Integer)gui.getViewState().getNumOfTowers().size()).toString());
 
         switch (playerTowerColor) {

@@ -161,10 +161,8 @@ public class MainGUI extends Application {
      *
      */
     public void initBoard() {
-        Platform.runLater(() -> {
             MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
             controller.setupBoard();
-        });
 
     }
 
