@@ -202,7 +202,7 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <AnchorPane id="controlsArea" layoutX="753.0" layoutY="17.0" prefHeight="92.0" prefWidth="438.0" style="-fx-background-color: #19b2bf;">
+      <AnchorPane id="controlsArea" fx:id="controlsArea" layoutX="753.0" layoutY="17.0" prefHeight="92.0" prefWidth="438.0" style="-fx-background-color: #19b2bf;">
          <children>
             <Button fx:id="showSpecialCards" layoutX="284.0" layoutY="59.0" mnemonicParsing="false" text="Show Special Cards" />
             <Button fx:id="showOtherBoards" layoutX="283.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
@@ -524,7 +524,7 @@
       </AnchorPane>
       <AnchorPane fx:id="showContentArea" layoutX="758.0" layoutY="116.0" prefHeight="460.0" prefWidth="115.0" style="-fx-background-color: #03e8fc;">
          <children>
-            <Label fx:id="showContentLable" layoutX="25.0" layoutY="17.0" text="Island # 3">
+            <Label fx:id="showContentLabel" layoutX="25.0" layoutY="17.0" text="Island # 3">
                <font>
                   <Font size="16.0" />
                </font>
