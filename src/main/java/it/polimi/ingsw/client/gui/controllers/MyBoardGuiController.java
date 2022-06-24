@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client.gui.controllers;
 
+import it.polimi.ingsw.client.view.IslandView;
+import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import javafx.beans.DefaultProperty;
@@ -35,6 +37,8 @@ public class MyBoardGuiController extends GUIController {
     private final ArrayList<ImageView> towersOnIslands = new ArrayList<ImageView>();
     private final ArrayList<ImageView> motherNatureOnIslands = new ArrayList<ImageView>();
     private final ArrayList<Line> islandBridges = new ArrayList<Line>();
+    private final ArrayList<Label> showContentLabels = new ArrayList<Label>();
+    private final ArrayList<ImageView> cloudsImgArray = new ArrayList<ImageView>();
 
     private Integer currentPlayerCoins;
 
@@ -301,21 +305,30 @@ public class MyBoardGuiController extends GUIController {
         createAssistantCards();
         createArchipelago();
         createSchoolBoard();
-
+        createShowContentArea();
 
     }
 
     /**
-     * The setupBoard() methods initializes the playerboard by setting the correct towerColor.
+     * The setupBoard() methods initializes the initial setup of the board:
+     * it setups the playerboard by setting the correct towerColor, then it sets the
+     * player's tower, the clouds and the archipelago.
      * It is called after the SETUP_UPDATE message is received by the ViewMessageParser.
      */
     public void setupBoard() {
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
         System.out.println("executing setupBoard() ");
         setupTowers();
+        setupClouds();
 
     }
 
+    public void updateWholeBoard(){
+        System.out.println("executing updateWholeBoard()...");
+        updateMyPlayerBoard();
+        updateArchipelago();
+        updateProfessors();
+    }
 
     /**
      * Initially sets the AssistantCards deck in the gui and the corresponding "pickCard()" method.
@@ -346,6 +359,8 @@ public class MyBoardGuiController extends GUIController {
         clickedImg.setDisable(true);
         int cardNum = deckArray.indexOf(clickedImg) +1 ;  // array indexes start at 0  whereas cards go from 1 to 10
         gui.getConnectionSocket().setAssistantCard(cardNum);
+
+        // gettare le usable cards da viewState
         for(ImageView card : deckArray)   // TODO: riabilitare cards al prossimo turno !!!
             card.setDisable(true);
     }
@@ -397,6 +412,11 @@ public class MyBoardGuiController extends GUIController {
         archipelagoIslands.add(island11);
         archipelagoIslands.add(island12);
 
+        for(ImageView img : archipelagoIslands) {
+            img.setOnMouseClicked(this::showContent);
+
+
+        }
 
         towersOnIslands.add(towerIsland1);
         towersOnIslands.add(towerIsland2);
@@ -447,7 +467,106 @@ public class MyBoardGuiController extends GUIController {
         }
     }
 
+    public void createShowContentArea(){
+        showContentLabels.add(num_contentBlue);
+        showContentLabels.add(num_contentGreen);
+        showContentLabels.add(num_contentPink);
+        showContentLabels.add(num_contentRed);
+        showContentLabels.add(num_contentYellow);
 
+        showContentArea.setVisible(false);
+        showContentArea.setDisable(true);
+    }
+
+    /**
+     * Method to show the content of a selected Island or Cloud.
+     * @param event : the MouseEvent triggered when clicking on an Island or Cloud imageview in the board
+     */
+    public void showContent(MouseEvent event) {
+        ImageView clickedImg = (ImageView) event.getSource();
+        String src = clickedImg.getId();
+        showContentArea.setVisible(true);
+        showContentArea.setDisable(false);
+        showContentLabel.setText(src);
+
+        if(src.contains("island")) {     // if an island has been clicked
+
+            updateArchipelago();
+
+            Integer islandNum = Integer.parseInt(src.substring(6));
+            //System.out.println("I clicked the island # " + islandNum);
+            List<IslandView> islands = gui.getViewState().getIslands();
+            Map<Color,Integer> studentsMap;
+            for(int j=0;j<islands.size();j++) {              // Note: the islands within the List<IslandView> are put in a random order
+                if (islands.get(j).getPosition() == islandNum) {
+                    studentsMap = islands.get(j).getStudentMap();
+                    //System.out.println("The island # " + islands.get(j).getPosition() + " has" + studentsMap);
+                    for(Label label : showContentLabels) {
+                        String str = label.getId().replace("num_content","");
+                        label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+
+                        // Shows the tower in the content panel  if it is present on the selected island
+                        Tower tower = gui.getViewState().getIslands().get(j).getTower();
+                        islandTower.setImage(towersImgMap.get(tower));
+
+                    }
+                }
+            }
+        }
+
+        else if(src.contains("cloud")){              // if a cloud has been clicked
+            islandTower.setVisible(false);
+            Integer cloudNum = Integer.parseInt(src.substring(5));
+            Map<Cloud,Integer> clouds = gui.getViewState().getClouds();
+            for(Cloud c : clouds.keySet() ) {
+                if(clouds.get(c).equals(cloudNum)) {
+                    Map<Color,Integer> studentsMap = c.getStudents();
+
+                    //System.out.println("The cloud # "+ cloudNum + " has" + studentsMap);
+                    for(Label label : showContentLabels) {
+                        String str = label.getId().replace("num_content","");
+                        label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    public void updateArchipelago() {
+
+        System.out.println("executing updateArchipelago() ");
+
+        // Shows mothernature if it is present on the selected island
+        Integer motherPosition = gui.getViewState().getMotherNature();
+        for(ImageView i : motherNatureOnIslands) {
+            if (i.getId().replace("motherIsland", "").equals(motherPosition.toString())) {
+                i.setVisible(true);
+            }
+            else{
+                i.setVisible(false);
+            }
+        }
+
+        // Shows a tower if it is present on the selected island, otherwise it makes the tower invisible
+        List<IslandView> islands = gui.getViewState().getIslands();
+
+        for(ImageView img : towersOnIslands) {
+            Integer position = Integer.parseInt(img.getId().replace("towerIsland",""));
+            for(IslandView island : islands){
+                if(island.getPosition() == position){
+                    if(island.getTower()!=null) {
+                        img.setImage(towersImgMap.get(island.getTower()));
+                        img.setVisible(true);
+                    }
+                    else{
+                        img.setVisible(false);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Updates the PlayerBoard (schoolboard) of the player by getting the updated occupancies from the ViewState
@@ -520,12 +639,29 @@ public class MyBoardGuiController extends GUIController {
         Map<Color, Tower> professors = gui.getViewState().getProfessors();
         for(Label label : professorsLabels){
             String str = label.getId().replace("_owner","");
-            System.out.println(str);
             Color color = Color.toColor(str);
             if(professors.get(color) != null){
                 label.setText(professors.get(color).toString());
             }
         }
+    }
+
+    public void setupClouds(){
+        cloudsImgArray.add(cloud1);
+        cloudsImgArray.add(cloud2);
+        cloudsImgArray.add(cloud3);
+
+        for(ImageView cloud : cloudsImgArray) {
+            cloud.setVisible(true);
+            cloud.setOnMouseClicked(this::showContent);
+        }
+
+        if(gui.getViewState().getTowers().size() == 2) {
+            cloud3.setVisible(false);
+            cloud3.setDisable(true);
+        }
+
+
     }
 
 
