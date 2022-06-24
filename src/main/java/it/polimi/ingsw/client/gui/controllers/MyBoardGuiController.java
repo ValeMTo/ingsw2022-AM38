@@ -505,7 +505,7 @@ public class MyBoardGuiController extends GUIController {
                         String str = label.getId().replace("num_content","");
                         label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
 
-                        // Shows the tower if it is present on the selected island
+                        // Shows the tower in the content panel  if it is present on the selected island
                         Tower tower = gui.getViewState().getIslands().get(j).getTower();
                         islandTower.setImage(towersImgMap.get(tower));
 
@@ -533,9 +533,11 @@ public class MyBoardGuiController extends GUIController {
 
     }
 
+
     public void updateArchipelago() {
 
         System.out.println("executing updateArchipelago() ");
+
         // Shows mothernature if it is present on the selected island
         Integer motherPosition = gui.getViewState().getMotherNature();
         for(ImageView i : motherNatureOnIslands) {
@@ -547,6 +549,23 @@ public class MyBoardGuiController extends GUIController {
             }
         }
 
+        // Shows a tower if it is present on the selected island, otherwise it makes the tower invisible
+        List<IslandView> islands = gui.getViewState().getIslands();
+
+        for(ImageView img : towersOnIslands) {
+            Integer position = Integer.parseInt(img.getId().replace("towerIsland",""));
+            for(IslandView island : islands){
+                if(island.getPosition() == position){
+                    if(island.getTower()!=null) {
+                        img.setImage(towersImgMap.get(island.getTower()));
+                        img.setVisible(true);
+                    }
+                    else{
+                        img.setVisible(false);
+                    }
+                }
+            }
+        }
     }
 
     /**
