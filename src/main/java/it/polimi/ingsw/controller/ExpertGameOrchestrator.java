@@ -376,13 +376,5 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - error in choose color of the student in special card usage");
     }
 
-    @Override
-    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException, IncorrectPhaseException {
-        boolean returnValue = super.moveMotherNature(destinationIsland);
-        // If the motherNature is moved correctly, computes the influence
-        if (returnValue) {
-            gameBoard.computeInfluence(destinationIsland);
-        }
-        return returnValue;
-    }
+
 }

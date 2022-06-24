@@ -115,7 +115,10 @@ public abstract class GameBoard extends Listenable {
             islandReceiver.setTowerNumber(towersNumber);
             // We transfer all the student to the island that have the group Island's properties
             islandReceiver.addStudent(islandGiver.getStudentMap());
-            if (motherNature == islandGiver.getPosition()) motherNature = islandReceiver.getPosition();
+            if(islandGiver.getPosition()==motherNature) {
+                this.motherNature = islandReceiver.getPosition();
+                System.out.println("GAME BOARD - transferIslandPossessionsIfSameTower - mother nature transferred from"+islandGiver.getPosition()+" to "+islandReceiver.getPosition());
+            }
             notifyArchipelago();
             return true;
         }
@@ -158,20 +161,17 @@ public abstract class GameBoard extends Listenable {
         // Now the grouping should have been correctly done. If we have islands to remove we now remove them from the array of Islands.
         Island[] newIslandsArray = new Island[islands.length - islandToRemove.size()];
         int counter = 0;
-        Island motherNaturePosition = null;
         for (int i = 0; i < islands.length; i++) {
             //Adds to the new array the islands which are not selected to be removed
             if (!islandToRemove.contains(islands[i])) {
                 newIslandsArray[counter] = islands[i];
                 counter++;
             }
-            if (islands[motherNature - 1] == islands[i]) motherNaturePosition = islands[i];
         }
         islands = newIslandsArray;
         //Reset the position value for each island, after the array change
         for (int i = 1; i <= islands.length; i++) {
             islands[i - 1].setPosition(i);
-            if (motherNaturePosition == islands[i - 1]) motherNature = i;
         }
         notifyArchipelago();
         for (int i = 0; i < islands.length; i++) {

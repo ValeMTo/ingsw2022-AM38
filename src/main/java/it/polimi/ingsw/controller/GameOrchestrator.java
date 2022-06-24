@@ -303,6 +303,7 @@ public abstract class GameOrchestrator extends Listenable {
             if (!this.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE))
                 throw new IncorrectPhaseException(this.getCurrentPhase());
             if (gameBoard.moveMotherNature(destinationIsland)) {
+                gameBoard.updateProfessorOwnership();
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
                 if (clients != null) {

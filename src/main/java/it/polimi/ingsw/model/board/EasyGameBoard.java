@@ -81,7 +81,10 @@ public class EasyGameBoard extends GameBoard {
         islands[island - 1].setTower(playerTower);
         if (islands[island - 1].getTowerNumber() == 0) islands[island - 1].setTowerNumber(1);
         for (PlayerBoard player : players)
-            if (player.getTowerColor() == playerTower) player.removeTower(islands[island - 1].getTowerNumber());
+            if (player.getTowerColor().equals(playerTower)) {
+                System.out.println("EASY GAME BOARD - computeInfluence - removing "+islands[island - 1].getTowerNumber()+" towers from player "+playerTower);
+                player.removeTower(islands[island - 1].getTowerNumber());
+            }
         Tower islandTowerToReturn = islands[island - 1].getTower();
         groupIslands(island);
         return islandTowerToReturn;
