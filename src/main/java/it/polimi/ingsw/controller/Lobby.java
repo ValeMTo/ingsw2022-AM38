@@ -21,7 +21,7 @@ public class Lobby {
     }
 
 
-    public List<String> getActiveUsers() {
+    public synchronized List<String> getActiveUsers() {
         List<String> list = new ArrayList<>();
         for (ClientHandler client : queue){
             System.out.println("GET ACTIVE PLAYERS - LOBBY" + client.getNickName());
@@ -30,15 +30,15 @@ public class Lobby {
         return list;
     }
 
-    public void setIsExpert(boolean isExpert) {
+    public synchronized void setIsExpert(boolean isExpert) {
         this.isExpert = isExpert;
     }
 
-    public int getNumOfPlayers() {
+    public synchronized int getNumOfPlayers() {
         return numOfPlayers;
     }
 
-    public void setNumOfPlayers(int numOfPlayers) {
+    public synchronized void setNumOfPlayers(int numOfPlayers) {
         this.numOfPlayers = numOfPlayers;
     }
 
@@ -90,41 +90,19 @@ public class Lobby {
         }
     }
 
-    public synchronized MessageParser getMessageParser(ClientHandler client){
-        for (MessageParser parser : messageParsers){
-            if (parser.getName().equals(client.getNickName())){
-                System.out.println("LOBBY - getMessageParser - giving a messageParser "+parser+" to "+client.getNickName());
-                queue.remove(client);
-                return parser;
-            }
-        }
-        if(queue.size()<=0) {
-            id++;
-            emptyLobby();
-        }
-        return null;
-    }
-
-
-    public void emptyLobby() {
-
+    public synchronized void emptyLobby() {
         for (ClientHandler client : queue) {
             if (gameOrchestrator !=null){
                 client.setGameOrchestrator(gameOrchestrator);
             } else {
                 System.err.println("GameOrchestrator is null. If it is a test, don't worry.");
             }
-            queue.remove(client);
-            System.out.println("LOBBY - client removed correctly returning a new message parser");
-            //Reset the lobby as inactive
-            if (queue.size() <= 0) {
-                System.out.println("LOBBY - no more clients, reset lobby");
-                players.clear();
-                numOfPlayers = 0;
-                gameOrchestrator = null;
-
-            }
         }
+        players.clear();
+        numOfPlayers = 0;
+        gameOrchestrator = null;
+        queue.clear();
+        System.out.println("LOBBY - All client removed correctly returning a new message parser");
     }
 
     public boolean getGamemode() {

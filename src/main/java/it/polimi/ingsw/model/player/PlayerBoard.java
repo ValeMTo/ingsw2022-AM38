@@ -95,12 +95,14 @@ public class PlayerBoard extends Listenable {
                 if(!card.isUsed())
                     listOfUsableCards.add(card.getPriority());
             }
+            List<ClientHandler> onlyTheOneClient = new ArrayList<>();
             for(ClientHandler client:clients) {
+                // Sends the usable cards only to the client with the same name of this playerBoard
                 if (client.getNickName().equalsIgnoreCase(this.nickName)) {
-                    notify(modelListener, MessageGenerator.assistantCardUpdateMessage(this.towerColor, listOfUsableCards), clients);
+                    onlyTheOneClient.add(client);
+                    notify(modelListener, MessageGenerator.assistantCardUpdateMessage(this.towerColor, listOfUsableCards), onlyTheOneClient);
+
                 }
-                if(lastUsed!=null)
-                    notify(modelListener, MessageGenerator.lastUsedAssistantCardUpdateMessage(this.towerColor, lastUsed), clients);
             }
         }
     }
