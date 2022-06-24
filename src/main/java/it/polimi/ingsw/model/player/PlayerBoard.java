@@ -336,6 +336,7 @@ public class PlayerBoard extends Listenable {
     public boolean addTower(int numTower) {
         if (this.towers + numTower < numTowersLimit && numTower > 0) {
             this.towers += numTower;
+            notifyPlayerBoard();
             return true;
         }
         return false;
@@ -351,8 +352,12 @@ public class PlayerBoard extends Listenable {
     public boolean removeTower(int numTower) {
         if (this.towers - numTower >= 0) {
             this.towers -= numTower;
+            notifyPlayerBoard();
+            System.out.println("PLAYER BOARD of "+towerColor+ " - removeTower - actual num of towers "+this.towers+" num of tower after have removed "+numTower);
             return true;
         }
+        else
+            this.towers = 0;
         return false;
     }
 

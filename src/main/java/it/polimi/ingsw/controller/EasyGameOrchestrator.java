@@ -39,18 +39,4 @@ public class EasyGameOrchestrator extends GameOrchestrator {
     public String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException {
         throw new FunctionNotImplementedException();
     }
-
-
-    @Override
-    public boolean moveMotherNature(int destinationIsland) throws IslandOutOfBoundException, IncorrectPhaseException {
-        boolean returnValue = super.moveMotherNature(destinationIsland);
-        // If the motherNature is moved correctly, updates the professors and computes the influence
-        if (returnValue) {
-            gameBoard.updateProfessorOwnership();
-            gameBoard.computeInfluence(destinationIsland);
-        }
-        return returnValue;
-    }
-
-
 }

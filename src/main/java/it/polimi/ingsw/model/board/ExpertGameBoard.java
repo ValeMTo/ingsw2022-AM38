@@ -133,17 +133,18 @@ public class ExpertGameBoard extends GameBoard {
 
     /**
      * Override of the setListenerAndClients to propagate the set to the Special Cards
+     *
      * @param modelListener : the modelListener
-     * @param clients : the clients to notify
+     * @param clients       : the clients to notify
      */
     @Override
-    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
-        super.setListenerAndClients(modelListener,clients);
-        if(clients!=null && modelListener!= null) {
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients) {
+        super.setListenerAndClients(modelListener, clients);
+        if (clients != null && modelListener != null) {
             Map<SpecialCardName, Integer> specialCardNameIntegerMap = new HashMap<>();
-            for(SpecialCard specialCard:specialCards)
-                specialCardNameIntegerMap.put(specialCard.getName(),specialCard.getCostCoin());
-            notify(modelListener,MessageGenerator.specialCardUpdateMessage(specialCardNameIntegerMap),clients);
+            for (SpecialCard specialCard : specialCards)
+                specialCardNameIntegerMap.put(specialCard.getName(), specialCard.getCostCoin());
+            notify(modelListener, MessageGenerator.specialCardUpdateMessage(specialCardNameIntegerMap), clients);
             for (SpecialCard specialCard : specialCards)
                 specialCard.setListenerAndClients(modelListener, clients);
         }
@@ -178,9 +179,9 @@ public class ExpertGameBoard extends GameBoard {
      *
      * @return : an array with the instantiated special cards
      */
-    public SpecialCard[] getArrayOfSpecialCard(){
+    public SpecialCard[] getArrayOfSpecialCard() {
         SpecialCard[] returnArray = new SpecialCard[specialCards.length];
-        for(int i = 0; i<specialCards.length;i++)
+        for (int i = 0; i < specialCards.length; i++)
             returnArray[i] = specialCards[i];
         return returnArray;
     }
@@ -254,25 +255,22 @@ public class ExpertGameBoard extends GameBoard {
         if (tie) return islands[island - 1].getTower();
 
         //Remove the old Towers from the player and add to the player that had the towers
-        int towerToChange = islands[island - 1].getTowerNumber();
         if (playerWithMoreInfluence != null) {
+            if (islands[island - 1].getTowerNumber() == 0) islands[island - 1].setTowerNumber(1);
+            int towerToChange = islands[island - 1].getTowerNumber();
             islandTower = islands[island - 1].getTower();
-            if (islandTower != null) {
-                for (PlayerBoard player : players) {
-                    if (player.getTowerColor() == islandTower) {
-                        player.addTower(towerToChange);
-                    }
-                    //Set the new number of tower of the player with maximum influence on the island
-                    if (player.getTowerColor() == playerWithMoreInfluence) {
-                        player.removeTower(towerToChange);
-                    }
+            for (PlayerBoard player : players) {
+                if (player.getTowerColor() == islandTower && islandTower != null) {
+                    player.addTower(towerToChange);
+                }
+                //Set the new number of tower of the player with maximum influence on the island
+                if (player.getTowerColor().equals(playerWithMoreInfluence)) {
+                    System.out.println("EXPERT GAME BOARD - computeInfluence - removing "+towerToChange+" towers");
+                    player.removeTower(towerToChange);
                 }
                 //Set the new Tower Color in Island and the tower number to 1 if its first tower is added
-
             }
             islands[island - 1].setTower(playerWithMoreInfluence);
-
-            if (islands[island - 1].getTowerNumber() == 0) islands[island - 1].setTowerNumber(1);
         }
         groupIslands(island);
         return playerWithMoreInfluence; //return tower name...
@@ -309,10 +307,10 @@ public class ExpertGameBoard extends GameBoard {
             }
         }
         System.out.println("EXPERT GAME BOARD - updateProfessorOwnershipIfTie - notify the professor ownership");
-        Map<Color,Tower> profMap = new HashMap<>();
+        Map<Color, Tower> profMap = new HashMap<>();
         profMap.putAll(professors);
-        if(modelListener!=null && clients!=null)
-            notify(modelListener, MessageGenerator.professorsUpdateMessage(profMap),clients);
+        if (modelListener != null && clients != null)
+            notify(modelListener, MessageGenerator.professorsUpdateMessage(profMap), clients);
     }
 
     /**
@@ -325,8 +323,8 @@ public class ExpertGameBoard extends GameBoard {
     public boolean disableInfluence(int position) throws IslandOutOfBoundException {
         if (position > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands[islands.length - 1].getPosition());
-        if (islands[position-1].isInfluenceEnabled()) {
-            islands[position-1].disableInfluence();
+        if (islands[position - 1].isInfluenceEnabled()) {
+            islands[position - 1].disableInfluence();
             return true;
         }
         return false;
@@ -336,12 +334,11 @@ public class ExpertGameBoard extends GameBoard {
      * Overrides the updateProfessorOwnerShip to use the tie effect
      */
     @Override
-    public void updateProfessorOwnership(){
-        if(!professorsUpdateTieEffect)
-            super.updateProfessorOwnership();
-        else
-            updateProfessorOwnershipIfTie();
+    public void updateProfessorOwnership() {
+        if (!professorsUpdateTieEffect) super.updateProfessorOwnership();
+        else updateProfessorOwnershipIfTie();
     }
+
     /**
      * Set the flag that increase the influence score for a particular player during the influence computation
      */
@@ -424,10 +421,12 @@ public class ExpertGameBoard extends GameBoard {
         if (this.motherNatureIncreasedMove) maxMovement += increasedMovement;
         if (destinationIsland >= motherNature && (destinationIsland - motherNature) <= maxMovement) {
             motherNature = destinationIsland;
+            System.out.println("EXPERT GAME BOARD - moveMotherNature - mother nature moved correctly to "+destinationIsland);
+            notifyArchipelago();
             return true;
         } else if (destinationIsland <= motherNature && (islands[islands.length - 1].getPosition() - destinationIsland + motherNature) <= maxMovement) {
             motherNature = destinationIsland;
-            System.out.println("EXPERT GAME BOARD - moveMotherNature - mother nature moved correctly");
+            System.out.println("EXPERT GAME BOARD - moveMotherNature - mother nature moved correctly to "+destinationIsland);
             notifyArchipelago();
             return true;
         }
