@@ -14,7 +14,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Line;
 
+import java.awt.font.ImageGraphicAttribute;
 import java.sql.Connection;
 import java.util.*;
 
@@ -28,6 +30,12 @@ public class MyBoardGuiController extends GUIController {
     private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
     private final ArrayList<Label> entranceStudLabels = new ArrayList<Label>();
     private final ArrayList<Label> diningRoomStudLabels = new ArrayList<Label>();
+    private final ArrayList<Label> professorsLabels = new ArrayList<Label>(5);
+    private final ArrayList<ImageView> archipelagoIslands = new ArrayList<ImageView>();
+    private final ArrayList<ImageView> towersOnIslands = new ArrayList<ImageView>();
+    private final ArrayList<ImageView> motherNatureOnIslands = new ArrayList<ImageView>();
+    private final ArrayList<Line> islandBridges = new ArrayList<Line>();
+
     private Integer currentPlayerCoins;
 
 
@@ -45,11 +53,15 @@ public class MyBoardGuiController extends GUIController {
     private ImageView testImg;
     @FXML
     private AnchorPane cloudsArea;
-
-
+    @FXML
+    private AnchorPane professorsArea;
 
     @FXML
     private Button showSpecialCards;
+
+    @FXML
+    private Button showOtherBoards;
+
 
     // Imports the assistantCards imageviews
     @FXML
@@ -127,7 +139,7 @@ public class MyBoardGuiController extends GUIController {
 
 
     @FXML
-    private ImageView contentRed;
+    private ImageView contentRed;    // icon of the red student in the ShowContent area
     @FXML
     private ImageView contentYellow;
     @FXML
@@ -138,7 +150,10 @@ public class MyBoardGuiController extends GUIController {
     private ImageView contentGreen;
 
     @FXML
-    private Label num_contentRed;
+    private ImageView islandTower;
+
+    @FXML
+    private Label num_contentRed;   // label for the number of red students in the ShowContent Area
     @FXML
     private Label num_contentYellow;
     @FXML
@@ -148,38 +163,166 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private Label num_contentGreen;
 
+    @FXML
+    private ImageView profRed;      // ImageView of the Red professor
+    @FXML
+    private ImageView profYellow;
+    @FXML
+    private ImageView profPink;
+    @FXML
+    private ImageView profBlue;
+    @FXML
+    private ImageView profGreen;
+
+    @FXML
+    private Label red_owner;    // label for the owner of the red professor
+    @FXML
+    private Label yellow_owner;
+    @FXML
+    private Label pink_owner;
+    @FXML
+    private Label blue_owner;
+    @FXML
+    private Label green_owner;
+
+    @FXML
+    private ImageView cloud1;   // Imageview of the cloud #1
+    @FXML
+    private ImageView cloud2;
+    @FXML
+    private ImageView cloud3;
+
+    @FXML
+    private ImageView island1;   // ImageView of the island #1
+    @FXML
+    private ImageView island2;
+    @FXML
+    private ImageView island3;
+    @FXML
+    private ImageView island4;
+    @FXML
+    private ImageView island5;
+    @FXML
+    private ImageView island6;
+    @FXML
+    private ImageView island7;
+    @FXML
+    private ImageView island8;
+    @FXML
+    private ImageView island9;
+    @FXML
+    private ImageView island10;
+    @FXML
+    private ImageView island11;
+    @FXML
+    private ImageView island12;
+
+    @FXML
+    private ImageView towerIsland1;   // ImageView of the tower on the island #1
+    @FXML
+    private ImageView towerIsland2;
+    @FXML
+    private ImageView towerIsland3;
+    @FXML
+    private ImageView towerIsland4;
+    @FXML
+    private ImageView towerIsland5;
+    @FXML
+    private ImageView towerIsland6;
+    @FXML
+    private ImageView towerIsland7;
+    @FXML
+    private ImageView towerIsland8;
+    @FXML
+    private ImageView towerIsland9;
+    @FXML
+    private ImageView towerIsland10;
+    @FXML
+    private ImageView towerIsland11;
+    @FXML
+    private ImageView towerIsland12;
+
+    @FXML
+    private ImageView motherIsland1;   // ImageView of the motherNature on the island #1
+    @FXML
+    private ImageView motherIsland2;
+    @FXML
+    private ImageView motherIsland3;
+    @FXML
+    private ImageView motherIsland4;
+    @FXML
+    private ImageView motherIsland5;
+    @FXML
+    private ImageView motherIsland6;
+    @FXML
+    private ImageView motherIsland7;
+    @FXML
+    private ImageView motherIsland8;
+    @FXML
+    private ImageView motherIsland9;
+    @FXML
+    private ImageView motherIsland10;
+    @FXML
+    private ImageView motherIsland11;
+    @FXML
+    private ImageView motherIsland12;
+
+    @FXML
+    private Line bridge_1_2;         // Line bridge that links the island #1 to the island #2
+    @FXML
+    private Line bridge_2_3;
+    @FXML
+    private Line bridge_3_4;
+    @FXML
+    private Line bridge_4_5;
+    @FXML
+    private Line bridge_5_6;
+    @FXML
+    private Line bridge_6_7;
+    @FXML
+    private Line bridge_7_8;
+    @FXML
+    private Line bridge_8_9;
+    @FXML
+    private Line bridge_9_10;
+    @FXML
+    private Line bridge_10_11;
+    @FXML
+    private Line bridge_11_12;
+    @FXML
+    private Line bridge_12_1;
+
+
 
 
     @FXML
     public void initialize() {
-        entranceStudLabels.add(num_entRed);
-        entranceStudLabels.add(num_entYellow);
-        entranceStudLabels.add(num_entPink);
-        entranceStudLabels.add(num_entBlue);
-        entranceStudLabels.add(num_entGreen);
 
-        diningRoomStudLabels.add(num_dinRed);
-        diningRoomStudLabels.add(num_dinYellow);
-        diningRoomStudLabels.add(num_dinPink);
-        diningRoomStudLabels.add(num_dinBlue);
-        diningRoomStudLabels.add(num_dinGreen);
+        createAssistantCards();
+        createArchipelago();
+        createSchoolBoard();
+
+
     }
 
-
+    /**
+     * The setupBoard() methods initializes the playerboard by setting the correct towerColor.
+     * It is called after the SETUP_UPDATE message is received by the ViewMessageParser.
+     */
     public void setupBoard() {
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
         System.out.println("executing setupBoard() ");
-        setupAssistantCards();
         setupTowers();
 
     }
+
 
     /**
      * Initially sets the AssistantCards deck in the gui and the corresponding "pickCard()" method.
      * From here onwards,every time a card is picked, it is immediately "disabled" so that it cannot be clicked anymore
      * and its number is sent via the ConnectionSocket class.
      */
-    public void setupAssistantCards() {
+    public void createAssistantCards() {
         deckArray.add(assistant1);
         deckArray.add(assistant2);
         deckArray.add(assistant3);
@@ -208,13 +351,108 @@ public class MyBoardGuiController extends GUIController {
     }
 
 
+    public void createSchoolBoard() {
+        // adding labels in the SchoolBoard
+        entranceStudLabels.add(num_entRed);
+        entranceStudLabels.add(num_entYellow);
+        entranceStudLabels.add(num_entPink);
+        entranceStudLabels.add(num_entBlue);
+        entranceStudLabels.add(num_entGreen);
+        for(Label l : entranceStudLabels){
+            l.setText("");
+        }
+        diningRoomStudLabels.add(num_dinRed);
+        diningRoomStudLabels.add(num_dinYellow);
+        diningRoomStudLabels.add(num_dinPink);
+        diningRoomStudLabels.add(num_dinBlue);
+        diningRoomStudLabels.add(num_dinGreen);
+        for(Label l : diningRoomStudLabels){
+            l.setText("");
+        }
+        //adding labels in the professors Area
+        professorsLabels.add(blue_owner);
+        professorsLabels.add(pink_owner);
+        professorsLabels.add(green_owner);
+        professorsLabels.add(yellow_owner);
+        professorsLabels.add(red_owner);
+        for(Label l : professorsLabels){
+            l.setText("");
+        }
+    }
+
+
+    public void createArchipelago() {
+
+        //adding Island images to the archipelago
+        archipelagoIslands.add(island1);
+        archipelagoIslands.add(island2);
+        archipelagoIslands.add(island3);
+        archipelagoIslands.add(island4);
+        archipelagoIslands.add(island5);
+        archipelagoIslands.add(island6);
+        archipelagoIslands.add(island7);
+        archipelagoIslands.add(island8);
+        archipelagoIslands.add(island9);
+        archipelagoIslands.add(island10);
+        archipelagoIslands.add(island11);
+        archipelagoIslands.add(island12);
+
+
+        towersOnIslands.add(towerIsland1);
+        towersOnIslands.add(towerIsland2);
+        towersOnIslands.add(towerIsland3);
+        towersOnIslands.add(towerIsland4);
+        towersOnIslands.add(towerIsland5);
+        towersOnIslands.add(towerIsland6);
+        towersOnIslands.add(towerIsland7);
+        towersOnIslands.add(towerIsland8);
+        towersOnIslands.add(towerIsland9);
+        towersOnIslands.add(towerIsland10);
+        towersOnIslands.add(towerIsland11);
+        towersOnIslands.add(towerIsland12);
+        for(ImageView i : towersOnIslands){
+            i.setVisible(false);
+        }
+
+        motherNatureOnIslands.add(motherIsland1);
+        motherNatureOnIslands.add(motherIsland2);
+        motherNatureOnIslands.add(motherIsland3);
+        motherNatureOnIslands.add(motherIsland4);
+        motherNatureOnIslands.add(motherIsland5);
+        motherNatureOnIslands.add(motherIsland6);
+        motherNatureOnIslands.add(motherIsland7);
+        motherNatureOnIslands.add(motherIsland8);
+        motherNatureOnIslands.add(motherIsland9);
+        motherNatureOnIslands.add(motherIsland10);
+        motherNatureOnIslands.add(motherIsland11);
+        motherNatureOnIslands.add(motherIsland12);
+        for(ImageView i : motherNatureOnIslands) {
+            i.setVisible(false);
+        }
+
+        islandBridges.add(bridge_1_2);
+        islandBridges.add(bridge_2_3);
+        islandBridges.add(bridge_3_4);
+        islandBridges.add(bridge_4_5);
+        islandBridges.add(bridge_5_6);
+        islandBridges.add(bridge_6_7);
+        islandBridges.add(bridge_7_8);
+        islandBridges.add(bridge_8_9);
+        islandBridges.add(bridge_9_10);
+        islandBridges.add(bridge_10_11);
+        islandBridges.add(bridge_11_12);
+        islandBridges.add(bridge_12_1);
+        for(Line l : islandBridges) {
+            l.setVisible(false);
+        }
+    }
 
 
 
     /**
      * Updates the PlayerBoard (schoolboard) of the player by getting the updated occupancies from the ViewState
-     * and then sets them to the labels in the Entrance and DiningRoom.  Moreover, it updates the current coins owned
-     * by the player.
+     * and then sets them to the labels in the Entrance and DiningRoom.  Moreover, it updates the current coins
+     * and towers owned by the player.
      */
     public void updateMyPlayerBoard() {
 
@@ -236,20 +474,18 @@ public class MyBoardGuiController extends GUIController {
             String str = label.getId();
             str = str.substring(7);
             Color color = Color.toColor(str);
-            System.out.println(color.toString());
             label.setText("x " + schoolEntranceOccupancy.get(color).toString());
         }
 
         for(Label label : diningRoomStudLabels){
             String str = label.getId();
             str = str.substring(7);
-            Color color = toColor(str);
+            Color color = Color.toColor(str);
             label.setText("x " + diningRoomOccupancy.get(color).toString());
         }
 
 
     }
-
 
 
 
@@ -262,7 +498,6 @@ public class MyBoardGuiController extends GUIController {
         towersImgMap.put(Tower.GRAY, new Image(getClass().getResourceAsStream(towersPath + "gray_tower.png")));
 
         Tower playerTowerColor = gui.getViewState().getPlayerTower();   // sets the player's towerColor in the board
-        //num_towersInBoard.setText(((Integer)gui.getViewState().getNumOfTowers().size()).toString());
 
         switch (playerTowerColor) {
             case WHITE:
@@ -278,12 +513,19 @@ public class MyBoardGuiController extends GUIController {
     }
 
 
-    public void setupProfessors() {
-
-    }
 
     public void updateProfessors() {
+        System.out.println("executing updateProfessors() ");
+
         Map<Color, Tower> professors = gui.getViewState().getProfessors();
+        for(Label label : professorsLabels){
+            String str = label.getId().replace("_owner","");
+            System.out.println(str);
+            Color color = Color.toColor(str);
+            if(professors.get(color) != null){
+                label.setText(professors.get(color).toString());
+            }
+        }
     }
 
 

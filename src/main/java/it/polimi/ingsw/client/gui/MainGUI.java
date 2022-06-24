@@ -169,6 +169,7 @@ public class MainGUI extends Application {
     public void updatePlayerBoard() {
         MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
         controller.updateMyPlayerBoard();
+        controller.updateProfessors();
     }
 
 

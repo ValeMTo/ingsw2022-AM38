@@ -205,7 +205,7 @@
       <AnchorPane id="controlsArea" layoutX="753.0" layoutY="17.0" prefHeight="92.0" prefWidth="438.0" style="-fx-background-color: #19b2bf;">
          <children>
             <Button fx:id="showSpecialCards" layoutX="284.0" layoutY="59.0" mnemonicParsing="false" text="Show Special Cards" />
-            <Button fx:id="showSpecialCards1" layoutX="283.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
+            <Button fx:id="showOtherBoards" layoutX="283.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
             <Label layoutX="17.0" layoutY="13.0" prefHeight="44.0" prefWidth="256.0" style="-fx-background-color: green;" text="Game status message">
                <font>
                   <Font size="13.0" />
@@ -213,19 +213,19 @@
             </Label>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="archipelagoArea" layoutX="20.0" layoutY="15.0" prefHeight="559.0" prefWidth="717.0" style="-fx-background-color: #90c9f0;">
+      <AnchorPane fx:id="archipelagoArea" layoutX="29.0" layoutY="21.0" prefHeight="566.0" prefWidth="699.0" style="-fx-background-color: #90c9f0;">
          <children>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="6.0" layoutY="179.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island1" fitHeight="109.0" fitWidth="124.0" layoutX="6.0" layoutY="179.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="54.0" layoutY="196.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland1" fitHeight="25.0" fitWidth="28.0" layoutX="54.0" layoutY="196.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="79.0" layoutY="234.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland1" fitHeight="25.0" fitWidth="21.0" layoutX="79.0" layoutY="234.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -235,17 +235,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="79.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island2" fitHeight="109.0" fitWidth="124.0" layoutX="79.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="127.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland2" fitHeight="25.0" fitWidth="28.0" layoutX="127.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="152.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland2" fitHeight="25.0" fitWidth="21.0" layoutX="152.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -255,17 +255,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="191.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island3" fitHeight="109.0" fitWidth="124.0" layoutX="191.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="239.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland3" fitHeight="25.0" fitWidth="28.0" layoutX="239.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="264.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland3" fitHeight="25.0" fitWidth="21.0" layoutX="264.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -275,17 +275,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="346.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island4" fitHeight="109.0" fitWidth="124.0" layoutX="346.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="394.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland4" fitHeight="25.0" fitWidth="28.0" layoutX="394.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="419.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland4" fitHeight="25.0" fitWidth="21.0" layoutX="419.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -295,17 +295,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="486.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island5" fitHeight="109.0" fitWidth="124.0" layoutX="486.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="534.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland5" fitHeight="25.0" fitWidth="28.0" layoutX="534.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="559.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland5" fitHeight="25.0" fitWidth="21.0" layoutX="559.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -315,17 +315,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="577.0" layoutY="166.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island6" fitHeight="109.0" fitWidth="124.0" layoutX="577.0" layoutY="166.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="625.0" layoutY="183.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland6" fitHeight="25.0" fitWidth="28.0" layoutX="625.0" layoutY="183.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="650.0" layoutY="221.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland6" fitHeight="25.0" fitWidth="21.0" layoutX="650.0" layoutY="221.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -335,17 +335,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="5.0" layoutY="305.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island12" fitHeight="109.0" fitWidth="124.0" layoutX="5.0" layoutY="305.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="53.0" layoutY="322.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland12" fitHeight="25.0" fitWidth="28.0" layoutX="53.0" layoutY="322.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="78.0" layoutY="360.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland12" fitHeight="25.0" fitWidth="21.0" layoutX="78.0" layoutY="360.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -355,17 +355,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="91.0" layoutY="394.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island11" fitHeight="109.0" fitWidth="124.0" layoutX="91.0" layoutY="394.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="139.0" layoutY="411.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland11" fitHeight="25.0" fitWidth="28.0" layoutX="139.0" layoutY="411.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="164.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland11" fitHeight="25.0" fitWidth="21.0" layoutX="164.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -375,17 +375,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="191.0" layoutY="458.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island10" fitHeight="109.0" fitWidth="124.0" layoutX="191.0" layoutY="458.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="239.0" layoutY="475.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland10" fitHeight="25.0" fitWidth="28.0" layoutX="239.0" layoutY="475.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="264.0" layoutY="513.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland10" fitHeight="25.0" fitWidth="21.0" layoutX="264.0" layoutY="513.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -395,17 +395,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="333.0" layoutY="452.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island9" fitHeight="109.0" fitWidth="124.0" layoutX="333.0" layoutY="452.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="381.0" layoutY="469.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland9" fitHeight="25.0" fitWidth="28.0" layoutX="381.0" layoutY="469.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="406.0" layoutY="507.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland9" fitHeight="25.0" fitWidth="21.0" layoutX="406.0" layoutY="507.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -415,17 +415,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="455.0" layoutY="394.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island8" fitHeight="109.0" fitWidth="124.0" layoutX="455.0" layoutY="394.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="503.0" layoutY="411.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland8" fitHeight="25.0" fitWidth="28.0" layoutX="503.0" layoutY="411.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="528.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland8" fitHeight="25.0" fitWidth="21.0" layoutX="528.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -435,17 +435,17 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="109.0" fitWidth="124.0" layoutX="571.0" layoutY="294.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="island7" fitHeight="109.0" fitWidth="124.0" layoutX="571.0" layoutY="294.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/island.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="28.0" layoutX="619.0" layoutY="311.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="towerIsland7" fitHeight="25.0" fitWidth="28.0" layoutX="619.0" layoutY="311.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/towers/gray_tower_2D.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="21.0" layoutX="644.0" layoutY="349.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="motherIsland7" fitHeight="25.0" fitWidth="21.0" layoutX="644.0" layoutY="349.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
@@ -455,35 +455,69 @@
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
             </ImageView>
-            <Line endX="-95.60000610351562" endY="-95.984619140625" layoutX="191.0" layoutY="234.0" startX="-116.27691650390625" startY="-48.72308349609375" strokeWidth="2.0" />
-            <Line endX="-73.72738647460938" endY="-61.99999237060547" layoutX="274.0" layoutY="124.0" startX="-102.79998779296875" startY="-43.79999542236328" strokeWidth="2.0" />
-            <Line endX="-55.399993896484375" endY="-43.79999542236328" layoutX="409.0" layoutY="97.0" startX="-102.79998779296875" startY="-43.79999542236328" strokeWidth="2.0" />
-            <Line endX="-62.66156005859375" endY="-26.50768280029297" layoutX="561.0" layoutY="120.0" startX="-102.79998779296875" startY="-43.79999542236328" strokeWidth="2.0" />
-            <Line endX="-61.923095703125" endY="-23.984619140625" layoutX="657.0" layoutY="212.0" startX="-75.21539306640625" startY="-55.73846435546875" strokeWidth="2.0" />
-            <Line endX="-61.923095703125" endY="-21.0" layoutX="699.0" layoutY="319.0" startX="-61.923095703125" startY="-50.4923095703125" strokeWidth="2.0" />
-            <Line endX="-56.10772705078125" endY="-4.969207763671875" layoutX="615.0" layoutY="416.0" startX="-27.30767822265625" startY="-32.29229736328125" strokeWidth="2.0" />
-            <Line endX="-56.10772705078125" endY="-4.969207763671875" layoutX="495.0" layoutY="499.0" startX="-27.30767822265625" startY="-32.29229736328125" strokeWidth="2.0" />
-            <Line endX="-56.10772705078125" endY="-4.969207763671875" layoutX="353.0" layoutY="517.0" startX="-12.692291259765625" startY="-4.96917724609375" strokeWidth="2.0" />
-            <Line endX="-40.461517333984375" endY="-47.4769287109375" layoutX="235.0" layoutY="520.0" startX="-27.30767822265625" startY="-32.29229736328125" strokeWidth="2.0" />
-            <Line endX="-56.10772705078125" endY="-4.969207763671875" layoutX="121.0" layoutY="311.0" startX="-56.10772705078125" startY="-29.0" strokeWidth="2.0" />
-            <Line endX="-43.83074951171875" endY="-9.369232177734375" layoutX="153.0" layoutY="430.0" startX="-56.10772705078125" startY="-29.30767822265625" strokeWidth="2.0" />
-            <AnchorPane fx:id="cloudsArea" layoutX="209.0" layoutY="152.0" prefHeight="264.0" prefWidth="299.0">
+            <Line fx:id="bridge_1_2" endX="-95.60000610351562" endY="-95.984619140625" layoutX="191.0" layoutY="234.0" startX="-116.27691650390625" startY="-48.72308349609375" strokeWidth="2.0" />
+            <Line fx:id="bridge_2_3" endX="-73.72738647460938" endY="-61.99999237060547" layoutX="274.0" layoutY="124.0" startX="-102.79998779296875" startY="-43.79999542236328" strokeWidth="2.0" />
+            <Line fx:id="bridge_3_4" endX="-55.399993896484375" endY="-43.79999542236328" layoutX="409.0" layoutY="97.0" startX="-102.79998779296875" startY="-43.79999542236328" strokeWidth="2.0" />
+            <Line fx:id="bridge_4_5" endX="-62.66156005859375" endY="-26.50768280029297" layoutX="561.0" layoutY="120.0" startX="-102.79998779296875" startY="-43.79999542236328" strokeWidth="2.0" />
+            <Line fx:id="bridge_5_6" endX="-61.923095703125" endY="-23.984619140625" layoutX="657.0" layoutY="212.0" startX="-75.21539306640625" startY="-55.73846435546875" strokeWidth="2.0" />
+            <Line fx:id="bridge_6_7" endX="-61.923095703125" endY="-21.0" layoutX="699.0" layoutY="319.0" startX="-61.923095703125" startY="-50.4923095703125" strokeWidth="2.0" />
+            <Line fx:id="bridge_7_8" endX="-56.10772705078125" endY="-4.969207763671875" layoutX="615.0" layoutY="416.0" startX="-27.30767822265625" startY="-32.29229736328125" strokeWidth="2.0" />
+            <Line fx:id="bridge_8_9" endX="-56.10772705078125" endY="-4.969207763671875" layoutX="495.0" layoutY="499.0" startX="-27.30767822265625" startY="-32.29229736328125" strokeWidth="2.0" />
+            <Line fx:id="bridge_9_10" endX="-56.10772705078125" endY="-4.969207763671875" layoutX="353.0" layoutY="517.0" startX="-12.692291259765625" startY="-4.96917724609375" strokeWidth="2.0" />
+            <Line fx:id="bridge_10_11" endX="-40.461517333984375" endY="-47.4769287109375" layoutX="235.0" layoutY="520.0" startX="-27.30767822265625" startY="-32.29229736328125" strokeWidth="2.0" />
+            <Line fx:id="bridge_12_1" endX="-56.10772705078125" endY="-4.969207763671875" layoutX="121.0" layoutY="311.0" startX="-56.10772705078125" startY="-29.0" strokeWidth="2.0" />
+            <Line fx:id="bridge_11_12" endX="-43.83074951171875" endY="-9.369232177734375" layoutX="153.0" layoutY="430.0" startX="-56.10772705078125" startY="-29.30767822265625" strokeWidth="2.0" />
+            <AnchorPane fx:id="cloudsArea" layoutX="190.0" layoutY="152.0" prefHeight="276.0" prefWidth="318.0">
                <children>
-                  <ImageView fitHeight="102.0" fitWidth="121.0" layoutX="-20.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="cloud3" fitHeight="102.0" fitWidth="121.0" layoutX="-50.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../graphics/board/cloud.png" />
                      </image>
                   </ImageView>
-                  <ImageView fitHeight="102.0" fitWidth="136.0" layoutX="49.0" layoutY="155.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="cloud2" fitHeight="102.0" fitWidth="136.0" layoutY="160.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../graphics/board/cloud.png" />
                      </image>
                   </ImageView>
-                  <ImageView fitHeight="102.0" fitWidth="136.0" layoutX="166.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="cloud1" fitHeight="102.0" fitWidth="136.0" layoutX="144.0" layoutY="173.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../graphics/board/cloud.png" />
                      </image>
                   </ImageView>
+                  <AnchorPane fx:id="professorsArea" layoutX="67.0" layoutY="33.0" prefHeight="123.0" prefWidth="318.0">
+                     <children>
+                        <ImageView fx:id="profRed" fitHeight="44.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../graphics/board/students_and_profs/red_prof.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="profYellow" fitHeight="44.0" fitWidth="46.0" layoutX="64.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../graphics/board/students_and_profs/yellow_prof.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="profPink" fitHeight="44.0" fitWidth="46.0" layoutX="125.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../graphics/board/students_and_profs/pink_prof.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="profBlue" fitHeight="44.0" fitWidth="46.0" layoutX="184.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../graphics/board/students_and_profs/blue_prof.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="profGreen" fitHeight="44.0" fitWidth="46.0" layoutX="242.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../graphics/board/students_and_profs/green_prof.png" />
+                           </image>
+                        </ImageView>
+                        <Label fx:id="red_owner" layoutX="7.0" layoutY="45.0" prefHeight="18.0" prefWidth="43.0" text="owner" />
+                        <Label fx:id="yellow_owner" layoutX="71.0" layoutY="45.0" prefHeight="18.0" prefWidth="43.0" text="owner" />
+                        <Label fx:id="pink_owner" layoutX="132.0" layoutY="45.0" prefHeight="18.0" prefWidth="43.0" text="owner" />
+                        <Label fx:id="blue_owner" layoutX="191.0" layoutY="45.0" prefHeight="18.0" prefWidth="43.0" text="owner" />
+                        <Label fx:id="green_owner" layoutX="249.0" layoutY="45.0" prefHeight="18.0" prefWidth="43.0" text="owner" />
+                     </children>
+                  </AnchorPane>
                </children>
             </AnchorPane>
          </children>
@@ -545,6 +579,11 @@
                   <Font size="16.0" />
                </font>
             </Label>
+            <ImageView fx:id="islandTower" fitHeight="50.0" fitWidth="43.0" layoutX="65.0" layoutY="386.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../graphics/board/towers/black_tower.png" />
+               </image>
+            </ImageView>
          </children>
       </AnchorPane>
    </children>
