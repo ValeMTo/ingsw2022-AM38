@@ -161,16 +161,15 @@ public class MainGUI extends Application {
      *
      */
     public void initBoard() {
-        Platform.runLater(() -> {
             MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
             controller.setupBoard();
-        });
 
     }
 
     public void updatePlayerBoard() {
         MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
         controller.updateMyPlayerBoard();
+        controller.updateProfessors();
     }
 
 

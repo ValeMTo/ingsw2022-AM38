@@ -78,8 +78,10 @@ public class ViewMessageParser {
                 view.setViewState(playersWithTower, json.get("isExpertMode").getAsBoolean());
 
                 if(!view.isCli()){
-                    Platform.runLater(()->view.getAwaitingGUI().initBoard());
-                    Platform.runLater(()->view.getAwaitingGUI().setNextStage("myBoardScene.fxml"));
+                    Platform.runLater(()-> {
+                        view.getAwaitingGUI().initBoard();
+                        view.getAwaitingGUI().setNextStage("myBoardScene.fxml");
+                    });
                 }
 
             } else if(json.get("UpdateType").getAsInt() == UpdateTypeEnum.PLAYER_UPDATE.ordinal()){
