@@ -383,6 +383,10 @@ public class MyBoardGuiController extends GUIController {
         updateArchipelago();
         updateProfessors();
 
+        updatePhaseAction();
+
+
+
     }
 
     public void updateGameStatus(){
@@ -393,6 +397,27 @@ public class MyBoardGuiController extends GUIController {
         statusHeader.setText("Phase : " + currentPhase.toString() + "\nActive player : " + activePlayerName);
 
     }
+
+    public void updatePhaseAction(){
+        deckArea.setVisible(false);
+        deckArea.setDisable(true);
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
+                deckArea.setVisible(true);
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                deckArea.setDisable(false);
+                List<Integer> usableCard = gui.getViewState().getUsableCards();
+                for(ImageView card : deckArray){
+                    if (usableCard.contains(deckArray.indexOf(card))){
+                        card.setDisable(false);
+
+                    } else {
+                        card.setVisible(false);
+                        card.setDisable(true);
+                    }
+                }
+            }
+        } 
+    };
 
     @FXML
     public void showSpecialCards(ActionEvent event){
@@ -416,7 +441,7 @@ public class MyBoardGuiController extends GUIController {
         deckArray.add(assistant9);
         deckArray.add(assistant10);
 
-        deckArea.setVisible(true);
+        deckArea.setVisible(false);
         for(ImageView img : deckArray) {
             img.setOnMouseClicked(this::pickCard);
         }
@@ -430,9 +455,6 @@ public class MyBoardGuiController extends GUIController {
         int cardNum = deckArray.indexOf(clickedImg) +1 ;  // array indexes start at 0  whereas cards go from 1 to 10
         gui.getConnectionSocket().setAssistantCard(cardNum);
 
-        // gettare le usable cards da viewState
-        for(ImageView card : deckArray)   // TODO: riabilitare cards al prossimo turno !!!
-            card.setDisable(true);
     }
 
 

@@ -270,7 +270,7 @@ public class ViewState {
      * @return the tower of the active player
      */
     public synchronized Tower getActivePlayer() {
-        return this.getPlayerTower();
+        return activePlayer;
     }
 
     /**
