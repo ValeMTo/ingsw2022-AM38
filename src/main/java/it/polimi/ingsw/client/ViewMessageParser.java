@@ -56,12 +56,14 @@ public class ViewMessageParser {
             }
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
-                Tower tower = Tower.toTower(json.get("PlayerTower").getAsString());
-                List<Number> usableAssistantCardNum = gson.fromJson(json.get("AvailableCards"),ArrayList.class);
-                List<Integer> usableAssistantCardInt = new ArrayList<>();
-                for(Number num: usableAssistantCardNum)
-                    usableAssistantCardInt.add(num.intValue());
-                view.setUsableCards(usableAssistantCardInt);
+                Tower tower = Tower.values()[json.get("PlayerTower").getAsInt()];
+                if(tower.equals(view.getPlayerTower())) {
+                    List<Number> usableAssistantCardNum = gson.fromJson(json.get("AvailableCards"), ArrayList.class);
+                    List<Integer> usableAssistantCardInt = new ArrayList<>();
+                    for (Number num : usableAssistantCardNum)
+                        usableAssistantCardInt.add(num.intValue());
+                    view.setUsableCards(usableAssistantCardInt);
+                }
             }
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.LAST_USED_ASSISTANT_CARD_UPDATE.ordinal()) {
                 view.setLastCardUsed(Tower.values()[json.get("PlayerTower").getAsInt()],json.get("LastUsed").getAsInt());

@@ -132,18 +132,6 @@ public class Server {
         }
     }
 
-    /**
-     * Return the created messageParser by the Lobby
-     *
-     * @param client : client that solicited the Lobby to get its MessageParser to connect to the Controller
-     * @return a new messageParser created by the lobby or null
-     */
-
-    public static MessageParser getMessageParserFromLobby(ClientHandler client) {
-        synchronized (lobby) {
-            return lobby.getMessageParser(client);
-        }
-    }
 
     public static void removePlayer(String name){
         allPlayers.remove(name);

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Scanner;
 
 
+import static it.polimi.ingsw.messages.ErrorTypeEnum.GENERIC_ERROR;
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
 
 public class ClientHandler implements Runnable {
@@ -62,7 +63,10 @@ public class ClientHandler implements Runnable {
             message = inputReader.nextLine();
             System.out.println("CLIENT HANDLER - player "+this.getNickName()+" got message "+message);
             System.out.println(message);
-            sendingMessage = messageParser.parseMessageToAction(message);
+            if(messageParser!=null)
+                sendingMessage = messageParser.parseMessageToAction(message);
+            else
+                sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR,"ERROR - ClientHandler has no messageParser");
             System.out.println("CLIENT HANDLER - sending "+sendingMessage);
             writer.print(sendingMessage);
             writer.flush();
@@ -85,38 +89,6 @@ public class ClientHandler implements Runnable {
     }
 
     /**
-     * Setups the message parser, waiting that the Lobby is completed and the GameOrchestrator has been generated
-     */
-    private void setupMessageParser() {
-        boolean set;
-        do {
-            try {
-                System.out.println("CLIENT HANDLER of" + playerName + "- Waiting for messageParser");
-                synchronized (this) {
-                    this.messageParser = Server.getMessageParserFromLobby(this);
-                    System.out.println("CLIENT HANDLER of" + playerName + "- Got a messageParser"+this.messageParser);
-                    if (this.messageParser == null) {
-                        this.wait();
-                        this.messageParser = Server.getMessageParserFromLobby(this);
-                    }
-                }
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-            if (this.messageParser != null)
-                System.out.println("CLIENT HANDLER of" + playerName + " - Got messageParser");
-            set = null != this.messageParser;
-            if (set) System.out.println("Set yes");
-            else System.out.println("Set no");
-        } while (!set);
-        System.out.println("CLIENT HANDLER of" + playerName + " - messageParserSet sends setup...");
-        writer.print(MessageGenerator.setupUpdateMessage(messageParser.getPlayersTower(), messageParser.getPlayersTower().size(), messageParser.isExpert()));
-        writer.flush();
-        System.out.println("CLIENT HANDLER of" + playerName + " - messageParserSet now waiting for messages...");
-    }
-
-
-    /**
      * When the lobby is full, the class receives the created messageParser
      *
      * @param messageParser
@@ -134,19 +106,6 @@ public class ClientHandler implements Runnable {
         inputReader.close();
         writer.close();
         this.disconnected = true;
-    }
-
-    private JsonObject getMessage() {
-        boolean error = false;
-        JsonObject json;
-        do {
-            System.out.println("waiting for message");
-            String jsonFromClient = inputReader.nextLine();
-            if (jsonFromClient != null) System.out.println("Got message " + jsonFromClient);
-            json = gson.fromJson(jsonFromClient, JsonObject.class);
-            error = json == null || !json.has("MessageType");
-        } while (error);
-        return json;
     }
 
     /**
@@ -210,72 +169,6 @@ public class ClientHandler implements Runnable {
         }
         writer.flush();
 
-    }
-
-    /**
-     * Receive the gamemode setting
-     *
-     * @return true if the expert mode was set, false otherwise.
-     */
-    private boolean receiveGamemode() {
-        System.out.println("GAMEMODE SET - Waiting for a message ");
-        JsonObject json = getMessage();
-        Boolean gamemode = null;
-        if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
-            if (json.get("SetType").getAsInt() == SetTypeEnum.SET_GAME_MODE.ordinal()) {
-                gamemode = json.get("SetExpertGameMode").getAsBoolean();
-                writer.print(MessageGenerator.okMessage());
-                System.out.println("Sending: " + MessageGenerator.okMessage());
-                writer.flush();
-            }
-        } else {
-            lobbyRequestHandler();
-        }
-        return gamemode;
-    }
-
-    /**
-     * Receive the number of player setting
-     *
-     * @return number of player that will play the next match
-     */
-    private int receiveNumOfPlayers() {
-        System.out.println("PLAYERS NUMBER SET - Waiting for a message ");
-        JsonObject json = getMessage();
-        Integer numOfPlayers = null;
-        if (json.get("MessageType").getAsInt() == MessageTypeEnum.SET.ordinal()) {
-            if (json.get("SetType").getAsInt() == SetTypeEnum.SELECT_NUMBER_OF_PLAYERS.ordinal()) {
-                numOfPlayers = json.get("SetNumberOfPlayers").getAsInt();
-                System.out.println("Sending: " + MessageGenerator.okMessage());
-                writer.print(MessageGenerator.okMessage());
-                writer.flush();
-            }
-        } else {
-            lobbyRequestHandler();
-        }
-        return numOfPlayers;
-    }
-
-    public boolean sendGameMode(boolean isExpert) {
-        System.out.println("SET GAME MODE - Sending: " + MessageGenerator.gamemodeMessage(isExpert));
-        writer.print(MessageGenerator.gamemodeMessage(isExpert));
-        writer.flush();
-        JsonObject json = getMessage();
-        System.out.println("Received: " + json);
-        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
-    }
-
-    public boolean sendNumberOfPlayers(int numOfPlayers) {
-        System.out.println("SET GAME MODE - Sending: " + MessageGenerator.numberOfPlayerMessage(numOfPlayers));
-        writer.print(MessageGenerator.numberOfPlayerMessage(numOfPlayers));
-        writer.flush();
-        JsonObject json = getMessage();
-        System.out.println("Received: " + json);
-        return json.get("MessageType").getAsInt() == MessageTypeEnum.OK.ordinal();
-    }
-
-    public int getGameID(){
-        return id;
     }
 
     public void setGameOrchestrator(GameOrchestrator gameOrchestrator){

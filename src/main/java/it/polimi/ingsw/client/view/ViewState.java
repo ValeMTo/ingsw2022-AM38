@@ -418,10 +418,10 @@ public class ViewState {
     }
 
     public synchronized List<IslandView> getIslands() {
-        System.out.println("VIEW STATE - getIslands - "+islands);
+        //System.out.println("VIEW STATE - getIslands - "+islands);
         for(IslandView islandView:islands)
         {
-            System.out.println("ISLAND "+islandView.getPosition()+" with "+islandView.getTowerNumber()+" tower "+islandView.getTower()+" and students "+islandView.getStudentMap());
+            //System.out.println("ISLAND "+islandView.getPosition()+" with "+islandView.getTowerNumber()+" tower "+islandView.getTower()+" and students "+islandView.getStudentMap());
         }
         return new ArrayList<>(islands);
     }
@@ -647,7 +647,7 @@ public class ViewState {
         }
         islands.clear();
         islands.addAll(islandsToModify);
-        System.out.println("VIEW STATE - setIslandNumber - now islands "+islands);
+        //System.out.println("VIEW STATE - setIslandNumber - now islands "+islands);
         refreshCLI();
     }
 
@@ -731,7 +731,7 @@ public class ViewState {
     public void wake(boolean onlyCli) {
         if (isCli == true) {
             synchronized (awaitingCLI) {
-                System.out.println("Waking the CLI");
+                //System.out.println("Waking the CLI");
                 awaitingCLI.notifyAll();
             }
         }
