@@ -74,6 +74,7 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     private Button showSpecialCardsButton;
+    @FXML
     private Label statusMessage;
     @FXML
     private Label statusHeader;

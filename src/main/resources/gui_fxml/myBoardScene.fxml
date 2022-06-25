@@ -204,19 +204,15 @@
       </AnchorPane>
       <AnchorPane id="controlsArea" fx:id="controlsArea" layoutX="738.0" layoutY="7.0" prefHeight="117.0" prefWidth="454.0" style="-fx-background-color: #19b2bf;">
          <children>
-<<<<<<< Updated upstream
-            <Button fx:id="showSpecialCards" layoutX="284.0" layoutY="59.0" mnemonicParsing="false" text="Show Special Cards" />
-            <Button fx:id="showOtherBoards" layoutX="283.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
-=======
-            <Button fx:id="showSpecialCardsButton" layoutX="284.0" layoutY="59.0" mnemonicParsing="false" text="Show Special Cards" />
-            <Button fx:id="showSpecialCards1" layoutX="283.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
->>>>>>> Stashed changes
-            <Label layoutX="17.0" layoutY="13.0" prefHeight="44.0" prefWidth="256.0" style="-fx-background-color: green;" text="Game status message">
+            <Button fx:id="showSpecialCardsButton" layoutX="294.0" layoutY="59.0" mnemonicParsing="false" text="Show Special Cards" />
+            <Button fx:id="showSpecialCards1" layoutX="294.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
+
+            <Label fx:id="statusMessage" alignment="CENTER" layoutX="5.0" layoutY="59.0" prefHeight="58.0" prefWidth="275.0" style="-fx-background-color: #2c4ba8; -fx-text-alignment: CENTER;" text="Game Status message" textFill="WHITE" wrapText="true">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="statusHeader" contentDisplay="CENTER" layoutX="3.0" prefHeight="46.0" prefWidth="270.0" style="-fx-background-color: #2c4ba8; -fx-text-alignment: center;" text="Phase : ###    Active player : ###  " textAlignment="CENTER" textFill="WHITE" wrapText="true">
+            <Label fx:id="statusHeader" alignment="CENTER" contentDisplay="CENTER" layoutX="5.0" layoutY="4.0" prefHeight="47.0" prefWidth="275.0" style="-fx-background-color: #2c4ba8; -fx-text-alignment: CENTER;" text="Phase : ###    Active player : ###  " textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
                   <Font size="13.0" />
                </font>
