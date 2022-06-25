@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.TextAlignment;
 
 import java.io.InputStreamReader;
 import java.util.List;
@@ -81,6 +82,8 @@ public class SpecialCardsMenuController extends GUIController {
 
     private void loadCorrectImage(ImageView image, SpecialCardName card, Label name, Label description){
         name.setText(card.name());
+        description.setTextAlignment(TextAlignment.CENTER);
+        description.setWrapText(true);
         description.setText(loadCorrectDescription(card));
 
         if(card.equals(SpecialCardName.ARCHER)){
