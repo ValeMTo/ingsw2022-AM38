@@ -177,7 +177,9 @@ public class ViewMessageParser {
                     view.setUsableSpecialCard(specialCards);
                 }
             }
-            Platform.runLater(() -> { view.getAwaitingGUI().refreshWholeBoard();});
+            if(!view.isCli()){
+                Platform.runLater(() -> { view.getAwaitingGUI().refreshWholeBoard();});
+            }
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
