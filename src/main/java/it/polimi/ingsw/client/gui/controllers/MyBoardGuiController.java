@@ -393,7 +393,7 @@ public class MyBoardGuiController extends GUIController {
 
     }
 
-
+    @FXML
     public void showSpecialCards(ActionEvent event){
         gui.loadSecondWindow("specialCardsScene.fxml");
     }
@@ -421,6 +421,7 @@ public class MyBoardGuiController extends GUIController {
         }
     }
 
+    @FXML
     public void pickCard(MouseEvent event){
         ImageView clickedImg = (ImageView) event.getSource();
         clickedImg.setEffect(createShadow());
@@ -573,10 +574,12 @@ public class MyBoardGuiController extends GUIController {
         statusMessage.setText("");
     }
 
+
     /**
      * Method to show the content of a selected Island or Cloud.
      * @param event : the MouseEvent triggered when clicking on an Island or Cloud imageview in the board
      */
+    @FXML
     public void showContent(MouseEvent event) {
         ImageView clickedImg = (ImageView) event.getSource();
         String src = clickedImg.getId();

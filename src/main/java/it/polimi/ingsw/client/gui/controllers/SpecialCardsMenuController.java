@@ -53,6 +53,7 @@ public class SpecialCardsMenuController extends GUIController {
         coin3.setVisible(false);
     }
 
+    @Override
     public void loadContent(){
         try {
             Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();
