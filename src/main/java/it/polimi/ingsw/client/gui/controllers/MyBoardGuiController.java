@@ -39,6 +39,8 @@ public class MyBoardGuiController extends GUIController {
     private final ArrayList<Line> islandBridges = new ArrayList<Line>();
     private final ArrayList<Label> showContentLabels = new ArrayList<Label>();
     private final ArrayList<ImageView> cloudsImgArray = new ArrayList<ImageView>();
+    private final ArrayList<ImageView> noEntryTilesArray = new ArrayList<ImageView>();
+
 
     private Integer currentPlayerCoins;
 
@@ -296,6 +298,31 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private Line bridge_12_1;
 
+    @FXML
+    private ImageView noEntry1;   // noEntryTiles imageviews on islands
+    @FXML
+    private ImageView noEntry2;
+    @FXML
+    private ImageView noEntry3;
+    @FXML
+    private ImageView noEntry4;
+    @FXML
+    private ImageView noEntry5;
+    @FXML
+    private ImageView noEntry6;
+    @FXML
+    private ImageView noEntry7;
+    @FXML
+    private ImageView noEntry8;
+    @FXML
+    private ImageView noEntry9;
+    @FXML
+    private ImageView noEntry10;
+    @FXML
+    private ImageView noEntry11;
+    @FXML
+    private ImageView noEntry12;
+
 
 
 
@@ -328,6 +355,7 @@ public class MyBoardGuiController extends GUIController {
         updateMyPlayerBoard();
         updateArchipelago();
         updateProfessors();
+
     }
 
     /**
@@ -450,6 +478,23 @@ public class MyBoardGuiController extends GUIController {
             i.setVisible(false);
         }
 
+        noEntryTilesArray.add(noEntry1);
+        noEntryTilesArray.add(noEntry2);
+        noEntryTilesArray.add(noEntry3);
+        noEntryTilesArray.add(noEntry4);
+        noEntryTilesArray.add(noEntry5);
+        noEntryTilesArray.add(noEntry6);
+        noEntryTilesArray.add(noEntry7);
+        noEntryTilesArray.add(noEntry8);
+        noEntryTilesArray.add(noEntry9);
+        noEntryTilesArray.add(noEntry10);
+        noEntryTilesArray.add(noEntry11);
+        noEntryTilesArray.add(noEntry12);
+        for(ImageView i : noEntryTilesArray){
+            i.setVisible(false);
+        }
+
+
         islandBridges.add(bridge_1_2);
         islandBridges.add(bridge_2_3);
         islandBridges.add(bridge_3_4);
@@ -465,7 +510,10 @@ public class MyBoardGuiController extends GUIController {
         for(Line l : islandBridges) {
             l.setVisible(false);
         }
+
     }
+
+
 
     public void createShowContentArea(){
         showContentLabels.add(num_contentBlue);
@@ -538,7 +586,24 @@ public class MyBoardGuiController extends GUIController {
 
         System.out.println("executing updateArchipelago() ");
 
-        // Shows mothernature if it is present on the selected island
+        List<IslandView> islands = gui.getViewState().getIslands();
+
+        // Shows a noEntryTile on the islands where it is present
+        for(ImageView img : noEntryTilesArray) {
+            Integer position = Integer.parseInt(img.getId().replace("noEntry",""));
+            for(IslandView island : islands){
+                if(island.getPosition() == position){
+                    if(!island.isInfluenceEnabled()) {
+                        img.setVisible(true);
+                    }
+                    else{
+                        img.setVisible(false);
+                    }
+                }
+            }
+        }
+
+        // Shows mothernature on the island where it is present
         Integer motherPosition = gui.getViewState().getMotherNature();
         for(ImageView i : motherNatureOnIslands) {
             if (i.getId().replace("motherIsland", "").equals(motherPosition.toString())) {
@@ -549,8 +614,7 @@ public class MyBoardGuiController extends GUIController {
             }
         }
 
-        // Shows a tower if it is present on the selected island, otherwise it makes the tower invisible
-        List<IslandView> islands = gui.getViewState().getIslands();
+        // Shows a tower if it is present on the island, otherwise it sets the image of the tower invisible
 
         for(ImageView img : towersOnIslands) {
             Integer position = Integer.parseInt(img.getId().replace("towerIsland",""));

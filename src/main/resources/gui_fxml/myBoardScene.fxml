@@ -230,7 +230,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="42.0" layoutY="234.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry1" fitHeight="25.0" fitWidth="25.0" layoutX="42.0" layoutY="234.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -250,7 +250,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="115.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry2" fitHeight="25.0" fitWidth="25.0" layoutX="115.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -270,7 +270,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="227.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry3" fitHeight="25.0" fitWidth="25.0" layoutX="227.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -290,7 +290,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="382.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry4" fitHeight="25.0" fitWidth="25.0" layoutX="382.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -310,7 +310,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="522.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry5" fitHeight="25.0" fitWidth="25.0" layoutX="522.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -330,7 +330,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="613.0" layoutY="221.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry6" fitHeight="25.0" fitWidth="25.0" layoutX="613.0" layoutY="221.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -350,7 +350,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="41.0" layoutY="360.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry12" fitHeight="25.0" fitWidth="25.0" layoutX="41.0" layoutY="360.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -370,7 +370,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="127.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry11" fitHeight="25.0" fitWidth="25.0" layoutX="127.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -390,7 +390,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="227.0" layoutY="513.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry10" fitHeight="25.0" fitWidth="25.0" layoutX="227.0" layoutY="513.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -410,7 +410,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="369.0" layoutY="507.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry9" fitHeight="25.0" fitWidth="25.0" layoutX="369.0" layoutY="507.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -430,7 +430,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="491.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry8" fitHeight="25.0" fitWidth="25.0" layoutX="491.0" layoutY="449.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
@@ -450,7 +450,7 @@
                   <Image url="@../graphics/board/mothernature.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="607.0" layoutY="349.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="noEntry7" fitHeight="25.0" fitWidth="25.0" layoutX="607.0" layoutY="349.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/no_entry_tile.png" />
                </image>
