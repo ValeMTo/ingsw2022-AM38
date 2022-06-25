@@ -110,8 +110,6 @@ public class SpecialCardsMenuController extends GUIController {
             image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/priest.jpg")));
         } else if(card.equals(SpecialCardName.PRINCESS)){
             image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/princess.jpg")));
-        } else {
-            image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/retro.jpg")));
         }
     }
 
