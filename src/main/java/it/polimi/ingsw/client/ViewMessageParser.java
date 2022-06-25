@@ -134,7 +134,6 @@ public class ViewMessageParser {
                 // Tells the gui to updates its board
                 if(!view.isCli() && view.getPlayerTower().equals(Tower.values()[json.get("TowerColor").getAsInt()])) {
                     Platform.runLater(() -> {
-                        view.getAwaitingGUI().refreshWholeBoard();
                         view.getAwaitingGUI().refreshGameStatus();
                     });
                 }
@@ -178,6 +177,8 @@ public class ViewMessageParser {
                     view.setUsableSpecialCard(specialCards);
                 }
             }
+            Platform.runLater(() -> { view.getAwaitingGUI().refreshWholeBoard();});
+
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
                 List<String> listOfPlayers = new ArrayList<>();
