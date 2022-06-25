@@ -328,10 +328,9 @@ public class MyBoardGuiController extends GUIController {
      */
     public void setupBoard() {
 
-        //showSpecialCardsButton.setOnAction(this::showSpecialCards);
         if (gui.getViewState().getGameSettings().getExpert()){
             showSpecialCardsButton.setVisible(true);
-            //setupSpecialCardsWindow();
+            showSpecialCardsButton.setOnAction(this::showSpecialCards);
         }else {
             showSpecialCardsButton.setVisible(false);
         }
@@ -350,41 +349,8 @@ public class MyBoardGuiController extends GUIController {
         updateProfessors();
     }
 
-    public void setupSpecialCardsWindow(){
-        FXMLLoader root;
-        try {
-            root = FXMLLoader.load(getClass().getClassLoader().getResource("gui_fxml/specialCardsScene.fxml"));
-            SpecialCardsMenuController guiController = root.getController();
-            guiController.setGuiToController(gui);
-            guiController.loadSpecialCards();
-            System.out.println("Che controller ho? " + guiController.getClass());
-            stage = new Stage();
-            stage.setTitle("Special Cards details");
-            stage.setScene(new Scene(root.load()));
-            stage.show();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public void showSpecialCards(ActionEvent event){
-        FXMLLoader root;
-        try {
-            root = FXMLLoader.load(getClass().getClassLoader().getResource("gui_fxml/specialCardsScene.fxml"));
-            SpecialCardsMenuController guiController = root.getController();
-            guiController.setGuiToController(gui);
-            guiController.loadSpecialCards();
-            System.out.println("Che controller ho? " + guiController.getClass());
-            stage = new Stage();
-            stage.setTitle("Special Cards details");
-            stage.setScene(new Scene(root.load()));
-            stage.show();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        gui.loadSecondWindow("specialCardsScene.fxml");
     }
 
     /**

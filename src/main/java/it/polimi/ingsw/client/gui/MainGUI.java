@@ -8,6 +8,7 @@ import it.polimi.ingsw.client.view.ViewState;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -35,12 +36,14 @@ public class MainGUI extends Application {
     public static final String LOBBY_SCENE = "lobbyScene.fxml";
     public static final String CREDITS_SCENE = "creditsScene.fxml";
     public static final String MY_BOARD_SCENE = "myBoardScene.fxml";
+    public static final String SPECIAL_CARD_SCENE = "specialCardsScene.fxml";
 
     private final ViewState viewState;
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
     private final HashMap<String, GUIController> guiControllersMap = new HashMap<>();
     private final Logger logger = Logger.getLogger(getClass().getName());
     private Stage primaryStage;
+    private Stage secondStage;
     private Scene runningScene;
     private ConnectionSocket connectionSocket = null;
     private final boolean isRunning;
@@ -96,9 +99,10 @@ public class MainGUI extends Application {
         fxmlScenes.add(CREDITS_SCENE);
         fxmlScenes.add(MY_BOARD_SCENE);
 
+        fxmlScenes.add(SPECIAL_CARD_SCENE);
+
         try {
             for (String fxmlName : fxmlScenes) {
-                System.out.println(fxmlName);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui_fxml/" + fxmlName));
                 Scene loadedScene = new Scene(loader.load());
                 guiScenesMap.put(fxmlName, loadedScene);
@@ -188,6 +192,22 @@ public class MainGUI extends Application {
 
     public GUIController getController(String fxmlName){
         return guiControllersMap.get(fxmlName);
+    }
+
+    public void loadSecondWindow(String fxmlName) {
+        secondStage = new Stage();
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader (getClass().getResource("/gui_fxml/" + fxmlName));
+            root = loader.load();
+
+            secondStage.setTitle("Eriantys");
+            secondStage.setScene(new Scene(root));
+            secondStage.getIcons().add(new Image(getClass().getResourceAsStream("/graphics/logos/Eriantys_logo-180x180.png")));
+            secondStage.setResizable(false);
+            secondStage.show();
+
+        } catch (IOException e) {e.printStackTrace();}
     }
 
 
