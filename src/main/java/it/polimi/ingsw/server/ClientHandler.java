@@ -5,15 +5,13 @@ import com.google.gson.JsonObject;
 import it.polimi.ingsw.controller.GameOrchestrator;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
-import it.polimi.ingsw.messages.*;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Suspendable;
+import it.polimi.ingsw.messages.MessageGenerator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
-
 
 import static it.polimi.ingsw.messages.ErrorTypeEnum.GENERIC_ERROR;
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
@@ -27,6 +25,9 @@ public class ClientHandler implements Runnable {
     private MessageParser messageParser;
     private int id;
     private boolean disconnected = false;
+    private Boolean hasReceivedMessageFromTimerStart = false;
+    private final Object hasReceivedMessageFromTimerStartBlocker = new Object();
+
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
         gson = new Gson();
@@ -45,8 +46,28 @@ public class ClientHandler implements Runnable {
     /**
      * Set the id game
      */
-    public void setIDGame(int id){
+    public void setIDGame(int id) {
         this.id = id;
+    }
+
+    /**
+     * Returns the flag for connection flow management (used for disconnection timer)
+     */
+    public Boolean getHasReceivedMessageFromTimerStart() {
+        synchronized (this.hasReceivedMessageFromTimerStart) {
+            return this.hasReceivedMessageFromTimerStart;
+        }
+    }
+
+    /**
+     * Sets the flag used to control the connection flow
+     *
+     * @param hasReceivedMessageFromTimerStart
+     */
+    public void setHasReceivedMessageFromTimerStart(Boolean hasReceivedMessageFromTimerStart) {
+        synchronized (this.hasReceivedMessageFromTimerStart) {
+            this.hasReceivedMessageFromTimerStart = hasReceivedMessageFromTimerStart;
+        }
     }
 
     /**
@@ -58,18 +79,21 @@ public class ClientHandler implements Runnable {
         messageParser = new MessageParser(this);
         messageParser.setName(this.playerName);
         String message;
-        while (true&&!disconnected) {
-            System.out.println("CLIENT HANDLER - player "+playerName+" waiting for message");
+        while (!disconnected) {
+            System.out.println("CLIENT HANDLER - player " + playerName + " waiting for message");
             message = inputReader.nextLine();
-            System.out.println("CLIENT HANDLER - player "+this.getNickName()+" got message "+message);
+            setHasReceivedMessageFromTimerStart(true);
+            System.out.println("CLIENT HANDLER - player " + this.getNickName() + " got message " + message);
             System.out.println(message);
-            if(messageParser!=null)
+            JsonObject json = new Gson().fromJson(message, JsonObject.class);
+            if (messageParser != null)
                 sendingMessage = messageParser.parseMessageToAction(message);
             else
-                sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR,"ERROR - ClientHandler has no messageParser");
-            System.out.println("CLIENT HANDLER - sending "+sendingMessage);
+                sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR, "ERROR - ClientHandler has no messageParser");
+            System.out.println("CLIENT HANDLER - sending " + sendingMessage);
             writer.print(sendingMessage);
             writer.flush();
+
         }
     }
 
@@ -78,12 +102,12 @@ public class ClientHandler implements Runnable {
      *
      * @param message : message to send
      */
-    public void asyncSend(String message){
+    public void asyncSend(String message) {
         System.out.println("ASYNC MESSAGE - Sending: " + message);
-        if(writer != null) {
+        if (writer != null) {
             writer.print(message);
             writer.flush();
-        }else {
+        } else {
             System.out.println("Printer not available");
         }
     }
@@ -128,7 +152,7 @@ public class ClientHandler implements Runnable {
         try {
             System.out.println("confirmNickname");
             Server.blockPlayerName(nickname);
-            System.out.println("IL MIO NICKNAME è "+ nickname + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("IL MIO NICKNAME è " + nickname + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             setNickname(nickname);
             System.out.println("Sending OK: " + MessageGenerator.okNicknameAnswer(nickname));
             message = MessageGenerator.okNicknameAnswer(nickname);
@@ -146,7 +170,7 @@ public class ClientHandler implements Runnable {
     /**
      * Set nickname
      */
-    public void setNickname(String nickname){
+    public void setNickname(String nickname) {
         this.playerName = nickname;
     }
 
@@ -157,27 +181,25 @@ public class ClientHandler implements Runnable {
         System.out.println("I'm in lobbyRequestHandler");
         List<String> list = Server.getLobbyOfActivePlayers();
         System.out.println(list.size());
-        if (list.size() == 0){
+        if (list.size() == 0) {
             System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(null, null, Server.getGamemode(), Server.getNumOfPlayerGame()));
-            writer.print(MessageGenerator.answerlobbyMessage(null, null , Server.getGamemode(), Server.getNumOfPlayerGame()));
-        } else if (list.size()==1){
-            System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(list.get(0),null, Server.getGamemode(), Server.getNumOfPlayerGame()));
+            writer.print(MessageGenerator.answerlobbyMessage(null, null, Server.getGamemode(), Server.getNumOfPlayerGame()));
+        } else if (list.size() == 1) {
+            System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(list.get(0), null, Server.getGamemode(), Server.getNumOfPlayerGame()));
             writer.print(MessageGenerator.answerlobbyMessage(list.get(0), null, Server.getGamemode(), Server.getNumOfPlayerGame()));
-        } else if(list.size()==2){
+        } else if (list.size() == 2) {
             System.out.println("Sending: " + MessageGenerator.answerlobbyMessage(list.get(0), list.get(1), Server.getGamemode(), Server.getNumOfPlayerGame()));
-            writer.print(MessageGenerator.answerlobbyMessage(list.get(0), list.get(1) , Server.getGamemode(), Server.getNumOfPlayerGame()));
+            writer.print(MessageGenerator.answerlobbyMessage(list.get(0), list.get(1), Server.getGamemode(), Server.getNumOfPlayerGame()));
         }
         writer.flush();
 
     }
 
-    public void setGameOrchestrator(GameOrchestrator gameOrchestrator){
-        System.out.println("CLIENT HANDLER of" + playerName + " - Got GameOrchestrator! "+gameOrchestrator);
+    public void setGameOrchestrator(GameOrchestrator gameOrchestrator) {
+        System.out.println("CLIENT HANDLER of" + playerName + " - Got GameOrchestrator! " + gameOrchestrator);
         messageParser.setGameOrchestrator(gameOrchestrator);
         messageParser.setName(this.playerName);
     }
-
-
 
 
 }
