@@ -57,7 +57,9 @@ public class ConnectionSocket {
         socketIn = createScanner(socket);
 
         viewMessageParser = new ViewMessageParser(viewState);
-        Thread r = new Thread(new Reader(socketIn, viewMessageParser)); //Thread to read from the server channel - async
+        Reader reader = new Reader(socketIn, viewMessageParser);
+        reader.setConnectionSocket(this);
+        Thread r = new Thread(reader); //Thread to read from the server channel - async
         r.start();
         socketOut = createWriter(socket);
         return true;
@@ -344,4 +346,11 @@ public class ConnectionSocket {
         socketOut.flush();
     }
 
+    /**
+     * Sends a ping to the Server
+     */
+    public void sendPing(){
+        socketOut.print(MessageGenerator.pingMessage());
+        socketOut.flush();
+    }
 }
