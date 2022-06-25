@@ -47,12 +47,16 @@ public class MessageParser{
     public String parseMessageToAction(String message) {
         System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - parse message to action");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
+        if(json.get("MessageType").getAsInt() == MessageTypeEnum.PING.ordinal())
+        {
+            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" received a ping, sending a pong");
+            return MessageGenerator.pongMessage();
+        }
         if ( gameOrchestrator!= null &&!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName())) {
             System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - ERROR - This is not his/her turn");
             System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - ERROR - current player is "+gameOrchestrator.getActivePlayer());
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_YOUR_TURN, "ERROR - This is not your turn");
         }
-        String returnMessage = null;
         System.out.println(client == null);
         System.out.println(message);
 
