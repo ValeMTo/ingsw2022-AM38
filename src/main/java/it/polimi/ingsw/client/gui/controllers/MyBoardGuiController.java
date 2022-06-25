@@ -8,6 +8,10 @@ import it.polimi.ingsw.model.board.Tower;
 import javafx.beans.DefaultProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BlurType;
@@ -20,8 +24,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Line;
 
 import java.awt.font.ImageGraphicAttribute;
+import javafx.stage.Stage;
+
+import java.awt.*;
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
+import java.util.List;
 
 import static it.polimi.ingsw.model.board.Color.toColor;
 
@@ -64,9 +73,12 @@ public class MyBoardGuiController extends GUIController {
     private AnchorPane professorsArea;
 
     @FXML
+    private Button showSpecialCardsButton;
     private Label statusMessage;
     @FXML
     private Label statusHeader;
+
+    private Stage stage;
 
     @FXML
     private Button showSpecialCards;
@@ -349,6 +361,14 @@ public class MyBoardGuiController extends GUIController {
      * It is called after the SETUP_UPDATE message is received by the ViewMessageParser.
      */
     public void setupBoard() {
+
+        if (gui.getViewState().getGameSettings().getExpert()){
+            showSpecialCardsButton.setVisible(true);
+            showSpecialCardsButton.setOnAction(this::showSpecialCards);
+        }else {
+            showSpecialCardsButton.setVisible(false);
+        }
+
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
         System.out.println("executing setupBoard() ");
         setupTowers();
@@ -373,6 +393,10 @@ public class MyBoardGuiController extends GUIController {
 
     }
 
+
+    public void showSpecialCards(ActionEvent event){
+        gui.loadSecondWindow("specialCardsScene.fxml");
+    }
 
     /**
      * Initially sets the AssistantCards deck in the gui and the corresponding "pickCard()" method.
