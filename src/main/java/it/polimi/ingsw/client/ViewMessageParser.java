@@ -96,9 +96,11 @@ public class ViewMessageParser {
 
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
-                Platform.runLater(() -> {
-                    view.getAwaitingGUI().refreshGameStatus();
-                });
+                if (!view.isCli()){
+                    Platform.runLater(() -> {
+                        view.getAwaitingGUI().refreshGameStatus();
+                    });
+                }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
                 IslandView islandToAdd = new IslandView(json.get("position").getAsInt());
                 if(json.get("TowerColor").getAsString()!=null&&!json.get("TowerColor").getAsString().equalsIgnoreCase("null"))
@@ -127,9 +129,11 @@ public class ViewMessageParser {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
                 }
-                Platform.runLater(() -> {
-                    view.getAwaitingGUI().refreshGameStatus();
-                });
+                if (!view.isCli()) {
+                    Platform.runLater(() -> {
+                        view.getAwaitingGUI().refreshGameStatus();
+                    });
+                }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()) {
                 Map<String, Number> students = gson.fromJson(json.get("SchoolEntranceMap"), HashMap.class);
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
