@@ -133,7 +133,10 @@ public class ViewMessageParser {
                 view.setTowerLeft(Tower.values()[json.get("TowerColor").getAsInt()],json.get("NumOfTowers").getAsInt());
                 // Tells the gui to updates its board
                 if(!view.isCli() && view.getPlayerTower().equals(Tower.values()[json.get("TowerColor").getAsInt()])) {
-                    Platform.runLater(() -> view.getAwaitingGUI().updatePlayerBoard());
+                    Platform.runLater(() -> {
+                        view.getAwaitingGUI().refreshWholeBoard();
+                        view.getAwaitingGUI().refreshGameStatus();
+                    });
                 }
                 //TODO: other sets
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal()) {

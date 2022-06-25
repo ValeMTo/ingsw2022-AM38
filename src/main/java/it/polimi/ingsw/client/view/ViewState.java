@@ -552,6 +552,14 @@ public class ViewState {
         return this.players.values();
     }
 
+    public synchronized Map<Tower,String> getPlayers() {
+        Map<Tower,String> towersToNames = new HashMap<Tower,String>();
+        for(String name : players.keySet()){
+            towersToNames.put(players.get(name), name);
+        }
+        return towersToNames;
+    }
+
     /*
     public synchronized int getNumOfTowers(Tower player) {
         return

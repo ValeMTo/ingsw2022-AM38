@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.client.view.IslandView;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
@@ -63,8 +64,12 @@ public class MyBoardGuiController extends GUIController {
     private AnchorPane professorsArea;
 
     @FXML
-    private Button showSpecialCards;
+    private Label statusMessage;
+    @FXML
+    private Label statusHeader;
 
+    @FXML
+    private Button showSpecialCards;
     @FXML
     private Button showOtherBoards;
 
@@ -333,6 +338,7 @@ public class MyBoardGuiController extends GUIController {
         createArchipelago();
         createSchoolBoard();
         createShowContentArea();
+        createControlsArea();
 
     }
 
@@ -357,6 +363,16 @@ public class MyBoardGuiController extends GUIController {
         updateProfessors();
 
     }
+
+    public void updateGameStatus(){
+        PhaseEnum currentPhase = gui.getViewState().getCurrentPhase();
+        Tower activePlayer = gui.getViewState().getActivePlayer();
+        String activePlayerName = gui.getViewState().getPlayers().get(activePlayer);
+
+        statusHeader.setText("Phase : " + currentPhase.toString() + "\nActive player : " + activePlayerName);
+
+    }
+
 
     /**
      * Initially sets the AssistantCards deck in the gui and the corresponding "pickCard()" method.
@@ -524,6 +540,13 @@ public class MyBoardGuiController extends GUIController {
 
         showContentArea.setVisible(false);
         showContentArea.setDisable(true);
+    }
+
+    public void createControlsArea() {
+        controlsArea.setVisible(true);
+        controlsArea.setDisable(false);
+        statusHeader.setText("");
+        statusMessage.setText("");
     }
 
     /**
