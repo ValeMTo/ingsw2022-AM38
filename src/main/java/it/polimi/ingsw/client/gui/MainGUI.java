@@ -98,6 +98,7 @@ public class MainGUI extends Application {
 
         try {
             for (String fxmlName : fxmlScenes) {
+                System.out.println(fxmlName);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui_fxml/" + fxmlName));
                 Scene loadedScene = new Scene(loader.load());
                 guiScenesMap.put(fxmlName, loadedScene);
