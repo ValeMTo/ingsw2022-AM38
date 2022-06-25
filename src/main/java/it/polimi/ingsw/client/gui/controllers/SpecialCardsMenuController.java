@@ -44,15 +44,15 @@ public class SpecialCardsMenuController extends GUIController {
     private Label description3;
 
     public void initialize(){
-        coin1.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
-        coin2.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
-        coin3.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
+        //coin1.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
+        //coin2.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
+        //coin3.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
         coin1.setVisible(false);
         coin2.setVisible(false);
         coin3.setVisible(false);
     }
 
-    public void loadSpecialCards(){
+    public void loadContent(){
         try {
             Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();
             List<SpecialCardName> list = specialCards.keySet().stream().toList();

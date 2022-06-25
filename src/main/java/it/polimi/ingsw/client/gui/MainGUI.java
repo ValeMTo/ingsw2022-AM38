@@ -36,7 +36,6 @@ public class MainGUI extends Application {
     public static final String LOBBY_SCENE = "lobbyScene.fxml";
     public static final String CREDITS_SCENE = "creditsScene.fxml";
     public static final String MY_BOARD_SCENE = "myBoardScene.fxml";
-    public static final String SPECIAL_CARD_SCENE = "specialCardsScene.fxml";
 
     private final ViewState viewState;
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
@@ -99,7 +98,6 @@ public class MainGUI extends Application {
         fxmlScenes.add(CREDITS_SCENE);
         fxmlScenes.add(MY_BOARD_SCENE);
 
-        fxmlScenes.add(SPECIAL_CARD_SCENE);
 
         try {
             for (String fxmlName : fxmlScenes) {
@@ -204,6 +202,12 @@ public class MainGUI extends Application {
             secondStage.setTitle("Eriantys");
             secondStage.setScene(new Scene(root));
             secondStage.getIcons().add(new Image(getClass().getResourceAsStream("/graphics/logos/Eriantys_logo-180x180.png")));
+
+            GUIController controller = loader.getController();
+            controller.setGuiToController(this);
+            controller.loadContent();
+            guiControllersMap.put(fxmlName, controller);
+
             secondStage.setResizable(false);
             secondStage.show();
 
