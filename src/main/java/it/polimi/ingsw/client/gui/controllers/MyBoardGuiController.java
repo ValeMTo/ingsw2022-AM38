@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.Glow;
 import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -41,6 +42,7 @@ public class MyBoardGuiController extends GUIController {
     private final HashMap<Tower, Image> towersImgMap = new HashMap<>();
     private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
     private final ArrayList<Label> entranceStudLabels = new ArrayList<Label>();
+    private final ArrayList<ImageView> entranceStudImages = new ArrayList<ImageView>(5);
     private final ArrayList<Label> diningRoomStudLabels = new ArrayList<Label>();
     private final ArrayList<Label> professorsLabels = new ArrayList<Label>(5);
     private final ArrayList<ImageView> archipelagoIslands = new ArrayList<ImageView>();
@@ -60,9 +62,15 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private AnchorPane playerboardArea;
     @FXML
+    private AnchorPane entranceStudentsArea;
+    @FXML
+    private AnchorPane diningRoomStudentsArea;
+    @FXML
     private AnchorPane controlsArea;
     @FXML
     private AnchorPane showContentArea;
+    @FXML
+    private AnchorPane archipelagoArea;
     @FXML
     private Label showContentLabel;
     @FXML
@@ -242,6 +250,11 @@ public class MyBoardGuiController extends GUIController {
     private ImageView island12;
 
     @FXML
+    private Button moveDiningRoomButton;
+    @FXML
+    private Button moveIslandButton;
+
+    @FXML
     private ImageView towerIsland1;   // ImageView of the tower on the island #1
     @FXML
     private ImageView towerIsland2;
@@ -341,6 +354,9 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private ImageView noEntry12;
 
+    private Color fromStudent;
+    private int destinationIslandPos;
+
 
 
 
@@ -370,6 +386,8 @@ public class MyBoardGuiController extends GUIController {
             showSpecialCardsButton.setVisible(false);
         }
 
+        moveDiningRoomButton.setOnAction(this::pickDiningRoom);
+        moveIslandButton.setOnAction(this::pickIsland);
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
         System.out.println("executing setupBoard() ");
         setupTowers();
@@ -401,6 +419,14 @@ public class MyBoardGuiController extends GUIController {
     public void updatePhaseAction(){
         deckArea.setVisible(false);
         deckArea.setDisable(true);
+        diningRoomStudentsArea.setDisable(true);
+        entranceStudentsArea.setDisable(true);
+        moveIslandButton.setVisible(false);
+        moveIslandButton.setDisable(true);
+        moveDiningRoomButton.setVisible(false);
+        moveDiningRoomButton.setDisable(true);
+
+
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
                 deckArea.setVisible(true);
             if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
@@ -416,7 +442,20 @@ public class MyBoardGuiController extends GUIController {
                     }
                 }
             }
-        } 
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)){
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                entranceStudentsArea.setDisable(false);
+                Map<Color, Integer> entrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+                for (ImageView image : entranceStudImages){
+                    if (entrance.get(getColorFromImage(image)) <= 0){
+                        image.setDisable(true);
+                    } else {
+                        image.setDisable(false);
+                    }
+                }
+            }
+
+        } //TODO: other phases
     };
 
     @FXML
@@ -457,6 +496,62 @@ public class MyBoardGuiController extends GUIController {
 
     }
 
+    @FXML
+    public void pickEntranceStudent(MouseEvent event){
+        ImageView imagePicked = (ImageView) event.getSource();
+        imagePicked.setEffect(createShadow());
+
+        fromStudent = getColorFromImage(imagePicked);
+        entranceStudentsArea.setDisable(true);
+        moveDiningRoomButton.setVisible(true);
+        moveDiningRoomButton.setDisable(false);
+    }
+
+    private Color getColorFromImage(ImageView image){
+        String str = image.getId();
+        str = str.replace("ent","");
+        str = str.replace("Stud","");
+        return toColor(str);
+    }
+
+    private int getPositionFromImage(ImageView image){
+        String str = image.getId();
+        str = str.replace("island","");
+        return Integer.parseInt(str);
+    }
+
+    @FXML
+    public void pickIsland(ActionEvent event){
+        removeEffect(archipelagoIslands);
+        removeEffect(entranceStudImages);
+        gui.getConnectionSocket().moveStudentToIsland(fromStudent, destinationIslandPos);
+    }
+
+    private void removeEffect(List<ImageView> list){
+        for (ImageView image : list){
+            image.setEffect(null);
+        }
+    }
+
+    @FXML
+    public void pickIslandAndPutStudent(MouseEvent event){
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
+            ImageView destinationIsland = (ImageView) event.getSource();
+            destinationIsland.setEffect(new Glow());
+            diningRoomStudentsArea.setDisable(true);
+            this.destinationIslandPos = getPositionFromImage(destinationIsland);
+            moveIslandButton.setVisible(true);
+            moveIslandButton.setDisable(false);
+        }
+    }
+
+    public void pickDiningRoom(ActionEvent event){
+        diningRoomStudentsArea.setDisable(true);
+        removeEffect(archipelagoIslands);
+        removeEffect(entranceStudImages);
+        gui.getConnectionSocket().moveStudentToDiningRoom(fromStudent);
+
+    }
 
     public void createSchoolBoard() {
         // adding labels in the SchoolBoard
@@ -468,6 +563,16 @@ public class MyBoardGuiController extends GUIController {
         for(Label l : entranceStudLabels){
             l.setText("");
         }
+
+        entranceStudImages.add(entBlueStud);
+        entranceStudImages.add(entRedStud);
+        entranceStudImages.add(entYellowStud);
+        entranceStudImages.add(entPinkStud);
+        entranceStudImages.add(entGreenStud);
+        for(ImageView img : entranceStudImages) {
+            img.setOnMouseClicked(this::pickEntranceStudent);
+        }
+
         diningRoomStudLabels.add(num_dinRed);
         diningRoomStudLabels.add(num_dinYellow);
         diningRoomStudLabels.add(num_dinPink);
@@ -505,9 +610,8 @@ public class MyBoardGuiController extends GUIController {
         archipelagoIslands.add(island12);
 
         for(ImageView img : archipelagoIslands) {
-            img.setOnMouseClicked(this::showContent);
-
-
+            img.setOnMouseEntered(this::showContent);
+            img.setOnMouseClicked(this::pickIslandAndPutStudent);
         }
 
         towersOnIslands.add(towerIsland1);
