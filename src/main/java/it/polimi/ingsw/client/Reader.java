@@ -66,7 +66,7 @@ public class Reader implements Runnable {
         Timer disconnectionTimer = new Timer("Disconnection timer");
         TimerTask disconnectionTask = new disconnectionTimer(this);
         pingPongTimer.scheduleAtFixedRate(pingPongtask,5000,5000);
-        disconnectionTimer.scheduleAtFixedRate(disconnectionTask,12000,12000);
+        disconnectionTimer.scheduleAtFixedRate(disconnectionTask,30000,30000);
         while (true) {
 
             try {

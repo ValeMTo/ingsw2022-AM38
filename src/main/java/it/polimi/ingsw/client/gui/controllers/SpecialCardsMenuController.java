@@ -88,10 +88,12 @@ public class SpecialCardsMenuController extends GUIController {
                     if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(0))) {
                         use1.setVisible(true);
                         use1.setDisable(false);
-                    } else if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(1))) {
+                    }
+                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(1))) {
                         use2.setVisible(true);
                         use2.setDisable(false);
-                    } else if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(2))) {
+                    }
+                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(2))) {
                         use3.setVisible(true);
                         use3.setDisable(false);
                     }
