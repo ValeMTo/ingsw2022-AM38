@@ -10,6 +10,7 @@ import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.*;
 
+import static it.polimi.ingsw.controller.PhaseEnum.END;
 import static it.polimi.ingsw.controller.PhaseEnum.PLANNING;
 
 public abstract class GameOrchestrator extends Listenable {
@@ -38,7 +39,6 @@ public abstract class GameOrchestrator extends Listenable {
         this.clients = new ArrayList<>();
         if(clients != null)
             this.clients.addAll(clients);
-        // TODO: better this. It is hardcode...
         System.out.println("GAME MODE NOTIFY: SETUP OF THE VIEW STATES");
         Map<String, Tower> sendMap = new HashMap<>();
         sendMap.put(players.get(0), Tower.WHITE);
@@ -48,7 +48,7 @@ public abstract class GameOrchestrator extends Listenable {
         if(clients != null)
             notify(modelListener, MessageGenerator.setupUpdateMessage(sendMap, players.size(),isExpert),clients);
         this.isExpert = isExpert;
-        System.out.println("GAMEORCHESTRATOR - SETTING");
+        System.out.println("GAME ORCHESTRATOR - SETTING");
         if (isExpert) this.gameBoard = new ExpertGameBoard(players.size(), players);
         else this.gameBoard = new EasyGameBoard(players.size(), players);
         this.players = new ArrayList<String>();
@@ -62,7 +62,7 @@ public abstract class GameOrchestrator extends Listenable {
         this.specialCardAlreadyUsed = false;
         this.studentMovesLeft = maxStudentMoves;
         for (int i = 0; i < players.size(); i++) {
-            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i+" "+players.get(i));
+            System.out.println("GAME ORCHESTRATOR - SETTING - Player " + i+" "+players.get(i));
             planningOrder[i] = players.get(i);
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
@@ -94,9 +94,9 @@ public abstract class GameOrchestrator extends Listenable {
         gameBoard.fillClouds();
         if(clients!=null&&modelListener!=null) {
             currentPhase = PLANNING;
-            System.out.println("GAMEORCHESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
+            System.out.println("GAME ORCHESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
             notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
-            System.out.println("GAMEORCHESTRATOR NOTIFY: new phase " + currentPhase.name());
+            System.out.println("GAME ORCHESTRATOR NOTIFY: new phase " + currentPhase.name());
             notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
         }
         currentPhase = PLANNING;
@@ -152,7 +152,7 @@ public abstract class GameOrchestrator extends Listenable {
     protected void setCurrentPhase(PhaseEnum updatePhase) {
         synchronized (phaseBlocker) {
             if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.InstantEndOfMatch))
-                this.currentPhase = PhaseEnum.END;
+                this.currentPhase = END;
             else this.currentPhase = updatePhase;
         }
     }
@@ -307,7 +307,6 @@ public abstract class GameOrchestrator extends Listenable {
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
                 if (clients != null) {
-                    notify(modelListener, MessageGenerator.archipelagoViewUpdateMessage(gameBoard.getIslandNumber(),destinationIsland), clients);
                     notifyPhaseAndCurrentPlayer();
                 }
                 return true;
@@ -352,13 +351,13 @@ public abstract class GameOrchestrator extends Listenable {
 
     protected void notifyPhaseAndCurrentPlayer(){
         if(clients!=null&&modelListener!=null) {
-            System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer])+" phase "+this.getCurrentPhase());
+            System.out.println("GAME ORCHESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer])+" phase "+this.getCurrentPhase());
             if(currentPhase==PLANNING) {
-                System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                System.out.println("GAME ORCHESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]) + " phase " + this.getCurrentPhase());
                 notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer]), this.getCurrentPhase()), clients);
             }
             else {
-                System.out.println("GAME ORHCESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                System.out.println("GAME ORCHESTRATOR NOTIFY - setPhaseAndCurrentPlayer - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
                 notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase()), clients);
             }
         }
@@ -391,12 +390,11 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                 } else if (getCurrentPhase() == PhaseEnum.ACTION_CHOOSE_CLOUD) {
                     //Sets the active player as the next on the action order and sets the action phase as move student
-                    activePlayer++;
+
                     this.specialCardAlreadyUsed = false;
-                    if (activePlayer < players.size()) {
-
+                    if (activePlayer < players.size()-1) {
+                        activePlayer++;
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
-
                         this.studentMovesLeft = maxStudentMoves;
                         setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
                     }
@@ -413,16 +411,17 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                     //If the game ends
                     else {
-                        setCurrentPhase(PhaseEnum.END);
+                        gameBoard.notifyEndOfMatchLeaderBoard();
+                        setCurrentPhase(END);
                     }
                 }
                 if(clients!=null&&modelListener!=null) {
                     if(getCurrentPhase()==PLANNING) {
-                        System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - PLANNING PHASE - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                        System.out.println("GAME ORCHESTRATOR NOTIFY - nextStep - PLANNING PHASE - ActivePlayerWithTower " + gameBoard.getPlayerTower(planningOrder[activePlayer]) + " phase " + this.getCurrentPhase());
                         notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer]), this.getCurrentPhase()), clients);
                     }
-                    else {
-                        System.out.println("GAMEORHCESTRATOR NOTIFY - nextStep - ACTION Phase - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
+                    else if(getCurrentPhase()!=END){
+                        System.out.println("GAME ORCHESTRATOR NOTIFY - nextStep - ACTION Phase - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
                         notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase()), clients);
                     }
 

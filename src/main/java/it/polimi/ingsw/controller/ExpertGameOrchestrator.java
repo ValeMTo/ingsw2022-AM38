@@ -136,7 +136,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 }
                 Integer cost = gameBoard.getSpecialCardCost(convertedName);
                 if (!gameBoard.paySpecialCard(cost)) {
-                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_ENOUGH_COINS, "ERROR - not enought coin to activate this special card");
+                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_ENOUGH_COINS, "ERROR - not enough coin to activate this special card");
                 }
                 setCurrentPhase(PhaseEnum.SPECIAL_CARD_USAGE);
                 this.activatedSpecialCard = convertedName;

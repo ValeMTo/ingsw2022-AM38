@@ -26,6 +26,8 @@ public abstract class GameBoard extends Listenable {
     protected Cloud[] clouds;
     protected int numRound;
     protected int motherNature;
+    protected Map<String, Integer> standing = new HashMap<>();
+
 
     public GameBoard(int playerNumber, List<String> playersNicknames) {
 
@@ -64,7 +66,7 @@ public abstract class GameBoard extends Listenable {
         }
     }
 
-    protected void notifyArchipelago(){
+    public void notifyArchipelago(){
         System.out.println("GAME BOARD - notifyArchipelago - notify the change on the archipelago "+MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature));
         if(clients!=null && modelListener!=null)
             notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
@@ -180,6 +182,38 @@ public abstract class GameBoard extends Listenable {
     }
 
     /**
+     * Updates the status of the leaderBoard, computing the standings
+     */
+    private void leaderBoardUpdate(){
+        Integer minTowerLeft = null;
+        List<String> minTowerOwner = new ArrayList<>();
+        int counter = 1, standingPosition = 1;
+        while(counter <=playerNumber){
+            minTowerLeft = null;
+            minTowerOwner.clear();
+            for(int i=0;i<playerNumber;i++)
+            {
+                if(minTowerLeft==null) {
+                    minTowerLeft = players[i].getAvailableTowers();
+                    minTowerOwner.add(players[i].getNickName());
+                }
+                else if(minTowerLeft>players[i].getAvailableTowers()) {
+                    minTowerOwner.clear();
+                    minTowerLeft = players[i].getAvailableTowers();
+                    minTowerOwner.add(players[i].getNickName());
+                } else if (minTowerLeft.equals(players[i].getAvailableTowers())) {
+                    minTowerOwner.add(players[i].getNickName());
+                }
+            }
+            for(String player : minTowerOwner) {
+                this.standing.put(player, standingPosition);
+                counter++;
+            }
+            standingPosition++;
+        }
+    }
+
+    /**
      * Verifies the conditions that bring to the end of the match
      *
      * @return NoEndOfMatch if the match ending conditions are not verified,
@@ -187,23 +221,57 @@ public abstract class GameBoard extends Listenable {
      * DelayedEndOfMatch if the match does end after the round is completed
      */
     public EndOfMatchCondition isEndOfMatch() {
+        // Change the leaderBoard status
+        leaderBoardUpdate();
         // Empty bag condition
-        if (bag.isEmpty()) return EndOfMatchCondition.DelayedEndOfMatch;
+        if (bag.isEmpty()) {
+            return EndOfMatchCondition.DelayedEndOfMatch;
+        }
         // Player has used all his towers
         for (PlayerBoard player : players) {
             if (player.getAvailableTowers() == 0) return EndOfMatchCondition.InstantEndOfMatch;
         }
         // No more assistant card (all 10 cards used)
-        if (numRound == 11) return EndOfMatchCondition.InstantEndOfMatch;
+        if (numRound == 11) {
+            return EndOfMatchCondition.InstantEndOfMatch;
+        }
         // Final round
         if (numRound == 10) return EndOfMatchCondition.DelayedEndOfMatch;
         for (PlayerBoard player : players) {
             if (player.getAvailableCards().size() == 1) return EndOfMatchCondition.DelayedEndOfMatch;
         }
         // 3 Islands groups
-        if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3)
+        if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3) {
             return EndOfMatchCondition.InstantEndOfMatch;
+        }
         return EndOfMatchCondition.NoEndOfMatch;
+    }
+
+    /**
+     * Notifies with the leaderBoard update the end of match, it is executed when the round ends,
+     * so it is effectively an end of match
+     */
+    public void notifyEndOfMatchLeaderBoard(){
+        // Change the leaderBoard status
+        leaderBoardUpdate();
+        // Empty bag condition
+        String message="";
+        if (bag.isEmpty()) {
+            message = " bags pawn ended ";
+        }
+        // Player has used all his towers
+        for (PlayerBoard player : players) {
+            if (player.getAvailableTowers() == 0) message+= " the player "+player.getNickName()+" has used all the towers ";
+        }
+        // No more assistant card (all 10 cards used)
+        if (numRound >= 10) {
+            message = "assistant card ended";
+        }
+        // 3 Islands groups
+        if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3) {
+            message += " only three island group left ";
+        }
+        notify(modelListener,MessageGenerator.leaderboardUpdateMessage(true,standing,message),clients);
     }
 
     /**
@@ -230,7 +298,6 @@ public abstract class GameBoard extends Listenable {
             exc.printStackTrace();
             return false;
         }
-
         if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands.length);
 
@@ -249,6 +316,7 @@ public abstract class GameBoard extends Listenable {
     public void fillClouds() {
         for (Cloud cloud : clouds) {
             while (!cloud.isFull() && !bag.isEmpty()) cloud.addStudent(bag.drawStudent());
+            cloud.setHasBeenUsed(false);
         }
         notifyClouds();
     }
@@ -584,7 +652,7 @@ public abstract class GameBoard extends Listenable {
     public Set<Integer> getUsableClouds() {
         Set<Integer> usableClouds = new HashSet<>();
         for (int i = 0; i < playerNumber; i++) {
-            if (clouds[i].isFull()) usableClouds.add(i + 1);
+            if (!clouds[i].isHasBeenUsed()) usableClouds.add(i + 1);
         }
         return usableClouds;
     }

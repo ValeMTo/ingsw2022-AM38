@@ -819,12 +819,13 @@ public class MessageGenerator {
      * @param leaderboard : the current updated leaderboard (results and scores).
      * @return : json string of the LeaderboardUpdate message
      */
-    public static String leaderboardUpdateMessage(boolean isEndOfGame, Map<String, Integer> leaderboard) {
+    public static String leaderboardUpdateMessage(boolean isEndOfGame, Map<String, Integer> leaderboard, String endingMessage) {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
         json.put("UpdateType", UpdateTypeEnum.LEADERBOARD_UPDATE.ordinal());
         json.put("IsEndOfGame", isEndOfGame);
         json.put("Leaderboard", leaderboard);
+        json.put("EndingMessage",endingMessage);
         return json + "\n";
     }
 

@@ -325,6 +325,7 @@ public class ClientCLI {
         System.out.println("\033[H");
         System.out.flush();
         System.out.println("\033[2J");
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.flush();
     }
 
@@ -888,4 +889,91 @@ public class ClientCLI {
         if(viewState.isExpert())
             System.out.println(ClientCLI.CLICyan+"(game mode is Expert, use V to visualize special cards, S to use a special card or just continue with the upper instructions)"+ClientCLI.CLIEffectReset);
     }
+
+
+    private boolean isDraw(Map<String, Integer> standing){
+        int firstClassified = 0;
+        for(String s: standing.keySet()){
+            if(standing.get(s)==1)firstClassified++;
+        }
+        if(firstClassified>1)
+            return true;
+        return false;
+    }
+
+    private void printStandings(Map<String, Integer> standing){
+        System.out.println("\n"+CLIBoldWhite+"Game has ended, caused of end "+viewState.getEndingMotivation()+CLIEffectReset+"\n");
+        System.out.println(CLIBoldWhite+"\t - STANDINGS -"+viewState.getEndingMotivation()+CLIEffectReset+"\n");
+        try{Thread.sleep(200);}
+        catch (InterruptedException exc){}
+        int stand = 1;
+        Set<String> standingNicknames = standing.keySet();
+        while(!standing.isEmpty()){
+            for(String s: standingNicknames)
+                if(standing.containsKey(s))
+                    if(standing.get(s)==stand) {
+                        switch (stand) {
+                            case 1:
+                                System.out.println(CLIBoldWhite + stand + "st: " + s + " with " + viewState.getTowerLeft(viewState.getPlayerTower(s)) + " towers left" + CLIEffectReset);
+                                break;
+                            case 2:
+                                System.out.println(CLIBoldWhite + stand + "nd: " + s + " with " + viewState.getTowerLeft(viewState.getPlayerTower(s)) + " towers left" + CLIEffectReset);
+                                break;
+                            case 3:
+                                System.out.println(CLIBoldWhite + stand + "rd: " + s + " with " + viewState.getTowerLeft(viewState.getPlayerTower(s)) + " towers left" + CLIEffectReset);
+                                break;
+                        }
+                        standing.remove(s);
+                    }
+            try{Thread.sleep(200);}
+            catch (InterruptedException exc){}
+            stand++;
+        }
+    }
+    public void printEndOfMatch(){
+        Map<String, Integer> standing = viewState.getLeaderBoard();
+        if(standing.get(viewState.getNickname())==1){
+            if(!isDraw(standing)){
+                System.out.println(CLIBoldWhite+"\tY");
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                cleaner();
+                System.out.println(CLIBoldWhite+"\tYO");
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                cleaner();
+                System.out.println(CLIBoldWhite+"\tYOU");
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                cleaner();
+                System.out.println(CLIBoldWhite+"\tYOU ");
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                System.out.println(CLIBoldWhite+"\tYOU W");
+                cleaner();
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                System.out.println(CLIBoldWhite+"\tYOU WI");
+                cleaner();
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                System.out.println(CLIBoldWhite+"\tYOU WIN");
+            }
+            else {
+                System.out.println(CLIBoldWhite + "\tT");
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                System.out.println(CLIBoldWhite+"\tTI");
+                try{Thread.sleep(200);}
+                catch (InterruptedException exc){}
+                System.out.println(CLIBoldWhite+"\tTIE");
+            }
+        }
+        try{Thread.sleep(200);}
+        catch (InterruptedException exc){}
+        printStandings(standing);
+
+    }
+
+
 }

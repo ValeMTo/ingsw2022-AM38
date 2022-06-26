@@ -10,6 +10,8 @@ public class Cloud extends Listenable {
     private final int studentLimit;
     private Map<Color, Integer> counter;
 
+    private boolean hasBeenUsed = false;
+
 
 
     /**
@@ -124,11 +126,9 @@ public class Cloud extends Listenable {
      * @return outcome of the removal
      */
     public boolean removeStudent(Color studentColor) throws NullPointerException {
+        setHasBeenUsed(true);
         if (studentColor == null) throw new NullPointerException();
-
         Integer previousNumStudents = counter.get(studentColor);
-
-
         if (!counter.containsKey(studentColor) || this.countStudent(studentColor) <= 0) return false;
         counter.put(studentColor, previousNumStudents - 1);
         return true;
@@ -152,4 +152,18 @@ public class Cloud extends Listenable {
         return studentLimit;
     }
 
+    /**
+     * Sets the cloud as already used
+     * @param hasBeenUsed
+     */
+    public void setHasBeenUsed(boolean hasBeenUsed) {
+        this.hasBeenUsed = hasBeenUsed;
+    }
+
+    /**
+     * @return true if the cloud has been already used
+     */
+    public boolean isHasBeenUsed() {
+        return hasBeenUsed;
+    }
 }

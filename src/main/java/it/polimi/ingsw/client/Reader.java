@@ -1,8 +1,13 @@
 package it.polimi.ingsw.client;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import it.polimi.ingsw.connectionManagement.disconnectionTimer;
 import it.polimi.ingsw.connectionManagement.pingPongTimer;
+import it.polimi.ingsw.messages.ConnectionTypeEnum;
+import it.polimi.ingsw.messages.MessageTypeEnum;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Timer;
@@ -47,7 +52,7 @@ public class Reader implements Runnable {
         try {
             connectionSocket.disconnect();
             inputReader.close();
-            System.out.println("READER - GRACEFUL DISCONNECTION - Server connection lost, shutting down, try later and check your connection");
+            System.out.println("READER - GRACEFUL DISCONNECTION -");
         } catch (IOException exc) {
             System.out.println("READER - GRACEFUL DISCONNECTION - not possible to close the reader, shutting down");
         }
@@ -67,14 +72,18 @@ public class Reader implements Runnable {
         TimerTask disconnectionTask = new disconnectionTimer(this);
         pingPongTimer.scheduleAtFixedRate(pingPongtask,5000,5000);
         disconnectionTimer.scheduleAtFixedRate(disconnectionTask,30000,30000);
+        JsonObject json;
+        Gson gson = new Gson();
         while (true) {
-
             try {
                 //System.out.println("READER - waiting for message");
                 input = inputReader.readLine();
                 setHasReceivedMessageFromTimerStart(true);
                 //System.out.println("READER - got message "+input);
                 viewHandler.parse(input);
+                json = gson.fromJson(input,JsonObject.class);
+                if(json!=null && json.has("MessageType")&&json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.has("ConnectionType")&&json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal())
+                    disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(0);

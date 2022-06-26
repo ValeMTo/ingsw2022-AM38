@@ -16,7 +16,7 @@ public class disconnectionTimer extends TimerTask {
         if(this.reader!=null)
         {
             if(!reader.isHasReceivedMessageFromTimerStart()){
-                System.out.println("TIMER TASK - DISCONNECTION TIMER - run() - server connection lost, disconnecting! ");
+                System.out.println("CONNECTION ERROR - DISCONNECTION TIMER - server connection lost, disconnecting! Shutting down");
                 reader.disconnect();
             }
             else

@@ -18,7 +18,6 @@ public class pingPongTimer extends TimerTask {
     public void run() {
         if (reader != null && connectionSocket != null) {
             if (!reader.isHasReceivedMessageFromTimerStart()) {
-                System.out.println("TIMER PING PONG - Sending a ping");
                 connectionSocket.sendPing();
             }
         }
