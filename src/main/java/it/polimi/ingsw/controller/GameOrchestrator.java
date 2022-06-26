@@ -307,7 +307,6 @@ public abstract class GameOrchestrator extends Listenable {
                 gameBoard.computeInfluence(destinationIsland);
                 setCurrentPhase(PhaseEnum.ACTION_CHOOSE_CLOUD);
                 if (clients != null) {
-                    notify(modelListener, MessageGenerator.archipelagoViewUpdateMessage(gameBoard.getIslandNumber(),destinationIsland), clients);
                     notifyPhaseAndCurrentPlayer();
                 }
                 return true;

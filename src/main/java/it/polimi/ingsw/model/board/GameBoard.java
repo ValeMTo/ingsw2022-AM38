@@ -64,7 +64,7 @@ public abstract class GameBoard extends Listenable {
         }
     }
 
-    protected void notifyArchipelago(){
+    public void notifyArchipelago(){
         System.out.println("GAME BOARD - notifyArchipelago - notify the change on the archipelago "+MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature));
         if(clients!=null && modelListener!=null)
             notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
