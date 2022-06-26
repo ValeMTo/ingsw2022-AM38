@@ -81,8 +81,8 @@ public class Reader implements Runnable {
                 setHasReceivedMessageFromTimerStart(true);
                 //System.out.println("READER - got message "+input);
                 viewHandler.parse(input);
-                json = gson.fromJson(inputReader,JsonObject.class);
-                if(json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal())
+                json = gson.fromJson(input,JsonObject.class);
+                if(json!=null && json.has("MessageType")&&json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.has("ConnectionType")&&json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal())
                     disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
