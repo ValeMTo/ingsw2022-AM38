@@ -412,6 +412,7 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                     //If the game ends
                     else {
+                        gameBoard.notifyEndOfMatchLeaderBoard();
                         setCurrentPhase(PhaseEnum.END);
                     }
                 }

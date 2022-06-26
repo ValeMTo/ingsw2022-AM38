@@ -46,6 +46,8 @@ public class ViewState {
     private boolean isSpecialCardUsed = false;
     private SubPhaseEnum subPhaseEnum = SubPhaseEnum.NO_SUB_PHASE;
     private boolean acceptedUseSpecialCard=false;
+    private Map<String, Integer> leaderBoard = new HashMap<>();
+    private String endingMotivation;
 
     public ViewState(boolean isCli) {
         this.onlinePlayers = new ArrayList<>();
@@ -101,6 +103,40 @@ public class ViewState {
         this.awaitingCLI = awaitingCLI;
         refreshCLI();
     }
+
+    /**
+     * @param leaderBoard the actual leaderBoard with the player and its standing (1,2,3 as 1st, 2nd, 3rd)
+     */
+    public synchronized void setLeaderBoard(Map<String, Integer> leaderBoard) {
+        this.leaderBoard = leaderBoard;
+    }
+
+
+    /**
+     * @return the map with the player and its actual standing (1,2,3 as 1st, 2nd, 3rd)
+     */
+    public synchronized Map<String, Integer> getLeaderBoard(){
+        Map<String, Integer> mapToBeReturn = new HashMap<>();
+        mapToBeReturn.putAll(this.leaderBoard);
+        return mapToBeReturn;
+    }
+
+    /**
+     * Sets the motif of game end (e.g. assistant cards ended, one player has finished the tower, etc.)
+     * @param endingMotivation the string containing the motif of the end of the game
+     */
+    public synchronized void setEndingMotivation(String endingMotivation) {
+        this.endingMotivation = endingMotivation;
+    }
+
+    /**
+     * Gets the motif of game end (e.g. assistant cards ended, one player has finished the tower, etc.)
+     * @return the string containing the motif of the end of the game
+     */
+    public synchronized String getEndingMotivation(){
+        return this.endingMotivation;
+    }
+
 
     /**
      * Gets the herbalist tiles number
@@ -521,6 +557,14 @@ public class ViewState {
         return playerTower;
     }
 
+    /**
+     * @param nickName the nickname of the player that we want to know the tower
+     * @return the tower of the specified player
+     */
+    public synchronized Tower getPlayerTower(String nickName){
+        return players.get(nickName);
+    }
+
 
 
     public synchronized void setPlayerTower(Tower playerTower) {
@@ -817,7 +861,11 @@ public class ViewState {
     private void refreshCLI() {
         if (awaitingCLI == null) return;
         awaitingCLI.cleaner();
-        if (!this.activeView) {
+        if(this.currentPhase.equals(PhaseEnum.END))
+        {
+            awaitingCLI.printEndOfMatch();
+        }
+        else if (!this.activeView) {
             awaitingCLI.showNotYourTurnView();
         } else {
             if(acceptedUseSpecialCard) awaitingCLI.specialCardUsage();

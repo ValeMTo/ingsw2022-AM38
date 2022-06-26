@@ -40,8 +40,7 @@ public class ViewMessageParser {
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
-        System.out.println("viewMessageParser receive..." + jsonFromServer);
-
+        //System.out.println("viewMessageParser receive..." + jsonFromServer);
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
 
@@ -64,6 +63,14 @@ public class ViewMessageParser {
                         usableAssistantCardInt.add(num.intValue());
                     view.setUsableCards(usableAssistantCardInt);
                 }
+            }
+            else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.LEADERBOARD_UPDATE.ordinal()) {
+                Map<String, Number> standing = gson.fromJson(json.get("Standing"), HashMap.class);
+                Map<String, Integer> integerStanding = new HashMap<>();
+                for (String s : standing.keySet())
+                    integerStanding.put(s, standing.get(s).intValue());
+                view.setLeaderBoard(integerStanding);
+                view.setEndingMotivation(json.get("EndingMessage").getAsString());
             }
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.LAST_USED_ASSISTANT_CARD_UPDATE.ordinal()) {
                 view.setLastCardUsed(Tower.values()[json.get("PlayerTower").getAsInt()],json.get("LastUsed").getAsInt());
