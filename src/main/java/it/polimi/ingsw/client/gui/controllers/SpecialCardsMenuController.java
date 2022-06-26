@@ -77,12 +77,14 @@ public class SpecialCardsMenuController extends GUIController {
     @Override
     public void loadContent(){
         try {
-            Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();
+            Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();  // prezzo della specialCard viene correttamente aggiornato
             list = specialCards.keySet().stream().toList();
             loadCorrectImage(specialCardImage1, list.get(0), specialCardName1, description1);
             loadCorrectImage(specialCardImage2, list.get(1), specialCardName2, description2);
             loadCorrectImage(specialCardImage3, list.get(2), specialCardName3, description3);
 
+            //TODO :
+            // Displayare il numero di monete/costo aggiornato
             if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
                 if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower()) && !gui.getViewState().getSpecialCardUsage()) {
                     if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(0))) {

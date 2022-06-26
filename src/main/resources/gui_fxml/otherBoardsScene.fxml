@@ -151,12 +151,12 @@
             </Label>
          </children>
       </AnchorPane>
-      <Label layoutX="281.0" layoutY="43.0" prefHeight="75.0" prefWidth="204.0" text="Label">
+      <Label fx:id="labelPlayer1" layoutX="281.0" layoutY="43.0" prefHeight="75.0" prefWidth="204.0" text="Other player 1">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Label layoutX="651.0" layoutY="43.0" prefHeight="75.0" prefWidth="204.0" text="Label">
+      <Label fx:id="labelPlayer11" layoutX="651.0" layoutY="43.0" prefHeight="75.0" prefWidth="204.0" text="Other player 11">
          <font>
             <Font size="24.0" />
          </font>
