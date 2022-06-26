@@ -600,6 +600,11 @@
                   <Image url="@../graphics/board/towers/black_tower.png" />
                </image>
             </ImageView>
+            <Label fx:id="numTowers" layoutX="22.0" layoutY="403.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

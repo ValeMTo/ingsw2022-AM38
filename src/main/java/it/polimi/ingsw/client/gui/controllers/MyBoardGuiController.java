@@ -173,6 +173,8 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     private ImageView islandTower;
+    @FXML
+    private Label numTowers;
 
     @FXML
     private Label num_contentRed;   // label for the number of red students in the ShowContent Area
@@ -416,7 +418,11 @@ public class MyBoardGuiController extends GUIController {
         moveDiningRoomButton.setVisible(false);
         moveDiningRoomButton.setDisable(true);
 
+        disableOff(archipelagoIslands);
+        disableOff(cloudsImgArray);
+
         removeEffect(archipelagoIslands);
+        removeEffect(cloudsImgArray);
 
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
                 deckArea.setVisible(true);
@@ -453,7 +459,7 @@ public class MyBoardGuiController extends GUIController {
                 destinationIsland.setEffect(null);
                 int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());
                 for (ImageView image : archipelagoIslands){
-                    if ((archipelagoIslands.indexOf(image) <= (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2))
+                    if ((archipelagoIslands.indexOf(image) < (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2))
                             && archipelagoIslands.indexOf(image) >= gui.getViewState().getMotherNature()){
                         image.setDisable(false);
                     }else {
@@ -468,6 +474,8 @@ public class MyBoardGuiController extends GUIController {
                     if (!gui.getViewState().getUsableClouds().contains(cloudsImgArray.indexOf(cloud)+1)){
                         cloud.setEffect(new Shadow());
                         cloud.setDisable(true);
+                    } else {
+                        cloud.setDisable(false);
                     }
                 }
 
@@ -526,9 +534,11 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     public void pickCloud(MouseEvent event){
-        ImageView imagePicked = (ImageView) event.getSource();
-        gui.getConnectionSocket().chooseCloud(getPositionFromImage(imagePicked, "cloud"));
-        removeEffect(cloudsImgArray);
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) {
+            ImageView imagePicked = (ImageView) event.getSource();
+            gui.getConnectionSocket().chooseCloud(getPositionFromImage(imagePicked, "cloud"));
+            removeEffect(cloudsImgArray);
+        }
     }
 
     private Color getColorFromImage(ImageView image){
@@ -559,6 +569,12 @@ public class MyBoardGuiController extends GUIController {
     private void removeEffect(List<ImageView> list){
         for (ImageView image : list){
             image.setEffect(null);
+        }
+    }
+
+    private void disableOff(List<ImageView> list){
+        for (ImageView image : list){
+            image.setDisable(false);
         }
     }
 
@@ -756,24 +772,28 @@ public class MyBoardGuiController extends GUIController {
 
             updateArchipelago();
 
-            Integer islandNum = Integer.parseInt(src.substring(6));
+            int islandNum = Integer.parseInt(src.substring(6));
             //System.out.println("I clicked the island # " + islandNum);
             List<IslandView> islands = gui.getViewState().getIslands();
             Map<Color,Integer> studentsMap;
-            for(int j=0;j<islands.size();j++) {              // Note: the islands within the List<IslandView> are put in a random order
-                if (islands.get(j).getPosition() == islandNum) {
-                    studentsMap = islands.get(j).getStudentMap();
-                    //System.out.println("The island # " + islands.get(j).getPosition() + " has" + studentsMap);
-                    for(Label label : showContentLabels) {
-                        String str = label.getId().replace("num_content","");
-                        label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
 
-                        // Shows the tower in the content panel  if it is present on the selected island
-                        Tower tower = gui.getViewState().getIslands().get(j).getTower();
-                        islandTower.setImage(towersImgMap.get(tower));
+            studentsMap = islands.get(islandNum-1).getStudentMap();
+            //System.out.println("The island # " + islands.get(j).getPosition() + " has" + studentsMap);
+            for(Label label : showContentLabels) {
+                String str = label.getId().replace("num_content","");
+                label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+            }
+            // Shows the tower in the content panel if it is present on the selected island
+            Tower tower = gui.getViewState().getIslands().get(islandNum-1).getTower();
+            islandTower.setImage(towersImgMap.get(tower));
+            numTowers.setText("x "+ islands.get(islandNum-1).getTowerNumber());
 
-                    }
-                }
+            if (islands.get(islandNum-1).getTowerNumber()>0){
+                islandTower.setVisible(true);
+                numTowers.setVisible(true);
+            }else {
+                islandTower.setVisible(false);
+                numTowers.setVisible(false);
             }
         }
 
@@ -788,7 +808,11 @@ public class MyBoardGuiController extends GUIController {
                     //System.out.println("The cloud # "+ cloudNum + " has" + studentsMap);
                     for(Label label : showContentLabels) {
                         String str = label.getId().replace("num_content","");
-                        label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+                        if (studentsMap != null){
+                            label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+                        }else{
+                            label.setText("x 0 ");
+                        }
                     }
                 }
             }
@@ -802,6 +826,16 @@ public class MyBoardGuiController extends GUIController {
         System.out.println("executing updateArchipelago() ");
 
         List<IslandView> islands = gui.getViewState().getIslands();
+
+        int num = archipelagoIslands.size();
+        for (int i= islands.size(); i< num; i++){
+            archipelagoIslands.get(i).setDisable(true);
+            archipelagoIslands.get(i).setVisible(false);
+            archipelagoIslands.remove(i);
+            noEntryTilesArray.remove(i);
+            motherNatureOnIslands.remove(i);
+            towersOnIslands.remove(i);
+        }
 
         // Shows a noEntryTile on the islands where it is present
         for(ImageView img : noEntryTilesArray) {
@@ -931,14 +965,15 @@ public class MyBoardGuiController extends GUIController {
         cloudsImgArray.add(cloud3);
 
         for(ImageView cloud : cloudsImgArray) {
-            cloud.setVisible(true);
             cloud.setOnMouseEntered(this::showContent);
             cloud.setOnMouseClicked(this::pickCloud);
+            cloud.setDisable(true);
         }
 
         if(gui.getViewState().getTowers().size() == 2) {
             cloud3.setVisible(false);
             cloud3.setDisable(true);
+            cloudsImgArray.remove(2);
         }
 
 
