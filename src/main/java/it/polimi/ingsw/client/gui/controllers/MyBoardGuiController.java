@@ -450,6 +450,7 @@ public class MyBoardGuiController extends GUIController {
         } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
             if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
                 destinationIsland = archipelagoIslands.get(gui.getViewState().getMotherNature()-1);
+                destinationIsland.setEffect(null);
                 int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());
                 for (ImageView image : archipelagoIslands){
                     if ((archipelagoIslands.indexOf(image) <= (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2))
@@ -460,6 +461,16 @@ public class MyBoardGuiController extends GUIController {
                         image.setEffect(new Shadow());
                     }
                 }
+            }
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)){
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                for (ImageView cloud : cloudsImgArray){
+                    if (!gui.getViewState().getUsableClouds().contains(cloudsImgArray.indexOf(cloud)+1)){
+                        cloud.setEffect(new Shadow());
+                        cloud.setDisable(true);
+                    }
+                }
+
             }
         }
     };
@@ -513,6 +524,13 @@ public class MyBoardGuiController extends GUIController {
         moveDiningRoomButton.setDisable(false);
     }
 
+    @FXML
+    public void pickCloud(MouseEvent event){
+        ImageView imagePicked = (ImageView) event.getSource();
+        gui.getConnectionSocket().chooseCloud(getPositionFromImage(imagePicked, "cloud"));
+        removeEffect(cloudsImgArray);
+    }
+
     private Color getColorFromImage(ImageView image){
         String str = image.getId();
         str = str.replace("ent","");
@@ -520,9 +538,9 @@ public class MyBoardGuiController extends GUIController {
         return toColor(str);
     }
 
-    private int getPositionFromImage(ImageView image){
+    private int getPositionFromImage(ImageView image, String name){
         String str = image.getId();
-        str = str.replace("island","");
+        str = str.replace(name,"");
         return Integer.parseInt(str);
     }
 
@@ -531,10 +549,10 @@ public class MyBoardGuiController extends GUIController {
         removeEffect(archipelagoIslands);
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
             removeEffect(entranceStudImages);
-            gui.getConnectionSocket().moveStudentToIsland(fromStudent, getPositionFromImage(destinationIsland));
+            gui.getConnectionSocket().moveStudentToIsland(fromStudent, getPositionFromImage(destinationIsland, "island"));
             fromStudent=null;
         }else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
-            gui.getConnectionSocket().moveMotherNature(getPositionFromImage(destinationIsland));
+            gui.getConnectionSocket().moveMotherNature(getPositionFromImage(destinationIsland, "island"));
         }
     }
 
@@ -914,7 +932,8 @@ public class MyBoardGuiController extends GUIController {
 
         for(ImageView cloud : cloudsImgArray) {
             cloud.setVisible(true);
-            cloud.setOnMouseClicked(this::showContent);
+            cloud.setOnMouseEntered(this::showContent);
+            cloud.setOnMouseClicked(this::pickCloud);
         }
 
         if(gui.getViewState().getTowers().size() == 2) {
