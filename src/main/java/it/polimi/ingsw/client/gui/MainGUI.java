@@ -36,6 +36,7 @@ public class MainGUI extends Application {
     public static final String LOBBY_SCENE = "lobbyScene.fxml";
     public static final String CREDITS_SCENE = "creditsScene.fxml";
     public static final String MY_BOARD_SCENE = "myBoardScene.fxml";
+    public static final String END_SCENE = "endScene.fxml";
 
     private final ViewState viewState;
     private final HashMap<String, Scene> guiScenesMap = new HashMap<>();
@@ -97,6 +98,7 @@ public class MainGUI extends Application {
         fxmlScenes.add(LOBBY_SCENE);
         fxmlScenes.add(CREDITS_SCENE);
         fxmlScenes.add(MY_BOARD_SCENE);
+        fxmlScenes.add(END_SCENE);
 
 
         try {

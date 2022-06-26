@@ -480,6 +480,8 @@ public class MyBoardGuiController extends GUIController {
                 }
 
             }
+        } else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.END)){
+            gui.setNextStage("endScene.fxml");
         }
     };
 
