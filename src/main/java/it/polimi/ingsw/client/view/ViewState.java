@@ -302,6 +302,11 @@ public class ViewState {
     }
 
     public synchronized void setUsableCards(List<Integer> usableCards) {
+        for (int i : this.usableCards){
+            if (!usableCards.contains(i)){
+                setLastCardUsed(getPlayerTower(), i );
+            }
+        }
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
         refreshCLI();

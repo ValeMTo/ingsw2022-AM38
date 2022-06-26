@@ -5,16 +5,10 @@ import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
-import javafx.beans.DefaultProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.BlurType;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Glow;
 import javafx.scene.effect.Shadow;
@@ -24,12 +18,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Line;
 
-import java.awt.font.ImageGraphicAttribute;
 import javafx.stage.Stage;
 
-import java.awt.*;
-import java.io.IOException;
-import java.sql.Connection;
 import java.util.*;
 import java.util.List;
 
@@ -355,7 +345,7 @@ public class MyBoardGuiController extends GUIController {
     private ImageView noEntry12;
 
     private Color fromStudent;
-    private int destinationIslandPos;
+    private ImageView destinationIsland;
 
 
 
@@ -387,7 +377,7 @@ public class MyBoardGuiController extends GUIController {
         }
 
         moveDiningRoomButton.setOnAction(this::pickDiningRoom);
-        moveIslandButton.setOnAction(this::pickIsland);
+        moveIslandButton.setOnAction(this::chooseIsland);
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
         System.out.println("executing setupBoard() ");
         setupTowers();
@@ -426,6 +416,7 @@ public class MyBoardGuiController extends GUIController {
         moveDiningRoomButton.setVisible(false);
         moveDiningRoomButton.setDisable(true);
 
+        removeEffect(archipelagoIslands);
 
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
                 deckArea.setVisible(true);
@@ -449,13 +440,28 @@ public class MyBoardGuiController extends GUIController {
                 for (ImageView image : entranceStudImages){
                     if (entrance.get(getColorFromImage(image)) <= 0){
                         image.setDisable(true);
+                        image.setEffect(new Shadow());
                     } else {
                         image.setDisable(false);
                     }
                 }
             }
 
-        } //TODO: other phases
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                destinationIsland = archipelagoIslands.get(gui.getViewState().getMotherNature()-1);
+                int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());
+                for (ImageView image : archipelagoIslands){
+                    if ((archipelagoIslands.indexOf(image) <= (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2))
+                            && archipelagoIslands.indexOf(image) >= gui.getViewState().getMotherNature()){
+                        image.setDisable(false);
+                    }else {
+                        image.setDisable(true);
+                        image.setEffect(new Shadow());
+                    }
+                }
+            }
+        }
     };
 
     @FXML
@@ -489,7 +495,7 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     public void pickCard(MouseEvent event){
         ImageView clickedImg = (ImageView) event.getSource();
-        clickedImg.setEffect(createShadow());
+        clickedImg.setEffect(new Glow());
         clickedImg.setDisable(true);
         int cardNum = deckArray.indexOf(clickedImg) +1 ;  // array indexes start at 0  whereas cards go from 1 to 10
         gui.getConnectionSocket().setAssistantCard(cardNum);
@@ -499,7 +505,7 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     public void pickEntranceStudent(MouseEvent event){
         ImageView imagePicked = (ImageView) event.getSource();
-        imagePicked.setEffect(createShadow());
+        imagePicked.setEffect(new Glow());
 
         fromStudent = getColorFromImage(imagePicked);
         entranceStudentsArea.setDisable(true);
@@ -521,10 +527,15 @@ public class MyBoardGuiController extends GUIController {
     }
 
     @FXML
-    public void pickIsland(ActionEvent event){
+    public void chooseIsland(ActionEvent event){
         removeEffect(archipelagoIslands);
-        removeEffect(entranceStudImages);
-        gui.getConnectionSocket().moveStudentToIsland(fromStudent, destinationIslandPos);
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
+            removeEffect(entranceStudImages);
+            gui.getConnectionSocket().moveStudentToIsland(fromStudent, getPositionFromImage(destinationIsland));
+            fromStudent=null;
+        }else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+            gui.getConnectionSocket().moveMotherNature(getPositionFromImage(destinationIsland));
+        }
     }
 
     private void removeEffect(List<ImageView> list){
@@ -534,12 +545,20 @@ public class MyBoardGuiController extends GUIController {
     }
 
     @FXML
-    public void pickIslandAndPutStudent(MouseEvent event){
+    public void pickIsland(MouseEvent event){
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
-            ImageView destinationIsland = (ImageView) event.getSource();
+            if (fromStudent != null) {
+                destinationIsland.setEffect(null);
+                destinationIsland = (ImageView) event.getSource();
+                destinationIsland.setEffect(new Glow());
+                diningRoomStudentsArea.setDisable(true);
+                moveIslandButton.setVisible(true);
+                moveIslandButton.setDisable(false);
+            }
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+            destinationIsland.setEffect(null);
+            destinationIsland = (ImageView) event.getSource();
             destinationIsland.setEffect(new Glow());
-            diningRoomStudentsArea.setDisable(true);
-            this.destinationIslandPos = getPositionFromImage(destinationIsland);
             moveIslandButton.setVisible(true);
             moveIslandButton.setDisable(false);
         }
@@ -611,8 +630,9 @@ public class MyBoardGuiController extends GUIController {
 
         for(ImageView img : archipelagoIslands) {
             img.setOnMouseEntered(this::showContent);
-            img.setOnMouseClicked(this::pickIslandAndPutStudent);
+            img.setOnMouseClicked(this::pickIsland);
         }
+        destinationIsland = archipelagoIslands.get(0); //initialise, otherwise error
 
         towersOnIslands.add(towerIsland1);
         towersOnIslands.add(towerIsland2);
