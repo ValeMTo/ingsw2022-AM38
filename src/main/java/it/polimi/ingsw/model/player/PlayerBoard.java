@@ -48,7 +48,7 @@ public class PlayerBoard extends Listenable {
         for (int i = 0; i < 10; i++) {
             numCard = i + 1;
             numSteps = numCard / 2;
-            if (i % 2 != 0) {
+            if ((i+1) % 2 != 0) {
                 numSteps += 1;
             }
             this.deck.add(new AssistantCard(numCard, numSteps));
@@ -393,7 +393,8 @@ public class PlayerBoard extends Listenable {
      */
     public int getLastCardSteps() throws NotLastCardUsedException {
         for (AssistantCard card : deck)
-            if (card.isUsed()) return deck.get(lastUsed).getSteps();
+            if (card.isUsed()&&lastUsed!=null&&lastUsed==card.getPriority())
+                return card.getSteps();
         throw new NotLastCardUsedException("No card used! Steps cannot be determined");
 
     }

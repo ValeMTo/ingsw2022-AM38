@@ -298,7 +298,6 @@ public abstract class GameBoard extends Listenable {
             exc.printStackTrace();
             return false;
         }
-
         if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands.length);
 

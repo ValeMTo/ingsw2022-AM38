@@ -39,7 +39,6 @@ public abstract class GameOrchestrator extends Listenable {
         this.clients = new ArrayList<>();
         if(clients != null)
             this.clients.addAll(clients);
-        // TODO: better this. It is hardcode...
         System.out.println("GAME MODE NOTIFY: SETUP OF THE VIEW STATES");
         Map<String, Tower> sendMap = new HashMap<>();
         sendMap.put(players.get(0), Tower.WHITE);
@@ -49,7 +48,7 @@ public abstract class GameOrchestrator extends Listenable {
         if(clients != null)
             notify(modelListener, MessageGenerator.setupUpdateMessage(sendMap, players.size(),isExpert),clients);
         this.isExpert = isExpert;
-        System.out.println("GAMEORCHESTRATOR - SETTING");
+        System.out.println("GAME ORCHESTRATOR - SETTING");
         if (isExpert) this.gameBoard = new ExpertGameBoard(players.size(), players);
         else this.gameBoard = new EasyGameBoard(players.size(), players);
         this.players = new ArrayList<String>();
@@ -63,7 +62,7 @@ public abstract class GameOrchestrator extends Listenable {
         this.specialCardAlreadyUsed = false;
         this.studentMovesLeft = maxStudentMoves;
         for (int i = 0; i < players.size(); i++) {
-            System.out.println("GAMEORCHESTRATOR - SETTING - Player " + i+" "+players.get(i));
+            System.out.println("GAME ORCHESTRATOR - SETTING - Player " + i+" "+players.get(i));
             planningOrder[i] = players.get(i);
             actionOrder[i] = players.get(i);
             if (gameBoard.getPlayerTower(players.get(i)) != null)
@@ -95,9 +94,9 @@ public abstract class GameOrchestrator extends Listenable {
         gameBoard.fillClouds();
         if(clients!=null&&modelListener!=null) {
             currentPhase = PLANNING;
-            System.out.println("GAMEORCHESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
+            System.out.println("GAME ORCHESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
             notify(modelListener, MessageGenerator.currentPlayerUpdateMessage(gameBoard.getPlayerTower(planningOrder[activePlayer])), clients);
-            System.out.println("GAMEORCHESTRATOR NOTIFY: new phase " + currentPhase.name());
+            System.out.println("GAME ORCHESTRATOR NOTIFY: new phase " + currentPhase.name());
             notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
         }
         currentPhase = PLANNING;
