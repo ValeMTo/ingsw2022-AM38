@@ -68,10 +68,13 @@ abstract public class GUIController {
     };
 
     /**
-     * method used by each GUI controller to refresh its parameters. The controller gets each parameter from the gui's
+     * method used by each GUI controller to loa its parameters. The controller gets each parameter from the gui's
      * viewState and then sets its local JavaFX objects accordingly.
+     *
+     * The method is override when the scene needs the update.
      */
-    // public abstract void refreshSceneByController();
+    public void loadContent(){
+    }
 
 
 }

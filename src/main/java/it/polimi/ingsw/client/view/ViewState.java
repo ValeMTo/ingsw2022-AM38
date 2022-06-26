@@ -270,7 +270,7 @@ public class ViewState {
      * @return the tower of the active player
      */
     public synchronized Tower getActivePlayer() {
-        return this.getPlayerTower();
+        return activePlayer;
     }
 
     /**
@@ -302,6 +302,11 @@ public class ViewState {
     }
 
     public synchronized void setUsableCards(List<Integer> usableCards) {
+        for (int i : this.usableCards){
+            if (!usableCards.contains(i)){
+                setLastCardUsed(getPlayerTower(), i );
+            }
+        }
         this.usableCards.clear();
         this.usableCards.addAll(usableCards);
         refreshCLI();
@@ -418,17 +423,26 @@ public class ViewState {
     }
 
     public synchronized List<IslandView> getIslands() {
-        //System.out.println("VIEW STATE - getIslands - "+islands);
-        for(IslandView islandView:islands)
-        {
-            //System.out.println("ISLAND "+islandView.getPosition()+" with "+islandView.getTowerNumber()+" tower "+islandView.getTower()+" and students "+islandView.getStudentMap());
-        }
         return new ArrayList<>(islands);
     }
 
     public synchronized void setIslands(List<IslandView> islands) {
         this.islands.clear();
-        this.islands.addAll(islands);
+
+        //Ordering the array
+        IslandView minIsland;
+        int num = islands.size();
+        for(int i=0; i<num; i++){
+            minIsland = islands.get(0);
+            for (IslandView island : islands){
+                if (island.getPosition() < minIsland.getPosition()){
+                    minIsland = island;
+                }
+            }
+            islands.remove(minIsland);
+            this.islands.add(minIsland);
+        }
+
         if (awaitingCLI != null) {
             if (this.currentPhase == PhaseEnum.ACTION_MOVE_STUDENTS && this.playerTower.equals(this.activePlayer))
                 awaitingCLI.printForMoveStudents();
@@ -550,6 +564,14 @@ public class ViewState {
 
     public synchronized Collection<Tower> getTowers() {
         return this.players.values();
+    }
+
+    public synchronized Map<Tower,String> getPlayers() {
+        Map<Tower,String> towersToNames = new HashMap<Tower,String>();
+        for(String name : players.keySet()){
+            towersToNames.put(players.get(name), name);
+        }
+        return towersToNames;
     }
 
     /*

@@ -1,16 +1,16 @@
 package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.client.view.IslandView;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
-import javafx.beans.DefaultProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.BlurType;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.Glow;
 import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,9 +18,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Line;
 
-import java.awt.font.ImageGraphicAttribute;
-import java.sql.Connection;
+import javafx.stage.Stage;
+
 import java.util.*;
+import java.util.List;
 
 import static it.polimi.ingsw.model.board.Color.toColor;
 
@@ -31,6 +32,7 @@ public class MyBoardGuiController extends GUIController {
     private final HashMap<Tower, Image> towersImgMap = new HashMap<>();
     private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
     private final ArrayList<Label> entranceStudLabels = new ArrayList<Label>();
+    private final ArrayList<ImageView> entranceStudImages = new ArrayList<ImageView>(5);
     private final ArrayList<Label> diningRoomStudLabels = new ArrayList<Label>();
     private final ArrayList<Label> professorsLabels = new ArrayList<Label>(5);
     private final ArrayList<ImageView> archipelagoIslands = new ArrayList<ImageView>();
@@ -39,6 +41,8 @@ public class MyBoardGuiController extends GUIController {
     private final ArrayList<Line> islandBridges = new ArrayList<Line>();
     private final ArrayList<Label> showContentLabels = new ArrayList<Label>();
     private final ArrayList<ImageView> cloudsImgArray = new ArrayList<ImageView>();
+    private final ArrayList<ImageView> noEntryTilesArray = new ArrayList<ImageView>();
+
 
     private Integer currentPlayerCoins;
 
@@ -48,9 +52,15 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private AnchorPane playerboardArea;
     @FXML
+    private AnchorPane entranceStudentsArea;
+    @FXML
+    private AnchorPane diningRoomStudentsArea;
+    @FXML
     private AnchorPane controlsArea;
     @FXML
     private AnchorPane showContentArea;
+    @FXML
+    private AnchorPane archipelagoArea;
     @FXML
     private Label showContentLabel;
     @FXML
@@ -61,11 +71,16 @@ public class MyBoardGuiController extends GUIController {
     private AnchorPane professorsArea;
 
     @FXML
-    private Button showSpecialCards;
+    private Button showSpecialCardsButton;
+    @FXML
+    private Label statusMessage;
+    @FXML
+    private Label statusHeader;
+
+    private Stage stage;
 
     @FXML
-    private Button showOtherBoards;
-
+    private Button showOtherBoardsButton;
 
     // Imports the assistantCards imageviews
     @FXML
@@ -155,6 +170,8 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     private ImageView islandTower;
+    @FXML
+    private Label numTowers;
 
     @FXML
     private Label num_contentRed;   // label for the number of red students in the ShowContent Area
@@ -222,6 +239,11 @@ public class MyBoardGuiController extends GUIController {
     private ImageView island12;
 
     @FXML
+    private Button moveDiningRoomButton;
+    @FXML
+    private Button moveIslandButton;
+
+    @FXML
     private ImageView towerIsland1;   // ImageView of the tower on the island #1
     @FXML
     private ImageView towerIsland2;
@@ -271,30 +293,34 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private ImageView motherIsland12;
 
+
     @FXML
-    private Line bridge_1_2;         // Line bridge that links the island #1 to the island #2
+    private ImageView noEntry1;   // noEntryTiles imageviews on islands
     @FXML
-    private Line bridge_2_3;
+    private ImageView noEntry2;
     @FXML
-    private Line bridge_3_4;
+    private ImageView noEntry3;
     @FXML
-    private Line bridge_4_5;
+    private ImageView noEntry4;
     @FXML
-    private Line bridge_5_6;
+    private ImageView noEntry5;
     @FXML
-    private Line bridge_6_7;
+    private ImageView noEntry6;
     @FXML
-    private Line bridge_7_8;
+    private ImageView noEntry7;
     @FXML
-    private Line bridge_8_9;
+    private ImageView noEntry8;
     @FXML
-    private Line bridge_9_10;
+    private ImageView noEntry9;
     @FXML
-    private Line bridge_10_11;
+    private ImageView noEntry10;
     @FXML
-    private Line bridge_11_12;
+    private ImageView noEntry11;
     @FXML
-    private Line bridge_12_1;
+    private ImageView noEntry12;
+
+    private Color fromStudent;
+    private ImageView destinationIsland;
 
 
 
@@ -306,6 +332,7 @@ public class MyBoardGuiController extends GUIController {
         createArchipelago();
         createSchoolBoard();
         createShowContentArea();
+        createControlsArea();
 
     }
 
@@ -316,6 +343,17 @@ public class MyBoardGuiController extends GUIController {
      * It is called after the SETUP_UPDATE message is received by the ViewMessageParser.
      */
     public void setupBoard() {
+
+        if (gui.getViewState().getGameSettings().getExpert()){
+            showSpecialCardsButton.setVisible(true);
+            showSpecialCardsButton.setOnAction(this::showSpecialCards);
+        }else {
+            showSpecialCardsButton.setVisible(false);
+        }
+
+        showOtherBoardsButton.setOnAction(this::showOtherBoards);
+        moveDiningRoomButton.setOnAction(this::pickDiningRoom);
+        moveIslandButton.setOnAction(this::chooseIsland);
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
         System.out.println("executing setupBoard() ");
         setupTowers();
@@ -328,7 +366,109 @@ public class MyBoardGuiController extends GUIController {
         updateMyPlayerBoard();
         updateArchipelago();
         updateProfessors();
+
+        updatePhaseAction();
+
+
+
     }
+
+    public void updateGameStatus(){
+        PhaseEnum currentPhase = gui.getViewState().getCurrentPhase();
+        Tower activePlayer = gui.getViewState().getActivePlayer();
+        String activePlayerName = gui.getViewState().getPlayers().get(activePlayer);
+
+        statusHeader.setText("Phase : " + currentPhase.toString() + "\nActive player : " + activePlayerName);
+
+    }
+
+    public void updatePhaseAction(){
+        deckArea.setVisible(false);
+        deckArea.setDisable(true);
+        diningRoomStudentsArea.setDisable(true);
+        entranceStudentsArea.setDisable(true);
+        moveIslandButton.setVisible(false);
+        moveIslandButton.setDisable(true);
+        moveDiningRoomButton.setVisible(false);
+        moveDiningRoomButton.setDisable(true);
+
+        disableOff(archipelagoIslands);
+        disableOff(cloudsImgArray);
+
+        removeEffect(archipelagoIslands);
+        removeEffect(cloudsImgArray);
+
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
+                deckArea.setVisible(true);
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                deckArea.setDisable(false);
+                List<Integer> usableCard = gui.getViewState().getUsableCards();
+                for(ImageView card : deckArray){
+                    if (usableCard.contains(deckArray.indexOf(card))){
+                        card.setDisable(false);
+
+                    } else {
+                        card.setVisible(false);
+                        card.setDisable(true);
+                    }
+                }
+            }
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)){
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                entranceStudentsArea.setDisable(false);
+                Map<Color, Integer> entrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+                for (ImageView image : entranceStudImages){
+                    if (entrance.get(getColorFromImage(image)) <= 0){
+                        image.setDisable(true);
+                        image.setEffect(new Shadow());
+                    } else {
+                        image.setDisable(false);
+                    }
+                }
+            }
+
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                destinationIsland = archipelagoIslands.get(gui.getViewState().getMotherNature()-1);
+                destinationIsland.setEffect(null);
+                int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());
+                for (ImageView image : archipelagoIslands){
+                    if ((archipelagoIslands.indexOf(image) < (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2))
+                            && archipelagoIslands.indexOf(image) >= gui.getViewState().getMotherNature()){
+                        image.setDisable(false);
+                    }else {
+                        image.setDisable(true);
+                        image.setEffect(new Shadow());
+                    }
+                }
+            }
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)){
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                for (ImageView cloud : cloudsImgArray){
+                    if (!gui.getViewState().getUsableClouds().contains(cloudsImgArray.indexOf(cloud)+1)){
+                        cloud.setEffect(new Shadow());
+                        cloud.setDisable(true);
+                    } else {
+                        cloud.setDisable(false);
+                    }
+                }
+
+            }
+        } else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.END)) {
+            gui.setNextStage("endScene.fxml");
+        }
+    };
+
+    @FXML
+    public void showSpecialCards(ActionEvent event){
+        gui.loadSecondWindow("specialCardsScene.fxml");
+    }
+
+    @FXML
+    public void showOtherBoards(ActionEvent event){
+        gui.loadSecondWindow("otherBoardsScene.fxml");
+    }
+    
 
     /**
      * Initially sets the AssistantCards deck in the gui and the corresponding "pickCard()" method.
@@ -347,24 +487,107 @@ public class MyBoardGuiController extends GUIController {
         deckArray.add(assistant9);
         deckArray.add(assistant10);
 
-        deckArea.setVisible(true);
+        deckArea.setVisible(false);
         for(ImageView img : deckArray) {
             img.setOnMouseClicked(this::pickCard);
         }
     }
 
+    @FXML
     public void pickCard(MouseEvent event){
         ImageView clickedImg = (ImageView) event.getSource();
-        clickedImg.setEffect(createShadow());
+        clickedImg.setEffect(new Glow());
         clickedImg.setDisable(true);
         int cardNum = deckArray.indexOf(clickedImg) +1 ;  // array indexes start at 0  whereas cards go from 1 to 10
         gui.getConnectionSocket().setAssistantCard(cardNum);
 
-        // gettare le usable cards da viewState
-        for(ImageView card : deckArray)   // TODO: riabilitare cards al prossimo turno !!!
-            card.setDisable(true);
     }
 
+    @FXML
+    public void pickEntranceStudent(MouseEvent event){
+        ImageView imagePicked = (ImageView) event.getSource();
+        imagePicked.setEffect(new Glow());
+
+        fromStudent = getColorFromImage(imagePicked);
+        entranceStudentsArea.setDisable(true);
+        moveDiningRoomButton.setVisible(true);
+        moveDiningRoomButton.setDisable(false);
+    }
+
+    @FXML
+    public void pickCloud(MouseEvent event){
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) {
+            ImageView imagePicked = (ImageView) event.getSource();
+            gui.getConnectionSocket().chooseCloud(getPositionFromImage(imagePicked, "cloud"));
+            removeEffect(cloudsImgArray);
+        }
+    }
+
+    private Color getColorFromImage(ImageView image){
+        String str = image.getId();
+        str = str.replace("ent","");
+        str = str.replace("Stud","");
+        return toColor(str);
+    }
+
+    private int getPositionFromImage(ImageView image, String name){
+        String str = image.getId();
+        str = str.replace(name,"");
+        return Integer.parseInt(str);
+    }
+
+    @FXML
+    public void chooseIsland(ActionEvent event){
+        removeEffect(archipelagoIslands);
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
+            removeEffect(entranceStudImages);
+            gui.getConnectionSocket().moveStudentToIsland(fromStudent, getPositionFromImage(destinationIsland, "island"));
+            fromStudent=null;
+        }else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+            gui.getConnectionSocket().moveMotherNature(getPositionFromImage(destinationIsland, "island"));
+        }
+    }
+
+    private void removeEffect(List<ImageView> list){
+        for (ImageView image : list){
+            image.setEffect(null);
+        }
+    }
+
+    private void disableOff(List<ImageView> list){
+        for (ImageView image : list){
+            image.setDisable(false);
+        }
+    }
+
+
+    @FXML
+    public void pickIsland(MouseEvent event){
+        if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
+            if (fromStudent != null) {
+                destinationIsland.setEffect(null);
+                destinationIsland = (ImageView) event.getSource();
+                destinationIsland.setEffect(new Glow());
+                diningRoomStudentsArea.setDisable(true);
+                moveIslandButton.setVisible(true);
+                moveIslandButton.setDisable(false);
+            }
+        } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+            destinationIsland.setEffect(null);
+            destinationIsland = (ImageView) event.getSource();
+            destinationIsland.setEffect(new Glow());
+            moveIslandButton.setVisible(true);
+            moveIslandButton.setDisable(false);
+        }
+    }
+
+    public void pickDiningRoom(ActionEvent event){
+        diningRoomStudentsArea.setDisable(true);
+        removeEffect(archipelagoIslands);
+        removeEffect(entranceStudImages);
+        gui.getConnectionSocket().moveStudentToDiningRoom(fromStudent);
+
+    }
 
     public void createSchoolBoard() {
         // adding labels in the SchoolBoard
@@ -376,6 +599,16 @@ public class MyBoardGuiController extends GUIController {
         for(Label l : entranceStudLabels){
             l.setText("");
         }
+
+        entranceStudImages.add(entBlueStud);
+        entranceStudImages.add(entRedStud);
+        entranceStudImages.add(entYellowStud);
+        entranceStudImages.add(entPinkStud);
+        entranceStudImages.add(entGreenStud);
+        for(ImageView img : entranceStudImages) {
+            img.setOnMouseClicked(this::pickEntranceStudent);
+        }
+
         diningRoomStudLabels.add(num_dinRed);
         diningRoomStudLabels.add(num_dinYellow);
         diningRoomStudLabels.add(num_dinPink);
@@ -413,10 +646,10 @@ public class MyBoardGuiController extends GUIController {
         archipelagoIslands.add(island12);
 
         for(ImageView img : archipelagoIslands) {
-            img.setOnMouseClicked(this::showContent);
-
-
+            img.setOnMouseEntered(this::showContent);
+            img.setOnMouseClicked(this::pickIsland);
         }
+        destinationIsland = archipelagoIslands.get(0); //initialise, otherwise error
 
         towersOnIslands.add(towerIsland1);
         towersOnIslands.add(towerIsland2);
@@ -450,22 +683,25 @@ public class MyBoardGuiController extends GUIController {
             i.setVisible(false);
         }
 
-        islandBridges.add(bridge_1_2);
-        islandBridges.add(bridge_2_3);
-        islandBridges.add(bridge_3_4);
-        islandBridges.add(bridge_4_5);
-        islandBridges.add(bridge_5_6);
-        islandBridges.add(bridge_6_7);
-        islandBridges.add(bridge_7_8);
-        islandBridges.add(bridge_8_9);
-        islandBridges.add(bridge_9_10);
-        islandBridges.add(bridge_10_11);
-        islandBridges.add(bridge_11_12);
-        islandBridges.add(bridge_12_1);
-        for(Line l : islandBridges) {
-            l.setVisible(false);
+        noEntryTilesArray.add(noEntry1);
+        noEntryTilesArray.add(noEntry2);
+        noEntryTilesArray.add(noEntry3);
+        noEntryTilesArray.add(noEntry4);
+        noEntryTilesArray.add(noEntry5);
+        noEntryTilesArray.add(noEntry6);
+        noEntryTilesArray.add(noEntry7);
+        noEntryTilesArray.add(noEntry8);
+        noEntryTilesArray.add(noEntry9);
+        noEntryTilesArray.add(noEntry10);
+        noEntryTilesArray.add(noEntry11);
+        noEntryTilesArray.add(noEntry12);
+        for(ImageView i : noEntryTilesArray){
+            i.setVisible(false);
         }
+
     }
+
+
 
     public void createShowContentArea(){
         showContentLabels.add(num_contentBlue);
@@ -478,10 +714,19 @@ public class MyBoardGuiController extends GUIController {
         showContentArea.setDisable(true);
     }
 
+    public void createControlsArea() {
+        controlsArea.setVisible(true);
+        controlsArea.setDisable(false);
+        statusHeader.setText("");
+        statusMessage.setText("");
+    }
+
+
     /**
      * Method to show the content of a selected Island or Cloud.
      * @param event : the MouseEvent triggered when clicking on an Island or Cloud imageview in the board
      */
+    @FXML
     public void showContent(MouseEvent event) {
         ImageView clickedImg = (ImageView) event.getSource();
         String src = clickedImg.getId();
@@ -493,24 +738,28 @@ public class MyBoardGuiController extends GUIController {
 
             updateArchipelago();
 
-            Integer islandNum = Integer.parseInt(src.substring(6));
+            int islandNum = Integer.parseInt(src.substring(6));
             //System.out.println("I clicked the island # " + islandNum);
             List<IslandView> islands = gui.getViewState().getIslands();
             Map<Color,Integer> studentsMap;
-            for(int j=0;j<islands.size();j++) {              // Note: the islands within the List<IslandView> are put in a random order
-                if (islands.get(j).getPosition() == islandNum) {
-                    studentsMap = islands.get(j).getStudentMap();
-                    //System.out.println("The island # " + islands.get(j).getPosition() + " has" + studentsMap);
-                    for(Label label : showContentLabels) {
-                        String str = label.getId().replace("num_content","");
-                        label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
 
-                        // Shows the tower in the content panel  if it is present on the selected island
-                        Tower tower = gui.getViewState().getIslands().get(j).getTower();
-                        islandTower.setImage(towersImgMap.get(tower));
+            studentsMap = islands.get(islandNum-1).getStudentMap();
+            //System.out.println("The island # " + islands.get(j).getPosition() + " has" + studentsMap);
+            for(Label label : showContentLabels) {
+                String str = label.getId().replace("num_content","");
+                label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+            }
+            // Shows the tower in the content panel if it is present on the selected island
+            Tower tower = gui.getViewState().getIslands().get(islandNum-1).getTower();
+            islandTower.setImage(towersImgMap.get(tower));
+            numTowers.setText("x "+ islands.get(islandNum-1).getTowerNumber());
 
-                    }
-                }
+            if (islands.get(islandNum-1).getTowerNumber()>0){
+                islandTower.setVisible(true);
+                numTowers.setVisible(true);
+            }else {
+                islandTower.setVisible(false);
+                numTowers.setVisible(false);
             }
         }
 
@@ -525,7 +774,11 @@ public class MyBoardGuiController extends GUIController {
                     //System.out.println("The cloud # "+ cloudNum + " has" + studentsMap);
                     for(Label label : showContentLabels) {
                         String str = label.getId().replace("num_content","");
-                        label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+                        if (studentsMap != null){
+                            label.setText("x " + studentsMap.get(Color.toColor(str)).toString());
+                        }else{
+                            label.setText("x 0 ");
+                        }
                     }
                 }
             }
@@ -538,7 +791,34 @@ public class MyBoardGuiController extends GUIController {
 
         System.out.println("executing updateArchipelago() ");
 
-        // Shows mothernature if it is present on the selected island
+        List<IslandView> islands = gui.getViewState().getIslands();
+
+        int num = archipelagoIslands.size();
+        for (int i= islands.size(); i< num; i++){
+            archipelagoIslands.get(i).setDisable(true);
+            archipelagoIslands.get(i).setVisible(false);
+            archipelagoIslands.remove(i);
+            noEntryTilesArray.remove(i);
+            motherNatureOnIslands.remove(i);
+            towersOnIslands.remove(i);
+        }
+
+        // Shows a noEntryTile on the islands where it is present
+        for(ImageView img : noEntryTilesArray) {
+            Integer position = Integer.parseInt(img.getId().replace("noEntry",""));
+            for(IslandView island : islands){
+                if(island.getPosition() == position){
+                    if(!island.isInfluenceEnabled()) {
+                        img.setVisible(true);
+                    }
+                    else{
+                        img.setVisible(false);
+                    }
+                }
+            }
+        }
+
+        // Shows mothernature on the island where it is present
         Integer motherPosition = gui.getViewState().getMotherNature();
         for(ImageView i : motherNatureOnIslands) {
             if (i.getId().replace("motherIsland", "").equals(motherPosition.toString())) {
@@ -549,8 +829,7 @@ public class MyBoardGuiController extends GUIController {
             }
         }
 
-        // Shows a tower if it is present on the selected island, otherwise it makes the tower invisible
-        List<IslandView> islands = gui.getViewState().getIslands();
+        // Shows a tower if it is present on the island, otherwise it sets the image of the tower invisible
 
         for(ImageView img : towersOnIslands) {
             Integer position = Integer.parseInt(img.getId().replace("towerIsland",""));
@@ -652,13 +931,15 @@ public class MyBoardGuiController extends GUIController {
         cloudsImgArray.add(cloud3);
 
         for(ImageView cloud : cloudsImgArray) {
-            cloud.setVisible(true);
-            cloud.setOnMouseClicked(this::showContent);
+            cloud.setOnMouseEntered(this::showContent);
+            cloud.setOnMouseClicked(this::pickCloud);
+            cloud.setDisable(true);
         }
 
         if(gui.getViewState().getTowers().size() == 2) {
             cloud3.setVisible(false);
             cloud3.setDisable(true);
+            cloudsImgArray.remove(2);
         }
 
 

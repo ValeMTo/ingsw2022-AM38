@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.EndController">
+    <children>
+        <Label fx:id="creditsButton" alignment="BOTTOM_CENTER" layoutX="304.0" layoutY="616.0" style="&#10;" text="Game credits" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false" AnchorPane.bottomAnchor="68.79999999999995" AnchorPane.leftAnchor="304.0" AnchorPane.rightAnchor="280.0">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+        <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="69.0" text="Thank you to have played" textFill="#46b9e7">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
+        <Button fx:id="quitButton" layoutX="556.0" layoutY="532.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: RED;" text="QUIT" AnchorPane.rightAnchor="534.0">
+            <font>
+                <Font size="18.0" />
+            </font></Button>
+      <Label id="home_title" fx:id="endText" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="375.0" layoutY="185.0" prefHeight="245.0" prefWidth="452.0" text="The winner is..." textFill="#46b9e7">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

@@ -96,6 +96,11 @@ public class ViewMessageParser {
 
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_UPDATE.ordinal()) {
                 view.setCurrentPhase(PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
+                if (!view.isCli()){
+                    Platform.runLater(() -> {
+                        view.getAwaitingGUI().refreshGameStatus();
+                    });
+                }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
                 IslandView islandToAdd = new IslandView(json.get("position").getAsInt());
                 if(json.get("TowerColor").getAsString()!=null&&!json.get("TowerColor").getAsString().equalsIgnoreCase("null"))
@@ -124,6 +129,11 @@ public class ViewMessageParser {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
                 }
+                if (!view.isCli()) {
+                    Platform.runLater(() -> {
+                        view.getAwaitingGUI().refreshGameStatus();
+                    });
+                }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()) {
                 Map<String, Number> students = gson.fromJson(json.get("SchoolEntranceMap"), HashMap.class);
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));
@@ -133,7 +143,9 @@ public class ViewMessageParser {
                 view.setTowerLeft(Tower.values()[json.get("TowerColor").getAsInt()],json.get("NumOfTowers").getAsInt());
                 // Tells the gui to updates its board
                 if(!view.isCli() && view.getPlayerTower().equals(Tower.values()[json.get("TowerColor").getAsInt()])) {
-                    Platform.runLater(() -> view.getAwaitingGUI().updatePlayerBoard());
+                    Platform.runLater(() -> {
+                        view.getAwaitingGUI().refreshGameStatus();
+                    });
                 }
                 //TODO: other sets
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal()) {
@@ -175,6 +187,10 @@ public class ViewMessageParser {
                     view.setUsableSpecialCard(specialCards);
                 }
             }
+            if(!view.isCli()){
+                Platform.runLater(() -> { view.getAwaitingGUI().refreshWholeBoard();});
+            }
+
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {
             if (json.get("AnswerType").getAsInt() == AnswerTypeEnum.LOBBY_ANSWER.ordinal()) {
                 List<String> listOfPlayers = new ArrayList<>();
