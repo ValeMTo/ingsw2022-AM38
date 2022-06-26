@@ -351,6 +351,7 @@ public class MyBoardGuiController extends GUIController {
             showSpecialCardsButton.setVisible(false);
         }
 
+        showOtherBoardsButton.setOnAction(this::showOtherBoards);
         moveDiningRoomButton.setOnAction(this::pickDiningRoom);
         moveIslandButton.setOnAction(this::chooseIsland);
         // prende le cose da viewState e  fa la setup iniziale di tutti gli elementi della board
@@ -461,6 +462,11 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     public void showSpecialCards(ActionEvent event){
         gui.loadSecondWindow("specialCardsScene.fxml");
+    }
+
+    @FXML
+    public void showOtherBoards(ActionEvent event){
+        gui.loadSecondWindow("otherBoardsScene.fxml");
     }
     
 
