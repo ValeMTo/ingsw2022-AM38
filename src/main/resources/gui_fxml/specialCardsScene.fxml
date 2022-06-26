@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -81,5 +82,8 @@
             </ImageView>
          </children>
       </AnchorPane>
+      <Button fx:id="use1" layoutX="215.0" layoutY="630.0" mnemonicParsing="false" text="Use" />
+      <Button fx:id="use2" layoutX="591.0" layoutY="629.0" mnemonicParsing="false" text="Use" />
+      <Button fx:id="use3" layoutX="949.0" layoutY="629.0" mnemonicParsing="false" text="Use" />
    </children>
 </AnchorPane>

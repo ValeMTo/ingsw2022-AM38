@@ -80,10 +80,7 @@ public class MyBoardGuiController extends GUIController {
     private Stage stage;
 
     @FXML
-    private Button showSpecialCards;
-    @FXML
-    private Button showOtherBoards;
-
+    private Button showOtherBoardsButton;
 
     // Imports the assistantCards imageviews
     @FXML
@@ -296,30 +293,6 @@ public class MyBoardGuiController extends GUIController {
     @FXML
     private ImageView motherIsland12;
 
-    @FXML
-    private Line bridge_1_2;         // Line bridge that links the island #1 to the island #2
-    @FXML
-    private Line bridge_2_3;
-    @FXML
-    private Line bridge_3_4;
-    @FXML
-    private Line bridge_4_5;
-    @FXML
-    private Line bridge_5_6;
-    @FXML
-    private Line bridge_6_7;
-    @FXML
-    private Line bridge_7_8;
-    @FXML
-    private Line bridge_8_9;
-    @FXML
-    private Line bridge_9_10;
-    @FXML
-    private Line bridge_10_11;
-    @FXML
-    private Line bridge_11_12;
-    @FXML
-    private Line bridge_12_1;
 
     @FXML
     private ImageView noEntry1;   // noEntryTiles imageviews on islands
@@ -480,7 +453,7 @@ public class MyBoardGuiController extends GUIController {
                 }
 
             }
-        } else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.END)){
+        } else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.END)) {
             gui.setNextStage("endScene.fxml");
         }
     };
@@ -489,6 +462,7 @@ public class MyBoardGuiController extends GUIController {
     public void showSpecialCards(ActionEvent event){
         gui.loadSecondWindow("specialCardsScene.fxml");
     }
+    
 
     /**
      * Initially sets the AssistantCards deck in the gui and the corresponding "pickCard()" method.
@@ -579,6 +553,7 @@ public class MyBoardGuiController extends GUIController {
             image.setDisable(false);
         }
     }
+
 
     @FXML
     public void pickIsland(MouseEvent event){
@@ -716,23 +691,6 @@ public class MyBoardGuiController extends GUIController {
         noEntryTilesArray.add(noEntry12);
         for(ImageView i : noEntryTilesArray){
             i.setVisible(false);
-        }
-
-
-        islandBridges.add(bridge_1_2);
-        islandBridges.add(bridge_2_3);
-        islandBridges.add(bridge_3_4);
-        islandBridges.add(bridge_4_5);
-        islandBridges.add(bridge_5_6);
-        islandBridges.add(bridge_6_7);
-        islandBridges.add(bridge_7_8);
-        islandBridges.add(bridge_8_9);
-        islandBridges.add(bridge_9_10);
-        islandBridges.add(bridge_10_11);
-        islandBridges.add(bridge_11_12);
-        islandBridges.add(bridge_12_1);
-        for(Line l : islandBridges) {
-            l.setVisible(false);
         }
 
     }

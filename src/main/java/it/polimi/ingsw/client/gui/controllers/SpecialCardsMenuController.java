@@ -2,9 +2,12 @@ package it.polimi.ingsw.client.gui.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,27 +47,76 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     private Label description3;
 
+    @FXML
+    private Button use1;
+    @FXML
+    private Button use2;
+    @FXML
+    private Button use3;
+
+    List<SpecialCardName> list;
+
     public void initialize(){
-        //coin1.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
-        //coin2.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
-        //coin3.setImage(new Image(getClass().getResourceAsStream("/graphics/board/coin.png")));
         coin1.setVisible(false);
         coin2.setVisible(false);
         coin3.setVisible(false);
+
+        use1.setVisible(false);
+        use2.setVisible(false);
+        use3.setVisible(false);
+
+        use1.setDisable(true);
+        use2.setDisable(true);
+        use3.setDisable(true);
+
+        use1.setOnAction(this::useSpecialCard1);
+        use2.setOnAction(this::useSpecialCard2);
+        use3.setOnAction(this::useSpecialCard3);
     }
 
     @Override
     public void loadContent(){
         try {
             Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();
-            List<SpecialCardName> list = specialCards.keySet().stream().toList();
+            list = specialCards.keySet().stream().toList();
             loadCorrectImage(specialCardImage1, list.get(0), specialCardName1, description1);
             loadCorrectImage(specialCardImage2, list.get(1), specialCardName2, description2);
             loadCorrectImage(specialCardImage3, list.get(2), specialCardName3, description3);
+
+            if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
+                if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower()) && !gui.getViewState().getSpecialCardUsage()) {
+                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(0))) {
+                        use1.setVisible(true);
+                        use1.setDisable(false);
+                    } else if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(1))) {
+                        use2.setVisible(true);
+                        use2.setDisable(false);
+                    } else if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(2))) {
+                        use3.setVisible(true);
+                        use3.setDisable(false);
+                    }
+                }
+            }
+
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
         }
 
+    }
+
+    @FXML
+    public void useSpecialCard1(ActionEvent event){
+        gui.getConnectionSocket().chooseSpecialCard(list.get(0).name());
+    }
+
+    @FXML
+    public void useSpecialCard2(ActionEvent event){
+        gui.getConnectionSocket().chooseSpecialCard(list.get(1).name());
+    }
+
+    @FXML
+    public void useSpecialCard3(ActionEvent event){
+        gui.getConnectionSocket().chooseSpecialCard(list.get(2).name());
     }
 
     private String loadCorrectDescription(SpecialCardName card){
