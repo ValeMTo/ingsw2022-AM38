@@ -95,6 +95,8 @@ public class ExpertGameOrchestratorTest {
                 while (game.currentPhase != PhaseEnum.END && game.currentPhase != PhaseEnum.PLANNING) {
                     doAMoveStudentsOnlyDining(game);
                     new GameOrchestratorTest().doAMoveMotherNature(game);
+                    System.out.println("Round "+game.gameBoard.getNumRound()+" active player "+game.gameBoard.getCurrentPlayer()+" CHOOSING CLOUD "+counter);
+                    System.out.println("Round "+game.gameBoard.getNumRound()+" active player "+game.gameBoard.getCurrentPlayer()+"From usable clouds "+game.gameBoard.getUsableClouds());
                     game.chooseCloud(counter);
                     counter++;
                 }

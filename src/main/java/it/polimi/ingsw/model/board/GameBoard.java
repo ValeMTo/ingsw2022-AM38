@@ -317,6 +317,7 @@ public abstract class GameBoard extends Listenable {
     public void fillClouds() {
         for (Cloud cloud : clouds) {
             while (!cloud.isFull() && !bag.isEmpty()) cloud.addStudent(bag.drawStudent());
+            cloud.setHasBeenUsed(false);
         }
         notifyClouds();
     }
@@ -652,7 +653,7 @@ public abstract class GameBoard extends Listenable {
     public Set<Integer> getUsableClouds() {
         Set<Integer> usableClouds = new HashSet<>();
         for (int i = 0; i < playerNumber; i++) {
-            if (clouds[i].isFull()) usableClouds.add(i + 1);
+            if (!clouds[i].isHasBeenUsed()) usableClouds.add(i + 1);
         }
         return usableClouds;
     }

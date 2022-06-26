@@ -853,8 +853,6 @@ public class ViewState {
         return null;
     }
 
-    //TODO : complete implementation
-
     /**
      * It prints with the awaitingCli and the currents phases etc...
      */

@@ -56,7 +56,7 @@ public class PlayerBoard extends Listenable {
         this.towers = numTowers;
         this.numTowersLimit = numTowers;
         this.towerColor = towerColor;
-        this.coin = 2;
+        this.coin = 1;
     }
 
     /**
