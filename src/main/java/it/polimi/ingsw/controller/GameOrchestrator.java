@@ -414,6 +414,11 @@ public abstract class GameOrchestrator extends Listenable {
                         System.out.println("GAME ORCHESTRATOR - END OF MATCH - end due to "+gameBoard.isEndOfMatch());
                         gameBoard.notifyEndOfMatchLeaderBoard();
                         setCurrentPhase(END);
+                        // Waits some time and then disconnect all players
+                        try{Thread.sleep(5000);}
+                        catch (InterruptedException exc){}
+                        for(ClientHandler client: clients)
+                            client.disconnectionManager();
                     }
                 }
                 if(clients!=null&&modelListener!=null) {
@@ -425,7 +430,6 @@ public abstract class GameOrchestrator extends Listenable {
                         System.out.println("GAME ORCHESTRATOR NOTIFY - nextStep - ACTION Phase - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase());
                         notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase()), clients);
                     }
-
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();

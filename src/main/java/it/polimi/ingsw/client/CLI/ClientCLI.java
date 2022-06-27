@@ -77,8 +77,8 @@ public class ClientCLI {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        System.out.println("GameSettings" + viewState.getGameSettings().getNumberActualClients());
+        if(viewState.getGameSettings()!=null)
+            System.out.println("GameSettings" + viewState.getGameSettings().getNumberActualClients());
         if (viewState.getGameSettings().getNumberActualClients() <= 0) {
             sendGameMode();
             sendNumOfPlayers();
@@ -213,15 +213,17 @@ public class ClientCLI {
      */
     public int chooseIslandSpecialCard(){
         printArchipelago();
-        System.out.println(CLICyan+"Choose an island from the archipelago where you want to apply the effect of the chosen special card "+getAllColorAbbreviations());
+        System.out.println(CLICyan+"Choose an island from the archipelago where you want to apply the effect of the chosen special card ");
         String input = in.nextLine();
         try {
-            return Integer.parseInt(input);
+            if(input!=null)
+                return Integer.parseInt(input);
         }
         catch (NumberFormatException exc){
             System.out.println(CLIPink+"WRONG INPUT! It is required a number, try again"+CLIEffectReset);
             return chooseIslandSpecialCard();
         }
+        return chooseIslandSpecialCard();
     }
 
     /**
@@ -931,6 +933,7 @@ public class ClientCLI {
     }
     public void printEndOfMatch(){
         Map<String, Integer> standing = viewState.getLeaderBoard();
+        if(standing==null) return;
         if(standing.get(viewState.getNickname())==1){
             if(!isDraw(standing)){
                 System.out.println(CLIBoldWhite+"\tY");

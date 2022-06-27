@@ -211,6 +211,8 @@ public abstract class GameBoard extends Listenable {
             }
             standingPosition++;
         }
+        if(clients!=null&&modelListener!=null&&standing!=null)
+            notify(modelListener,MessageGenerator.leaderboardUpdateMessage(false,standing,""),clients);
     }
 
     /**
@@ -252,7 +254,7 @@ public abstract class GameBoard extends Listenable {
             }
         }
         // 3 Islands groups
-        if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3) {
+        if (islands.length<=3) {
             System.out.println("GAME BOARD - isEndOfMatch - ONLY THREE ISLAND GROUPS!");
             return EndOfMatchCondition.InstantEndOfMatch;
         }
@@ -283,7 +285,8 @@ public abstract class GameBoard extends Listenable {
         if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3) {
             message += " only three island group left ";
         }
-        notify(modelListener,MessageGenerator.leaderboardUpdateMessage(true,standing,message),clients);
+        if(clients!=null&&modelListener!=null&&standing!=null)
+            notify(modelListener,MessageGenerator.leaderboardUpdateMessage(true,standing,message),clients);
     }
 
     /**

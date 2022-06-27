@@ -65,7 +65,7 @@ public class ViewMessageParser {
                 }
             }
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.LEADERBOARD_UPDATE.ordinal()) {
-                Map<String, Number> standing = gson.fromJson(json.get("Standing"), HashMap.class);
+                Map<String, Number> standing = gson.fromJson(json.get("Leaderboard"), HashMap.class);
                 Map<String, Integer> integerStanding = new HashMap<>();
                 for (String s : standing.keySet())
                     integerStanding.put(s, standing.get(s).intValue());
