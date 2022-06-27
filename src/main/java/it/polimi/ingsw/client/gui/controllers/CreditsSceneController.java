@@ -17,24 +17,18 @@ public class CreditsSceneController extends GUIController {
     @FXML
     private Label creditsLabel;
 
-    @FXML
-    private Button demoBoard;
+
 
 
     @FXML
     public void initialize() {
         returnButton.setOnAction(this::returnToHome);
         creditsLabel.setText(ourCredits);
-        demoBoard.setOnAction(this::launchDemoBoard);
     }
+
 
     public void returnToHome(ActionEvent event) {
         gui.setNextStage("homeMenu.fxml");
     }
-
-    public void launchDemoBoard(ActionEvent event) {
-        gui.setNextStage("myBoardScene.fxml");
-    }
-
 
 }

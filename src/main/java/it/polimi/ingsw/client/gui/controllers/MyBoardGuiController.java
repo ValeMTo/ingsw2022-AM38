@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.gui.controllers;
 
 import it.polimi.ingsw.client.view.IslandView;
+import it.polimi.ingsw.client.view.SubPhaseEnum;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
@@ -29,22 +30,20 @@ import static it.polimi.ingsw.model.board.Color.toColor;
 public class MyBoardGuiController extends GUIController {
 
     private final String towersPath = "/graphics/board/towers/";
-    private final HashMap<Tower, Image> towersImgMap = new HashMap<>();
+    private final Map<Tower, Image> towersImgMap = new HashMap<>();
     private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
-    private final ArrayList<Label> entranceStudLabels = new ArrayList<Label>();
-    private final ArrayList<ImageView> entranceStudImages = new ArrayList<ImageView>(5);
-    private final ArrayList<Label> diningRoomStudLabels = new ArrayList<Label>();
-    private final ArrayList<Label> professorsLabels = new ArrayList<Label>(5);
-    private final ArrayList<ImageView> archipelagoIslands = new ArrayList<ImageView>();
-    private final ArrayList<ImageView> towersOnIslands = new ArrayList<ImageView>();
-    private final ArrayList<ImageView> motherNatureOnIslands = new ArrayList<ImageView>();
-    private final ArrayList<Line> islandBridges = new ArrayList<Line>();
-    private final ArrayList<Label> showContentLabels = new ArrayList<Label>();
-    private final ArrayList<ImageView> cloudsImgArray = new ArrayList<ImageView>();
-    private final ArrayList<ImageView> noEntryTilesArray = new ArrayList<ImageView>();
+    private final List<Label> entranceStudLabels = new ArrayList<Label>();
+    private final List<ImageView> entranceStudImages = new ArrayList<ImageView>(5);
+    private final List<Label> diningRoomStudLabels = new ArrayList<Label>();
+    private final List<Label> professorsLabels = new ArrayList<Label>(5);
+    private final List<ImageView> archipelagoIslands = new ArrayList<ImageView>();
+    private final List<ImageView> towersOnIslands = new ArrayList<ImageView>();
+    private final List<ImageView> motherNatureOnIslands = new ArrayList<ImageView>();
+    private final List<Line> islandBridges = new ArrayList<Line>();
+    private final List<Label> showContentLabels = new ArrayList<Label>();
+    private final List<ImageView> cloudsImgArray = new ArrayList<ImageView>();
+    private final List<ImageView> noEntryTilesArray = new ArrayList<ImageView>();
 
-
-    private Integer currentPlayerCoins;
 
 
     @FXML
@@ -363,14 +362,13 @@ public class MyBoardGuiController extends GUIController {
 
     public void updateWholeBoard(){
         System.out.println("executing updateWholeBoard()...");
-        updateMyPlayerBoard();
-        updateArchipelago();
-        updateProfessors();
+        if(gui.getViewState().getPlayerTower() != null) {     // updates the board only if the towers matching has already been initialized
+            updateMyPlayerBoard();
+            updateArchipelago();
+            updateProfessors();
 
-        updatePhaseAction();
-
-
-
+            updatePhaseAction();
+        }
     }
 
     public void updateGameStatus(){
@@ -380,6 +378,28 @@ public class MyBoardGuiController extends GUIController {
 
         statusHeader.setText("Phase : " + currentPhase.toString() + "\nActive player : " + activePlayerName);
 
+    }
+
+
+    public void updateStatusMessage(){
+        PhaseEnum currentPhase = gui.getViewState().getCurrentPhase();
+        SubPhaseEnum currentSubPhase = gui.getViewState().getSubPhaseEnum();
+
+        if(gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())) {   // firstly checks if the owner of the gui is the current active player
+            if(currentPhase.equals(PhaseEnum.PLANNING)){
+                statusMessage.setText("Choose an Assistant Card to play. Select between the available cards in the bottom");
+            }
+            else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
+                if(currentSubPhase.equals(SubPhaseEnum.NO_SUB_PHASE)||currentSubPhase.equals(SubPhaseEnum.CHOOSE_COLOR)) {
+                    statusMessage.setText("Choose a student color to move from the ones in the School Entrance");
+                }
+                //else if(equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND))
+            }
+
+        }
+        else {
+            statusMessage.setText("Wait until it is your turn...");
+        }
     }
 
     public void updatePhaseAction(){
@@ -394,9 +414,11 @@ public class MyBoardGuiController extends GUIController {
 
         disableOff(archipelagoIslands);
         disableOff(cloudsImgArray);
+        disableOff(entranceStudImages);
 
         removeEffect(archipelagoIslands);
         removeEffect(cloudsImgArray);
+        removeEffect(entranceStudImages);
 
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
                 deckArea.setVisible(true);
@@ -420,7 +442,7 @@ public class MyBoardGuiController extends GUIController {
                 for (ImageView image : entranceStudImages){
                     if (entrance.get(getColorFromImage(image)) <= 0){
                         image.setDisable(true);
-                        image.setEffect(new Shadow());
+                        image.setEffect(createShadow());
                     } else {
                         image.setDisable(false);
                     }
@@ -438,7 +460,7 @@ public class MyBoardGuiController extends GUIController {
                         image.setDisable(false);
                     }else {
                         image.setDisable(true);
-                        image.setEffect(new Shadow());
+                        image.setEffect(createShadow());
                     }
                 }
             }
@@ -446,7 +468,7 @@ public class MyBoardGuiController extends GUIController {
             if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
                 for (ImageView cloud : cloudsImgArray){
                     if (!gui.getViewState().getUsableClouds().contains(cloudsImgArray.indexOf(cloud)+1)){
-                        cloud.setEffect(new Shadow());
+                        cloud.setEffect(createShadow());
                         cloud.setDisable(true);
                     } else {
                         cloud.setDisable(false);
@@ -461,6 +483,7 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     public void showSpecialCards(ActionEvent event){
+
         gui.loadSecondWindow("specialCardsScene.fxml");
     }
 
@@ -864,7 +887,7 @@ public class MyBoardGuiController extends GUIController {
         schoolEntranceOccupancy =  gui.getViewState().getSchoolEntranceOccupancy(playerTowerColor);
 
 
-        currentPlayerCoins = gui.getViewState().getPlayerCoins(playerTowerColor);
+        int currentPlayerCoins = gui.getViewState().getPlayerCoins(playerTowerColor);
         num_playerCoins.setText("x " + currentPlayerCoins);
         num_towersInBoard.setText("x " + gui.getViewState().getTowerLeft(playerTowerColor));
 
