@@ -419,12 +419,12 @@ public class ExpertGameBoard extends GameBoard {
             return false;
         }
         if (this.motherNatureIncreasedMove) maxMovement += increasedMovement;
-        if (destinationIsland >= motherNature && (destinationIsland - motherNature) <= maxMovement) {
+        if (destinationIsland > motherNature && (destinationIsland - motherNature) <= maxMovement) {
             motherNature = destinationIsland;
             System.out.println("EXPERT GAME BOARD - moveMotherNature - mother nature moved correctly to "+destinationIsland);
             notifyArchipelago();
             return true;
-        } else if (destinationIsland <= motherNature && (islands[islands.length - 1].getPosition() - destinationIsland + motherNature) <= maxMovement) {
+        } else if (destinationIsland < motherNature && (islands[islands.length - 1].getPosition() - motherNature + destinationIsland) <= maxMovement) {
             motherNature = destinationIsland;
             System.out.println("EXPERT GAME BOARD - moveMotherNature - mother nature moved correctly to "+destinationIsland);
             notifyArchipelago();
