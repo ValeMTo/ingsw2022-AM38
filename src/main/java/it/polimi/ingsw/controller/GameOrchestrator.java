@@ -411,6 +411,7 @@ public abstract class GameOrchestrator extends Listenable {
                     }
                     //If the game ends
                     else {
+                        System.out.println("GAME ORCHESTRATOR - END OF MATCH - end due to "+gameBoard.isEndOfMatch());
                         gameBoard.notifyEndOfMatchLeaderBoard();
                         setCurrentPhase(END);
                     }

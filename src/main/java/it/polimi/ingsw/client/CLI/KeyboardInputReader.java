@@ -77,6 +77,12 @@ public class KeyboardInputReader implements Runnable {
         } else if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) {
             fromInputSendCloud();
         }
+        else if(viewState.getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE)){
+            if(SpecialCardRequiredAction.isColorChoise(viewState.getSpecialPhase()))
+                fromInputSetColor();
+            else if(viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_ISLAND))
+                fromInputSendIsland();
+        }
     }
 
     /**
@@ -206,6 +212,7 @@ public class KeyboardInputReader implements Runnable {
         try {
             if(input.equalsIgnoreCase("N")) {
                 viewState.setAcceptedUseSpecialCard(false);
+                viewState.refreshCLI();
                 return;
             }
             for (String specialCardName : viewState.getUpperCaseSpecialCards())
@@ -231,4 +238,5 @@ public class KeyboardInputReader implements Runnable {
     public Color getPendingColor() {
         return pendingColor;
     }
+
 }

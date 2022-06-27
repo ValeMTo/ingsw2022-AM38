@@ -6,7 +6,6 @@ import it.polimi.ingsw.client.gui.MainGUI;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
-import it.polimi.ingsw.exceptions.NotLastCardUsedException;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
@@ -856,7 +855,7 @@ public class ViewState {
     /**
      * It prints with the awaitingCli and the currents phases etc...
      */
-    private void refreshCLI() {
+    public void refreshCLI() {
         if (awaitingCLI == null) return;
         awaitingCLI.cleaner();
         if(this.currentPhase.equals(PhaseEnum.END))
@@ -866,7 +865,14 @@ public class ViewState {
         else if (!this.activeView) {
             awaitingCLI.showNotYourTurnView();
         } else {
-            if(acceptedUseSpecialCard) awaitingCLI.specialCardUsage();
+            if(this.currentPhase.equals(PhaseEnum.SPECIAL_CARD_USAGE)&&specialCardRequiredAction!=null)
+            {
+                if(SpecialCardRequiredAction.isColorChoise(this.specialCardRequiredAction))
+                    awaitingCLI.chooseColorSpecialCardCommand();
+                else if(this.specialCardRequiredAction.equals(SpecialCardRequiredAction.CHOOSE_ISLAND))
+                    awaitingCLI.chooseIslandSpecialCard();
+            }
+            else if(acceptedUseSpecialCard) awaitingCLI.specialCardUsage();
             else if (this.currentPhase.equals(PhaseEnum.PLANNING)) awaitingCLI.showPlanningInstruction();
             else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) awaitingCLI.showMoveStudentPhase();
             else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) awaitingCLI.printForMoveMotherNature();

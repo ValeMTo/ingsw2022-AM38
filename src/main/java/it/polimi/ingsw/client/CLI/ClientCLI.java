@@ -6,12 +6,10 @@ import it.polimi.ingsw.client.ConnectionSocket;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.SubPhaseEnum;
 import it.polimi.ingsw.client.view.ViewState;
-import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Cloud;
 import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 
@@ -195,7 +193,7 @@ public class ClientCLI {
      * Requires the color for the special card usage
      * @return the color chosen
      */
-    private void chooseColorSpecialCardComand() {
+    public void chooseColorSpecialCardCommand() {
         if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD)) {
             // TODO : print the special card usable colors
             //printActiveSpecialCard();
@@ -320,12 +318,13 @@ public class ClientCLI {
      * Cleans the CLI
      */
     public synchronized void cleaner() {
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        System.out.flush();
         System.out.println("\u001b[2J");
         System.out.flush();
         System.out.println("\033[H");
         System.out.flush();
         System.out.println("\033[2J");
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.flush();
     }
 

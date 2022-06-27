@@ -225,23 +225,35 @@ public abstract class GameBoard extends Listenable {
         leaderBoardUpdate();
         // Empty bag condition
         if (bag.isEmpty()) {
+            System.out.println("GAME BOARD - isEndOfMatch - BAG IS EMPTY!");
             return EndOfMatchCondition.DelayedEndOfMatch;
         }
         // Player has used all his towers
         for (PlayerBoard player : players) {
-            if (player.getAvailableTowers() == 0) return EndOfMatchCondition.InstantEndOfMatch;
+            if (player.getAvailableTowers() == 0) {
+                System.out.println("GAME BOARD - isEndOfMatch - A PLAYER HAS FINISHED ITS TOWERS! Player "+player.getNickName()+" with tower "+player.getTowerColor());
+                return EndOfMatchCondition.InstantEndOfMatch;
+            }
         }
         // No more assistant card (all 10 cards used)
         if (numRound == 11) {
+            System.out.println("GAME BOARD - isEndOfMatch - ROUND FINISHED!");
             return EndOfMatchCondition.InstantEndOfMatch;
         }
         // Final round
-        if (numRound == 10) return EndOfMatchCondition.DelayedEndOfMatch;
+        if (numRound == 10) {
+            System.out.println("GAME BOARD - isEndOfMatch - LAST ROUND!");
+            return EndOfMatchCondition.DelayedEndOfMatch;
+        }
         for (PlayerBoard player : players) {
-            if (player.getAvailableCards().size() == 1) return EndOfMatchCondition.DelayedEndOfMatch;
+            if (player.getAvailableCards().size() == 0) {
+                System.out.println("GAME BOARD - isEndOfMatch - ALL CARD USED!");
+                return EndOfMatchCondition.DelayedEndOfMatch;
+            }
         }
         // 3 Islands groups
         if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3) {
+            System.out.println("GAME BOARD - isEndOfMatch - ONLY THREE ISLAND GROUPS!");
             return EndOfMatchCondition.InstantEndOfMatch;
         }
         return EndOfMatchCondition.NoEndOfMatch;
@@ -301,6 +313,7 @@ public abstract class GameBoard extends Listenable {
         if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands.length);
 
+        //TODO: fix problem 1 not reachable... also motherNature MUST move from its position!
         if ((motherNature <= destinationIsland && destinationIsland - motherNature <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland <= cardSteps)) {
             motherNature = destinationIsland;
             System.out.println("GAME BOARD - moveMotherNature - motherNature correctly moved to "+destinationIsland+" notifying the clients");
