@@ -236,7 +236,7 @@ public class MessageParser{
             if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal())) {
                 return gameOrchestrator.chooseColor(Color.values()[json.get("Color").getAsInt()]);
             }
-            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal())
+            if (json.get("MessageType").getAsInt() == MessageTypeEnum.ACTION.ordinal() && (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal()||json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal()))
                 return gameOrchestrator.chooseIsland(json.get("IslandPosition").getAsInt());
         } catch (FunctionNotImplementedException exc) {
             return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.FUNCTION_NOT_IMPLEMENTED, "ERROR - this functionality is for expert game mode only");

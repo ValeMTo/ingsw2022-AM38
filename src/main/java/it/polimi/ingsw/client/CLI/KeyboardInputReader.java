@@ -44,10 +44,10 @@ public class KeyboardInputReader implements Runnable {
     public void run() {
         while (!viewState.isEndOfMatch()) {
             input = in.nextLine();
-            System.out.println("KEYBOARD - run - got" + input);
+            if(input.equalsIgnoreCase("N"))
+                viewState.refreshCLI();
             // We receive a generic input, then we choose the destin of  this input
             if (viewState.isActiveView()) {
-                System.out.println("KEYBOARD - run - time to act, view active");
                 consumeInput();
             }
         }
@@ -113,7 +113,7 @@ public class KeyboardInputReader implements Runnable {
             System.out.println(ClientCLI.CLIPink + "Incorrect value, colors abbreviations are: " + ClientCLI.getAllColorAbbreviations() + ClientCLI.CLIEffectReset);
         } else {
             this.pendingColor = Color.toColor(input);
-            // If it is required the color for a special card, is send to the Server
+            // If it is required the color for a special card, is sent to the Server
             if (viewState.getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE) && viewState.getSpecialPhase() != null && SpecialCardRequiredAction.isColorChoise(viewState.getSpecialPhase())) {
                 connectionSocket.chooseColor(this.pendingColor);
             }

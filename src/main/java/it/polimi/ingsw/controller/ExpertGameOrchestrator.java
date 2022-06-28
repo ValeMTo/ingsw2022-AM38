@@ -134,9 +134,27 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 if (gameBoard.getSpecialCardCost(convertedName)==null) {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_SPECIAL_CARD, "ERROR - no such specialCard");
                 }
-                Integer cost = gameBoard.getSpecialCardCost(convertedName);
+                if(convertedName.equals(SpecialCardName.BARD)&&!gameBoard.isDiningRoomOccupied())
+                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_STUDENTS_IN_DINING_ROOM, "ERROR - There are not students in the dining room! Not possible to switch students between schoolEntrance and diningRoom");
+                if(convertedName.equals(SpecialCardName.HERBALIST))
+                    for(int i=0;i<specialCardsArray.length;i++)
+                    {
+                        if(specialCardsArray[i].getName().equals(convertedName))
+                            if(specialCardsArray[i].getNumberOfEntryTiles()<=0)
+                                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.ALL_TILES_USED, "ERROR - There are not tiles on the special card! Not possible to use this special card effect");
+                    }
+                    Integer cost = gameBoard.getSpecialCardCost(convertedName);
                 if (!gameBoard.paySpecialCard(cost)) {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_ENOUGH_COINS, "ERROR - not enough coin to activate this special card");
+                }
+                System.out.println("EXPERT GAME ORCHESTRATOR - Increase cost of card if first use "+convertedName);
+                for(int i=0;i<specialCardsArray.length;i++)
+                {
+                    System.out.println("EXPERT GAME ORCHESTRATOR - Card "+specialCardsArray[i].getName());
+                    if(specialCardsArray[i].getName().equals(convertedName)) {
+                        System.out.println("EXPERT GAME ORCHESTRATOR - Increase cost of card "+specialCardsArray[i].getName());
+                        specialCardsArray[i].increaseCostIfFirstUse();
+                    }
                 }
                 setCurrentPhase(PhaseEnum.SPECIAL_CARD_USAGE);
                 this.activatedSpecialCard = convertedName;
@@ -336,11 +354,16 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
      */
     @Override
     public String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException {
-        synchronized (actionBlocker) {
+        System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - CHOOSING ISLAND for special card usage");
+        System.out.flush();
+        synchronized (phaseBlocker) {
             if (!expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_ISLAND)) {
-                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose color");
+                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose island");
             }
+        }
             Integer cardPosition = getPositionSpecialCard();
+            if(cardPosition==null)
+                System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - null card position");
             System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - position "+position+" pending color "+pendingColor+" activated card "+activatedSpecialCard);
             try {
                 switch (activatedSpecialCard) {
@@ -372,7 +395,6 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
             catch (LocationNotAllowedException exc){
                 exc.printStackTrace();
             }
-        }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - error in choose color of the student in special card usage");
     }
 

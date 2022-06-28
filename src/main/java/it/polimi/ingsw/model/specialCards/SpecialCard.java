@@ -21,7 +21,7 @@ public class SpecialCard extends Listenable {
 
     public SpecialCard(SpecialCardName name) {
         this.name = name;
-        this.firstUse = false;
+        this.firstUse = true;
         if (name == SpecialCardName.PRIEST || name == SpecialCardName.POSTMAN || name == SpecialCardName.JUGGLER || name == SpecialCardName.BARD) {
             this.cost = 1;
         } else if (name == SpecialCardName.HERBALIST || name == SpecialCardName.KNIGHT || name == SpecialCardName.PRINCESS || name == SpecialCardName.CHEESEMAKER) {
@@ -171,6 +171,21 @@ public class SpecialCard extends Listenable {
      */
     public int getGuestsChangeLimit() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
+    }
+
+    /**
+     * If it is the first usage of this special card, increase the cost by one
+     */
+    public void increaseCostIfFirstUse(){
+        if(firstUse)
+        {
+            System.out.println("Increasing the cost of special card "+this.name+" from "+cost);
+            this.cost++;
+            this.firstUse = false;
+            if(modelListener!=null&&clients!=null){
+                notify(modelListener,MessageGenerator.specialCardUpdateMessage(this.name, this.cost),clients);
+            }
+        }
     }
 
 

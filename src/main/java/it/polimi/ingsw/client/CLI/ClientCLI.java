@@ -77,8 +77,8 @@ public class ClientCLI {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        System.out.println("GameSettings" + viewState.getGameSettings().getNumberActualClients());
+        if(viewState.getGameSettings()!=null)
+            System.out.println("GameSettings" + viewState.getGameSettings().getNumberActualClients());
         if (viewState.getGameSettings().getNumberActualClients() <= 0) {
             sendGameMode();
             sendNumOfPlayers();
@@ -189,6 +189,10 @@ public class ClientCLI {
         //TODO
     }
 
+    private void printActiveSpecialCard(){
+        //TODO
+    }
+
     /**
      * Requires the color for the special card usage
      * @return the color chosen
@@ -196,7 +200,7 @@ public class ClientCLI {
     public void chooseColorSpecialCardCommand() {
         if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD)) {
             // TODO : print the special card usable colors
-            //printActiveSpecialCard();
+            printSpecialCards();
             System.out.println(CLICyan + "Choose a color from the card, colors abbreviations: " + getAllColorAbbreviations());
         } else if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)) {
             printPlayerBoard();
@@ -211,17 +215,9 @@ public class ClientCLI {
      * Used to set an island to use for the special card effect
      * @return the chosen island from the archipelago
      */
-    public int chooseIslandSpecialCard(){
+    public void chooseIslandSpecialCard(){
         printArchipelago();
-        System.out.println(CLICyan+"Choose an island from the archipelago where you want to apply the effect of the chosen special card "+getAllColorAbbreviations());
-        String input = in.nextLine();
-        try {
-            return Integer.parseInt(input);
-        }
-        catch (NumberFormatException exc){
-            System.out.println(CLIPink+"WRONG INPUT! It is required a number, try again"+CLIEffectReset);
-            return chooseIslandSpecialCard();
-        }
+        System.out.println(CLICyan+"Choose an island from the archipelago where you want to apply the effect of the chosen special card ");
     }
 
     /**
@@ -284,8 +280,10 @@ public class ClientCLI {
     public synchronized void showMoveStudentPhase(){
         printArchipelago();
         printPlayerBoard();
-        if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR))
+        if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR)) {
             showColorChoiceInstruction();
+            specialCardDecision();
+        }
         else if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND))
             showStudentMovementDiningOrIsland();
         else if(viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_ISLAND))
@@ -359,7 +357,7 @@ public class ClientCLI {
         viewState.setNickname(null);
         boolean confirmation = false;
         nickname = null;
-        while (!confirmation) {
+        while (!confirmation&&viewState.getNickname()==null) {
             System.out.println(">Insert your nickname: ");
             nickname = in.nextLine();
             System.out.println(">You chose: " + nickname);
@@ -370,7 +368,10 @@ public class ClientCLI {
                 nickname = null;
             }
         }
-        connectionSocket.sendNickname(nickname);
+        if(viewState.getNickname()==null)
+            connectionSocket.sendNickname(nickname);
+        else
+            nickname = viewState.getNickname();
         try {
             this.wait();
         } catch (InterruptedException e) {
@@ -931,6 +932,7 @@ public class ClientCLI {
     }
     public void printEndOfMatch(){
         Map<String, Integer> standing = viewState.getLeaderBoard();
+        if(standing==null) return;
         if(standing.get(viewState.getNickname())==1){
             if(!isDraw(standing)){
                 System.out.println(CLIBoldWhite+"\tY");
@@ -972,6 +974,14 @@ public class ClientCLI {
         catch (InterruptedException exc){}
         printStandings(standing);
 
+    }
+
+    /**
+     * Visualizes the error message and then awaits for 3 sec
+     * @param error the error message to be print
+     */
+    public void visualizeError(String error){
+        System.out.println(ClientCLI.CLIPink+error+CLIEffectReset);
     }
 
 
