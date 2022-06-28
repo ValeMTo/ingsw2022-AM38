@@ -59,9 +59,9 @@ public class SpecialCard extends Listenable {
      * It can be used only once: the price will not be increased with two calls of the method.
      */
     public void use() {
-        if (!firstUse) {
+        if (firstUse) {
             this.cost += 1;
-            firstUse = true;
+            firstUse = false;
         }
         if(modelListener!=null&&clients!=null){
             notify(modelListener,MessageGenerator.specialCardUpdateMessage(this.name, this.cost),clients);
