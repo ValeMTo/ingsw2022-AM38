@@ -700,6 +700,16 @@ public abstract class GameBoard extends Listenable {
     }
 
     /**
+     * Tells if the diningRoom of the current player is occupied by at least one student or not
+     * Used for the bard special card to avoid situation where there are not students in the dining room
+     */
+    public boolean isDiningRoomOccupied(){
+        if(this.players[currentPlayer]!=null && this.players[currentPlayer].countStudentsDiningRoom()>0)
+            return true;
+        return false;
+    }
+
+    /**
      * Computes the influence on a given island and sets accordingly the towers
      *
      * @param island : position of the island we want to compute the influence

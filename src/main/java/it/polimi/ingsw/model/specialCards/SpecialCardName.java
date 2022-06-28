@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum SpecialCardName {
-    PRIEST,
-    HERALD,
-    POSTMAN,
-    HERBALIST,
-    ARCHER,
-    JUGGLER,
-    KNIGHT,
-    COOKER,
-    BARD,
-    PRINCESS,
-    GAMBLER,
-    CHEESEMAKER;
+    PRIEST,         //0
+    HERALD,         //1
+    POSTMAN,        //2
+    HERBALIST,      //3
+    ARCHER,         //4
+    JUGGLER,        //5
+    KNIGHT,         //6
+    COOKER,         //7
+    BARD,           //8
+    PRINCESS,       //9
+    GAMBLER,        //10
+    CHEESEMAKER;    //11
 
     /**
      * Convert from String to the SpecialCardName enum type

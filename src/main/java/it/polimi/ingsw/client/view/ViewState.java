@@ -853,6 +853,18 @@ public class ViewState {
     }
 
     /**
+     * Print with the CLI the error, then set as not accepted to be used the special card and refresh the cli
+     * @param error the error to be print
+     */
+    public synchronized void visualizeErrorAndGoOn(String error){
+        if(awaitingCLI!=null){
+            awaitingCLI.visualizeError(error);
+            this.acceptedUseSpecialCard = false;
+        }
+        refreshCLI();
+    }
+
+    /**
      * It prints with the awaitingCli and the currents phases etc...
      */
     public void refreshCLI() {

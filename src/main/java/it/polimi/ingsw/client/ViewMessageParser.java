@@ -2,6 +2,7 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.client.CLI.ClientCLI;
 import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
@@ -48,11 +49,8 @@ public class ViewMessageParser {
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
             view.setTurnShown(false);
-            if (json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()){
-                //System.out.println("NICKNAME ALREADY TAKEN");
-                view.setNickname(null);
-                view.wake();
-            }
+            if(json.get("errorString")!=null&&json.get("ErrorType").getAsInt() != ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal())
+                view.visualizeErrorAndGoOn(json.get("errorString").getAsString());
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
                 Tower tower = Tower.values()[json.get("PlayerTower").getAsInt()];

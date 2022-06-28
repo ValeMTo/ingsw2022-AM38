@@ -134,9 +134,27 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 if (gameBoard.getSpecialCardCost(convertedName)==null) {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_SUCH_SPECIAL_CARD, "ERROR - no such specialCard");
                 }
-                Integer cost = gameBoard.getSpecialCardCost(convertedName);
+                if(convertedName.equals(SpecialCardName.BARD)&&!gameBoard.isDiningRoomOccupied())
+                    return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NO_STUDENTS_IN_DINING_ROOM, "ERROR - There are not students in the dining room! Not possible to switch students between schoolEntrance and diningRoom");
+                if(convertedName.equals(SpecialCardName.HERBALIST))
+                    for(int i=0;i<specialCardsArray.length;i++)
+                    {
+                        if(specialCardsArray[i].getName().equals(convertedName))
+                            if(specialCardsArray[i].getNumberOfEntryTiles()<=0)
+                                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.ALL_TILES_USED, "ERROR - There are not tiles on the special card! Not possible to use this special card effect");
+                    }
+                    Integer cost = gameBoard.getSpecialCardCost(convertedName);
                 if (!gameBoard.paySpecialCard(cost)) {
                     return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_ENOUGH_COINS, "ERROR - not enough coin to activate this special card");
+                }
+                System.out.println("EXPERT GAME ORCHESTRATOR - Increase cost of card if first use "+convertedName);
+                for(int i=0;i<specialCardsArray.length;i++)
+                {
+                    System.out.println("EXPERT GAME ORCHESTRATOR - Card "+specialCardsArray[i].getName());
+                    if(specialCardsArray[i].getName().equals(convertedName)) {
+                        System.out.println("EXPERT GAME ORCHESTRATOR - Increase cost of card "+specialCardsArray[i].getName());
+                        specialCardsArray[i].increaseCostIfFirstUse();
+                    }
                 }
                 setCurrentPhase(PhaseEnum.SPECIAL_CARD_USAGE);
                 this.activatedSpecialCard = convertedName;
