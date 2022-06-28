@@ -354,11 +354,16 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
      */
     @Override
     public String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException {
-        synchronized (actionBlocker) {
+        System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - CHOOSING ISLAND for special card usage");
+        System.out.flush();
+        synchronized (phaseBlocker) {
             if (!expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_ISLAND)) {
-                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose color");
+                return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose island");
             }
+        }
             Integer cardPosition = getPositionSpecialCard();
+            if(cardPosition==null)
+                System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - null card position");
             System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - position "+position+" pending color "+pendingColor+" activated card "+activatedSpecialCard);
             try {
                 switch (activatedSpecialCard) {
@@ -390,7 +395,6 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
             catch (LocationNotAllowedException exc){
                 exc.printStackTrace();
             }
-        }
         return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.GENERIC_ERROR, "ERROR - error in choose color of the student in special card usage");
     }
 

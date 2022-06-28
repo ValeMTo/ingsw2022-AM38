@@ -839,7 +839,7 @@ public class MessageGenerator {
         JSONObject json = new JSONObject();
         json.put("MessageType", MessageTypeEnum.ACTION.ordinal());
         json.put("ActionType", ActionTypeEnum.CHOOSE_ISLAND.ordinal());
-        json.put("position", position);
+        json.put("IslandPosition", position);
         return json + "\n";
     }
 
