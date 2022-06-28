@@ -368,6 +368,7 @@ public class MyBoardGuiController extends GUIController {
             updateProfessors();
 
             updatePhaseAction();
+            updateStatusMessage();
         }
     }
 
@@ -387,18 +388,27 @@ public class MyBoardGuiController extends GUIController {
 
         if(gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())) {   // firstly checks if the owner of the gui is the current active player
             if(currentPhase.equals(PhaseEnum.PLANNING)){
-                statusMessage.setText("Choose an Assistant Card to play. Select between the available cards in the bottom");
+                statusMessage.setText("Choose an AssistantCard to play. Select between the available cards in the bottom");
             }
             else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
                 if(currentSubPhase.equals(SubPhaseEnum.NO_SUB_PHASE)||currentSubPhase.equals(SubPhaseEnum.CHOOSE_COLOR)) {
-                    statusMessage.setText("Choose a student color to move from the ones in the School Entrance");
+                    statusMessage.setText("Choose a student color to move from the icons in the School Entrance");
                 }
-                //else if(equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND))
+                else if(currentSubPhase.equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND)) {
+                    statusMessage.setText("Choose where to place the Student: click on an Island or select" + " Move To DiningRoom");
+                }
             }
+            else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) {
+                int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());  // TODO: test if this works correctly
+                int maximumStepsAllowed = cardPriority/2 + cardPriority%2 ;
+                statusMessage.setText("Choose an Island on which to move MotherNature. " + "The maximum steps allowed are " + maximumStepsAllowed);
+            }
+
+            //TODO:  riprendere  da qui in poi ...
 
         }
         else {
-            statusMessage.setText("Wait until it is your turn...");
+            statusMessage.setText("Please wait until it is your turn...");
         }
     }
 
@@ -477,7 +487,7 @@ public class MyBoardGuiController extends GUIController {
 
             }
         } else if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.END)) {
-            gui.setNextStage("endScene.fxml");
+            gui.loadSecondWindow("endScene.fxml");   // calling loadSecondWindow in order to run the loadContent() method in EndController
         }
     };
 

@@ -42,5 +42,6 @@
             <Font name="Britannic Bold" size="24.0" />
          </font>
       </Label>
+      <Button fx:id="demoEndingButton" layoutX="42.0" layoutY="561.0" mnemonicParsing="false" text="launch ending DEMO" />
    </children>
 </AnchorPane>

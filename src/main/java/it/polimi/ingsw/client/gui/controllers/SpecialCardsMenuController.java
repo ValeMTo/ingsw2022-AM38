@@ -83,6 +83,9 @@ public class SpecialCardsMenuController extends GUIController {
             loadCorrectImage(specialCardImage2, list.get(1), specialCardName2, description2);
             loadCorrectImage(specialCardImage3, list.get(2), specialCardName3, description3);
 
+            //displayCardsCoin(specialCards);   // displays a coin if the cost of the card has been incremented
+
+
             //TODO :
             // Displayare il numero di monete/costo aggiornato
             if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
@@ -169,6 +172,15 @@ public class SpecialCardsMenuController extends GUIController {
             image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/princess.jpg")));
         }
     }
+
+    /*
+    public void displayCardsCoin(Map<SpecialCardName, Integer>  specialCards) {
+        for(SpecialCardName card : specialCards.keySet() ) {
+            if(SpecialCard)
+        }
+    }
+
+     */
 
 
 }

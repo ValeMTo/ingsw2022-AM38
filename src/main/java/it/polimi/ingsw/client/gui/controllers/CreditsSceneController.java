@@ -17,6 +17,9 @@ public class CreditsSceneController extends GUIController {
     @FXML
     private Label creditsLabel;
 
+    @FXML
+    private Button demoEndingButton;
+
 
 
 
@@ -24,11 +27,19 @@ public class CreditsSceneController extends GUIController {
     public void initialize() {
         returnButton.setOnAction(this::returnToHome);
         creditsLabel.setText(ourCredits);
+
+        demoEndingButton.setOnAction(this::showDemoEnding);
     }
 
-
+    @FXML
     public void returnToHome(ActionEvent event) {
         gui.setNextStage("homeMenu.fxml");
     }
+
+    @FXML
+    public void showDemoEnding(ActionEvent event){
+        gui.setNextStage("endScene.fxml");
+    }
+
 
 }

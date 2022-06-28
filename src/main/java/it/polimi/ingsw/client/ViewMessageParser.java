@@ -71,6 +71,15 @@ public class ViewMessageParser {
                     integerStanding.put(s, standing.get(s).intValue());
                 view.setLeaderBoard(integerStanding);
                 view.setEndingMotivation(json.get("EndingMessage").getAsString());
+
+                //TODO:  creare scena "ending" + metodo in gui  +  passare come argomento il "EndingMessage" e "EndingMotivation"
+
+                if(!view.isCli()){
+                    Platform.runLater(()-> {
+                        view.getAwaitingGUI().loadSecondWindow("endingScene.fxml");
+                    });
+                }
+
             }
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.LAST_USED_ASSISTANT_CARD_UPDATE.ordinal()) {
                 view.setLastCardUsed(Tower.values()[json.get("PlayerTower").getAsInt()],json.get("LastUsed").getAsInt());

@@ -181,7 +181,9 @@ public class MainGUI extends Application {
         controller.updateGameStatus();
     }
 
+    public void setEndingScene(){
 
+    }
 
     public ViewState getViewState() {
         return viewState;
