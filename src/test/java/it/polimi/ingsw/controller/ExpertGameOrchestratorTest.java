@@ -148,9 +148,13 @@ public class ExpertGameOrchestratorTest {
             jsonObject = gson.fromJson(json, JsonObject.class);
             if (game.specialCards.contains(specialCard)) {
                 switch (specialCard) {
-                    case PRIEST, POSTMAN, JUGGLER, BARD:
+                    case PRIEST, POSTMAN, JUGGLER:
                         assertNotEquals(MessageTypeEnum.ERROR.ordinal(), jsonObject.get("MessageType").getAsInt());
                         break;
+                        case  BARD:
+                            assertNotEquals(ErrorTypeEnum.NOT_ENOUGH_COINS.ordinal(), jsonObject.get("ErrorType").getAsInt());
+                            assertEquals(ErrorTypeEnum.NO_STUDENTS_IN_DINING_ROOM.ordinal(), jsonObject.get("ErrorType").getAsInt());
+                            break;
                     default:
                         assertEquals(MessageTypeEnum.ERROR.ordinal(), jsonObject.get("MessageType").getAsInt());
                 }
