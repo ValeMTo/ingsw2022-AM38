@@ -49,8 +49,17 @@ public class ViewMessageParser {
 
         if (json.get("MessageType").getAsInt()==MessageTypeEnum.ERROR.ordinal()) {
             view.setTurnShown(false);
-            if(json.get("errorString")!=null&&json.get("ErrorType").getAsInt() != ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal())
+            if(json.get("errorString")!=null&&json.get("ErrorType").getAsInt() != ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()) {
                 view.visualizeErrorAndGoOn(json.get("errorString").getAsString());
+            }
+            else if(json.get("ErrorType").getAsInt() == ErrorTypeEnum.NICKNAME_ALREADY_TAKEN.ordinal()) {
+                System.out.println("parser received : NicknameAlreadyTaken error...");
+                if(!view.isCli()) {            // correction made to fix gui bug when nicknameAlreadyTaken occurs
+                    view.setNickname(null);
+                    view.wake();
+                }
+            }
+
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.UPDATE.ordinal()) {
             if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ASSISTANT_CARD_UPDATE.ordinal()) {
                 Tower tower = Tower.values()[json.get("PlayerTower").getAsInt()];
