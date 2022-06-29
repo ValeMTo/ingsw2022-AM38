@@ -17,9 +17,7 @@ public class PingPongTimer extends TimerTask {
     @Override
     public void run() {
         if (reader != null && connectionSocket != null) {
-            if (!reader.isHasReceivedMessageFromTimerStart()) {
                 connectionSocket.sendPing();
-            }
         }
     }
 }

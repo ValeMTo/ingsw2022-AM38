@@ -29,8 +29,10 @@ public class ClientHandler implements Runnable {
     private MessageParser messageParser;
     private int id;
     private boolean disconnected = false;
-    private Boolean hasReceivedMessageFromTimerStart = false;
+    private Boolean hasReceivedMessageFromTimerStart = true;
     private final Object hasReceivedMessageFromTimerStartBlocker = new Object();
+    private Timer timer = new Timer();
+
 
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
@@ -83,24 +85,23 @@ public class ClientHandler implements Runnable {
         messageParser = new MessageParser(this);
         messageParser.setName(this.playerName);
         String message;
-        Timer timer = new Timer();
         DisconnectionTimer timerTask = new DisconnectionTimer(this);
         timer.scheduleAtFixedRate(timerTask,15000,20000);
         while (!disconnected) {
             System.out.println("CLIENT HANDLER - player " + playerName + " waiting for message");
             try {
                 message = inputReader.nextLine();
-            setHasReceivedMessageFromTimerStart(true);
-            System.out.println("CLIENT HANDLER - player " + this.getNickName() + " got message " + message);
-            System.out.println(message);
-            JsonObject json = new Gson().fromJson(message, JsonObject.class);
-            if (messageParser != null)
-                sendingMessage = messageParser.parseMessageToAction(message);
-            else
-                sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR, "ERROR - ClientHandler has no messageParser");
-            System.out.println("CLIENT HANDLER - sending " + sendingMessage);
-            writer.print(sendingMessage);
-            writer.flush();
+                setHasReceivedMessageFromTimerStart(true);
+                System.out.println("CLIENT HANDLER - player " + this.getNickName() + " got message " + message);
+                System.out.println(message);
+                JsonObject json = new Gson().fromJson(message, JsonObject.class);
+                if (messageParser != null)
+                    sendingMessage = messageParser.parseMessageToAction(message);
+                else
+                    sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR, "ERROR - ClientHandler has no messageParser");
+                System.out.println("CLIENT HANDLER - sending " + sendingMessage);
+                writer.print(sendingMessage);
+                writer.flush();
             }
             catch (IllegalStateException exception)
             {
@@ -108,6 +109,7 @@ public class ClientHandler implements Runnable {
                 disconnectionManager();
             }
         }
+        timer.cancel();
     }
 
     /**
@@ -139,6 +141,7 @@ public class ClientHandler implements Runnable {
      * Manage the disconnection and controls the messages searching for the disconnection request
      */
     public void disconnectionManager() {
+        timer.cancel();
         if(this.messageParser!=null)
         {
             messageParser.disconnectClients();
@@ -150,6 +153,7 @@ public class ClientHandler implements Runnable {
      * Disconnect the client without notifying the game orchestrator to close other connections
      */
     public void disconnect() {
+        timer.cancel();
         Server.removePlayer(playerName);
         writer.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
         writer.flush();
@@ -227,6 +231,4 @@ public class ClientHandler implements Runnable {
         messageParser.setGameOrchestrator(gameOrchestrator);
         messageParser.setName(this.playerName);
     }
-
-
 }

@@ -6,8 +6,8 @@ import it.polimi.ingsw.server.ClientHandler;
 import java.util.TimerTask;
 
 public class DisconnectionTimer extends TimerTask {
-    private Reader reader;
-    private ClientHandler clientHandler;
+    private Reader reader = null;
+    private ClientHandler clientHandler = null;
     public DisconnectionTimer(Reader reader){
         this.reader = reader;
     }

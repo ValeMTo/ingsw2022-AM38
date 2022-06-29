@@ -18,7 +18,7 @@ import java.util.TimerTask;
 public class Reader implements Runnable {
     private final BufferedReader inputReader;
     private final ViewMessageParser viewHandler;
-    private Boolean hasReceivedMessageFromTimerStart = false;
+    private Boolean hasReceivedMessageFromTimerStart = true;
     private ConnectionSocket connectionSocket;
 
     public Reader(BufferedReader inputReader, ViewMessageParser viewHandler) {
@@ -81,8 +81,10 @@ public class Reader implements Runnable {
                 //System.out.println("READER - got message "+input);
                 viewHandler.parse(input);
                 json = gson.fromJson(input,JsonObject.class);
-                if(json!=null && json.has("MessageType")&&json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.has("ConnectionType")&&json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal())
+                if(json!=null && json.has("MessageType")&&json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.has("ConnectionType")&&json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal()) {
+                    System.out.println("READER - CLOSING CONNECTION DUE TO SERVER REQUEST - others player disconnected or there was a connection issue");
                     disconnect();
+                }
             } catch (IOException e) {
                 System.out.println("CONNECTION - The inputReader has been closed, disconnecting");
                 System.exit(0);
