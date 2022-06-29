@@ -153,14 +153,23 @@ public class ClientHandler implements Runnable {
      * Disconnect the client without notifying the game orchestrator to close other connections
      */
     public void disconnect() {
-        timer.cancel();
-        Server.removePlayer(playerName);
-        writer.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
-        writer.flush();
-        inputReader.close();
-        writer.close();
-        this.disconnected = true;
-        System.out.println("ERROR - CLIENT HANDLER - CLOSING THREAD OF CLIENT "+playerName+" DUE TO CONNECTION LOST");
+        try {
+            timer.cancel();
+            Server.removePlayer(playerName);
+            if(writer!=null) {
+                writer.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
+                writer.flush();
+            }
+            inputReader.close();
+            writer.close();
+            writer=null;
+            inputReader=null;
+            this.disconnected = true;
+            System.out.println("ERROR - CLIENT HANDLER - CLOSING THREAD OF CLIENT " + playerName + " DUE TO CONNECTION LOST");
+        }
+        catch (Exception exc){
+            System.out.println("CLIENT HANDLER - not possible to disconnect, everything already closed");
+        }
     }
 
     /**

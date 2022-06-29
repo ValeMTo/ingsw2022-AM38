@@ -527,6 +527,7 @@ public abstract class GameOrchestrator extends Listenable {
      */
     public void disconnectClients(){
         for(ClientHandler client : clients) {
+            System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: "+client.getNickName());
             client.disconnect();
         }
     }
