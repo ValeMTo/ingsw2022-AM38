@@ -869,26 +869,26 @@ public class ViewState {
      */
     public void refreshCLI() {
         if (awaitingCLI == null) return;
-        awaitingCLI.cleaner();
-        if(this.currentPhase.equals(PhaseEnum.END))
-        {
-            awaitingCLI.printEndOfMatch();
-        }
-        else if (!this.activeView) {
-            awaitingCLI.showNotYourTurnView();
-        } else {
-            if(this.currentPhase.equals(PhaseEnum.SPECIAL_CARD_USAGE)&&specialCardRequiredAction!=null)
-            {
-                if(SpecialCardRequiredAction.isColorChoise(this.specialCardRequiredAction))
-                    awaitingCLI.chooseColorSpecialCardCommand();
-                else if(this.specialCardRequiredAction.equals(SpecialCardRequiredAction.CHOOSE_ISLAND))
-                    awaitingCLI.chooseIslandSpecialCard();
+        if(getCurrentPhase()!=PhaseEnum.CREATING_GAME) {
+            awaitingCLI.cleaner();
+            if (this.currentPhase.equals(PhaseEnum.END)) {
+                awaitingCLI.printEndOfMatch();
+            } else if (!this.activeView) {
+                awaitingCLI.showNotYourTurnView();
+            } else {
+                if (this.currentPhase.equals(PhaseEnum.SPECIAL_CARD_USAGE) && specialCardRequiredAction != null) {
+                    if (SpecialCardRequiredAction.isColorChoise(this.specialCardRequiredAction))
+                        awaitingCLI.chooseColorSpecialCardCommand();
+                    else if (this.specialCardRequiredAction.equals(SpecialCardRequiredAction.CHOOSE_ISLAND))
+                        awaitingCLI.chooseIslandSpecialCard();
+                } else if (acceptedUseSpecialCard) awaitingCLI.specialCardUsage();
+                else if (this.currentPhase.equals(PhaseEnum.PLANNING)) awaitingCLI.showPlanningInstruction();
+                else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) awaitingCLI.showMoveStudentPhase();
+                else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE))
+                    awaitingCLI.printForMoveMotherNature();
+                else if (this.currentPhase.equals(PhaseEnum.ACTION_CHOOSE_CLOUD))
+                    awaitingCLI.showCloudChoiceInstruction();
             }
-            else if(acceptedUseSpecialCard) awaitingCLI.specialCardUsage();
-            else if (this.currentPhase.equals(PhaseEnum.PLANNING)) awaitingCLI.showPlanningInstruction();
-            else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) awaitingCLI.showMoveStudentPhase();
-            else if (this.currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) awaitingCLI.printForMoveMotherNature();
-            else if (this.currentPhase.equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) awaitingCLI.showCloudChoiceInstruction();
         }
     }
 }
