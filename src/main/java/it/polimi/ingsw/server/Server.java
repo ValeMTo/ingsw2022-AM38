@@ -133,7 +133,17 @@ public class Server {
     }
 
 
+    /**
+     * Remove a player that has been disconnected from the list of players and from the lobby
+     * @param name player to remove
+     */
     public static void removePlayer(String name){
-        allPlayers.remove(name);
+        synchronized (lobby) {
+            lobby.removePlayer(name);
+        }
+        System.out.println("SERVER - removePlayer "+name+" from the allPlayersList");
+        synchronized (allPlayers) {
+            allPlayers.remove(name);
+        }
     }
 }

@@ -2,9 +2,11 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.connectionManagement.DisconnectionTimer;
 import it.polimi.ingsw.controller.GameOrchestrator;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
+import it.polimi.ingsw.messages.ConnectionTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
 
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static it.polimi.ingsw.messages.ErrorTypeEnum.GENERIC_ERROR;
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
@@ -54,7 +58,7 @@ public class ClientHandler implements Runnable {
      * Returns the flag for connection flow management (used for disconnection timer)
      */
     public Boolean getHasReceivedMessageFromTimerStart() {
-        synchronized (this.hasReceivedMessageFromTimerStart) {
+        synchronized (this.hasReceivedMessageFromTimerStartBlocker) {
             return this.hasReceivedMessageFromTimerStart;
         }
     }
@@ -65,7 +69,7 @@ public class ClientHandler implements Runnable {
      * @param hasReceivedMessageFromTimerStart
      */
     public void setHasReceivedMessageFromTimerStart(Boolean hasReceivedMessageFromTimerStart) {
-        synchronized (this.hasReceivedMessageFromTimerStart) {
+        synchronized (this.hasReceivedMessageFromTimerStartBlocker) {
             this.hasReceivedMessageFromTimerStart = hasReceivedMessageFromTimerStart;
         }
     }
@@ -79,9 +83,13 @@ public class ClientHandler implements Runnable {
         messageParser = new MessageParser(this);
         messageParser.setName(this.playerName);
         String message;
+        Timer timer = new Timer();
+        DisconnectionTimer timerTask = new DisconnectionTimer(this);
+        timer.scheduleAtFixedRate(timerTask,15000,20000);
         while (!disconnected) {
             System.out.println("CLIENT HANDLER - player " + playerName + " waiting for message");
-            message = inputReader.nextLine();
+            try {
+                message = inputReader.nextLine();
             setHasReceivedMessageFromTimerStart(true);
             System.out.println("CLIENT HANDLER - player " + this.getNickName() + " got message " + message);
             System.out.println(message);
@@ -93,7 +101,12 @@ public class ClientHandler implements Runnable {
             System.out.println("CLIENT HANDLER - sending " + sendingMessage);
             writer.print(sendingMessage);
             writer.flush();
-
+            }
+            catch (IllegalStateException exception)
+            {
+                System.out.println("CLIENT HANDLER - player "+this.playerName+" inputReader closed - disconnecting");
+                disconnectionManager();
+            }
         }
     }
 
@@ -126,10 +139,24 @@ public class ClientHandler implements Runnable {
      * Manage the disconnection and controls the messages searching for the disconnection request
      */
     public void disconnectionManager() {
+        if(this.messageParser!=null)
+        {
+            messageParser.disconnectClients();
+        }
+        disconnect();
+    }
+
+    /**
+     * Disconnect the client without notifying the game orchestrator to close other connections
+     */
+    public void disconnect() {
         Server.removePlayer(playerName);
+        writer.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
+        writer.flush();
         inputReader.close();
         writer.close();
         this.disconnected = true;
+        System.out.println("ERROR - CLIENT HANDLER - CLOSING THREAD OF CLIENT "+playerName+" DUE TO CONNECTION LOST");
     }
 
     /**

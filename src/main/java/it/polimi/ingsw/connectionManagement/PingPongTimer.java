@@ -5,11 +5,11 @@ import it.polimi.ingsw.client.Reader;
 
 import java.util.TimerTask;
 
-public class pingPongTimer extends TimerTask {
+public class PingPongTimer extends TimerTask {
     private final Reader reader;
     private final ConnectionSocket connectionSocket;
 
-    public pingPongTimer(Reader reader, ConnectionSocket connectionSocket) {
+    public PingPongTimer(Reader reader, ConnectionSocket connectionSocket) {
         this.reader = reader;
         this.connectionSocket = connectionSocket;
     }
