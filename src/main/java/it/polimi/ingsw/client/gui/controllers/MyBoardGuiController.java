@@ -321,6 +321,9 @@ public class MyBoardGuiController extends GUIController {
     private Color fromStudent;
     private ImageView destinationIsland;
 
+    @FXML
+    private Button quitButton;
+
 
 
 
@@ -333,7 +336,14 @@ public class MyBoardGuiController extends GUIController {
         createShowContentArea();
         createControlsArea();
 
+        quitButton.setOnAction(this::quitGame);
     }
+
+    @FXML
+    private void  quitGame(ActionEvent event){
+        quit();
+    }
+
 
     /**
      * The setupBoard() methods initializes the initial setup of the board:
@@ -366,9 +376,10 @@ public class MyBoardGuiController extends GUIController {
             updateMyPlayerBoard();
             updateArchipelago();
             updateProfessors();
+            updateClouds();
 
             updatePhaseAction();
-            updateStatusMessage();
+
         }
     }
 
@@ -378,6 +389,9 @@ public class MyBoardGuiController extends GUIController {
         String activePlayerName = gui.getViewState().getPlayers().get(activePlayer);
 
         statusHeader.setText("Phase : " + currentPhase.toString() + "\nActive player : " + activePlayerName);
+
+        updateStatusMessage();
+
 
     }
 
@@ -392,7 +406,7 @@ public class MyBoardGuiController extends GUIController {
             }
             else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
                 if(currentSubPhase.equals(SubPhaseEnum.NO_SUB_PHASE)||currentSubPhase.equals(SubPhaseEnum.CHOOSE_COLOR)) {
-                    statusMessage.setText("Choose a student color to move from the icons in the School Entrance");
+                    statusMessage.setText("Choose a student color to move from the icons in the School Entrance, then choose where to place the Student: click on an Island or select MoveToDiningRoom");
                 }
                 else if(currentSubPhase.equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND)) {
                     statusMessage.setText("Choose where to place the Student: click on an Island or select" + " Move To DiningRoom");
@@ -401,11 +415,17 @@ public class MyBoardGuiController extends GUIController {
             else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) {
                 int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());  // TODO: test if this works correctly
                 int maximumStepsAllowed = cardPriority/2 + cardPriority%2 ;
-                statusMessage.setText("Choose an Island on which to move MotherNature. " + "The maximum steps allowed are " + maximumStepsAllowed);
+                String outputMessage = "Choose an Island on which to move MotherNature. " + "The maximum steps allowed are " + maximumStepsAllowed;
+                if(gui.getViewState().playerHasCoinsToUseASpecialCard()){
+                    outputMessage = outputMessage + "\n You can use a SpecialCard now if you want to.";
+                }
+                statusMessage.setText(outputMessage);
+            }
+            else if(currentPhase.equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) {
+                statusMessage.setText("Choose a cloud to fill your School Entrance with: click on the cloud of your choosing");
             }
 
-            //TODO:  riprendere  da qui in poi ...
-
+            //TODO :  statusmessages for Specialcard usage  --> see CLI
         }
         else {
             statusMessage.setText("Please wait until it is your turn...");
@@ -918,7 +938,23 @@ public class MyBoardGuiController extends GUIController {
 
     }
 
-
+    /**
+     * Updates the clouds available. If a cloud has already been chosen, it will not be displayed on the board.
+     */
+    public void updateClouds() {
+        List<Integer> availableClouds = gui.getViewState().getUsableClouds();
+        for(ImageView img : cloudsImgArray) {
+            int cloudNum = Integer.parseInt(img.getId().replace("cloud",""));
+            if(availableClouds.contains(cloudNum)) {
+                img.setVisible(true);
+                img.setDisable(false);
+            }
+            else {
+                img.setVisible(false);
+                img.setDisable(true);
+            }
+        }
+    }
 
     /**
      * Initializes the tower icon in the board, according to the TowerColor assigned to the player.

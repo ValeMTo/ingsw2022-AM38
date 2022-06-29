@@ -70,11 +70,9 @@ public class ViewMessageParser {
                 view.setLeaderBoard(integerStanding);
                 view.setEndingMotivation(json.get("EndingMessage").getAsString());
 
-                //TODO:  creare scena "ending" + metodo in gui  +  passare come argomento il "EndingMessage" e "EndingMotivation"
-
-                if(!view.isCli()){
+                if(!view.isCli() && view.getCurrentPhase().equals(PhaseEnum.END)){
                     Platform.runLater(()-> {
-                        view.getAwaitingGUI().loadSecondWindow("endingScene.fxml");
+                        view.getAwaitingGUI().loadSecondWindow("endScene.fxml");
                     });
                 }
 
@@ -113,6 +111,7 @@ public class ViewMessageParser {
                 if (!view.isCli()){
                     Platform.runLater(() -> {
                         view.getAwaitingGUI().refreshGameStatus();
+                        view.getAwaitingGUI().refreshWholeBoard();  // added after  refreshGameStatus()
                     });
                 }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
@@ -146,6 +145,7 @@ public class ViewMessageParser {
                 if (!view.isCli()) {
                     Platform.runLater(() -> {
                         view.getAwaitingGUI().refreshGameStatus();
+                        view.getAwaitingGUI().refreshWholeBoard();  // added after  refreshGameStatus()
                     });
                 }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()) {
@@ -159,6 +159,7 @@ public class ViewMessageParser {
                 if(!view.isCli() && view.getPlayerTower().equals(Tower.values()[json.get("TowerColor").getAsInt()])) {
                     Platform.runLater(() -> {
                         view.getAwaitingGUI().refreshGameStatus();
+                        view.getAwaitingGUI().refreshWholeBoard();  // added after  refreshGameStatus()
                     });
                 }
                 //TODO: other sets
@@ -201,8 +202,10 @@ public class ViewMessageParser {
                     view.setUsableSpecialCard(specialCards);
                 }
             }
-            if(!view.isCli()){
-                Platform.runLater(() -> { view.getAwaitingGUI().refreshWholeBoard();});
+            if(!view.isCli()){                 // updates the board after receiving any kind of UPDATE message. Beware: don't refresh game status at this point or it will cause error
+                Platform.runLater(() -> {
+                    view.getAwaitingGUI().refreshWholeBoard();
+                });
             }
 
         } else if (json.get("MessageType").getAsInt() == MessageTypeEnum.ANSWER.ordinal()) {

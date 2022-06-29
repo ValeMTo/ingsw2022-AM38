@@ -12,7 +12,7 @@
    <children>
       <AnchorPane layoutX="838.0" layoutY="59.0" prefHeight="571.0" prefWidth="241.0">
          <children>
-            <ImageView fx:id="specialCardImage3" fitHeight="364.0" fitWidth="241.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="specialCardImage3" fitHeight="249.0" fitWidth="220.0" layoutY="108.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/specialCards/retro.jpg" />
                </image>
@@ -22,21 +22,26 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <Label fx:id="description3" layoutX="22.0" layoutY="418.0" prefHeight="123.0" prefWidth="194.0" text="Descrizione" textFill="WHITE">
+            <Label fx:id="description3" layoutX="-1.0" layoutY="418.0" prefHeight="153.0" prefWidth="275.0" text="Descrizione" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <ImageView fx:id="coin3" fitHeight="150.0" fitWidth="200.0" layoutX="162.0" layoutY="-40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="coin3" fitHeight="90.0" fitWidth="87.0" layoutX="136.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/coin.png" />
                </image>
             </ImageView>
+            <Button fx:id="use3" layoutX="203.0" layoutY="325.0" mnemonicParsing="false" text="Use">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
       <AnchorPane layoutX="480.0" layoutY="59.0" prefHeight="571.0" prefWidth="241.0">
          <children>
-            <ImageView fx:id="specialCardImage2" fitHeight="364.0" fitWidth="241.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="specialCardImage2" fitHeight="249.0" fitWidth="220.0" layoutX="3.0" layoutY="108.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/specialCards/retro.jpg" />
                </image>
@@ -46,21 +51,26 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <Label fx:id="description2" layoutX="22.0" layoutY="418.0" prefHeight="123.0" prefWidth="194.0" text="Descrizione" textFill="WHITE">
+            <Label fx:id="description2" layoutX="-2.0" layoutY="418.0" prefHeight="154.0" prefWidth="275.0" text="Descrizione" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <ImageView fx:id="coin2" fitHeight="150.0" fitWidth="200.0" layoutX="149.0" layoutY="-35.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="coin2" fitHeight="90.0" fitWidth="87.0" layoutX="137.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/coin.png" />
                </image>
             </ImageView>
+            <Button fx:id="use2" layoutX="206.0" layoutY="320.0" mnemonicParsing="false" text="Use">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="109.0" layoutY="59.0">
+      <AnchorPane layoutX="109.0" layoutY="59.0" prefHeight="560.0" prefWidth="244.0">
          <children>
-            <ImageView fx:id="specialCardImage1" fitHeight="364.0" fitWidth="241.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="specialCardImage1" fitHeight="249.0" fitWidth="220.0" layoutX="21.0" layoutY="108.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/specialCards/retro.jpg" />
                </image>
@@ -70,20 +80,42 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <Label fx:id="description1" layoutX="22.0" layoutY="419.0" prefHeight="123.0" prefWidth="194.0" text="Descrizione" textFill="WHITE">
+            <Label fx:id="description1" layoutX="18.0" layoutY="416.0" prefHeight="154.0" prefWidth="281.0" text="Descrizione" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <ImageView fx:id="coin1" fitHeight="150.0" fitWidth="200.0" layoutX="152.0" layoutY="-30.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="coin1" fitHeight="90.0" fitWidth="87.0" layoutX="163.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../graphics/board/coin.png" />
                </image>
             </ImageView>
+            <Button fx:id="use1" layoutX="202.0" layoutY="317.0" mnemonicParsing="false" text="Use">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
-      <Button fx:id="use1" layoutX="215.0" layoutY="630.0" mnemonicParsing="false" text="Use" />
-      <Button fx:id="use2" layoutX="591.0" layoutY="629.0" mnemonicParsing="false" text="Use" />
-      <Button fx:id="use3" layoutX="949.0" layoutY="629.0" mnemonicParsing="false" text="Use" />
+      <Label fx:id="usageMessage" layoutX="125.0" layoutY="17.0" prefHeight="80.0" prefWidth="773.0" text="Label" textFill="WHITE" wrapText="true">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="availability1" layoutX="139.0" layoutY="637.0" prefHeight="68.0" prefWidth="244.0" text="availability 1" textFill="WHITE" wrapText="true">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Label fx:id="availability2" layoutX="491.0" layoutY="637.0" prefHeight="60.0" prefWidth="264.0" text="availability 2" textFill="WHITE" wrapText="true">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Label fx:id="availability3" layoutX="853.0" layoutY="637.0" prefHeight="68.0" prefWidth="256.0" text="availability 3" textFill="WHITE" wrapText="true">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

@@ -41,7 +41,7 @@ public class EndController extends GUIController{
     @Override
     public void loadContent(){
 
-        endText.setText("The game has ended because of :" +  gui.getViewState().getEndingMotivation());
+        endText.setText("The game ended because of : " +  gui.getViewState().getEndingMotivation());
 
         Map<String,Integer> standing = gui.getViewState().getLeaderBoard();
 

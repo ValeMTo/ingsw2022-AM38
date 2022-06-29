@@ -109,7 +109,7 @@ public class OtherBoardsController extends GUIController {
         playerboardArea11.setVisible(true);
         // Enables or disables the second "other" playerboard according to the number of players in viewState
 
-        showInfoAlert("num other towers from viewState", "other towers: " + gui.getViewState().getPlayers());
+        showInfoAlert("Current players in the game", "The players are: " + gui.getViewState().getPlayers());
 
         numOfPlayers = gui.getViewState().getPlayers().size();
 
@@ -166,7 +166,6 @@ public class OtherBoardsController extends GUIController {
             Map<Color, Integer> diningRoomOccupancy;
             Collection<Tower> otherPlayers = gui.getViewState().getTowers();
             List<Tower> otherPlayersList = gui.getViewState().getTowers().stream().toList();
-            showInfoAlert("updating other schoolboards:", "players list : " + otherPlayersList);
 
             for(Tower tower : otherPlayersList) {
                 if(!(tower.equals(gui.getViewState().getPlayerTower())))

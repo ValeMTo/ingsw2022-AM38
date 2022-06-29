@@ -24,30 +24,30 @@
             <font>
                 <Font size="18.0" />
             </font></Button>
-      <Label id="home_title" fx:id="endText" layoutX="140.0" layoutY="128.0" prefHeight="113.0" prefWidth="541.0" text="The game has ended : motivation" textFill="#46b9e7" wrapText="true">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="126.0" layoutY="272.0" prefHeight="47.0" prefWidth="370.0" text="Final leaderboard " textAlignment="CENTER" textFill="#46b9e7">
-         <font>
-            <Font size="32.0" />
-         </font>
-      </Label>
-      <ImageView fx:id="motherNatureFinal" fitHeight="403.0" fitWidth="278.0" layoutX="870.0" layoutY="183.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../graphics/specialCards/retro.jpg" />
-         </image>
-      </ImageView>
-      <Label id="home_title" fx:id="leaderboard" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="337.0" prefHeight="267.0" prefWidth="371.0" text="[ final leaderboard ]" textAlignment="CENTER" textFill="#e5b247" wrapText="true">
-         <font>
-            <Font size="32.0" />
-         </font>
-      </Label>
-      <Label id="home_title" fx:id="winnerMessage" layoutX="883.0" layoutY="75.0" prefHeight="83.0" prefWidth="242.0" text="you win / you lost / the game was tied" textFill="#46b9e7">
-         <font>
-            <Font size="32.0" />
-         </font>
-      </Label>
+        <Label id="home_title" fx:id="endText" layoutX="140.0" layoutY="128.0" prefHeight="113.0" prefWidth="541.0" text="The game has ended : motivation" textFill="#46b9e7" wrapText="true">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+        <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="126.0" layoutY="272.0" prefHeight="47.0" prefWidth="370.0" text="Final leaderboard " textAlignment="CENTER" textFill="#46b9e7">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
+        <ImageView fx:id="motherNatureFinal" fitHeight="403.0" fitWidth="278.0" layoutX="870.0" layoutY="183.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../graphics/specialCards/retro.jpg" />
+            </image>
+        </ImageView>
+        <Label id="home_title" fx:id="leaderboard" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="337.0" prefHeight="267.0" prefWidth="371.0" text="[ final leaderboard ]" textAlignment="CENTER" textFill="#e5b247" wrapText="true">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
+        <Label id="home_title" fx:id="winnerMessage" layoutX="883.0" layoutY="75.0" prefHeight="83.0" prefWidth="242.0" text="you win / you lost / the game was tied" textFill="#46b9e7">
+            <font>
+                <Font size="32.0" />
+            </font>
+        </Label>
     </children>
 </AnchorPane>

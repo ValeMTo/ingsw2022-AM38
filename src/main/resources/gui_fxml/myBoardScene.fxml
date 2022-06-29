@@ -211,12 +211,12 @@
       </AnchorPane>
       <AnchorPane id="controlsArea" fx:id="controlsArea" layoutX="738.0" layoutY="7.0" prefHeight="117.0" prefWidth="454.0" style="-fx-background-color: #19b2bf;">
          <children>
-            <Button fx:id="showSpecialCardsButton" layoutX="294.0" layoutY="59.0" mnemonicParsing="false" text="Show Special Cards" />
-            <Button fx:id="showOtherBoardsButton" layoutX="294.0" layoutY="15.0" mnemonicParsing="false" text="Show other players' board" />
+            <Button fx:id="showSpecialCardsButton" layoutX="294.0" layoutY="46.0" mnemonicParsing="false" text="Show Special Cards" />
+            <Button fx:id="showOtherBoardsButton" layoutX="294.0" layoutY="5.0" mnemonicParsing="false" text="Show other players' board" />
 
-            <Label fx:id="statusMessage" alignment="CENTER" layoutX="5.0" layoutY="59.0" prefHeight="58.0" prefWidth="275.0" style="-fx-background-color: #2c4ba8; -fx-text-alignment: CENTER;" text="Game Status message" textFill="WHITE" wrapText="true">
+            <Label fx:id="statusMessage" alignment="CENTER" layoutX="5.0" layoutY="59.0" prefHeight="58.0" prefWidth="275.0" style="-fx-background-color: #2c4ba8; -fx-text-alignment: CENTER;" text="Game status message" textFill="WHITE" wrapText="true">
                <font>
-                  <Font size="13.0" />
+                  <Font size="12.0" />
                </font>
             </Label>
             <Label fx:id="statusHeader" alignment="CENTER" contentDisplay="CENTER" layoutX="5.0" layoutY="4.0" prefHeight="47.0" prefWidth="275.0" style="-fx-background-color: #2c4ba8; -fx-text-alignment: CENTER;" text="Phase : ###    Active player : ###  " textAlignment="CENTER" textFill="WHITE" wrapText="true">
@@ -224,6 +224,11 @@
                   <Font size="13.0" />
                </font>
             </Label>
+            <Button fx:id="quitButton" layoutX="294.0" layoutY="88.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="18.0" prefWidth="69.0" style="-fx-background-color: #69695c;" text="QUIT" textFill="WHITE">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
       <AnchorPane fx:id="archipelagoArea" layoutX="29.0" layoutY="21.0" prefHeight="566.0" prefWidth="699.0" style="-fx-background-color: #90c9f0;">
@@ -522,7 +527,7 @@
                </children>
             </AnchorPane>
             <Button fx:id="moveDiningRoomButton" layoutX="560.0" layoutY="475.0" mnemonicParsing="false" prefWidth="130.0" text="Move to DiningRoom" />
-            <Button fx:id="moveIslandButton" layoutX="574.0" layoutY="507.0" mnemonicParsing="false" text="Choose Island" />
+            <Button fx:id="moveIslandButton" layoutX="574.0" layoutY="507.0" mnemonicParsing="false" text="Move to Island" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="showContentArea" layoutX="758.0" layoutY="130.0" prefHeight="460.0" prefWidth="115.0" style="-fx-background-color: #03e8fc;">

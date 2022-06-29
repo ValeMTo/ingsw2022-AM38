@@ -20,6 +20,9 @@ import java.util.Map;
 public class SpecialCardsMenuController extends GUIController {
 
     @FXML
+    private Label usageMessage;
+
+    @FXML
     private ImageView coin1;
     @FXML
     private ImageView coin2;
@@ -54,9 +57,23 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     private Button use3;
 
+    @FXML
+    private Label availability1;
+    @FXML
+    private Label availability2;
+    @FXML
+    private Label availability3;
+
+
     List<SpecialCardName> list;
 
     public void initialize(){
+
+        usageMessage.setText("");
+        availability1.setText("");
+        availability2.setText("");
+        availability3.setText("");
+
         coin1.setVisible(false);
         coin2.setVisible(false);
         coin3.setVisible(false);
@@ -77,7 +94,10 @@ public class SpecialCardsMenuController extends GUIController {
     @Override
     public void loadContent(){
         try {
-            Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();  // prezzo della specialCard viene correttamente aggiornato
+            Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();// prezzo della specialCard viene correttamente aggiornato
+
+            System.out.println(specialCards);
+
             list = specialCards.keySet().stream().toList();
             loadCorrectImage(specialCardImage1, list.get(0), specialCardName1, description1);
             loadCorrectImage(specialCardImage2, list.get(1), specialCardName2, description2);
@@ -94,13 +114,22 @@ public class SpecialCardsMenuController extends GUIController {
                         use1.setVisible(true);
                         use1.setDisable(false);
                     }
+                    else{
+                        availability1.setText("You don't have enough coins to play this card.");
+                    }
                     if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(1))) {
                         use2.setVisible(true);
                         use2.setDisable(false);
                     }
+                    else{
+                        availability2.setText("You don't have enough coins to play this card.");
+                    }
                     if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(2))) {
                         use3.setVisible(true);
                         use3.setDisable(false);
+                    }
+                    else{
+                        availability3.setText("You don't have enough coins to play this card.");
                     }
                 }
             }
