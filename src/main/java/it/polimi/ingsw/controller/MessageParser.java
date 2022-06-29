@@ -263,7 +263,8 @@ public class MessageParser{
      * Method used to disconnect all clients from a game, due to the lost of a player
      */
     public void disconnectClients(){
-        gameOrchestrator.disconnectClients();
+        if(gameOrchestrator!=null)
+            gameOrchestrator.disconnectClients();
     }
 
 }
