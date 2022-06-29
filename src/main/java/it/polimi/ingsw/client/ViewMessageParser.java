@@ -8,6 +8,7 @@ import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.ViewState;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.controller.SpecialCardRequiredAction;
+import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.AnswerTypeEnum;
 import it.polimi.ingsw.messages.ErrorTypeEnum;
 import it.polimi.ingsw.messages.MessageTypeEnum;
@@ -210,6 +211,20 @@ public class ViewMessageParser {
                     }
                     view.setUsableSpecialCard(specialCards);
                 }
+                if(json.has("coinCost")){
+                    try{
+                        Map<SpecialCardName,Integer> returnCardsMap = new HashMap<>();
+                        returnCardsMap = view.getUsableSpecialCards();
+                        SpecialCardName name = SpecialCardName.values()[json.get("Name").getAsInt()];
+                        returnCardsMap.remove(name);
+                        returnCardsMap.put(name, json.get("coinCost").getAsInt());
+                        view.setUsableSpecialCard(returnCardsMap);
+                    }
+                    catch(FunctionNotImplementedException exc){
+                        exc.printStackTrace();
+                    }
+                }
+
             }
             if(!view.isCli()){                 // updates the board after receiving any kind of UPDATE message. Beware: don't refresh game status at this point or it will cause error
                 Platform.runLater(() -> {

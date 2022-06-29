@@ -47,6 +47,8 @@ public class ViewState {
     private boolean acceptedUseSpecialCard=false;
     private Map<String, Integer> leaderBoard = new HashMap<>();
     private String endingMotivation;
+    private boolean isFirstSetup = true;
+    private final Map<SpecialCardName,Integer> initialCosts = new HashMap<SpecialCardName,Integer>();
 
     public ViewState(boolean isCli) {
         this.onlinePlayers = new ArrayList<>();
@@ -649,15 +651,32 @@ public class ViewState {
 
     /**
      * Sets the specialCard of this particular game
+     * if it is the first time that the cards are set in viewState, their initial costs are initialized in a dedicated HashMap,
      *
-     * @param specialCard : the list of names of the usable special cards
+     * @param specialCard : the list of names of the usable special cards with their associated current cost
      */
     public synchronized void setUsableSpecialCard(Map<SpecialCardName, Integer> specialCard) {
         if (usableSpecialCards == null) this.usableSpecialCards = new HashMap<>();
         else this.usableSpecialCards.clear();
         this.usableSpecialCards.putAll(specialCard);
+
+        if(isFirstSetup) {
+            storeInitialCosts(specialCard);
+            isFirstSetup = false;
+        }
         refreshCLI();
     }
+
+    public synchronized void storeInitialCosts(Map<SpecialCardName, Integer> specialCards) {
+        for(SpecialCardName cardName : specialCards.keySet()) {
+            initialCosts.put(cardName,specialCards.get(cardName));
+        }
+    }
+
+    public Map<SpecialCardName,Integer> getInitialCosts() {
+        return this.initialCosts;
+    }
+
 
     /**
      * Returns a copy of the special card of this game,
@@ -864,6 +883,7 @@ public class ViewState {
         refreshCLI();
     }
 
+
     /**
      * It prints with the awaitingCli and the currents phases etc...
      */
@@ -891,4 +911,8 @@ public class ViewState {
             else if (this.currentPhase.equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) awaitingCLI.showCloudChoiceInstruction();
         }
     }
+
+
+
+
 }

@@ -11,13 +11,55 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextAlignment;
 
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SpecialCardsMenuController extends GUIController {
+
+
+
+
+    @FXML
+    private AnchorPane showContentArea;
+    @FXML
+    private Label chooseColorLabel;
+    @FXML
+    private Label chooseIslandLabel;
+    @FXML
+    private Label showContentLabel;
+
+    @FXML
+    private ImageView noEntryImg;
+    @FXML
+    private Label numEntryTiles;
+
+    @FXML
+    private ImageView contentRed;    // icon of the red student in the ShowContent area
+    @FXML
+    private ImageView contentYellow;
+    @FXML
+    private ImageView contentPink;
+    @FXML
+    private ImageView contentBlue;
+    @FXML
+    private ImageView contentGreen;
+
+    @FXML
+    private Label num_contentRed;   // label for the number of red students in the ShowContent Area
+    @FXML
+    private Label num_contentYellow;
+    @FXML
+    private Label num_contentPink;
+    @FXML
+    private Label num_contentBlue;
+    @FXML
+    private Label num_contentGreen;
+
 
     @FXML
     private Label usageMessage;
@@ -65,7 +107,7 @@ public class SpecialCardsMenuController extends GUIController {
     private Label availability3;
 
 
-    List<SpecialCardName> list;
+    List<SpecialCardName> cardsList;
 
     public void initialize(){
 
@@ -96,35 +138,37 @@ public class SpecialCardsMenuController extends GUIController {
         try {
             Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();// prezzo della specialCard viene correttamente aggiornato
 
-            System.out.println(specialCards);
 
-            list = specialCards.keySet().stream().toList();
-            loadCorrectImage(specialCardImage1, list.get(0), specialCardName1, description1);
-            loadCorrectImage(specialCardImage2, list.get(1), specialCardName2, description2);
-            loadCorrectImage(specialCardImage3, list.get(2), specialCardName3, description3);
+            System.out.println("The active specialCards are : " + specialCards);
 
-            //displayCardsCoin(specialCards);   // displays a coin if the cost of the card has been incremented
+            cardsList = specialCards.keySet().stream().toList();
+            loadCorrectImage(specialCardImage1, cardsList.get(0), specialCardName1, description1);
+            loadCorrectImage(specialCardImage2, cardsList.get(1), specialCardName2, description2);
+            loadCorrectImage(specialCardImage3, cardsList.get(2), specialCardName3, description3);
+
+            displayCardsCoin(cardsList, specialCards);   // displays a coin if the cost of the card has been incremented
 
 
-            //TODO :
-            // Displayare il numero di monete/costo aggiornato
+            //TODO :  inizializzare le StudentsMap delle carte (se presenti)
+
+
             if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
                 if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower()) && !gui.getViewState().getSpecialCardUsage()) {
-                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(0))) {
+                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(cardsList.get(0))) {
                         use1.setVisible(true);
                         use1.setDisable(false);
                     }
                     else{
                         availability1.setText("You don't have enough coins to play this card.");
                     }
-                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(1))) {
+                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(cardsList.get(1))) {
                         use2.setVisible(true);
                         use2.setDisable(false);
                     }
                     else{
                         availability2.setText("You don't have enough coins to play this card.");
                     }
-                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(list.get(2))) {
+                    if (gui.getViewState().getPlayerCoins() >= specialCards.get(cardsList.get(2))) {
                         use3.setVisible(true);
                         use3.setDisable(false);
                     }
@@ -142,17 +186,17 @@ public class SpecialCardsMenuController extends GUIController {
 
     @FXML
     public void useSpecialCard1(ActionEvent event){
-        gui.getConnectionSocket().chooseSpecialCard(list.get(0).name());
+        gui.getConnectionSocket().chooseSpecialCard(cardsList.get(0).name());
     }
 
     @FXML
     public void useSpecialCard2(ActionEvent event){
-        gui.getConnectionSocket().chooseSpecialCard(list.get(1).name());
+        gui.getConnectionSocket().chooseSpecialCard(cardsList.get(1).name());
     }
 
     @FXML
     public void useSpecialCard3(ActionEvent event){
-        gui.getConnectionSocket().chooseSpecialCard(list.get(2).name());
+        gui.getConnectionSocket().chooseSpecialCard(cardsList.get(2).name());
     }
 
     private String loadCorrectDescription(SpecialCardName card){
@@ -201,6 +245,32 @@ public class SpecialCardsMenuController extends GUIController {
             image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/princess.jpg")));
         }
     }
+
+
+
+
+    public void displayCardsCoin(List<SpecialCardName> list, Map<SpecialCardName, Integer> updatedSpecialCards) {
+        Map<SpecialCardName, Integer> initialCosts = gui.getViewState().getInitialCosts();
+        System.out.println("Initial costs : " + initialCosts);
+        System.out.println("updated costs : " + updatedSpecialCards);
+        for(SpecialCardName card : list) {
+            if(updatedSpecialCards.get(card) > initialCosts.get(card)){
+                int cardNum = list.indexOf(card) +1 ;
+                switch (cardNum) {
+                    case 1:
+                        coin1.setVisible(true);
+                        break;
+                    case 2:
+                        coin2.setVisible(true);
+                        break;
+                    case 3:
+                        coin3.setVisible(true);
+                        break;
+                }
+            }
+        }
+    }
+
 
     /*
     public void displayCardsCoin(Map<SpecialCardName, Integer>  specialCards) {
