@@ -1,10 +1,7 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
-import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.ExpertGameBoard;
-import it.polimi.ingsw.model.board.StudentCounter;
-import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
@@ -203,8 +200,8 @@ public class ExpertGameBoardTest {
         ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
         expert.disableColorInfluence(color);
         try {
-            expert.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
-            expert.addStudent(StudentCounter.DININGROOM, Color.BLUE, 0);
+            expert.addStudent(StudentCounter.ISLAND, color, 1);
+            expert.addStudent(StudentCounter.DININGROOM, color, 0);
             assertNull(expert.computeInfluence(1));
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -220,7 +217,7 @@ public class ExpertGameBoardTest {
     public void computeInfluenceWithTieProfessors() {
         ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
         adder(3, expert); //configuration where most of the professors not naturally possessed by a player
-        expert.updateProfessorOwnershipIfTie(); //We favour the player 0
+        expert.professorsUpdateTieEffect(); //We favour the player 0
         try {
             assertEquals(expert.computeInfluence(1), Tower.WHITE); //Normally Player1 (BLACK) should win but not with tie professors possessed by player0
         } catch (Exception exc) {
@@ -355,7 +352,7 @@ public class ExpertGameBoardTest {
      */
     @Test
     @DisplayName("Test increased movement of motherNature")
-    public void motherNatureMovement() {
+    public void motherNatureMovement() throws AlreadyUsedException {
         ExpertGameBoard expert = new ExpertGameBoard(2, nameString);
         expert.increaseMovementMotherNature();
         if (!expert.useAssistantCard(Tower.WHITE, 2)) System.out.println("CARD NOT USABLE");
@@ -502,8 +499,6 @@ public class ExpertGameBoardTest {
                 expertGameBoard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1);
             for (int i = 0; i < 2; i++)
                 expertGameBoard.addStudent(StudentCounter.ISLAND, Color.PINK, 1);
-            assertNull(expertGameBoard.computeInfluence(1));
-            expertGameBoard.updateProfessorOwnership();
             assertEquals(Tower.GRAY, expertGameBoard.computeInfluence(1));
         } catch (Exception exc) {
             exc.printStackTrace();

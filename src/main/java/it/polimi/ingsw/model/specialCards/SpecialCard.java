@@ -1,16 +1,27 @@
 package it.polimi.ingsw.model.specialCards;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.board.Island;
+import it.polimi.ingsw.model.player.PlayerBoard;
+import it.polimi.ingsw.server.ClientHandler;
 
-public class SpecialCard {
-    private final SpecialCardName name;
-    private int cost;
-    private boolean firstUse;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SpecialCard extends Listenable {
+    protected final SpecialCardName name;
+    protected int cost;
+    protected boolean firstUse;
+    protected Listener modelListener = null;
+    protected List<ClientHandler> clients = new ArrayList<>();
 
     public SpecialCard(SpecialCardName name) {
         this.name = name;
-        this.firstUse = false;
+        this.firstUse = true;
         if (name == SpecialCardName.PRIEST || name == SpecialCardName.POSTMAN || name == SpecialCardName.JUGGLER || name == SpecialCardName.BARD) {
             this.cost = 1;
         } else if (name == SpecialCardName.HERBALIST || name == SpecialCardName.KNIGHT || name == SpecialCardName.PRINCESS || name == SpecialCardName.CHEESEMAKER) {
@@ -18,7 +29,19 @@ public class SpecialCard {
         } else {
             this.cost = 3;
         }
+    }
 
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        System.out.println("SPECIAL CARD "+this.name+" I HAVE NOW SET THE LISTENERS");
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        if(clients!=null)
+            this.clients.addAll(clients);
     }
 
     /**
@@ -36,9 +59,12 @@ public class SpecialCard {
      * It can be used only once: the price will not be increased with two calls of the method.
      */
     public void use() {
-        if (!firstUse) {
+        if (firstUse) {
             this.cost += 1;
-            firstUse = true;
+            firstUse = false;
+        }
+        if(modelListener!=null&&clients!=null){
+            notify(modelListener,MessageGenerator.specialCardUpdateMessage(this.name, this.cost),clients);
         }
     }
 
@@ -145,6 +171,21 @@ public class SpecialCard {
      */
     public int getGuestsChangeLimit() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException("Not usable method for this card: " + name.toString());
+    }
+
+    /**
+     * If it is the first usage of this special card, increase the cost by one
+     */
+    public void increaseCostIfFirstUse(){
+        if(firstUse)
+        {
+            System.out.println("Increasing the cost of special card "+this.name+" from "+cost);
+            this.cost++;
+            this.firstUse = false;
+            if(modelListener!=null&&clients!=null){
+                notify(modelListener,MessageGenerator.specialCardUpdateMessage(this.name, this.cost),clients);
+            }
+        }
     }
 
 

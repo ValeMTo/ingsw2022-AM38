@@ -1,15 +1,20 @@
 package it.polimi.ingsw.model.player;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.NotLastCardUsedException;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.board.Island;
 import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.server.ClientHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class PlayerBoard {
+public class PlayerBoard extends Listenable {
+    private Listener modelListener;
+    private List<ClientHandler> clients = null;
     private final String nickName;
     private final Tower towerColor;
     private final int numTowersLimit;
@@ -30,7 +35,7 @@ public class PlayerBoard {
      * @param towerColor color of the player's tower in the game
      * @param numTowers  number of towers of the player
      */
-    public PlayerBoard(String nickName, Tower towerColor, int numTowers) {
+    public PlayerBoard(String nickName, Tower towerColor, int numTowers){
         this.nickName = nickName;
         if (numTowers == 8) {
             this.schoolBoard = new SchoolBoard(7, 10);
@@ -43,7 +48,7 @@ public class PlayerBoard {
         for (int i = 0; i < 10; i++) {
             numCard = i + 1;
             numSteps = numCard / 2;
-            if (i % 2 != 0) {
+            if ((i+1) % 2 != 0) {
                 numSteps += 1;
             }
             this.deck.add(new AssistantCard(numCard, numSteps));
@@ -51,7 +56,55 @@ public class PlayerBoard {
         this.towers = numTowers;
         this.numTowersLimit = numTowers;
         this.towerColor = towerColor;
-        this.coin = 0;
+        this.coin = 1;
+    }
+
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        if(clients!=null)
+            this.clients.addAll(clients);
+        notifyUsablesCards();
+        notifyPlayerBoard();
+    }
+
+    private void notifyPlayerBoard(){
+        if(this.clients!=null && this.modelListener!=null) {
+            Map<Color, Integer> diningRoom = new HashMap<>();
+            Map<Color, Integer> schoolEntrance = new HashMap<>();
+            diningRoom.putAll(this.schoolBoard.getDiningRoomOccupancy());
+            schoolEntrance.putAll(this.schoolBoard.getSchoolEntranceOccupancy());
+            notify(modelListener,MessageGenerator.schoolBoardViewUpdate(diningRoom,schoolEntrance,this.towerColor,this.towers,this.coin),clients);
+        }
+    }
+
+    /**
+     * Notify to the player that played the card the change of its usable cards and the last card used
+     */
+    private void notifyUsablesCards(){
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("PLAYER BOARD - notify the usable cards of player with tower "+this.towerColor);
+            ArrayList<Integer> listOfUsableCards = new ArrayList<>();
+            for(AssistantCard card:deck)
+            {
+                if(!card.isUsed())
+                    listOfUsableCards.add(card.getPriority());
+            }
+            List<ClientHandler> onlyTheOneClient = new ArrayList<>();
+            for(ClientHandler client:clients) {
+                // Sends the usable cards only to the client with the same name of this playerBoard
+                if (client.getNickName().equalsIgnoreCase(this.nickName)) {
+                    onlyTheOneClient.add(client);
+                    notify(modelListener, MessageGenerator.assistantCardUpdateMessage(this.towerColor, listOfUsableCards), onlyTheOneClient);
+
+                }
+            }
+        }
     }
 
     /**
@@ -90,21 +143,34 @@ public class PlayerBoard {
     }
 
     /**
+     * Returns the nickname of the player
+     *
+     * @return the String of the nickname of the player
+     */
+    public String getNickName() {
+        return nickName;
+    }
+
+    /**
      * Makes the assistant card at the position number passed unusable.
      * If the card was already use return false, otherwise true.
      *
      * @param position the number of card that has to be used
      * @return the output of the legacy of the action
      */
-    public boolean useAssistantCard(int position) throws IndexOutOfBoundsException {
+    public void useAssistantCard(int position) throws IndexOutOfBoundsException, AlreadyUsedException {
         if (position < 1 || position > deck.size())
             throw new IndexOutOfBoundsException("AssistantCardValues are from " + 1 + " to " + 12);
         if (!deck.get(position - 1).isUsed()) {
             deck.get(position - 1).use();
             this.lastUsed = position;
-            return true;
+        } else {
+            Set<Integer> usableCards = new HashSet<>();
+            for (AssistantCard card : deck)
+                if (!card.isUsed()) usableCards.add(card.getPriority());
+            throw new AlreadyUsedException(usableCards);
         }
-        return false;
+        notifyUsablesCards();
     }
 
     /**
@@ -178,6 +244,7 @@ public class PlayerBoard {
         addResult = schoolBoard.addStudentDiningRoom(studentColor);
         if (addResult && countStudentsDiningRoom(studentColor) % 3 == 0 && countStudentsDiningRoom(studentColor) != 0)
             increaseCoinBudget();
+        notifyPlayerBoard();
         return addResult;
 
     }
@@ -190,8 +257,10 @@ public class PlayerBoard {
      * @return outcome of the addition.
      */
     public boolean addStudentEntrance(Color studentColor) {
-        return schoolBoard.addStudentEntrance(studentColor);
-
+        boolean returnValue = schoolBoard.addStudentEntrance(studentColor);
+        if(returnValue)
+            notifyPlayerBoard();
+        return returnValue;
     }
 
     /**
@@ -202,7 +271,10 @@ public class PlayerBoard {
      * @return outcome of the removal
      */
     public boolean removeStudentDiningRoom(Color studentColor) {
-        return schoolBoard.removeStudentDiningRoom(studentColor);
+        boolean returnValue =schoolBoard.removeStudentDiningRoom(studentColor);
+        if(returnValue)
+            notifyPlayerBoard();
+        return returnValue;
     }
 
     /**
@@ -213,7 +285,11 @@ public class PlayerBoard {
      * @return outcome of the removal
      */
     public boolean removeStudentEntrance(Color studentColor) {
-        return schoolBoard.removeStudentEntrance(studentColor);
+        boolean returnValue = schoolBoard.removeStudentEntrance(studentColor);
+        if(returnValue)
+            notifyPlayerBoard();
+        return returnValue;
+
     }
 
     /**
@@ -262,6 +338,7 @@ public class PlayerBoard {
     public boolean addTower(int numTower) {
         if (this.towers + numTower < numTowersLimit && numTower > 0) {
             this.towers += numTower;
+            notifyPlayerBoard();
             return true;
         }
         return false;
@@ -277,8 +354,12 @@ public class PlayerBoard {
     public boolean removeTower(int numTower) {
         if (this.towers - numTower >= 0) {
             this.towers -= numTower;
+            notifyPlayerBoard();
+            System.out.println("PLAYER BOARD of "+towerColor+ " - removeTower - actual num of towers "+this.towers+" num of tower after have removed "+numTower);
             return true;
         }
+        else
+            this.towers = 0;
         return false;
     }
 
@@ -312,7 +393,8 @@ public class PlayerBoard {
      */
     public int getLastCardSteps() throws NotLastCardUsedException {
         for (AssistantCard card : deck)
-            if (card.isUsed()) return deck.get(lastUsed).getSteps();
+            if (card.isUsed()&&lastUsed!=null&&lastUsed==card.getPriority())
+                return card.getSteps();
         throw new NotLastCardUsedException("No card used! Steps cannot be determined");
 
     }

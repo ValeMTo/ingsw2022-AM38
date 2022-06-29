@@ -1,12 +1,16 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Cloud {
+public class Cloud extends Listenable {
     private final int studentLimit;
     private Map<Color, Integer> counter;
+
+    private boolean hasBeenUsed = false;
 
 
 
@@ -57,6 +61,29 @@ public class Cloud {
     }
 
     /**
+     * Returns a copy of the student's map
+     * @return a copy of the student's map
+     */
+    public Map<Color, Integer> getStudents(){
+        Map<Color,Integer> returnMap = new HashMap<>();
+        returnMap.putAll(this.counter);
+        return returnMap;
+    }
+
+    public void setStudents(Map<Color, Integer> students){
+        this.counter.clear();
+        this.counter.putAll(students);
+    }
+
+    /**
+     * Returns the limit of students
+     * @return the limit of students
+     */
+    public int getLimit(){
+        return this.studentLimit;
+    }
+
+    /**
      * Empties the given cloud, removing all the students it contains.
      *
      * @return the outcome of the emptying : false is the cloud is already empty and cannot be emptied; true otherwise.
@@ -99,11 +126,9 @@ public class Cloud {
      * @return outcome of the removal
      */
     public boolean removeStudent(Color studentColor) throws NullPointerException {
+        setHasBeenUsed(true);
         if (studentColor == null) throw new NullPointerException();
-
         Integer previousNumStudents = counter.get(studentColor);
-
-
         if (!counter.containsKey(studentColor) || this.countStudent(studentColor) <= 0) return false;
         counter.put(studentColor, previousNumStudents - 1);
         return true;
@@ -118,7 +143,27 @@ public class Cloud {
      */
 
     public int countStudent(Color color) {
-        return this.counter.get(color);
+        if(this.counter.get(color)!=null)
+            return this.counter.get(color);
+        return 0;
     }
 
+    public int getStudentLimit(){
+        return studentLimit;
+    }
+
+    /**
+     * Sets the cloud as already used
+     * @param hasBeenUsed
+     */
+    public void setHasBeenUsed(boolean hasBeenUsed) {
+        this.hasBeenUsed = hasBeenUsed;
+    }
+
+    /**
+     * @return true if the cloud has been already used
+     */
+    public boolean isHasBeenUsed() {
+        return hasBeenUsed;
+    }
 }

@@ -1,8 +1,13 @@
 package it.polimi.ingsw.model.specialCards;
 
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SpecialCardWithStudent extends SpecialCard{
     private HashMap<Color, Integer> guests;
@@ -30,9 +35,31 @@ public class SpecialCardWithStudent extends SpecialCard{
             this.guestsLimit = 4;
             this.guestsChangeLimit = 1;
         }
+    }
 
+    /**
+     * Overrides setListenerAndClients to notify the guests into the special card
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    @Override
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        super.setListenerAndClients(modelListener,clients);
+        System.out.println("SPECIAL CARD "+this.name+" I HAVE NOW SET THE LISTENERS and I am with students!");
+        notifyGuestsChange();
+    }
 
-
+    /**
+     * Notifies the changes to the guests
+     */
+    private void notifyGuestsChange(){
+        System.out.println("SPECIAL CARD "+name+" I have changed the counter, now I notify");
+        if(modelListener!=null&&clients!=null){
+            Map<Color,Integer> studentToSend = new HashMap<>();
+            if(guests!=null)
+                studentToSend.putAll(guests);
+            notify(modelListener, MessageGenerator.specialCardUpdateMessage(this.name,this.cost,studentToSend),clients);
+        }
     }
 
     /**
@@ -51,6 +78,7 @@ public class SpecialCardWithStudent extends SpecialCard{
             } else {
                 guests.put(studentColor, this.countStudents(studentColor) + 1);
             }
+            notifyGuestsChange();
             return true;
         }
         return false;
@@ -68,6 +96,7 @@ public class SpecialCardWithStudent extends SpecialCard{
         Integer previousNumStudents = guests.get(studentColor);
         if (previousNumStudents == null || this.countStudents(studentColor) <= 0) return false;
         guests.put(studentColor, previousNumStudents - 1);
+        notifyGuestsChange();
         return true;
     }
 

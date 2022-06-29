@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.HomeMenuController">
+      <children>
+        <Label fx:id="creditsButton" alignment="BOTTOM_CENTER" layoutX="304.0" layoutY="616.0" style="&#10;" text="Game credits" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false" AnchorPane.bottomAnchor="68.79999999999995" AnchorPane.leftAnchor="304.0" AnchorPane.rightAnchor="280.0">
+          <font>
+            <Font size="24.0" />
+          </font>
+        </Label>
+            <ImageView id="home_background" fitHeight="440.0" fitWidth="1012.0" layoutX="105.0" layoutY="162.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="169.83560180664062" AnchorPane.leftAnchor="105.0" AnchorPane.rightAnchor="83.0">
+               <image>
+                  <Image url="@../graphics/backgrounds/Eriantys_slider_wide.png" />
+               </image>
+            </ImageView>
+            <Label id="home_title" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="462.0" layoutY="68.0" text="Welcome to Eriantys" textFill="#46b9e7">
+               <font>
+                  <Font size="32.0" />
+               </font>
+            </Label>
+            <Button fx:id="playButton" layoutX="230.0" layoutY="329.0" mnemonicParsing="false" onMouseClicked="#startPlay" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: GREEN;" text="PLAY" AnchorPane.leftAnchor="230.0">
+               <font>
+                  <Font size="18.0" />
+               </font></Button>
+            <Button fx:id="quitButton" layoutX="903.0" layoutY="335.0" mnemonicParsing="false" onMouseClicked="#quit" prefHeight="65.0" prefWidth="110.0" style="-fx-background-color: RED;" text="QUIT" AnchorPane.rightAnchor="186.60000000000002">
+               <font>
+                  <Font size="18.0" />
+               </font></Button>
+      </children>
+    </AnchorPane>
