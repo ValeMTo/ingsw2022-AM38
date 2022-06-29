@@ -31,7 +31,7 @@ public class MyBoardGuiController extends GUIController {
 
     private final String towersPath = "/graphics/board/towers/";
     private final Map<Tower, Image> towersImgMap = new HashMap<>();
-    private final List<ImageView> deckArray = new ArrayList<ImageView>(10);
+    private final List<ImageView> deckArray = new ArrayList<ImageView>();
     private final List<Label> entranceStudLabels = new ArrayList<Label>();
     private final List<ImageView> entranceStudImages = new ArrayList<ImageView>(5);
     private final List<Label> diningRoomStudLabels = new ArrayList<Label>();
@@ -406,7 +406,7 @@ public class MyBoardGuiController extends GUIController {
             }
             else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
                 if(currentSubPhase.equals(SubPhaseEnum.NO_SUB_PHASE)||currentSubPhase.equals(SubPhaseEnum.CHOOSE_COLOR)) {
-                    statusMessage.setText("Choose a student color to move from the icons in the School Entrance, then choose where to place the Student: click on an Island or select MoveToDiningRoom");
+                    statusMessage.setText("Choose a student color to move from the icons in the School Entrance, then choose where to place the Student: Island or MoveToDiningRoom");
                 }
                 else if(currentSubPhase.equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND)) {
                     statusMessage.setText("Choose where to place the Student: click on an Island or select" + " Move To DiningRoom");
@@ -425,7 +425,7 @@ public class MyBoardGuiController extends GUIController {
                 statusMessage.setText("Choose a cloud to fill your School Entrance with: click on the cloud of your choosing");
             }
 
-            //TODO :  statusmessages for Specialcard usage  --> see CLI
+            //TODO :  statusmessages for Specialcard_Usage_Phase  --> see CLI
         }
         else {
             statusMessage.setText("Please wait until it is your turn...");
@@ -451,17 +451,19 @@ public class MyBoardGuiController extends GUIController {
         removeEffect(entranceStudImages);
 
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.PLANNING)){
-                deckArea.setVisible(true);
+
             if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
+                deckArea.setVisible(true);   // moved this instruction here
                 deckArea.setDisable(false);
                 List<Integer> usableCard = gui.getViewState().getUsableCards();
+                System.out.println("Usable cards now are : " + usableCard);
                 for(ImageView card : deckArray){
-                    if (usableCard.contains(deckArray.indexOf(card))){
+                    if (usableCard.contains(Integer.parseInt(card.getId().replace("assistant","")))) {
                         card.setDisable(false);
 
                     } else {
-                        card.setVisible(false);
                         card.setDisable(true);
+                        card.setVisible(false);
                     }
                 }
             }
@@ -552,8 +554,13 @@ public class MyBoardGuiController extends GUIController {
         clickedImg.setEffect(new Glow());
         clickedImg.setDisable(true);
         int cardNum = deckArray.indexOf(clickedImg) +1 ;  // array indexes start at 0  whereas cards go from 1 to 10
-        gui.getConnectionSocket().setAssistantCard(cardNum);
 
+        List<Integer> usableCard = gui.getViewState().getUsableCards();
+        if (usableCard.contains(cardNum)) {
+            System.out.println("sending card # " + cardNum);
+            gui.getConnectionSocket().setAssistantCard(cardNum);
+            clickedImg.setEffect(null);
+        }
     }
 
     @FXML
