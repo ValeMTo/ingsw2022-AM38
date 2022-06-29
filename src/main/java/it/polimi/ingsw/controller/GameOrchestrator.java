@@ -522,4 +522,14 @@ public abstract class GameOrchestrator extends Listenable {
         addListener(modelListener);
     }
 
+    /**
+     * Method used to disconnect all clients from a game, due to the lost of a player
+     */
+    public void disconnectClients(){
+        for(ClientHandler client : clients) {
+            System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: "+client.getNickName());
+            client.disconnect();
+        }
+    }
+
 }

@@ -2,9 +2,11 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.connectionManagement.DisconnectionTimer;
 import it.polimi.ingsw.controller.GameOrchestrator;
 import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
+import it.polimi.ingsw.messages.ConnectionTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
 
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static it.polimi.ingsw.messages.ErrorTypeEnum.GENERIC_ERROR;
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;
@@ -25,8 +29,10 @@ public class ClientHandler implements Runnable {
     private MessageParser messageParser;
     private int id;
     private boolean disconnected = false;
-    private Boolean hasReceivedMessageFromTimerStart = false;
+    private Boolean hasReceivedMessageFromTimerStart = true;
     private final Object hasReceivedMessageFromTimerStartBlocker = new Object();
+    private Timer timer = new Timer();
+
 
     public ClientHandler(Socket clientSocket) {
         inSocket = clientSocket;
@@ -54,7 +60,7 @@ public class ClientHandler implements Runnable {
      * Returns the flag for connection flow management (used for disconnection timer)
      */
     public Boolean getHasReceivedMessageFromTimerStart() {
-        synchronized (this.hasReceivedMessageFromTimerStart) {
+        synchronized (this.hasReceivedMessageFromTimerStartBlocker) {
             return this.hasReceivedMessageFromTimerStart;
         }
     }
@@ -65,7 +71,7 @@ public class ClientHandler implements Runnable {
      * @param hasReceivedMessageFromTimerStart
      */
     public void setHasReceivedMessageFromTimerStart(Boolean hasReceivedMessageFromTimerStart) {
-        synchronized (this.hasReceivedMessageFromTimerStart) {
+        synchronized (this.hasReceivedMessageFromTimerStartBlocker) {
             this.hasReceivedMessageFromTimerStart = hasReceivedMessageFromTimerStart;
         }
     }
@@ -79,22 +85,31 @@ public class ClientHandler implements Runnable {
         messageParser = new MessageParser(this);
         messageParser.setName(this.playerName);
         String message;
+        DisconnectionTimer timerTask = new DisconnectionTimer(this);
+        timer.scheduleAtFixedRate(timerTask,15000,20000);
         while (!disconnected) {
             System.out.println("CLIENT HANDLER - player " + playerName + " waiting for message");
-            message = inputReader.nextLine();
-            setHasReceivedMessageFromTimerStart(true);
-            System.out.println("CLIENT HANDLER - player " + this.getNickName() + " got message " + message);
-            System.out.println(message);
-            JsonObject json = new Gson().fromJson(message, JsonObject.class);
-            if (messageParser != null)
-                sendingMessage = messageParser.parseMessageToAction(message);
-            else
-                sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR, "ERROR - ClientHandler has no messageParser");
-            System.out.println("CLIENT HANDLER - sending " + sendingMessage);
-            writer.print(sendingMessage);
-            writer.flush();
-
+            try {
+                message = inputReader.nextLine();
+                setHasReceivedMessageFromTimerStart(true);
+                System.out.println("CLIENT HANDLER - player " + this.getNickName() + " got message " + message);
+                System.out.println(message);
+                JsonObject json = new Gson().fromJson(message, JsonObject.class);
+                if (messageParser != null)
+                    sendingMessage = messageParser.parseMessageToAction(message);
+                else
+                    sendingMessage = MessageGenerator.errorWithStringMessage(GENERIC_ERROR, "ERROR - ClientHandler has no messageParser");
+                System.out.println("CLIENT HANDLER - sending " + sendingMessage);
+                writer.print(sendingMessage);
+                writer.flush();
+            }
+            catch (IllegalStateException exception)
+            {
+                System.out.println("CLIENT HANDLER - player "+this.playerName+" inputReader closed - disconnecting");
+                disconnectionManager();
+            }
         }
+        timer.cancel();
     }
 
     /**
@@ -126,10 +141,35 @@ public class ClientHandler implements Runnable {
      * Manage the disconnection and controls the messages searching for the disconnection request
      */
     public void disconnectionManager() {
-        Server.removePlayer(playerName);
-        inputReader.close();
-        writer.close();
-        this.disconnected = true;
+        timer.cancel();
+        if(this.messageParser!=null)
+        {
+            messageParser.disconnectClients();
+        }
+        disconnect();
+    }
+
+    /**
+     * Disconnect the client without notifying the game orchestrator to close other connections
+     */
+    public void disconnect() {
+        try {
+            timer.cancel();
+            Server.removePlayer(playerName);
+            if(writer!=null) {
+                writer.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
+                writer.flush();
+            }
+            inputReader.close();
+            writer.close();
+            writer=null;
+            inputReader=null;
+            this.disconnected = true;
+            System.out.println("ERROR - CLIENT HANDLER - CLOSING THREAD OF CLIENT " + playerName + " DUE TO CONNECTION LOST");
+        }
+        catch (Exception exc){
+            System.out.println("CLIENT HANDLER - not possible to disconnect, everything already closed");
+        }
     }
 
     /**
@@ -200,6 +240,4 @@ public class ClientHandler implements Runnable {
         messageParser.setGameOrchestrator(gameOrchestrator);
         messageParser.setName(this.playerName);
     }
-
-
 }

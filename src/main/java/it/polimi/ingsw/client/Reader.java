@@ -2,12 +2,11 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.connectionManagement.disconnectionTimer;
-import it.polimi.ingsw.connectionManagement.pingPongTimer;
+import it.polimi.ingsw.connectionManagement.DisconnectionTimer;
+import it.polimi.ingsw.connectionManagement.PingPongTimer;
 import it.polimi.ingsw.messages.ConnectionTypeEnum;
 import it.polimi.ingsw.messages.MessageTypeEnum;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Timer;
@@ -19,7 +18,7 @@ import java.util.TimerTask;
 public class Reader implements Runnable {
     private final BufferedReader inputReader;
     private final ViewMessageParser viewHandler;
-    private Boolean hasReceivedMessageFromTimerStart = false;
+    private Boolean hasReceivedMessageFromTimerStart = true;
     private ConnectionSocket connectionSocket;
 
     public Reader(BufferedReader inputReader, ViewMessageParser viewHandler) {
@@ -50,9 +49,9 @@ public class Reader implements Runnable {
      */
     public void disconnect() {
         try {
+            System.out.println("READER - GRACEFUL DISCONNECTION DUE TO CONNECTION ISSUE - SHUTTING DOWN THE SYSTEM");
             connectionSocket.disconnect();
             inputReader.close();
-            System.out.println("READER - GRACEFUL DISCONNECTION -");
         } catch (IOException exc) {
             System.out.println("READER - GRACEFUL DISCONNECTION - not possible to close the reader, shutting down");
         }
@@ -67,9 +66,9 @@ public class Reader implements Runnable {
     public void run() {
         String input;
         Timer pingPongTimer = new Timer("Ping pong timer");
-        TimerTask pingPongtask = new pingPongTimer(this, connectionSocket);
+        TimerTask pingPongtask = new PingPongTimer(this, connectionSocket);
         Timer disconnectionTimer = new Timer("Disconnection timer");
-        TimerTask disconnectionTask = new disconnectionTimer(this);
+        TimerTask disconnectionTask = new DisconnectionTimer(this);
         pingPongTimer.scheduleAtFixedRate(pingPongtask,5000,5000);
         disconnectionTimer.scheduleAtFixedRate(disconnectionTask,30000,30000);
         JsonObject json;
@@ -82,10 +81,12 @@ public class Reader implements Runnable {
                 //System.out.println("READER - got message "+input);
                 viewHandler.parse(input);
                 json = gson.fromJson(input,JsonObject.class);
-                if(json!=null && json.has("MessageType")&&json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.has("ConnectionType")&&json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal())
+                if(json!=null && json.has("MessageType")&&json.get("MessageType").getAsInt()== MessageTypeEnum.CONNECTION.ordinal() && json.has("ConnectionType")&&json.get("ConnectionType").getAsInt()== ConnectionTypeEnum.CLOSE_CONNECTION.ordinal()) {
+                    System.out.println("READER - CLOSING CONNECTION DUE TO SERVER REQUEST - others player disconnected or there was a connection issue");
                     disconnect();
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("CONNECTION - The inputReader has been closed, disconnecting");
                 System.exit(0);
             }
         }

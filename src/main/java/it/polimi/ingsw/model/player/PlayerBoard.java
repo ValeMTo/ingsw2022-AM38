@@ -143,6 +143,15 @@ public class PlayerBoard extends Listenable {
     }
 
     /**
+     * Sends the last played card
+     */
+    private void notifyLastCard(){
+        if(this.clients!=null && this.modelListener!=null){
+            notify(modelListener,MessageGenerator.lastUsedAssistantCardUpdateMessage(this.towerColor,this.lastUsed),clients);
+        }
+    }
+
+    /**
      * Returns the nickname of the player
      *
      * @return the String of the nickname of the player
@@ -171,6 +180,7 @@ public class PlayerBoard extends Listenable {
             throw new AlreadyUsedException(usableCards);
         }
         notifyUsablesCards();
+        notifyLastCard();
     }
 
     /**

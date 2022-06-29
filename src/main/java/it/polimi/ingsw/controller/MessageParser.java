@@ -259,4 +259,12 @@ public class MessageParser{
         return this.gameOrchestrator.isExpert();
     }
 
+    /**
+     * Method used to disconnect all clients from a game, due to the lost of a player
+     */
+    public void disconnectClients(){
+        if(gameOrchestrator!=null)
+            gameOrchestrator.disconnectClients();
+    }
+
 }

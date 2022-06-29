@@ -195,6 +195,7 @@ public class ConnectionSocket {
      * Send a disconnect message to disconnect from the server gracefully
      */
     public void disconnect() {
+        System.out.println("CONNECTION SOCKET - GRACEFUL DISCONNECTION - Shutting down the system due to connection issue - GoodBye");
         socketOut.print(MessageGenerator.connectionMessage(ConnectionTypeEnum.CLOSE_CONNECTION));
         socketOut.flush();
         socketOut.close();

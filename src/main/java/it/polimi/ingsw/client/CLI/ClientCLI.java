@@ -103,11 +103,16 @@ public class ClientCLI {
             System.out.println("Insert the server IP address:");
             hostName = in.nextLine();
             System.out.println("Insert the server port");
-            portNumber = Integer.parseInt(in.nextLine());
-            System.out.println("Information set: IP " + hostName + " port " + portNumber);
-            this.connectionSocket = createConnectionWithServer(hostName, portNumber);
-            if(connectionSocket != null)
-                isConnected = true;
+            try {
+                portNumber = Integer.parseInt(in.nextLine());
+                System.out.println("Information set: IP " + hostName + " port " + portNumber);
+                this.connectionSocket = createConnectionWithServer(hostName, portNumber);
+                if (connectionSocket != null)
+                    isConnected = true;
+            }
+            catch (NumberFormatException exc) {
+                System.out.println(CLIPink + "Only numbers are allowed for ip and port!"+CLIEffectReset);
+            }
         }
         return;
     }
@@ -122,6 +127,7 @@ public class ClientCLI {
 
     public synchronized void printForMoveMotherNature(){
         System.out.println("CLIENT CLI - mother nature set");
+        printPlayerBoard();
         printArchipelago();
         System.out.println(CLICyan+"Last card used "+getLastAssistantCardString(viewState.getPlayerTower()));
         showMoveMotherNatureInstruction();
@@ -139,6 +145,7 @@ public class ClientCLI {
      * Start Game just start the KeyboardInputReader for acquire the input, then it is viewState that prints everything
      */
     public void startGame() {
+        System.out.println("WAITING FOR PLAYERS ...");
         viewState.setAwaitingCLI(this);
         this.keyboardInputReader = new KeyboardInputReader(connectionSocket,viewState,this,in);
         Thread thread = new Thread(this.keyboardInputReader);
@@ -225,6 +232,7 @@ public class ClientCLI {
      * Then get the number of card from stdin
      */
     public synchronized void showPlanningInstruction() {
+        printArchipelago();
         printAssistantCards();
         System.out.println(CLICyan + "CHOICE AN ASSISTANT CARD TO PLAY, SELECT  BETWEEN THE USABLE CARDS (enter the Priority value)" + CLIEffectReset);
         System.out.println("Which card have you chosen?");
@@ -234,6 +242,8 @@ public class ClientCLI {
      * Shows the possible commands and what to do in the action phase: move cloud choice subaction
      */
     public synchronized void showCloudChoiceInstruction() {
+        printPlayerBoard();
+        printArchipelago();
         printClouds();
         System.out.println(CLICyan + "CHOICE THE CLOUD TO FILL YOUR SCHOOL ENTRANCE WITH (enter the cloud number)" + CLIEffectReset);
     }
@@ -475,7 +485,7 @@ public class ClientCLI {
      * Prints the usable assistant card
      */
     synchronized void printAssistantCards() {
-        System.out.println(CLIBlack+" - Usable assistant cards - \n\t(Less priority = first in action order, Steps = steps that the motherNature can do)\n"+CLIEffectReset);
+        System.out.println(CLIBlack+" - Usable assistant cards - \n        (Less priority = first in action order, Steps = steps that the motherNature can do)\n"+CLIEffectReset);
         String[] rows = new String[5];
         int steps;
         for (int j = 0; j < 5; j++)
@@ -588,7 +598,7 @@ public class ClientCLI {
     }
 
     synchronized void printArchipelago() {
-        System.out.println(CLIBlack+" - Archipelago - \n\t TW: tower on the island, M.N. : motherNature\n"+CLIEffectReset);
+        System.out.println(CLIBlack+" - Archipelago - \n         TW: tower on the island, M.N. : motherNature\n"+CLIEffectReset);
         String[] rows = new String[12];
         for (int i = 0; i < 12; i++)
             rows[i] = "";
@@ -733,9 +743,9 @@ public class ClientCLI {
      * Prints the playerBoard (SchoolBoard, DiningRoom and Professors owned)
      */
     synchronized void printPlayerBoard(){
-        System.out.println(CLIBlack+" - PlayerBoard - \n\t PROFESSORS : owned professors, DINING ROOM: student in the dining room, needed to determine the owned professors,\n SCHOOL ENTRANCE: Movable students \n"+CLIEffectReset);
-        String[] rows = new String[12];
-        for(int i=0;i<12;i++)
+        System.out.println(CLIBlack+" - PlayerBoard - \n         PROFESSORS : owned professors, DINING ROOM: student in the dining room, needed to determine the owned professors,\n SCHOOL ENTRANCE: Movable students \n"+CLIEffectReset);
+        String[] rows = new String[13];
+        for(int i=0;i<13;i++)
             rows [i] = "";
         Map<Color, Integer> schoolEntranceOccupancy;
         Map<Color, Integer> diningRoomOccupancy;
@@ -750,53 +760,61 @@ public class ClientCLI {
             if(viewState.getLastUsedCard(viewState.getPlayerTower())!=null)
                 lastcard = viewState.getLastUsedCard(viewState.getPlayerTower()).toString();
             if(playerTower.equals(viewState.getPlayerTower())) {
-                if(!viewState.isExpert())
-                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" - LAST CARD USED " + lastcard + "        "+ CLIEffectReset;
-                else
-                rows[0] += CLICyan + ""+CLIRed+"- MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ")"+CLICyan+" - LAST CARD USED " + lastcard + " COINS "+viewState.getPlayerCoins(playerTower) + CLIEffectReset;
+                if(!viewState.isExpert()) {
+                    rows[0] += CLICyan + "" + CLIRed + "               - MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ") -           " +CLIEffectReset;
+                    rows[1] += CLICyan + "      - LAST CARD " + getLastAssistantCardString(playerTower) + "           " + CLIEffectReset;
+                }
+                else {
+                    rows[0] += CLICyan + "" + CLIRed + "               - MY PLAYERBOARD (Tw: " + getTowerAbbreviation(playerTower) + ") -           " +CLIEffectReset;
+                    rows[1] += CLIRed +  "      - LAST CARD " + getLastAssistantCardString(playerTower) + " COINS " + viewState.getPlayerCoins(playerTower) +" -     "+ CLIEffectReset;
+                }
                 effectSchoolBoard = CLIRed;
             }
             else {
                 effectSchoolBoard = CLIEffectReset;
-                if(!viewState.isExpert())
-                rows[0] += CLICyan + "   PLAYER BOARD TW: " + getTowerAbbreviation(playerTower) + " LAST CARD USED " + getLastAssistantCardString(playerTower) + "          " + CLIEffectReset;
-                else
-                rows[0] += CLICyan + "  PLAYER BOARD OF TOWER: " + getTowerAbbreviation(playerTower) + " LAST CARD USED " + getLastAssistantCardString(playerTower) + " COINS: "+viewState.getPlayerCoins(playerTower)+" " + CLIEffectReset;
-            }rows[1] += effectSchoolBoard+"  ┌────────────┬────────────────┬─────────────────┐  "+CLIEffectReset;
-            rows[2] += "  "+effectSchoolBoard+"│ " + CLIBlack + "PROFESSORS" + CLIEffectReset +effectSchoolBoard+ " │   " + CLIBlack + "DINING ROOM" + CLIEffectReset +effectSchoolBoard+ "  │ " + CLIBlack + "SCHOOL ENTRANCE" + CLIEffectReset +effectSchoolBoard+ " │  ";
-            rows[3] += "  "+effectSchoolBoard+"│            │                │                 │  ";
+                if(!viewState.isExpert()) {
+                    rows[0] += CLICyan + "            PLAYER BOARD OF TOWER: " + getTowerAbbreviation(playerTower) +"                "+ CLIEffectReset;
+                    rows[1] += CLICyan + "        LAST CARD USED " + getLastAssistantCardString(playerTower) + "          " + CLIEffectReset;
+                }
+                else {
+                    rows[0] += CLICyan + "            PLAYER BOARD OF TOWER: " + getTowerAbbreviation(playerTower) + "                "+CLIEffectReset;
+                    rows[1] +=CLICyan +"     LAST CARD USED " + getLastAssistantCardString(playerTower) + " COINS: " + viewState.getPlayerCoins(playerTower) + "    " + CLIEffectReset;
+                }
+            }rows[2] += effectSchoolBoard+"  ┌────────────┬────────────────┬─────────────────┐  "+CLIEffectReset;
+            rows[3] += "  "+effectSchoolBoard+"│ " + CLIBlack + "PROFESSORS" + CLIEffectReset +effectSchoolBoard+ " │   " + CLIBlack + "DINING ROOM" + CLIEffectReset +effectSchoolBoard+ "  │ " + CLIBlack + "SCHOOL ENTRANCE" + CLIEffectReset +effectSchoolBoard+ " │  ";
+            rows[4] += "  "+effectSchoolBoard+"│            │                │                 │  ";
             if (playerTower.equals(viewState.getProfessors().get(Color.BLUE)))
-            rows[4] += "  "+effectSchoolBoard+"│    " + CLIBlue + "BLUE " + CLIEffectReset + "   ";
+            rows[5] += "  "+effectSchoolBoard+"│    " + CLIBlue + "BLUE " + CLIEffectReset + "   ";
             else
-            rows[4] += "  "+effectSchoolBoard+"│            ";
-            rows[4] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE),10) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
+            rows[5] += "  "+effectSchoolBoard+"│            ";
+            rows[5] += effectSchoolBoard+"│ " + CLIBlue + "B:" + diningRoomOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createCubesString(Color.BLUE, diningRoomOccupancy.get(Color.BLUE),10) +effectSchoolBoard+ " │  " + CLIBlue + "B:" + schoolEntranceOccupancy.get(Color.BLUE) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.BLUE, schoolEntranceOccupancy.get(Color.BLUE)) + effectSchoolBoard+"  │  ";
 
             if (playerTower.equals(professors.get(Color.GREEN)))
-            rows[5] += effectSchoolBoard+"  │    " + CLIGreen + "GREEN " + CLIEffectReset + "  ";
+            rows[6] += effectSchoolBoard+"  │    " + CLIGreen + "GREEN " + CLIEffectReset + "  ";
             else
-            rows[5] += effectSchoolBoard+"  │            ";
-            rows[5] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN),10) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
+            rows[6] += effectSchoolBoard+"  │            ";
+            rows[6] += effectSchoolBoard+"│ " + CLIGreen + "G:" + diningRoomOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createCubesString(Color.GREEN, diningRoomOccupancy.get(Color.GREEN),10) +effectSchoolBoard+ " │  " + CLIGreen + "G:" + schoolEntranceOccupancy.get(Color.GREEN) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.GREEN, schoolEntranceOccupancy.get(Color.GREEN)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.YELLOW)))
-                rows[6] += effectSchoolBoard+"  │    " + CLIYellow + "YELLOW" + CLIEffectReset + "  ";
+                rows[7] += effectSchoolBoard+"  │    " + CLIYellow + "YELLOW" + CLIEffectReset + "  ";
             else
-                rows[6] +=effectSchoolBoard+ "  │            ";
-            rows[6] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW),10) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
+                rows[7] +=effectSchoolBoard+ "  │            ";
+            rows[7] += effectSchoolBoard+"│ " + CLIYellow + "Y:" + diningRoomOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createCubesString(Color.YELLOW, diningRoomOccupancy.get(Color.YELLOW),10) +effectSchoolBoard+ " │  " + CLIYellow + "Y:" + schoolEntranceOccupancy.get(Color.YELLOW) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.YELLOW, schoolEntranceOccupancy.get(Color.YELLOW)) +effectSchoolBoard+ "  │  ";
 
             if (playerTower.equals(professors.get(Color.PINK)))
-                rows[7] += effectSchoolBoard+"  │    " + CLIPink + "PINK  " + CLIEffectReset + "  ";
-            else
-                rows[7] += effectSchoolBoard+"  │            ";
-            rows[7] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK),10) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
-
-            if (playerTower.equals(professors.get(Color.RED)))
-                rows[8] += effectSchoolBoard+"  │    " + CLIRed + "RED   " + CLIEffectReset + "  ";
+                rows[8] += effectSchoolBoard+"  │    " + CLIPink + "PINK  " + CLIEffectReset + "  ";
             else
                 rows[8] += effectSchoolBoard+"  │            ";
-            rows[8] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED),10) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
-            rows[9] += effectSchoolBoard+"  ├────────────┴────────────────┴─────────────────┤  "+CLIEffectReset;
-            rows[10] += "  "+effectSchoolBoard+"│     TOWERS LEFT:"+viewState.getTowerLeft(playerTower)+"   "+createTowersCubesString(playerTower,viewState.getTowerLeft(playerTower))+effectSchoolBoard+"                 │  ";
-            rows[11] += effectSchoolBoard+"  └───────────────────────────────────────────────┘  "+CLIEffectReset;
+            rows[8] +=effectSchoolBoard+ "│ " + CLIPink + "P:" + diningRoomOccupancy.get(Color.PINK) + CLIEffectReset + " " + createCubesString(Color.PINK, diningRoomOccupancy.get(Color.PINK),10) +effectSchoolBoard+ " │  " + CLIPink + "P:" + schoolEntranceOccupancy.get(Color.PINK) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.PINK, schoolEntranceOccupancy.get(Color.PINK)) +effectSchoolBoard+ "  │  ";
+
+            if (playerTower.equals(professors.get(Color.RED)))
+                rows[9] += effectSchoolBoard+"  │    " + CLIRed + "RED   " + CLIEffectReset + "  ";
+            else
+                rows[9] += effectSchoolBoard+"  │            ";
+            rows[9] += effectSchoolBoard+"│ " + CLIRed + "R:" + diningRoomOccupancy.get(Color.RED) + CLIEffectReset + " " + createCubesString(Color.RED, diningRoomOccupancy.get(Color.RED),10) + effectSchoolBoard+" │  " + CLIRed + "R:" + schoolEntranceOccupancy.get(Color.RED) + CLIEffectReset + " " + createSchoolEntranceCubesString(Color.RED, schoolEntranceOccupancy.get(Color.RED)) +effectSchoolBoard+ "  │  ";
+            rows[10] += effectSchoolBoard+"  ├────────────┴────────────────┴─────────────────┤  "+CLIEffectReset;
+            rows[11] += "  "+effectSchoolBoard+"│     TOWERS LEFT:"+viewState.getTowerLeft(playerTower)+"   "+createTowersCubesString(playerTower,viewState.getTowerLeft(playerTower))+effectSchoolBoard+"                 │  ";
+            rows[12] += effectSchoolBoard+"  └───────────────────────────────────────────────┘  "+CLIEffectReset;
 
         }
             printVector(rows);
@@ -903,7 +921,7 @@ public class ClientCLI {
 
     private void printStandings(Map<String, Integer> standing){
         System.out.println("\n"+CLIBoldWhite+"Game has ended, caused of end "+viewState.getEndingMotivation()+CLIEffectReset+"\n");
-        System.out.println(CLIBoldWhite+"\t - STANDINGS -"+viewState.getEndingMotivation()+CLIEffectReset+"\n");
+        System.out.println(CLIBoldWhite+"         - STANDINGS -"+viewState.getEndingMotivation()+CLIEffectReset+"\n");
         try{Thread.sleep(200);}
         catch (InterruptedException exc){}
         int stand = 1;

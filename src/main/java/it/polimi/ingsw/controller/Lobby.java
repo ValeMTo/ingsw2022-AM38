@@ -108,4 +108,24 @@ public class Lobby {
     public boolean getGamemode() {
         return isExpert;
     }
+
+    /**
+     * Removes a player from the lobby if it has been disconnected
+     */
+    public void removePlayer(String playerToRemove){
+        if(players.remove(playerToRemove)){
+            System.out.println("LOBBY - removePlayer "+playerToRemove+" successfully removed");
+            ClientHandler clientToBeRemoved = null;
+            for(ClientHandler client : queue)
+                if(client.getNickName().equalsIgnoreCase(playerToRemove))
+                    clientToBeRemoved = client;
+            if(clientToBeRemoved!=null)
+                queue.remove(clientToBeRemoved);
+            // If it was the only client connected, just empty the lobby and reset all settings
+            if(queue.size()==0) {
+                System.out.println("LOBBY - removePlayer "+playerToRemove+" no other players, resetting the options");
+                emptyLobby();
+            }
+        }
+    }
 }
