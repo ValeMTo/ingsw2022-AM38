@@ -21,6 +21,7 @@ import javafx.scene.shape.Line;
 
 import javafx.stage.Stage;
 
+import java.sql.Time;
 import java.util.*;
 import java.util.List;
 
@@ -487,7 +488,7 @@ public class MyBoardGuiController extends GUIController {
                 destinationIsland.setEffect(null);
                 int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());
                 for (ImageView image : archipelagoIslands){
-                    if ((archipelagoIslands.indexOf(image) < (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2))
+                    if ((archipelagoIslands.indexOf(image) < (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2 + gui.getViewState().getIncreasedMotherNatureMovement()))
                             && archipelagoIslands.indexOf(image) >= gui.getViewState().getMotherNature()){
                         image.setDisable(false);
                     }else {
