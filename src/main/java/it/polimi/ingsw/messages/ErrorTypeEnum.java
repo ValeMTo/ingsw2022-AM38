@@ -29,5 +29,6 @@ public enum ErrorTypeEnum {
     NO_SUCH_STUDENT_IN_DINING_ROOM,     //25
     ALL_TILES_USED,                     //26
     FUNCTION_NOT_IMPLEMENTED,           //27
-    NO_STUDENTS_IN_DINING_ROOM          //28
+    NO_STUDENTS_IN_DINING_ROOM,         //28
+    NOT_TERMINABLE                      //29
 }

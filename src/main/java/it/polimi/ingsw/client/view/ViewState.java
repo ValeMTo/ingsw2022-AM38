@@ -51,6 +51,7 @@ public class ViewState {
     private final Map<SpecialCardName,Integer> initialCosts = new HashMap<SpecialCardName,Integer>();
     private int increasedMotherNatureMovement=0;
 
+    private boolean optionalSpecialEffectUsage = false;
     public ViewState(boolean isCli) {
         this.onlinePlayers = new ArrayList<>();
         this.isCli = isCli;
@@ -904,6 +905,22 @@ public class ViewState {
         return this.increasedMotherNatureMovement;
     }
 
+    /**
+     * Sets the usage of the special effect as optional
+     */
+    public synchronized void setOptionalSpecialEffectUsage(boolean specialEffectUsage){
+        this.optionalSpecialEffectUsage = specialEffectUsage;
+        refreshCLI();
+    }
+
+    /**
+     * Gets the usage of the special effect as optional
+     * @return
+     */
+    public synchronized boolean isOptionalSpecialEffectUsage(){
+        //System.out.println("VIEW - isOptionalSpecialEffectUsage - effect optional: "+this.optionalSpecialEffectUsage);
+        return this.optionalSpecialEffectUsage;
+    }
 
     /**
      * It prints with the awaitingCli and the currents phases etc...

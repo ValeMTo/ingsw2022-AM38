@@ -375,13 +375,14 @@ public abstract class GameOrchestrator extends Listenable {
             try {
                 if (getCurrentPhase() == PLANNING) {
                     //Goes to the next player and set it into the gameBoard
-                    activePlayer++;
-                    if (activePlayer < players.size()) {
+                    if (activePlayer < players.size() - 1) {
+                        activePlayer++;
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
                     }
                     //Sets the order of the action phase, set the phase as action and set the player as the first of the array
                     else {
-                        gameBoard.resetAllTurnFlags();
+                        if(isExpert)
+                            gameBoard.resetAllTurnFlags();
                         this.setActionOrder();
                         activePlayer = 0;
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
@@ -398,7 +399,8 @@ public abstract class GameOrchestrator extends Listenable {
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(actionOrder[activePlayer]));
                         this.studentMovesLeft = maxStudentMoves;
                         setCurrentPhase(PhaseEnum.ACTION_MOVE_STUDENTS);
-                        gameBoard.resetAllTurnFlags();
+                        if(isExpert)
+                            gameBoard.resetAllTurnFlags();
                     }
                     //If the game is not finished, set everything for the next planning phase
                     else if (gameBoard.isEndOfMatch().equals(EndOfMatchCondition.NoEndOfMatch)) {
@@ -411,7 +413,7 @@ public abstract class GameOrchestrator extends Listenable {
                         gameBoard.fillClouds();
                         try {
                             if(isExpert)
-                            gameBoard.resetAllTurnFlags();
+                                gameBoard.resetAllTurnFlags();
                         }
                         catch (FunctionNotImplementedException exc){
                             System.out.println("SERVER ERROR - IS EXPERT AND GAME BOARD MODE DOES NOT COINCIDE");
@@ -522,6 +524,12 @@ public abstract class GameOrchestrator extends Listenable {
 
     public abstract String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException;
 
+    /**
+     * Ends the special card usage
+     * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
+     */
+    public abstract String terminateSpecialCardUsage() throws FunctionNotImplementedException;
+
 
     /**
      * Creates all listeners and initialises them
@@ -536,7 +544,7 @@ public abstract class GameOrchestrator extends Listenable {
      */
     public void disconnectClients(){
         for(ClientHandler client : clients) {
-            System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: "+client.getNickName());
+            System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: " + client.getNickName());
             client.disconnect();
         }
     }

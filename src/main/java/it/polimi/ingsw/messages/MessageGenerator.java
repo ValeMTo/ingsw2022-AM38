@@ -354,6 +354,16 @@ public class MessageGenerator {
     }
 
     /**
+     * Terminates the special card effects if the effect is optional
+     */
+    public static String terminateSpecialEffect(){
+        JsonObject json = new JsonObject();
+        json.addProperty("MessageType", MessageTypeEnum.ACTION.ordinal());
+        json.addProperty("ActionType", ActionTypeEnum.TERMINATE_SPECIAL_EFFECT.ordinal());
+        return gson.toJson(json) + "\n";
+    }
+
+    /**
      * Generates the MoveStudent Action message, used to move a student of a given color from one given location
      * to another.
      *

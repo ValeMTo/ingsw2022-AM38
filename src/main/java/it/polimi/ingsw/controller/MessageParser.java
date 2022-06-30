@@ -69,7 +69,13 @@ public class MessageParser{
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_CLOUD.ordinal()) return chooseCloud(json);
             if (json.get("ActionType").getAsInt() == ActionTypeEnum.USE_SPECIAL_CARD.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_ISLAND.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_COLOR.ordinal() || json.get("ActionType").getAsInt() == ActionTypeEnum.CHOOSE_TILE_POSITION.ordinal())
                 return useSpecialCard(json);
-
+            if (json.get("ActionType").getAsInt() == ActionTypeEnum.TERMINATE_SPECIAL_EFFECT.ordinal()) {
+                try {
+                    return gameOrchestrator.terminateSpecialCardUsage();
+                } catch (FunctionNotImplementedException exc) {
+                    System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - ERROR - Not expert game mode not possible terminate special card usage");
+                }
+            }
         } else if(json.get("MessageType").getAsInt() == MessageTypeEnum.REQUEST.ordinal()){
             if(json.get("RequestType").getAsInt() == RequestTypeEnum.PLAYERS_NUMBER_REQUEST.ordinal()){
                 return MessageGenerator.numberOfPlayerMessage(Server.getNumOfPlayerGame());
