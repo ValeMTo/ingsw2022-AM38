@@ -6,7 +6,6 @@ import it.polimi.ingsw.connectionManagement.DisconnectionTimer;
 import it.polimi.ingsw.connectionManagement.PingPongTimer;
 import it.polimi.ingsw.messages.ConnectionTypeEnum;
 import it.polimi.ingsw.messages.MessageTypeEnum;
-import it.polimi.ingsw.server.ViewMessageParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;

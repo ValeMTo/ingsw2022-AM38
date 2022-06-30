@@ -8,7 +8,6 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
-import it.polimi.ingsw.server.ViewMessageParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
