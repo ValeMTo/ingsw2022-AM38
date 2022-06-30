@@ -998,6 +998,8 @@ public class MyBoardGuiController extends GUIController {
             Color color = Color.toColor(str);
             if(professors.get(color) != null){
                 label.setText(professors.get(color).toString());
+            }else{
+                label.setText("");
             }
         }
     }
