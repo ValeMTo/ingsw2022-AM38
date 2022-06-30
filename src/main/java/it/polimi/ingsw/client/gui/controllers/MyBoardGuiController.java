@@ -414,7 +414,7 @@ public class MyBoardGuiController extends GUIController {
             }
             else if(currentPhase.equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)) {
                 int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());  // TODO: test if this works correctly
-                int maximumStepsAllowed = cardPriority/2 + cardPriority%2 ;
+                int maximumStepsAllowed = cardPriority/2 + cardPriority%2 + gui.getViewState().getIncreasedMotherNatureMovement();
                 String outputMessage = "Choose an Island on which to move MotherNature. " + "The maximum steps allowed are " + maximumStepsAllowed;
                 if(gui.getViewState().playerHasCoinsToUseASpecialCard()){
                     outputMessage = outputMessage + "\n You can use a SpecialCard now if you want to.";

@@ -158,7 +158,7 @@ public class ViewMessageParser {
                 }
                 if (!view.isCli()) {
                     Platform.runLater(() -> {
-                        if(json.get)
+                    // check special card
                         view.getAwaitingGUI().refreshGameStatus();
                         view.getAwaitingGUI().refreshWholeBoard();  // added after  refreshGameStatus()
                     });
