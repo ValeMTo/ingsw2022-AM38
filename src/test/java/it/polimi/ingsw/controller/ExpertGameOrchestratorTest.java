@@ -410,7 +410,7 @@ public class ExpertGameOrchestratorTest {
             jsonObject = gson.fromJson(chooseColor(game), JsonObject.class);
             assertEquals(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM.ordinal(), jsonObject.get("SpecialCardAnswer").getAsInt());
             jsonObject = gson.fromJson(chooseColor(game), JsonObject.class);
-            assertEquals(MessageTypeEnum.OK.ordinal(), jsonObject.get("MessageType").getAsInt());
+            assertEquals(MessageTypeEnum.ANSWER.ordinal(), jsonObject.get("MessageType").getAsInt());
         } catch (Exception e) {
             e.printStackTrace();
         }

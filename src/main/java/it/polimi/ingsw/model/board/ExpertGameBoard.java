@@ -366,7 +366,6 @@ public class ExpertGameBoard extends GameBoard {
      * Reset all the flags of the special card to their default value, disabling all the effects of the special cards that only have active effects in the turn.
      */
     public void resetAllTurnFlags() {
-        ArrayList<Color> temporaryNoInfluenceColor = new ArrayList<Color>();
         towerInfluence = true;
         moreInfluenceQuantity = 0;
         motherNatureIncreasedMove = false;
@@ -402,6 +401,7 @@ public class ExpertGameBoard extends GameBoard {
      */
     public void professorsUpdateTieEffect() {
         this.professorsUpdateTieEffect = true;
+        updateProfessorOwnership();
     }
 
 
