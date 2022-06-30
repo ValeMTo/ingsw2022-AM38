@@ -219,6 +219,10 @@ public class ClientCLI {
             printPlayerBoard();
             System.out.println(CLICyan + "Choose a color from the diningRoom, colors abbreviations: " + getAllColorAbbreviations());
         }
+        else if (viewState.getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR)) {
+            printPlayerBoard();
+            System.out.println(CLICyan + "Choose a color to apply the special card effect: " + getAllColorAbbreviations());
+        }
         if(viewState.isOptionalSpecialEffectUsage())
             System.out.println(CLICyan + "This effect is optional, enter END to terminate special card usage"+CLIEffectReset);
 

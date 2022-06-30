@@ -232,7 +232,6 @@ public class ExpertGameBoard extends GameBoard {
             computationMap.put(islandTower, computationMap.get(islandTower) + islands[island - 1].getTowerNumber());
 
         }
-
         //Finally, increase the influence if the player has bonuses
         if (moreInfluenceQuantity != 0) {
             Tower currentPlayerTower = players[currentPlayer].getTowerColor();
@@ -372,6 +371,7 @@ public class ExpertGameBoard extends GameBoard {
         noInfluenceByColor = null;
         increasedMovement = 0;
         professorsUpdateTieEffect = false;
+        updateProfessorOwnership();
         if(modelListener!=null&&clients!=null)
             notify(modelListener,MessageGenerator.specialCardIncreaseMovementUpdate(motherNatureIncreasedMove,increasedMovement),clients);
     }
