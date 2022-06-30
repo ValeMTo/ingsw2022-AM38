@@ -1,13 +1,25 @@
 package it.polimi.ingsw.model.board;
 
-import java.util.HashMap;
+import com.sun.jdi.PrimitiveValue;
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.ModelListener;
+import it.polimi.ingsw.messages.MessageGenerator;
+import it.polimi.ingsw.server.ClientHandler;
 
-public class Island {
-    private HashMap<Color, Integer> influence;
-    private int position;
-    private boolean influenceIsEnabled = true;
-    private Tower towerColor = null;
-    private int towerNumber = 0;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Island extends Listenable {
+    private Listener modelListener;
+    private List<ClientHandler> clients = null;
+    protected HashMap<Color, Integer> influence;
+    protected int position;
+    protected boolean influenceIsEnabled = true;
+    protected Tower towerColor = null;
+    protected int towerNumber = 0;
 
     /**
      * Constructor that initializes the HashMap and position
@@ -17,6 +29,33 @@ public class Island {
     public Island(int position) {
         influence = new HashMap<Color, Integer>();
         this.position = position;
+    }
+
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        if(clients!=null)
+        this.clients.addAll(clients);
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("ISLAND "+this.position+" - notify my existence!");
+            Map<Color,Integer> returnMap = new HashMap<>();
+            returnMap.putAll(this.influence);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+        }
+    }
+
+    public void notifySomethingHasChanged(){
+        if(this.clients!=null && this.modelListener!=null){
+            System.out.println("ISLAND "+this.position+" - notify a change!");
+            Map<Color,Integer> returnMap = new HashMap<>();
+            returnMap.putAll(this.influence);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+        }
     }
 
     /**
@@ -41,6 +80,33 @@ public class Island {
             influence.put(color, 1);
         else
             influence.put(color, influence.get(color) + 1);
+        notifySomethingHasChanged();
+        return true;
+    }
+
+    /**
+     * Returns a copy of the student map of this island
+     * @return
+     */
+    public Map<Color,Integer> getStudentMap(){
+        Map<Color,Integer> studentMap = new HashMap<>();
+        studentMap.putAll(this.influence);
+        return studentMap;
+    }
+
+    /**
+     * Adds in block students from a Map
+     * @param studentsToAdd
+     * @return
+     */
+    public boolean addStudent(Map<Color,Integer> studentsToAdd){
+        for(Color color: studentsToAdd.keySet()){
+            if (!influence.containsKey(color))
+                influence.put(color, studentsToAdd.get(color));
+            else
+                influence.put(color, influence.get(color) + studentsToAdd.get(color));
+        }
+        notifySomethingHasChanged();
         return true;
     }
 
@@ -50,13 +116,19 @@ public class Island {
      */
     public void disableInfluence() {
         influenceIsEnabled = false;
+        notifySomethingHasChanged();
     }
 
     /**
      * Enable the influence computation
      */
     public void enableInfluence() {
+        boolean notify=false;
+        if(!influenceIsEnabled)
+            notify = true;
         influenceIsEnabled = true;
+        if(notify)
+            notifySomethingHasChanged();
     }
 
     /**
@@ -105,6 +177,7 @@ public class Island {
      */
     public void setTower(Tower tower) {
         this.towerColor = tower;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -114,6 +187,7 @@ public class Island {
      */
     public void setTowerNumber(int towerNum) {
         this.towerNumber = towerNum;
+        notifySomethingHasChanged();
     }
 
     /**
@@ -123,6 +197,7 @@ public class Island {
      */
     public void setPosition(int pos) {
         this.position = pos;
+        notifySomethingHasChanged();
     }
 
     /**

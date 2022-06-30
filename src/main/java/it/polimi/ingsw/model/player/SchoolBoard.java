@@ -2,6 +2,9 @@ package it.polimi.ingsw.model.player;
 
 import it.polimi.ingsw.model.board.Color;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SchoolBoard {
     private final SchoolEntrance entrance;
     private final DiningRoom house;
@@ -28,7 +31,6 @@ public class SchoolBoard {
         try {
             return house.addStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
 
@@ -45,7 +47,6 @@ public class SchoolBoard {
         try {
             return entrance.addStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -61,7 +62,6 @@ public class SchoolBoard {
         try {
             return house.removeStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -77,7 +77,6 @@ public class SchoolBoard {
         try {
             return entrance.removeStudent(student);
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -118,5 +117,17 @@ public class SchoolBoard {
      */
     public int countStudentsEntrance(Color color) {
         return entrance.countStudents(color);
+    }
+
+    public Map<Color, Integer> getDiningRoomOccupancy(){
+        Map<Color, Integer> returnDining = new HashMap<>();
+        returnDining.putAll(this.house.guests);
+        return returnDining;
+    }
+
+    public Map<Color, Integer> getSchoolEntranceOccupancy(){
+        Map<Color, Integer> returnDining = new HashMap<>();
+        returnDining.putAll(this.entrance.guests);
+        return returnDining;
     }
 }

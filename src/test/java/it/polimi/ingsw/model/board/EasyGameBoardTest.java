@@ -117,8 +117,6 @@ public class EasyGameBoardTest {
                 assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1));
             for (int i = 0; i < 2; i++)
                 assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.PINK, 1));
-            assertNull(easyGameBoard.computeInfluence(1));
-            easyGameBoard.updateProfessorOwnership();
             assertEquals(Tower.GRAY, easyGameBoard.computeInfluence(1));
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -147,8 +145,6 @@ public class EasyGameBoardTest {
             for (int i = 0; i < 5; i++)
                 assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.BLUE, 1));
             assertTrue(easyGameBoard.addStudent(StudentCounter.ISLAND, Color.PINK, 1));
-            assertNull(easyGameBoard.computeInfluence(1));
-            easyGameBoard.updateProfessorOwnership();
             assertEquals(Tower.GRAY, easyGameBoard.computeInfluence(1));
             //P1 now 3 PINK
             assertTrue(easyGameBoard.addStudent(StudentCounter.DININGROOM, Color.PINK, easyGameBoard.getPlayerPosition(Tower.BLACK)));

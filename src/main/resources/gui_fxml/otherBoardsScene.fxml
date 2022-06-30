@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: #46b9e7;" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.client.gui.controllers.OtherBoardsController">
+    <children>
+      <AnchorPane fx:id="playerboardArea1" layoutX="230.0" layoutY="131.0" prefHeight="459.0" prefWidth="305.0" style="-fx-background-color: #03e8fc;">
+         <children>
+            <Label layoutX="40.0" layoutY="12.0" prefHeight="25.0" prefWidth="63.0" text="Entrance">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label layoutX="176.0" layoutY="13.0" text="Dining Room">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="entranceStudentsArea1" layoutX="62.0" layoutY="61.0">
+               <children>
+                  <ImageView fx:id="entRedStud1" fitHeight="46.0" fitWidth="63.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/red_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entYellowStud1" fitHeight="46.0" fitWidth="63.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/yellow_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entPinkStud1" fitHeight="46.0" fitWidth="63.0" layoutY="130.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/pink_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entBlueStud1" fitHeight="46.0" fitWidth="63.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/blue_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entGreenStud1" fitHeight="46.0" fitWidth="63.0" layoutY="260.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/green_stud.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+            <ImageView fx:id="towersInBoard1" fitHeight="48.0" fitWidth="55.0" layoutX="74.0" layoutY="386.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../graphics/board/towers/white_tower.png" />
+               </image>
+            </ImageView>
+            <AnchorPane fx:id="diningRoomStudentsArea1" layoutX="218.0" layoutY="61.0">
+               <children>
+                  <ImageView fx:id="dinRedStud1" fitHeight="46.0" fitWidth="63.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/red_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinYellowStud1" fitHeight="46.0" fitWidth="63.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/yellow_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinPinkStud1" fitHeight="46.0" fitWidth="63.0" layoutY="130.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/pink_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinBlueStud1" fitHeight="46.0" fitWidth="63.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/blue_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinGreenStud1" fitHeight="46.0" fitWidth="63.0" layoutY="260.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/green_stud.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+            <Label fx:id="num_entRed1" layoutX="23.0" layoutY="76.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <ImageView fx:id="playerCoins1" fitHeight="48.0" fitWidth="55.0" layoutX="218.0" layoutY="387.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../graphics/board/one_coin.png" />
+               </image>
+            </ImageView>
+            <Label fx:id="num_entYellow1" layoutX="23.0" layoutY="141.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_entPink1" layoutX="23.0" layoutY="206.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_entBlue1" layoutX="23.0" layoutY="271.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_entGreen1" layoutX="23.0" layoutY="337.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_towersInBoard1" layoutX="23.0" layoutY="397.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinRed1" layoutX="180.0" layoutY="76.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinYellow1" layoutX="180.0" layoutY="141.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinPink1" layoutX="180.0" layoutY="206.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinBlue1" layoutX="180.0" layoutY="271.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinGreen1" layoutX="180.0" layoutY="337.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_playerCoins1" layoutX="180.0" layoutY="400.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <Label fx:id="labelPlayer1" layoutX="281.0" layoutY="43.0" prefHeight="75.0" prefWidth="204.0" text="Other player 1">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="labelPlayer11" layoutX="651.0" layoutY="43.0" prefHeight="75.0" prefWidth="204.0" text="Other player 11">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <AnchorPane fx:id="playerboardArea11" layoutX="600.0" layoutY="131.0" prefHeight="459.0" prefWidth="305.0" style="-fx-background-color: #03e8fc;">
+         <children>
+            <Label layoutX="40.0" layoutY="12.0" prefHeight="25.0" prefWidth="63.0" text="Entrance">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label layoutX="176.0" layoutY="13.0" text="Dining Room">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="entranceStudentsArea11" layoutX="62.0" layoutY="61.0">
+               <children>
+                  <ImageView fx:id="entRedStud11" fitHeight="46.0" fitWidth="63.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/red_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entYellowStud11" fitHeight="46.0" fitWidth="63.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/yellow_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entPinkStud11" fitHeight="46.0" fitWidth="63.0" layoutY="130.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/pink_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entBlueStud11" fitHeight="46.0" fitWidth="63.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/blue_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="entGreenStud11" fitHeight="46.0" fitWidth="63.0" layoutY="260.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/green_stud.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+            <ImageView fx:id="towersInBoard11" fitHeight="48.0" fitWidth="55.0" layoutX="74.0" layoutY="386.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../graphics/board/towers/white_tower.png" />
+               </image>
+            </ImageView>
+            <AnchorPane fx:id="diningRoomStudentsArea11" layoutX="218.0" layoutY="61.0">
+               <children>
+                  <ImageView fx:id="dinRedStud11" fitHeight="46.0" fitWidth="63.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/red_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinYellowStud11" fitHeight="46.0" fitWidth="63.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/yellow_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinPinkStud11" fitHeight="46.0" fitWidth="63.0" layoutY="130.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/pink_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinBlueStud11" fitHeight="46.0" fitWidth="63.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/blue_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="dinGreenStud11" fitHeight="46.0" fitWidth="63.0" layoutY="260.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/green_stud.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+            <Label fx:id="num_entRed11" layoutX="23.0" layoutY="76.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <ImageView fx:id="playerCoins11" fitHeight="48.0" fitWidth="55.0" layoutX="218.0" layoutY="387.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../graphics/board/one_coin.png" />
+               </image>
+            </ImageView>
+            <Label fx:id="num_entYellow11" layoutX="23.0" layoutY="141.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_entPink11" layoutX="23.0" layoutY="206.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_entBlue11" layoutX="23.0" layoutY="271.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_entGreen11" layoutX="23.0" layoutY="337.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_towersInBoard11" layoutX="23.0" layoutY="397.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinRed11" layoutX="180.0" layoutY="76.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinYellow11" layoutX="180.0" layoutY="141.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinPink11" layoutX="180.0" layoutY="206.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinBlue11" layoutX="180.0" layoutY="271.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_dinGreen11" layoutX="180.0" layoutY="337.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="num_playerCoins11" layoutX="180.0" layoutY="400.0" text="x 0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+    </children>
+</AnchorPane>

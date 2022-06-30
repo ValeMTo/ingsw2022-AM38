@@ -1,15 +1,20 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.controller.mvc.ModelListener;
 import it.polimi.ingsw.exceptions.*;
+import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.player.PlayerBoard;
-import it.polimi.ingsw.exceptions.NoSuchTowerException;
+import it.polimi.ingsw.model.specialCards.SpecialCard;
+import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import it.polimi.ingsw.server.ClientHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public abstract class GameBoard {
+public abstract class GameBoard extends Listenable {
+    protected Listener modelListener;
+    protected List<ClientHandler> clients = null;
     protected final int initialIslandNumber = 12;
     protected int playerNumber;
     protected int currentPlayer; // The position in the array which has the active player.
@@ -21,8 +26,11 @@ public abstract class GameBoard {
     protected Cloud[] clouds;
     protected int numRound;
     protected int motherNature;
+    protected Map<String, Integer> standing = new HashMap<>();
+
 
     public GameBoard(int playerNumber, List<String> playersNicknames) {
+
         this.playerNumber = playerNumber;
         currentPlayer = 0;
         professors = new HashMap<Color, Tower>();
@@ -51,6 +59,47 @@ public abstract class GameBoard {
         motherNature = 1;
     }
 
+    private void notifyClouds(){
+        if(this.clients!=null && this.modelListener!=null){
+            for(int i=0;i<clouds.length;i++)
+                notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
+        }
+    }
+
+    public void notifyArchipelago(){
+        System.out.println("GAME BOARD - notifyArchipelago - notify the change on the archipelago "+MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature));
+        if(clients!=null && modelListener!=null)
+            notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
+    }
+
+    /**
+     * Sets the listener and clients for the update and notify for changes
+     * @param modelListener : the modelListener
+     * @param clients : the clients to notify
+     */
+    public void setListenerAndClients(Listener modelListener, List<ClientHandler> clients){
+        this.modelListener = modelListener;
+        this.clients = new ArrayList<>();
+        if(clients!=null)
+        this.clients.addAll(clients);
+        if(this.clients!=null && this.modelListener!=null){
+            for(Island island:islands)
+            {
+                island.setListenerAndClients(modelListener,clients);
+            }
+            for(PlayerBoard playerBoard: players){
+                playerBoard.setListenerAndClients(modelListener,clients);
+            }
+            System.out.println("GAME BOARD - notify the archipelago");
+            notify(modelListener,MessageGenerator.archipelagoViewUpdateMessage(islands.length,motherNature),clients);
+            System.out.println("GAME BOARD - notify the clouds");
+            for(int i=0;i<clouds.length;i++)
+            notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
+            for(Island island:islands)
+                island.setListenerAndClients(modelListener,clients);
+        }
+    }
+
     /**
      * Transfer all the students and tower from an Island to another. This effect is needed to create or increase a group of Islands.
      * A group of Island is simply an Island with a tower number greater than 1. The towerNumber parameter corresponds to the number of Islands involved in the Group
@@ -62,15 +111,17 @@ public abstract class GameBoard {
     protected boolean transferIslandPossessionsIfSameTower(Island islandReceiver, Island islandGiver) {
         if (islandGiver == null || islandReceiver == null) return false;
         if (islandGiver.getTower() != null && islandReceiver.getTower() != null && islandReceiver.getTower().equals(islandGiver.getTower())) {
+            System.out.println("GAME BOARD - transferIslandPossessionsIfSameTower - from island "+islandGiver.getPosition()+" to "+islandReceiver.getPosition());
             int towersNumber = islandReceiver.getTowerNumber() + islandGiver.getTowerNumber();
             // We update the number of tower on the island adding the Towers of the island merging
             islandReceiver.setTowerNumber(towersNumber);
             // We transfer all the student to the island that have the group Island's properties
-            for (Color color : Color.values()) {
-                for (int i = 0; i < islandGiver.studentNumber(color); i++)
-                    islandReceiver.addStudent(color);
+            islandReceiver.addStudent(islandGiver.getStudentMap());
+            if(islandGiver.getPosition()==motherNature) {
+                this.motherNature = islandReceiver.getPosition();
+                System.out.println("GAME BOARD - transferIslandPossessionsIfSameTower - mother nature transferred from"+islandGiver.getPosition()+" to "+islandReceiver.getPosition());
             }
-            if (motherNature == islandGiver.getPosition()) motherNature = islandReceiver.getPosition();
+            notifyArchipelago();
             return true;
         }
         return false;
@@ -90,7 +141,7 @@ public abstract class GameBoard {
         // Search the island after the island considered, set the island with min position as the receiver
         if (island < islands.length - 1) {
             islandReceiver = currentIsland;
-            islandGiver = islands[island + 1];
+            islandGiver = islands[island];
         } else if (island == islands.length - 1 && islands.length >= 2) {
             islandReceiver = islands[0];
             islandGiver = currentIsland;
@@ -112,21 +163,56 @@ public abstract class GameBoard {
         // Now the grouping should have been correctly done. If we have islands to remove we now remove them from the array of Islands.
         Island[] newIslandsArray = new Island[islands.length - islandToRemove.size()];
         int counter = 0;
-        Island motherNaturePosition = null;
         for (int i = 0; i < islands.length; i++) {
             //Adds to the new array the islands which are not selected to be removed
             if (!islandToRemove.contains(islands[i])) {
                 newIslandsArray[counter] = islands[i];
                 counter++;
             }
-            if (islands[motherNature - 1] == islands[i]) motherNaturePosition = islands[i];
         }
         islands = newIslandsArray;
         //Reset the position value for each island, after the array change
         for (int i = 1; i <= islands.length; i++) {
             islands[i - 1].setPosition(i);
-            if (motherNaturePosition == islands[i - 1]) motherNature = i;
         }
+        notifyArchipelago();
+        for (int i = 0; i < islands.length; i++) {
+            islands[i].notifySomethingHasChanged();
+        }
+    }
+
+    /**
+     * Updates the status of the leaderBoard, computing the standings
+     */
+    private void leaderBoardUpdate(){
+        Integer minTowerLeft = null;
+        List<String> minTowerOwner = new ArrayList<>();
+        int counter = 1, standingPosition = 1;
+        while(counter <=playerNumber){
+            minTowerLeft = null;
+            minTowerOwner.clear();
+            for(int i=0;i<playerNumber;i++)
+            {
+                if(minTowerLeft==null) {
+                    minTowerLeft = players[i].getAvailableTowers();
+                    minTowerOwner.add(players[i].getNickName());
+                }
+                else if(minTowerLeft>players[i].getAvailableTowers()) {
+                    minTowerOwner.clear();
+                    minTowerLeft = players[i].getAvailableTowers();
+                    minTowerOwner.add(players[i].getNickName());
+                } else if (minTowerLeft.equals(players[i].getAvailableTowers())) {
+                    minTowerOwner.add(players[i].getNickName());
+                }
+            }
+            for(String player : minTowerOwner) {
+                this.standing.put(player, standingPosition);
+                counter++;
+            }
+            standingPosition++;
+        }
+        if(clients!=null&&modelListener!=null&&standing!=null)
+            notify(modelListener,MessageGenerator.leaderboardUpdateMessage(false,standing,""),clients);
     }
 
     /**
@@ -137,18 +223,70 @@ public abstract class GameBoard {
      * DelayedEndOfMatch if the match does end after the round is completed
      */
     public EndOfMatchCondition isEndOfMatch() {
+        // Change the leaderBoard status
+        leaderBoardUpdate();
         // Empty bag condition
-        if (bag.isEmpty()) return EndOfMatchCondition.DelayedEndOfMatch;
+        if (bag.isEmpty()) {
+            System.out.println("GAME BOARD - isEndOfMatch - BAG IS EMPTY!");
+            return EndOfMatchCondition.DelayedEndOfMatch;
+        }
         // Player has used all his towers
         for (PlayerBoard player : players) {
-            if (player.getAvailableTowers() == 0) return EndOfMatchCondition.InstantEndOfMatch;
+            if (player.getAvailableTowers() == 0) {
+                System.out.println("GAME BOARD - isEndOfMatch - A PLAYER HAS FINISHED ITS TOWERS! Player "+player.getNickName()+" with tower "+player.getTowerColor());
+                return EndOfMatchCondition.InstantEndOfMatch;
+            }
         }
         // No more assistant card (all 10 cards used)
-        if (numRound == 11) return EndOfMatchCondition.InstantEndOfMatch;
-        // 3 Islands groups
-        if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3)
+        if (numRound == 11) {
+            System.out.println("GAME BOARD - isEndOfMatch - ROUND FINISHED!");
             return EndOfMatchCondition.InstantEndOfMatch;
+        }
+        // Final round
+        if (numRound == 10) {
+            System.out.println("GAME BOARD - isEndOfMatch - LAST ROUND!");
+            return EndOfMatchCondition.DelayedEndOfMatch;
+        }
+        for (PlayerBoard player : players) {
+            if (player.getAvailableCards().size() == 0) {
+                System.out.println("GAME BOARD - isEndOfMatch - ALL CARD USED!");
+                return EndOfMatchCondition.DelayedEndOfMatch;
+            }
+        }
+        // 3 Islands groups
+        if (islands.length<=3) {
+            System.out.println("GAME BOARD - isEndOfMatch - ONLY THREE ISLAND GROUPS!");
+            return EndOfMatchCondition.InstantEndOfMatch;
+        }
         return EndOfMatchCondition.NoEndOfMatch;
+    }
+
+    /**
+     * Notifies with the leaderBoard update the end of match, it is executed when the round ends,
+     * so it is effectively an end of match
+     */
+    public void notifyEndOfMatchLeaderBoard(){
+        // Change the leaderBoard status
+        leaderBoardUpdate();
+        // Empty bag condition
+        String message="";
+        if (bag.isEmpty()) {
+            message = " bags pawn ended ";
+        }
+        // Player has used all his towers
+        for (PlayerBoard player : players) {
+            if (player.getAvailableTowers() == 0) message+= " the player "+player.getNickName()+" has used all the towers ";
+        }
+        // No more assistant card (all 10 cards used)
+        if (numRound >= 10) {
+            message = "assistant card ended";
+        }
+        // 3 Islands groups
+        if (islands[islands.length - 1].getPosition() < initialIslandNumber - 3) {
+            message += " only three island group left ";
+        }
+        if(clients!=null&&modelListener!=null&&standing!=null)
+            notify(modelListener,MessageGenerator.leaderboardUpdateMessage(true,standing,message),clients);
     }
 
     /**
@@ -175,12 +313,14 @@ public abstract class GameBoard {
             exc.printStackTrace();
             return false;
         }
-
         if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands.length);
 
-        if ((motherNature <= destinationIsland && destinationIsland - motherNature <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland <= cardSteps)) {
+        //TODO: fix problem 1 not reachable... also motherNature MUST move from its position!
+        if ((motherNature < destinationIsland && destinationIsland - motherNature <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland <= cardSteps)) {
             motherNature = destinationIsland;
+            System.out.println("GAME BOARD - moveMotherNature - motherNature correctly moved to "+destinationIsland+" notifying the clients");
+            notifyArchipelago();
             return true;
         }
         return false;
@@ -192,7 +332,9 @@ public abstract class GameBoard {
     public void fillClouds() {
         for (Cloud cloud : clouds) {
             while (!cloud.isFull() && !bag.isEmpty()) cloud.addStudent(bag.drawStudent());
+            cloud.setHasBeenUsed(false);
         }
+        notifyClouds();
     }
 
     /**
@@ -208,7 +350,9 @@ public abstract class GameBoard {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                return players[currentPlayer].addStudentDiningRoom(student);
+                boolean retValue = players[currentPlayer].addStudentDiningRoom(student);
+                updateProfessorOwnership();
+                return retValue;
             case SCHOOLENTRANCE:
                 return players[currentPlayer].addStudentEntrance(student);
             default:
@@ -230,7 +374,11 @@ public abstract class GameBoard {
             case BAG:
                 return bag.addStudent(student);
             case DININGROOM:
-                if (position >= 0 && position < playerNumber) return players[position].addStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber) {
+                    boolean retValue = players[position].addStudentDiningRoom(student);
+                    updateProfessorOwnership();
+                    return retValue;
+                }
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case SCHOOLENTRANCE:
@@ -239,7 +387,7 @@ public abstract class GameBoard {
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
             case ISLAND:
                 if (position <= islands.length && position > 0) return islands[position - 1].addStudent(student);
-                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length].getPosition());
+                throw new IndexOutOfBoundsException("Islands Position is from " + islands[0].getPosition() + " to " + islands[islands.length - 1].getPosition());
             case CLOUD:
                 if (position <= clouds.length && position >= 1) return clouds[position - 1].addStudent(student);
                 throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
@@ -261,13 +409,30 @@ public abstract class GameBoard {
     public boolean removeStudent(StudentCounter location, Color student) throws LocationNotAllowedException, FunctionNotImplementedException {
         switch (location) {
             case DININGROOM:
-                return players[currentPlayer].removeStudentDiningRoom(student);
+                boolean retValue = players[currentPlayer].removeStudentDiningRoom(student);
+                updateProfessorOwnership();
+                return retValue;
             case SCHOOLENTRANCE:
                 return players[currentPlayer].removeStudentEntrance(student);
-
             default:
                 throw new LocationNotAllowedException("Islands, clouds and special cards are not allowed since this remove method does not have a position value");
         }
+    }
+
+    /**
+     * Draws a student from the bag
+     *
+     * @return the student Color drawn, null if no students are into the bag
+     */
+    public Color drawFromBag() {
+        return this.bag.drawStudent();
+    }
+
+    /**
+     * Initializes the bag after the initial phase
+     */
+    public void initializeBag() {
+        this.bag.initialise();
     }
 
     /**
@@ -305,15 +470,16 @@ public abstract class GameBoard {
     public boolean removeStudent(StudentCounter location, Color student, int position) throws LocationNotAllowedException, FunctionNotImplementedException, IndexOutOfBoundsException {
         switch (location) {
             case DININGROOM:
-                if (position >= 0 && position < playerNumber)
-
-                    return players[currentPlayer].removeStudentDiningRoom(student);
+                if (position >= 0 && position < playerNumber) {
+                    boolean retValue = players[position].removeStudentDiningRoom(student);
+                    updateProfessorOwnership();
+                    return retValue;
+                }
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case SCHOOLENTRANCE:
                 if (position >= 0 && position < playerNumber)
-
-                    return players[currentPlayer].removeStudentEntrance(student);
+                    return players[position].removeStudentEntrance(student);
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case CLOUD:
@@ -349,13 +515,23 @@ public abstract class GameBoard {
      * @param numCard     : number of the card we want to use (=priority of the AssistantCard)
      * @return : true if the card is correctly used, false if it cannot be used
      */
-    public boolean useAssistantCard(Tower playerTower, int numCard) throws IndexOutOfBoundsException {
+    public boolean useAssistantCard(Tower playerTower, int numCard) throws IndexOutOfBoundsException, AlreadyUsedException {
         for (PlayerBoard player : players) {
-            if (player.getTowerColor() == playerTower) return player.useAssistantCard(numCard);
+            if (player.getTowerColor() == playerTower) {
+                player.useAssistantCard(numCard);
+                return true;
+            }
         }
         return false;
     }
 
+    /**
+     * Returns usable assistant cards
+     *
+     * @param playerTower : color tower of the player chosen
+     * @return the hashmap of usable card with priority as key value
+     * @throws NoSuchTowerException : that tower color is not applicable in this game
+     */
     public Map<Integer, Integer> getUsableAssistantCard(Tower playerTower) throws NoSuchTowerException {
         if (playerTower == null) throw new NoSuchTowerException("Tower value is null");
         Map<Integer, Integer> list = new HashMap<Integer, Integer>();
@@ -476,6 +652,32 @@ public abstract class GameBoard {
                 professors.put(color, playerTowerWithMaxValue);
             }
         }
+        System.out.println("GAME BOARD - updateProfessorOwnership - notify the professor ownership");
+        Map<Color,Tower> profMap = new HashMap<>();
+        profMap.putAll(professors);
+        if(modelListener!=null && clients!=null)
+            notify(modelListener,MessageGenerator.professorsUpdateMessage(profMap),clients);
+    }
+
+    /**
+     * Return the list of the clouds' positions that the player can choose
+     * The cloud positions are in the range [1,numPlayer]
+     *
+     * @return : the list of the positions of the usable clouds
+     */
+    public Set<Integer> getUsableClouds() {
+        Set<Integer> usableClouds = new HashSet<>();
+        for (int i = 0; i < playerNumber; i++) {
+            if (!clouds[i].isHasBeenUsed()) usableClouds.add(i + 1);
+        }
+        return usableClouds;
+    }
+
+    public Tower getPlayerTower(String nickname) {
+        for (PlayerBoard player : players) {
+            if (nickname.equalsIgnoreCase(player.getNickName())) return player.getTowerColor();
+        }
+        return null;
     }
 
     /**
@@ -495,6 +697,16 @@ public abstract class GameBoard {
 
     public boolean isBagEmpty() {
         return this.bag.isEmpty();
+    }
+
+    /**
+     * Tells if the diningRoom of the current player is occupied by at least one student or not
+     * Used for the bard special card to avoid situation where there are not students in the dining room
+     */
+    public boolean isDiningRoomOccupied(){
+        if(this.players[currentPlayer]!=null && this.players[currentPlayer].countStudentsDiningRoom()>0)
+            return true;
+        return false;
     }
 
     /**
@@ -552,4 +764,58 @@ public abstract class GameBoard {
      */
     public abstract void increaseMovementMotherNature() throws FunctionNotImplementedException;
 
+    /**
+     * Getter of cloud limit number
+     */
+    public int getCloudLimit(){
+        return clouds[0].getStudentLimit();
+    }
+
+    /**
+     * Returns a Set with the specialCardNames
+     *
+     * @return : a Set with the SpecialCardNames of the instantiated special cards
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract Set<SpecialCardName> getSetOfSpecialCardNames() throws FunctionNotImplementedException;
+
+    /**
+     * Pay the coins of the active player to use a particular special card
+     *
+     * @param cost : expense of the activation of a SpecialCard, expressed in coin
+     * @return : true if the SpecialCard has been pay, false if the cost is too much and the expense could not be pay.
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract boolean paySpecialCard(int cost) throws FunctionNotImplementedException;
+
+    /**
+     * Gets the cost of a particular special card
+     *
+     * @param specialCardName : name of the special card to pay
+     * @return true if the special card exists and is one of the initialized special cards, false if not
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+
+    public abstract Integer getSpecialCardCost(SpecialCardName specialCardName) throws FunctionNotImplementedException;
+
+    /**
+     * Disable the towerInfluence in order to not count the towers in the influence score computation
+     *
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract void disableTowerInfluence() throws FunctionNotImplementedException;
+
+    /**
+     * Activates the special effect
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract void professorsUpdateTieEffect() throws FunctionNotImplementedException ;
+
+    /**
+     * Returns an array with the specialCardNames
+     *
+     * @return : an array with the SpecialCardNames of the instantiated special cards
+     * @throws FunctionNotImplementedException : if the game mode is easy, this method cannot be called as this functionality is for expert game only
+     */
+    public abstract SpecialCard[] getArrayOfSpecialCard() throws FunctionNotImplementedException ;
 }
