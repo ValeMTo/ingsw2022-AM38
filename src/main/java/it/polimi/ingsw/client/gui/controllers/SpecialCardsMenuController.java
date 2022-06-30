@@ -306,6 +306,8 @@ public class SpecialCardsMenuController extends GUIController {
     }
 
     public void initialiseVisibleAndDisableSetting(SpecialCardName cardName) {
+        Map<Color, Integer> studentsMap;
+        List<Color> color = new ArrayList<>();
         showContentArea.setVisible(true);
         studentsArea.setVisible(false);
         noEntryBox.setVisible(false);
@@ -333,8 +335,6 @@ public class SpecialCardsMenuController extends GUIController {
             chooseColorBox.setVisible(true);
 
         } else if (cardName.equals(SpecialCardName.JUGGLER)) {
-            Map<Color, Integer> studentsMap;
-            List<Color> color = new ArrayList<>();
             colorBox.getItems().clear();
             System.out.println(colorBox);
             if (first){
@@ -352,6 +352,13 @@ public class SpecialCardsMenuController extends GUIController {
 
         } else if (cardName.equals(SpecialCardName.PRINCESS)) {
             chooseColorBox.setVisible(true);
+            studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.PRINCESS);
+            for (Color item : studentsMap.keySet()){
+                if (studentsMap.get(item) >0) {
+                    color.add(item);
+                }
+            }
+            colorBox.getItems().addAll(color);
         } else if (cardName.equals(SpecialCardName.HERALD)) {
             chooseIslandBox.setVisible(true);
         } else if (cardName.equals(SpecialCardName.COOKER)) {
@@ -362,6 +369,17 @@ public class SpecialCardsMenuController extends GUIController {
             choiceBoxMenu.setVisible(false);
         } else if (cardName.equals(SpecialCardName.BARD)) {
             chooseColorBox.setVisible(true);
+            colorBox.getItems().clear();
+            System.out.println(colorBox);
+            if (first){
+                studentsMap = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+                for (Color item : studentsMap.keySet()){
+                    if (studentsMap.get(item) >0) {
+                        color.add(item);
+                    }
+                }
+                colorBox.getItems().addAll(color);
+            }
         }
 
 
@@ -436,10 +454,30 @@ public class SpecialCardsMenuController extends GUIController {
             }else{
                 first=false;
             }
+        } else if (cardUsed.equals(SpecialCardName.BARD)){
+            if (!first){
+                colorBox.getItems().clear();
+                Map<Color, Integer> studentsMap = gui.getViewState().getDiningRoomOccupancy(gui.getViewState().getPlayerTower());
+                List<Color> color = new ArrayList<>();
+                for (Color item : studentsMap.keySet()){
+                    if (studentsMap.get(item) >0) {
+                        color.add(item);
+                    }
+                }
+                colorBox.getItems().addAll(color);
+                first=true;
+            }else {
+                first=false;
+            }
         }
         if(colorBox.getValue() != null)
             gui.getConnectionSocket().chooseColor(Color.toColor(colorBox.getValue().toString()));
-        colorBox.getSelectionModel().clearSelection();
+
+        try {
+            colorBox.setValue(null);
+        }catch (NullPointerException e){
+            System.out.println("zero value");
+        }
     }
 
     @FXML
@@ -450,7 +488,11 @@ public class SpecialCardsMenuController extends GUIController {
             Integer pos = Integer.parseInt(islandBox.getValue().toString());
             gui.getConnectionSocket().chooseIsland(pos);
         }
-        islandBox.getSelectionModel().clearSelection();
+        try {
+            islandBox.setValue(null);
+        }catch (NullPointerException e){
+            System.out.println("zero value");
+        }
     }
 
 
