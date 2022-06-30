@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.player.PlayerBoard;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -56,6 +57,38 @@ public abstract class GameBoard extends Listenable {
             clouds[i] = new Cloud(cloudStudentsLimit);
         numRound = 1;
         motherNature = 1;
+    }
+
+    /**
+     * Saves all the informations in the given json file
+     * @param jsonSave the JSONObject where to save the informations
+     */
+    public void save(JSONObject jsonSave){
+        jsonSave.put("MotherNature",motherNature);
+        jsonSave.put("PlayerNumber",playerNumber);
+        jsonSave.put("Players",players);
+        jsonSave.put("CurrentPlayer", currentPlayer);
+        jsonSave.put("NumRound",numRound);
+        List<JSONObject> jsonObjectsList = new ArrayList<>();
+        for(Island island : islands) {
+            jsonObjectsList.add(island.save());
+        }
+        jsonSave.put("IslandList",jsonObjectsList);
+        jsonSave.put("IslandNumber",islands.length);
+        jsonObjectsList.clear();
+        for(PlayerBoard playerBoard:players)
+        {
+            jsonObjectsList.add(playerBoard.save());
+        }
+        jsonSave.put("PlayerBoardList",jsonObjectsList);
+        jsonObjectsList.clear();
+        for(Cloud cloud:clouds)
+        {
+            jsonObjectsList.add(cloud.save());
+        }
+        jsonSave.put("CloudList",jsonObjectsList);
+        jsonObjectsList.clear();
+        bag.save(jsonSave);
     }
 
     private void notifyClouds(){

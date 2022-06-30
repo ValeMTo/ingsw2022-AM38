@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.mvc.Listenable;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -165,5 +166,14 @@ public class Cloud extends Listenable {
      */
     public boolean isHasBeenUsed() {
         return hasBeenUsed;
+    }
+
+    //TODO: possible create them just empty! end turn
+    public JSONObject save(){
+        JSONObject json = new JSONObject();
+        json.put("StudentLimit",studentLimit);
+        json.put("Counter",counter);
+        json.put("HasBeenUsed",hasBeenUsed);
+        return json;
     }
 }

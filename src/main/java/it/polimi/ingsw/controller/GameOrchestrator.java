@@ -1,5 +1,6 @@
 package it.polimi.ingsw.controller;
 
+import com.google.gson.Gson;
 import it.polimi.ingsw.mvc.Listenable;
 import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.mvc.ModelListener;
@@ -7,7 +8,11 @@ import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.*;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import static it.polimi.ingsw.controller.PhaseEnum.END;
@@ -31,7 +36,6 @@ public abstract class GameOrchestrator extends Listenable {
     protected int id;
     protected boolean specialCardAlreadyUsed;
     protected List<ClientHandler> clients;
-    protected HashMap<Tower, ClientHandler> playerBoardListeners;
 
 
     public GameOrchestrator(List<String> players, boolean isExpert, int id, List<ClientHandler> clients) {
@@ -100,6 +104,10 @@ public abstract class GameOrchestrator extends Listenable {
             notify(modelListener, MessageGenerator.phaseUpdateMessage(currentPhase), clients);
         }
         currentPhase = PLANNING;
+    }
+
+    public GameOrchestrator(JSONObject jsonSave){
+        
     }
 
     /**
@@ -398,8 +406,9 @@ public abstract class GameOrchestrator extends Listenable {
                         activePlayer = 0;
                         gameBoard.setCurrentPlayer(gameBoard.getPlayerTower(planningOrder[activePlayer]));
                         this.specialCardAlreadyUsed = false;
-                        setCurrentPhase(PLANNING);
                         gameBoard.increaseRound();
+                        if(gameBoard.getNumRound()>1)
+                            save();
                         gameBoard.fillClouds();
                         try {
                             if(isExpert)
@@ -409,6 +418,7 @@ public abstract class GameOrchestrator extends Listenable {
                             System.out.println("SERVER ERROR - IS EXPERT AND GAME BOARD MODE DOES NOT COINCIDE");
                         }
                         playedAssistantCard.clear();
+                        setCurrentPhase(PLANNING);
                     }
                     //If the game ends
                     else {
@@ -536,6 +546,25 @@ public abstract class GameOrchestrator extends Listenable {
         for(ClientHandler client : clients) {
             System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: " + client.getNickName());
             client.disconnect();
+        }
+    }
+
+    public void save(){
+        JSONObject jsonSave = new JSONObject();
+        jsonSave.put("PlayersTower",players);
+        jsonSave.put("IsExpert",isExpert);
+        jsonSave.put("PlanningOrder",planningOrder);
+        jsonSave.put("ActionOrder",actionOrder);
+        jsonSave.put("CurrentPhaseOrdinal",currentPhase.ordinal());
+        jsonSave.put("ID",id);
+        gameBoard.save(jsonSave);
+        try {
+            FileWriter file = new FileWriter("ID_" + id);
+            file.write(jsonSave.toString());
+            file.flush();
+        }
+        catch (IOException exception){
+            System.out.println("ERROR - SERVER CANNOT SAVE JSON RESTORE FILE");
         }
     }
 

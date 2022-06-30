@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import it.polimi.ingsw.model.specialCards.SpecialCardWithStudent;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -497,5 +498,16 @@ public class ExpertGameBoard extends GameBoard {
             }
         }
         return null;
+    }
+
+    @Override
+    public void save(JSONObject jsonSave){
+        super.save(jsonSave);
+        jsonSave.put("IsExpert",true);
+        jsonSave.put("SpecialCardsNum",specialCardsNum);
+        List<JSONObject> specialCardsJson = new ArrayList<>();
+        for(SpecialCard specialCard:specialCards)
+            specialCardsJson.add(specialCard.save());
+        jsonSave.put("SpecialCards",specialCardsJson);
     }
 }

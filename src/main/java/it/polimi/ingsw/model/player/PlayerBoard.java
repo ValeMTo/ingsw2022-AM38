@@ -8,6 +8,7 @@ import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -406,5 +407,24 @@ public class PlayerBoard extends Listenable {
                 return card.getSteps();
         throw new NotLastCardUsedException("No card used! Steps cannot be determined");
 
+    }
+
+    public JSONObject save(){
+        JSONObject playerBoard = new JSONObject();
+        playerBoard.put("NickName",nickName);
+        playerBoard.put("Tower",towerColor.name());
+        playerBoard.put("NumTowerLimit",numTowersLimit);
+        playerBoard.put("LastUsed",lastUsed);
+        playerBoard.put("Towers",towers);
+        List<JSONObject> deckList = new ArrayList<>();
+        JSONObject json = new JSONObject();
+        for(AssistantCard assistantCard:deck) {
+            json.put("Priority",assistantCard.getPriority());
+            json.put("Steps",assistantCard.getSteps());
+            json.put("IsUsed",assistantCard.isUsed());
+            deckList.add(json);
+            json.clear();
+        }
+        return playerBoard;
     }
 }

@@ -2,16 +2,19 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.controller.EasyGameOrchestrator;
+import it.polimi.ingsw.controller.ExpertGameOrchestrator;
+import it.polimi.ingsw.controller.GameOrchestrator;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
+import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,6 +26,7 @@ public class Server {
     private static int numClientConnected;
     private static Map<String, ClientHandler> allPlayers;
     protected static ArrayList<ClientHandler> allClients = new ArrayList<>();
+    private static List<GameOrchestrator> restoredGames = new ArrayList<>();
 
     public static int getPort(String[] args) {
         if (args != null && args.length > 1) {
@@ -49,8 +53,33 @@ public class Server {
         ServerSocket serverSocket = createServerSocket(args);
         executorService = Executors.newCachedThreadPool();
         lobby = new Lobby();
-
-
+        String s;
+        JSONObject json;
+        Gson gson = new Gson();
+        Scanner in = new Scanner(System.in);
+        for(int i =0;i<64;i++) {
+            try {
+                File file = new File("ID_" + i);
+                String str = FileUtils.readFileToString(file, "utf-8");
+                if(str!=null) {
+                    json = new JSONObject(str);
+                    if (json.has("NumRound"))
+                        System.out.println("PENDING GAME WITH ID " + i + " at round " + json.getInt("NumRound") + " press Y to restore, clients rejoin with same nickname");
+                    if (in.nextLine().equalsIgnoreCase("Y")) ;
+                    {
+                        if(json.has("IsExpert")) {
+                            if (json.getBoolean("IsExpert"))
+                                restoredGames.add(new ExpertGameOrchestrator(json));
+                            else
+                                restoredGames.add(new EasyGameOrchestrator(json));
+                        }
+                    }
+                }
+            }
+            catch (IOException exception){
+                System.out.println("NO SAVE FILE ID "+i);
+            }
+        }
         while (true) {
             ClientHandler client = new ClientHandler(establishConnection(serverSocket));
             allClients.add(client);

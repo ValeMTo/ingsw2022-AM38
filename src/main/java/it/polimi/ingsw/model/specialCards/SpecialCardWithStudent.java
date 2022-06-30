@@ -4,6 +4,7 @@ import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -149,5 +150,14 @@ public class SpecialCardWithStudent extends SpecialCard{
     @Override
     public int getGuestsChangeLimit(){
         return guestsChangeLimit;
+    }
+
+    @Override
+    public JSONObject save(){
+        JSONObject json = super.save();
+        json.put("GuestLimit", guestsLimit);
+        json.put("Guests",guests);
+        json.put("GuestsChangeLimit", guestsChangeLimit);
+        return json;
     }
 }

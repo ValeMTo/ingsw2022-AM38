@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.board.StudentCounter;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +70,10 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 }
 
         }
+    }
+
+    public ExpertGameOrchestrator(JSONObject jsonSave){
+        super(jsonSave)
     }
 
     @Override

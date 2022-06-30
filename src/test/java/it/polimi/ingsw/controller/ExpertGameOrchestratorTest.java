@@ -2,6 +2,7 @@ package it.polimi.ingsw.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;
 import it.polimi.ingsw.messages.AnswerTypeEnum;
@@ -98,7 +99,14 @@ public class ExpertGameOrchestratorTest {
                     System.out.println("Round "+game.gameBoard.getNumRound()+" active player "+game.gameBoard.getCurrentPlayer()+" CHOOSING CLOUD "+counter);
                     System.out.println("Round "+game.gameBoard.getNumRound()+" active player "+game.gameBoard.getCurrentPlayer()+"From usable clouds "+game.gameBoard.getUsableClouds());
                     if(game.currentPhase==PhaseEnum.ACTION_CHOOSE_CLOUD)
+                    try {
                         game.chooseCloud(counter);
+                    }
+                    catch (AlreadyUsedException exc){
+                        System.out.println("Already used cloud");
+                        if(exc.getUsableIndexes().size()==0)
+                            return game;
+                    }
                     counter++;
                 }
             } catch (Exception e) {

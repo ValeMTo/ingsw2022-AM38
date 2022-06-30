@@ -5,6 +5,7 @@ import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.model.player.PlayerBoard;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -198,5 +199,11 @@ public class EasyGameBoard extends GameBoard {
     @Override
     public SpecialCard[] getArrayOfSpecialCard() throws FunctionNotImplementedException {
         throw new FunctionNotImplementedException();
+    }
+
+    @Override
+    public void save(JSONObject jsonSave){
+        super.save(jsonSave);
+        jsonSave.put("IsExpert",false);
     }
 }

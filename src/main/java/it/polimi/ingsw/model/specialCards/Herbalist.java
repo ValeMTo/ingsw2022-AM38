@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.specialCards;
 import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -82,5 +83,12 @@ public class Herbalist extends SpecialCard{
         return false;
     }
 
+    @Override
+    public JSONObject save(){
+        JSONObject json = super.save();
+        json.put("NoEntryTiles", noEntryTiles);
+        json.put("NoEntryTilesLimit", noEntryTilesLimit);
+        return json;
+    }
 
 }

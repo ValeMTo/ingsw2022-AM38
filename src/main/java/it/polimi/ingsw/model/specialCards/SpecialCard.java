@@ -6,6 +6,7 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,5 +187,13 @@ public class SpecialCard extends Listenable {
         }
     }
 
+
+    public JSONObject save(){
+        JSONObject json = new JSONObject();
+        json.put("SpecialCardName",name.name());
+        json.put("SpecialCardUsed",firstUse);
+        json.put("Cost",cost);
+        return json;
+    }
 
 }

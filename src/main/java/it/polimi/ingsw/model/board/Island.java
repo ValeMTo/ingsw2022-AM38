@@ -4,6 +4,7 @@ import it.polimi.ingsw.mvc.Listenable;
 import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.server.ClientHandler;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -204,6 +205,16 @@ public class Island extends Listenable {
      */
     public int getPosition(){ return this.position;}
 
+    public JSONObject save(){
+        JSONObject island = new JSONObject();
+        island.put("Position",position);
+        island.put("Influence",influence);
+        island.put("InfluenceIsEnabled",influenceIsEnabled);
+        if(towerColor!=null)
+            island.put("TowerColor",towerColor.name());
+        island.put("TowerNumber",towerNumber);
+        return island;
+    }
 }
 
 

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.board;
 
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Random;
@@ -169,6 +171,10 @@ public class Bag {
         return this.counter.get(color);
     }
 
+    public void save(JSONObject jsonSave){
+        jsonSave.put("BagStudentNumber",studentNumber);
+        jsonSave.put("BagOccupancy",counter);
+    }
 
 }
 
