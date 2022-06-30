@@ -49,6 +49,7 @@ public class ViewState {
     private String endingMotivation;
     private boolean isFirstSetup = true;
     private final Map<SpecialCardName,Integer> initialCosts = new HashMap<SpecialCardName,Integer>();
+    private int increasedMotherNatureMovement=0;
 
     public ViewState(boolean isCli) {
         this.onlinePlayers = new ArrayList<>();
@@ -881,6 +882,26 @@ public class ViewState {
             this.acceptedUseSpecialCard = false;
         }
         refreshCLI();
+    }
+
+    /**
+     * Sets the increased range of movement of motherNature due to special card usage
+     * @param increasedMovement if the movement is increased
+     * @param increase the increased movement
+     */
+    public synchronized void setIncreasedMovement(boolean increasedMovement, int increase){
+        if(increasedMovement)
+            this.increasedMotherNatureMovement = increase;
+        else
+            this.increasedMotherNatureMovement = 0;
+    }
+
+    /**
+     * Gets the increased movement of motherNature
+     * @return the increase of movement for motherNature
+     */
+    public synchronized int getIncreasedMotherNatureMovement(){
+        return this.increasedMotherNatureMovement;
     }
 
 

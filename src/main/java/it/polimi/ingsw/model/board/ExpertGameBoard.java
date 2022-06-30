@@ -373,6 +373,8 @@ public class ExpertGameBoard extends GameBoard {
         noInfluenceByColor = null;
         increasedMovement = 0;
         professorsUpdateTieEffect = false;
+        if(modelListener!=null&&clients!=null)
+            notify(modelListener,MessageGenerator.specialCardIncreaseMovementUpdate(motherNatureIncreasedMove,increasedMovement),clients);
     }
 
     /**
@@ -386,11 +388,13 @@ public class ExpertGameBoard extends GameBoard {
     }
 
     /**
-     * Increase the movement of the MotherNature in this round
+     * Increase the movement of the MotherNature in this round and notifies the clients
      */
     public void increaseMovementMotherNature() {
         increasedMovement = 2;
         motherNatureIncreasedMove = true;
+        if(modelListener!=null&&clients!=null)
+            notify(modelListener,MessageGenerator.specialCardIncreaseMovementUpdate(motherNatureIncreasedMove,increasedMovement),clients);
     }
 
     /**

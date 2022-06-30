@@ -45,11 +45,11 @@ public class MessageParser{
      * @return : a String (json) that is the answer message from the server
      */
     public String parseMessageToAction(String message) {
-        System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - parse message to action");
+        //System.out.println("MESSAGE PARSER - PLAYER "+this.name+" - parse message to action");
         JsonObject json = new Gson().fromJson(message, JsonObject.class);
         if(json.get("MessageType").getAsInt() == MessageTypeEnum.PING.ordinal())
         {
-            System.out.println("MESSAGE PARSER - PLAYER "+this.name+" received a ping, sending a pong");
+            //System.out.println("MESSAGE PARSER - PLAYER "+this.name+" received a ping, sending a pong");
             return MessageGenerator.pongMessage();
         }
         if ( gameOrchestrator!= null &&!gameOrchestrator.getActivePlayer().equalsIgnoreCase(client.getNickName())) {

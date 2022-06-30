@@ -671,6 +671,21 @@ public class MessageGenerator {
     }
 
 
+    /**
+     * Generates the message specialCardIncreaseMovementUpdate to update the clients on the increased movement
+     * of motherNature
+     * @param movementIncreased tells if mothernature has increased movement
+     * @param increasedMovement the increase of the movement
+     * @return the String of the json message
+     */
+    public static String specialCardIncreaseMovementUpdate(boolean movementIncreased, int increasedMovement){
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.SPECIAL_CARD_UPDATE.ordinal());
+        json.put("IsMovementIncreased", movementIncreased);
+        json.put("IncreasedMovement", increasedMovement);
+        return json+ "\n";
+    }
     public static String specialCardUpdateMessage(SpecialCardName name, int coinCost) {
         JSONObject json = new JSONObject();
         json = specialCardStandardMessage(name, coinCost);

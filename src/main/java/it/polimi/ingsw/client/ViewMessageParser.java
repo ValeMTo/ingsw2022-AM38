@@ -130,6 +130,10 @@ public class ViewMessageParser {
                     islandToAdd.setTower(Tower.values()[json.get("TowerColor").getAsInt()]);
                 islandToAdd.setTowerNumber(json.get("NumOfTowers").getAsInt());
                 Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
+                if(json.get("IsDisabled").getAsBoolean())
+                    islandToAdd.disableInfluence();
+                else
+                    islandToAdd.enableInfluence();
                 islandToAdd.setStudentMap(getStudentMapFromStringAndNumberMap(students));
                 List<IslandView> islands = view.getIslands();
                 List<IslandView> transformedIslands = new ArrayList<>();
@@ -223,6 +227,9 @@ public class ViewMessageParser {
                     catch(FunctionNotImplementedException exc){
                         exc.printStackTrace();
                     }
+                }
+                if(json.has("IsMovementIncreased")){
+                    view.setIncreasedMovement(json.get("IsMovementIncreased").getAsBoolean(),json.get("IncreasedMovement").getAsInt());
                 }
 
             }

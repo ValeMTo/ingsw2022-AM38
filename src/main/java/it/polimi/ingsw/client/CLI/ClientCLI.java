@@ -129,7 +129,10 @@ public class ClientCLI {
         System.out.println("CLIENT CLI - mother nature set");
         printPlayerBoard();
         printArchipelago();
-        System.out.println(CLICyan+"Last card used "+getLastAssistantCardString(viewState.getPlayerTower()));
+        if(viewState.getIncreasedMotherNatureMovement()==0)
+            System.out.println(CLICyan+"Last card used "+getLastAssistantCardString(viewState.getPlayerTower()));
+        else
+            System.out.println(CLICyan+"Last card used "+getLastAssistantCardString(viewState.getPlayerTower())+" usable steps are increased by +"+viewState.getIncreasedMotherNatureMovement()+" due to special card effect");
         showMoveMotherNatureInstruction();
     }
 
@@ -598,7 +601,10 @@ public class ClientCLI {
     }
 
     synchronized void printArchipelago() {
-        System.out.println(CLIBlack+" - Archipelago - \n         TW: tower on the island, M.N. : motherNature\n"+CLIEffectReset);
+        if(viewState.isExpert())
+            System.out.println(CLIBlack+" - Archipelago - \n         TW: tower on the island, M.N. : motherNature, X: the island influence is disabled due to a herbalist tile\n"+CLIEffectReset);
+        else
+            System.out.println(CLIBlack+" - Archipelago - \n         TW: tower on the island, M.N. : motherNature\n"+CLIEffectReset);
         String[] rows = new String[12];
         for (int i = 0; i < 12; i++)
             rows[i] = "";
@@ -620,7 +626,10 @@ public class ClientCLI {
                 rows[1] += " " + CLICyan + " Position : " + island.getPosition() + CLIEffectReset + " ";
             else
                 rows[1] += " " + CLICyan + " Position : " + island.getPosition() + CLIEffectReset + "  ";
-            rows[2] += "    ┌─────┐    .";
+            if(island.isInfluenceEnabled())
+                rows[2] += "    ┌─────┐    .";
+            else
+                rows[2] += "    ┌──X──┐    .";
             if (!island.isTaken())
                 rows[3] += "   ┌┘     └┐   .";
             else if ( island.getTowerNumber() <= 1)
@@ -651,7 +660,10 @@ public class ClientCLI {
             rows[9] += "   └┐     ┌┘   .";
             else
             rows[9]  += "   └┐ " + CLIBoldWhite + "M.N." + CLIEffectReset + "┌┘   .";
-            rows[10] += "    └─────┘    .";
+            if(island.isInfluenceEnabled())
+                rows[10] += "    └─────┘    .";
+            else
+                rows[10] += "    └──X──┘    .";
 
             counter++;
             if (counter >= maxIslandsPerRow) {
