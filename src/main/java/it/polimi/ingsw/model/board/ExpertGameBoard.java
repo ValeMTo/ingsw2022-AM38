@@ -44,7 +44,7 @@ public class ExpertGameBoard extends GameBoard {
             }else if (i==1){
                 cardNum=4;
             }else{
-                cardNum=7;
+                cardNum=8;
             }
             //
             //int final int card = cardNum;
