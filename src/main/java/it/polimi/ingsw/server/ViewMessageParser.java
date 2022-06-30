@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client;
+package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -155,6 +155,11 @@ public class ViewMessageParser {
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
+                    if (json.has("SpecialCardInUse")){
+                        view.setSpecialCardInUse(SpecialCardName.convertFromStringToEnum(json.get("SpecialCardInUse").toString()));
+                    }else {
+                        view.setSpecialCardInUse(null);
+                    }
                 }
                 if (!view.isCli()) {
                     Platform.runLater(() -> {

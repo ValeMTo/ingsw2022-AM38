@@ -11,10 +11,12 @@ import it.polimi.ingsw.model.board.Island;
 import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -27,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.polimi.ingsw.model.board.Color.toColor;
+
 public class SpecialCardsMenuController extends GUIController {
 
 
@@ -38,6 +42,18 @@ public class SpecialCardsMenuController extends GUIController {
 
     @FXML
     private AnchorPane showContentArea;
+    @FXML
+    private AnchorPane studentsArea;
+    @FXML
+    private AnchorPane choiceBox;
+    @FXML
+    private AnchorPane firstColorBox;
+    @FXML
+    private AnchorPane secondColorBox;
+    @FXML
+    private AnchorPane chooseIslandBox;
+    @FXML
+    private Button confirmButton;
     @FXML
     private Label chooseColorLabel;
     @FXML
@@ -123,6 +139,8 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     private Label availability3;
 
+    Color fromStudent;
+
 
     List<SpecialCardName> cardsList;
 
@@ -153,6 +171,8 @@ public class SpecialCardsMenuController extends GUIController {
 
         showContentArea.setDisable(true);
         showContentArea.setVisible(false);
+        studentsArea.setVisible(false);
+        studentsArea.setDisable(true);
 
         noEntryImg.setVisible(false);
         noEntryImg.setDisable(true);
@@ -163,9 +183,6 @@ public class SpecialCardsMenuController extends GUIController {
         colorBox.setDisable(true);
         islandBox.setVisible(false);
         islandBox.setDisable(true);
-
-
-
     }
 
     @Override
@@ -320,35 +337,94 @@ public class SpecialCardsMenuController extends GUIController {
         }
     }
 
+    public void visibleAndDisableSetting(SpecialCardName cardName){
+        choiceBox.setVisible(true);
+        choiceBox.setDisable(false);
+        studentsArea.setVisible(false);
+        noEntryImg.setVisible(false);
+        firstColorBox.setVisible(false);
+        secondColorBox.setVisible(false);
+        chooseIslandBox.setVisible(false);
+        if(gui.getViewState().getSpecialCardUsage()) {
+            if (cardName.equals(SpecialCardName.HERBALIST)) {
+                noEntryImg.setVisible(true);
+                chooseIslandBox.setVisible(true);
+                chooseIslandBox.setDisable(false);
+
+            } else if (cardName.equals(SpecialCardName.PRIEST)) {
+                studentsArea.setVisible(true);
+                firstColorBox.setVisible(true);
+                firstColorBox.setDisable(false);
+                chooseIslandBox.setVisible(true);
+                chooseIslandBox.setDisable(false);
+
+            } else if (cardName.equals(SpecialCardName.JUGGLER)) {
+                studentsArea.setVisible(true);
+                firstColorBox.setVisible(true);
+                firstColorBox.setDisable(false);
+                chooseIslandBox.setVisible(true);
+                chooseIslandBox.setDisable(false);
+
+            } else if (cardName.equals(SpecialCardName.PRINCESS)) {
+                studentsArea.setVisible(true);
+                firstColorBox.setVisible(true);
+                firstColorBox.setDisable(false);
+
+            } else if (cardName.equals(SpecialCardName.HERALD)) {
+                chooseIslandBox.setVisible(true);
+                chooseIslandBox.setDisable(false);
+
+            } else if (cardName.equals(SpecialCardName.COOKER)) {
+                firstColorBox.setVisible(true);
+                firstColorBox.setDisable(false);
+            } else if (cardName.equals(SpecialCardName.GAMBLER)) {
+                firstColorBox.setVisible(true);
+                firstColorBox.setDisable(false);
+            } else if (cardName.equals(SpecialCardName.POSTMAN)) {
+                choiceBox.setVisible(false);
+            } else if (cardName.equals(SpecialCardName.BARD)) {
+                firstColorBox.setVisible(true);
+                firstColorBox.setDisable(false);
+            }
+        }else {
+            choiceBox.setVisible(false);
+            choiceBox.setDisable(true);
+        }
+
+    }
+
+    public void confirmSpecialChoice(){
+
+        SpecialCardName cardName = gui.getViewState().getSpecialCardinUse();
+
+        if (cardName.equals(SpecialCardName.HERBALIST)) {
+            gui.getConnectionSocket().chooseIsland();
+        } else if (cardName.equals(SpecialCardName.PRIEST)) {
+        } else if (cardName.equals(SpecialCardName.JUGGLER)) {
+        } else if (cardName.equals(SpecialCardName.PRINCESS)) {
+        } else if (cardName.equals(SpecialCardName.HERALD)) {
+        } else if (cardName.equals(SpecialCardName.COOKER)) {
+        } else if (cardName.equals(SpecialCardName.GAMBLER)) {
+        } else if (cardName.equals(SpecialCardName.POSTMAN)) {
+        } else if (cardName.equals(SpecialCardName.BARD)) {
+        }
+    }
+
     // Receives the card img id  as an integer. cardId is 1 for the specialCardImage1 ,  2 for the specialCardImage2, etc.
     public void updateCardContent(Integer cardId) {
-
-        resetShowContent();
 
         SpecialCardName cardName = cardsList.get(cardId-1);
         showContentLabel.setText(cardName.toString());
 
+        visibleAndDisableSetting(cardName);
+
+        Integer numTiles = gui.getViewState().getHerbalistTiles();
+        numEntryTiles.setText(numTiles.toString());
+
         if(cardName.equals(SpecialCardName.HERBALIST)) {
-            noEntryImg.setVisible(true);
-            noEntryImg.setDisable(false);
-            numEntryTiles.setVisible(true);
-            islandBox.setDisable(false);
-            islandBox.setVisible(true);
 
-            Integer numTiles = gui.getViewState().getHerbalistTiles();
-            numEntryTiles.setText(numTiles.toString());
-
-            chooseIsland();
-
-
-        }
-        else if(cardName.equals(SpecialCardName.PRIEST) || cardName.equals(SpecialCardName.JUGGLER) || cardName.equals(SpecialCardName.PRINCESS) ) {
-
-            for(ImageView icon : showContentStudIcons){
-                icon.setOnMouseClicked(this::pickStudent);
-                icon.setVisible(true);
-                icon.setDisable(false);
-            }
+        } else if(cardName.equals(SpecialCardName.PRIEST) || cardName.equals(SpecialCardName.JUGGLER) || cardName.equals(SpecialCardName.PRINCESS) ) {
+            studentsArea.setVisible(true);
 
             Map<Color,Integer> studentsMap = gui.getViewState().getSpecialCardStudents(cardName);
 
@@ -361,11 +437,7 @@ public class SpecialCardsMenuController extends GUIController {
                 if(studentsMap.get(color)!=null)
                     label.setText("x " + studentsMap.get(color).toString());
             }
-            // TODO: specific IFs with PRIEST, JUGGLER, PRINCESS
-        }
-        else if(cardName.equals(SpecialCardName.HERALD)){
-            islandBox.setVisible(true);
-            islandBox.setDisable(false);
+        } else if(cardName.equals(SpecialCardName.HERALD)){
             List<IslandView> islands = gui.getViewState().getIslands();
 
             for(IslandView island : islands) {
@@ -374,8 +446,7 @@ public class SpecialCardsMenuController extends GUIController {
             // TODO: interaction with Herald
         }
         else if(cardName.equals(SpecialCardName.COOKER) || cardName.equals(SpecialCardName.GAMBLER)) {
-            colorBox.setVisible(true);
-            colorBox.setDisable(false);
+
             colorBox.getItems().addAll(Color.values());
 
             //TODO: interaction with COOKER  and GAMBLER
@@ -399,19 +470,6 @@ public class SpecialCardsMenuController extends GUIController {
 
     }
 
-    @FXML
-    public void pickStudent(MouseEvent event) {
-
-    }
-
-    public void chooseIsland(){
-        Integer chosenIsland = null;
-        while(chosenIsland==null)
-            chosenIsland = Integer.parseInt(islandBox.getValue().toString());
-
-        gui.getConnectionSocket().chooseIsland(chosenIsland);
-    }
-
     /**
      * Update status message is called by MainGUI after receiving an update from ViewMessageParser
      */
@@ -419,6 +477,19 @@ public class SpecialCardsMenuController extends GUIController {
         PhaseEnum currentPhase = gui.getViewState().getCurrentPhase();
         SubPhaseEnum currentSubPhase = gui.getViewState().getSubPhaseEnum();
 
+    }
+
+    public Color getColorFromImage(ImageView image){
+        String str = image.getId();
+        str = str.replace("ent","");
+        str = str.replace("Stud","");
+        return toColor(str);
+    }
+
+    private int getPositionFromImage(ImageView image, String name){
+        String str = image.getId();
+        str = str.replace(name,"");
+        return Integer.parseInt(str);
     }
 
 
@@ -440,7 +511,6 @@ public class SpecialCardsMenuController extends GUIController {
         showContentStudIcons.add(contentPink);
 
         for (ImageView icon : showContentStudIcons) {
-            icon.setOnMouseClicked(this::pickStudent);
             icon.setVisible(false);
             icon.setDisable(true);
         }
@@ -465,7 +535,6 @@ public class SpecialCardsMenuController extends GUIController {
             l.setVisible(false);
         }
         for(ImageView icon : showContentStudIcons){
-            icon.setOnMouseClicked(this::pickStudent);
             icon.setVisible(false);
             icon.setDisable(true);
         }

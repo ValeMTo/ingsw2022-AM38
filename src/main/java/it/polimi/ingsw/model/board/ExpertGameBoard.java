@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.board;
 
-import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.exceptions.LocationNotAllowedException;
@@ -39,6 +39,13 @@ public class ExpertGameBoard extends GameBoard {
         Set<Integer> alreadyUsedCardNum = new TreeSet<Integer>();
         while (i < specialCardsNum) {
             cardNum = random.nextInt(12);
+            if (i==0){
+                cardNum=0;
+            }else if (i==1){
+                cardNum=1;
+            }else{
+                cardNum=2;
+            }
             //
             //int final int card = cardNum;
             //SpecialCard s = SpecialCardName.values().stream.filter((x)->x.ordinal()==card);
@@ -232,7 +239,6 @@ public class ExpertGameBoard extends GameBoard {
             computationMap.put(islandTower, computationMap.get(islandTower) + islands[island - 1].getTowerNumber());
 
         }
-
         //Finally, increase the influence if the player has bonuses
         if (moreInfluenceQuantity != 0) {
             Tower currentPlayerTower = players[currentPlayer].getTowerColor();
@@ -372,6 +378,7 @@ public class ExpertGameBoard extends GameBoard {
         noInfluenceByColor = null;
         increasedMovement = 0;
         professorsUpdateTieEffect = false;
+        updateProfessorOwnership();
         if(modelListener!=null&&clients!=null)
             notify(modelListener,MessageGenerator.specialCardIncreaseMovementUpdate(motherNatureIncreasedMove,increasedMovement),clients);
     }

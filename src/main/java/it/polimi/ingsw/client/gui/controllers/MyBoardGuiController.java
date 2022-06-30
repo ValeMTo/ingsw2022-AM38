@@ -583,7 +583,7 @@ public class MyBoardGuiController extends GUIController {
         }
     }
 
-    private Color getColorFromImage(ImageView image){
+    public Color getColorFromImage(ImageView image){
         String str = image.getId();
         str = str.replace("ent","");
         str = str.replace("Stud","");

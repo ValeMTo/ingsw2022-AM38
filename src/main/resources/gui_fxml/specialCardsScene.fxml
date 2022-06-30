@@ -125,31 +125,35 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <ImageView fx:id="contentRed" fitHeight="46.0" fitWidth="30.0" layoutX="41.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../graphics/board/students_and_profs/red_stud.png" />
-               </image>
-            </ImageView>
-            <ImageView fx:id="contentYellow" fitHeight="46.0" fitWidth="30.0" layoutX="130.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../graphics/board/students_and_profs/yellow_stud.png" />
-               </image>
-            </ImageView>
-            <ImageView fx:id="contentPink" fitHeight="46.0" fitWidth="30.0" layoutX="207.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../graphics/board/students_and_profs/pink_stud.png" />
-               </image>
-            </ImageView>
-            <ImageView fx:id="contentBlue" fitHeight="46.0" fitWidth="30.0" layoutX="297.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../graphics/board/students_and_profs/blue_stud.png" />
-               </image>
-            </ImageView>
-            <ImageView fx:id="contentGreen" fitHeight="46.0" fitWidth="30.0" layoutX="385.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../graphics/board/students_and_profs/green_stud.png" />
-               </image>
-            </ImageView>
+            <AnchorPane fx:id="studentsArea" layoutX="41.0" layoutY="60.0">
+               <children>
+                  <ImageView fx:id="contentRed" fitHeight="46.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/red_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="contentYellow" fitHeight="46.0" fitWidth="30.0" layoutX="89.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/yellow_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="contentPink" fitHeight="46.0" fitWidth="30.0" layoutX="166.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/pink_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="contentBlue" fitHeight="46.0" fitWidth="30.0" layoutX="256.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/blue_stud.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="contentGreen" fitHeight="46.0" fitWidth="30.0" layoutX="344.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../graphics/board/students_and_profs/green_stud.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
             <Label fx:id="num_contentRed" layoutX="15.0" layoutY="65.0" text="x 0">
                <font>
                   <Font size="13.0" />
@@ -185,18 +189,41 @@
                   <Font size="13.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="colorBox" layoutX="571.0" layoutY="22.0" prefHeight="25.0" prefWidth="82.0" />
-            <Label fx:id="chooseColorLabel" layoutX="460.0" layoutY="27.0" text="Choose color">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Label>
-            <ChoiceBox fx:id="islandBox" layoutX="571.0" layoutY="61.0" prefHeight="25.0" prefWidth="80.0" />
-            <Label fx:id="chooseIslandLabel" layoutX="458.0" layoutY="63.0" text="Choose Island">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Label>
+            <AnchorPane fx:id="choiceBox" layoutX="357.0" layoutY="12.0">
+               <children>
+                  <AnchorPane fx:id="secondColorBox" layoutX="101.0" layoutY="63.0">
+                     <children>
+                        <ChoiceBox fx:id="colorBox1" layoutX="110.0" layoutY="3.0" prefHeight="25.0" prefWidth="82.0" />
+                        <Label fx:id="chooseColorLabel1" text="Choose color2">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane fx:id="ChooseIslandBox" layoutX="102.0" layoutY="31.0">
+                     <children>
+                        <ChoiceBox fx:id="islandBox" layoutX="110.0" prefHeight="25.0" prefWidth="80.0" />
+                        <Label fx:id="chooseIslandLabel" layoutY="3.0" text="Choose Island">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <Button fx:id="confirmButton" layoutX="14.0" layoutY="10.0" mnemonicParsing="false" text="confirm" />
+                  <AnchorPane fx:id="firstColorBox" layoutX="101.0">
+                     <children>
+                        <ChoiceBox fx:id="colorBox" layoutX="110.0" prefHeight="25.0" prefWidth="82.0" />
+                        <Label fx:id="chooseColorLabel" layoutY="3.0" text="Choose color1">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </AnchorPane>
          </children>
       </AnchorPane>
    </children>

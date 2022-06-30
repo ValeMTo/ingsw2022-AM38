@@ -1,8 +1,7 @@
 package it.polimi.ingsw.model.board;
 
-import it.polimi.ingsw.controller.mvc.Listenable;
-import it.polimi.ingsw.controller.mvc.Listener;
-import it.polimi.ingsw.controller.mvc.ModelListener;
+import it.polimi.ingsw.mvc.Listenable;
+import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.player.PlayerBoard;

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import it.polimi.ingsw.connectionManagement.DisconnectionTimer;
 import it.polimi.ingsw.controller.GameOrchestrator;
-import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 import it.polimi.ingsw.messages.ConnectionTypeEnum;
 import it.polimi.ingsw.messages.MessageGenerator;
@@ -15,7 +14,6 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import static it.polimi.ingsw.messages.ErrorTypeEnum.GENERIC_ERROR;
 import static it.polimi.ingsw.messages.ErrorTypeEnum.NICKNAME_ALREADY_TAKEN;

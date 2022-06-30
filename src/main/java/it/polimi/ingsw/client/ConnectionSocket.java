@@ -8,16 +8,13 @@ import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.*;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.board.StudentCounter;
-import it.polimi.ingsw.model.board.Tower;
+import it.polimi.ingsw.server.ViewMessageParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
