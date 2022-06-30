@@ -186,7 +186,7 @@ public class KeyboardInputReader implements Runnable {
      * Print this message for the special card input usage
      */
     private void specialCardInputDecision() {
-        if(!viewState.isExpert()&&(viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)||(viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)&&(viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR))))) {
+        if((!viewState.isExpert()||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_ISLAND)||viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_DINING_OR_ISLAND))) {
             viewState.setAcceptedUseSpecialCard(false);
             return;
         }
@@ -194,7 +194,7 @@ public class KeyboardInputReader implements Runnable {
             clientCLI.printSpecialCards();
             viewState.setAcceptedUseSpecialCard(false);
         }
-        else if(input.equalsIgnoreCase("S"))
+        else if(input.equalsIgnoreCase("S")&&!viewState.getCurrentPhase().equals(PhaseEnum.PLANNING))
         {
             if(viewState.getSpecialCardUsage()) {
                 System.out.println(ClientCLI.CLIPink + "Already used a special card this turn! wait for next turn to use them" + ClientCLI.CLIEffectReset);
