@@ -231,7 +231,6 @@ public class ViewMessageParser {
                 if(json.has("IsMovementIncreased")){
                     view.setIncreasedMovement(json.get("IsMovementIncreased").getAsBoolean(),json.get("IncreasedMovement").getAsInt());
                 }
-
             }
             if(!view.isCli()){                 // updates the board after receiving any kind of UPDATE message. Beware: don't refresh game status at this point or it will cause error
                 Platform.runLater(() -> {
@@ -259,6 +258,9 @@ public class ViewMessageParser {
                 view.setNickname(json.get("nickname").getAsString());
                 view.wake();
             }
+            else if(json.get("AnswerType").getAsInt() == AnswerTypeEnum.SPECIAL_CARD_ANSWER.ordinal())
+                if(json.has("Optional"))
+                    view.setOptionalSpecialEffectUsage(json.get("Optional").getAsBoolean());
         }
     }
     }

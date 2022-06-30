@@ -354,4 +354,9 @@ public class ConnectionSocket {
         socketOut.print(MessageGenerator.pingMessage());
         socketOut.flush();
     }
+
+    public void sendTerminationSpecialCard(){
+        socketOut.print(MessageGenerator.terminateSpecialEffect());
+        socketOut.flush();
+    }
 }

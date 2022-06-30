@@ -522,6 +522,12 @@ public abstract class GameOrchestrator extends Listenable {
 
     public abstract String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException;
 
+    /**
+     * Ends the special card usage
+     * @throws FunctionNotImplementedException if the gameHandler was initialized as easy and not expert game mode
+     */
+    public abstract String terminateSpecialCardUsage() throws FunctionNotImplementedException;
+
 
     /**
      * Creates all listeners and initialises them
@@ -536,7 +542,7 @@ public abstract class GameOrchestrator extends Listenable {
      */
     public void disconnectClients(){
         for(ClientHandler client : clients) {
-            System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: "+client.getNickName());
+            System.out.println("GAME ORCHESTRATOR - disconnectClients - connection lost with one client disconnecting all the clients disconnecting: " + client.getNickName());
             client.disconnect();
         }
     }

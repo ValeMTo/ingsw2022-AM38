@@ -219,6 +219,9 @@ public class ClientCLI {
             printPlayerBoard();
             System.out.println(CLICyan + "Choose a color from the diningRoom, colors abbreviations: " + getAllColorAbbreviations());
         }
+        if(viewState.isOptionalSpecialEffectUsage())
+            System.out.println(CLICyan + "This effect is optional, enter END to terminate special card usage"+CLIEffectReset);
+
     }
 
     /**
@@ -228,6 +231,8 @@ public class ClientCLI {
     public void chooseIslandSpecialCard(){
         printArchipelago();
         System.out.println(CLICyan+"Choose an island from the archipelago where you want to apply the effect of the chosen special card ");
+        if(viewState.isOptionalSpecialEffectUsage())
+            System.out.println(CLICyan + "This effect is optional, enter END to terminate special card usage"+CLIEffectReset);
     }
 
     /**

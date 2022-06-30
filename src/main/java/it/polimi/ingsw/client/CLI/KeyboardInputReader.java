@@ -57,7 +57,11 @@ public class KeyboardInputReader implements Runnable {
      * This method uses the input accordingly to the phase
      */
     private void consumeInput() {
-        if(input.equalsIgnoreCase("V")||input.equalsIgnoreCase("S"))
+        if(input.equalsIgnoreCase("END")&&viewState.isOptionalSpecialEffectUsage()&&viewState.getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE))
+        {
+            connectionSocket.sendTerminationSpecialCard();
+        }
+        else if(input.equalsIgnoreCase("V")||input.equalsIgnoreCase("S"))
             specialCardInputDecision();
         else if(viewState.getAcceptedUseSpecialCard())
         {

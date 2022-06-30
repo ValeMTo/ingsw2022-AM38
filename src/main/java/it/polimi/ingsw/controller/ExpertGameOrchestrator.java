@@ -31,6 +31,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
 
     // Color that we have removed from a card or other place and that we are waiting to locate.
     protected Color pendingColor;
+    protected boolean optionalMove = false;
 
     public ExpertGameOrchestrator(List<String> players, int id, List<ClientHandler> clients) {
         super(players, true, id, clients);
@@ -106,6 +107,17 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
     }
 
     /**
+     * Terminates the usage of the special card if optional
+     */
+    public String terminateSpecialCardUsage(){
+        if(optionalMove) {
+            resetPhase();
+            return MessageGenerator.okMessage();
+        }
+        return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.NOT_TERMINABLE,"ERROR - not possible to terminate this effect");
+    }
+
+    /**
      * Uses the special card specified with the String of the name of the card to be used
      *
      * @param cardName : Name of the specialCard to use
@@ -156,6 +168,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         specialCardsArray[i].increaseCostIfFirstUse();
                     }
                 }
+                optionalMove = false;
                 setCurrentPhase(PhaseEnum.SPECIAL_CARD_USAGE);
                 this.activatedSpecialCard = convertedName;
                 switch (convertedName) {
@@ -166,6 +179,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                     case JUGGLER:
                         this.specialCardAlreadyUsed = true;
                         setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_CARD);
+                        optionalMove = true;
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_CARD, true);
                     case CHEESEMAKER:
                         this.specialCardAlreadyUsed = true;
@@ -206,7 +220,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                     case BARD:
                         this.specialCardAlreadyUsed = true;
                         setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE);
-                        return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, false);
+                        optionalMove = true;
+                        return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, true);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -252,6 +267,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                         }
                         pendingColor = color;
                         setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_ISLAND);
+                        optionalMove = false;
                         return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_ISLAND, false);
                     case JUGGLER:
                         // If it is the moment to choose the color to remove from the card tries to remove it and save it in pendingColor
@@ -261,6 +277,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             }
                             pendingColor = color;
                             setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE);
+                            optionalMove = false;
                             return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, false);
                         } else {
                             // If it is not the choice of the color from the card but with what color substitute it does the swap
@@ -280,6 +297,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             // Requires another (optional) swap
                             else {
                                 setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_CARD);
+                                optionalMove = true;
                                 return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_CARD, true);
                             }
                         }
@@ -296,6 +314,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             }
                             pendingColor = color;
                             setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM);
+                            optionalMove = true;
                             return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM, true);
                         } else {
                             // If the phase requires to remove the player from the Dining Room and place the selected.
@@ -310,8 +329,14 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.DINING_ROOM_COLOR_FULL, "ERROR - the student color chosen cannot be added to the diningRoom since it is full, try another color");
                             }
                             // The student is moved correctly
-                            resetPhase();
-                            return MessageGenerator.okMessage();
+                            numberOfUsedInteractions++;
+                            if(numberOfUsedInteractions>=2) {
+                                resetPhase();
+                                return MessageGenerator.okMessage();
+                            }
+                            setSpecialCardPhase(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE);
+                            optionalMove = true;
+                            return MessageGenerator.specialCardAnswer(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE, true);
                         }
                     case PRINCESS:
                         // Tries to remove the student from the card and add it to the diningRoom, if ok set an ok message, if not set the proper error message

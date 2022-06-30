@@ -39,4 +39,15 @@ public class EasyGameOrchestrator extends GameOrchestrator {
     public String chooseIsland(int position) throws FunctionNotImplementedException, IslandOutOfBoundException {
         throw new FunctionNotImplementedException();
     }
+
+    /**
+     * Throws FunctionNotImplementedException since the function is not implemented by the easy game mode
+     */
+
+    @Override
+    public String terminateSpecialCardUsage() throws FunctionNotImplementedException
+    {
+        throw new FunctionNotImplementedException();
+    }
+
 }
