@@ -2,7 +2,11 @@ package it.polimi.ingsw.model.specialCards;
 
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -62,5 +66,15 @@ public class SpecialCardTest {
         assertThrows(FunctionNotImplementedException.class, () -> priest.getGuestsLimit(), "Not usable method for this card: ");
     }
 
+    /**
+     * Tests that from a name, it is correctly returned the specialCardName value
+     * @param specialCardName the special card name to test
+     */
+    @DisplayName("Special card name conversion test")
+    @ParameterizedTest
+    @EnumSource(SpecialCardName.class)
+    public void testConversionName(SpecialCardName specialCardName){
+        assertEquals(specialCardName,SpecialCardName.convertFromStringToEnum(specialCardName.name()));
+    }
 
 }

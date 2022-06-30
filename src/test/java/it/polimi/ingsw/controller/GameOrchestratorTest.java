@@ -430,6 +430,8 @@ public class GameOrchestratorTest {
         assertTrue(conditionEndRound.contains(game.getCurrentPhase()));
     }
 
+
+
     /**
      * Tests an entire play, expecting into 10 rounds the end signaling.
      */

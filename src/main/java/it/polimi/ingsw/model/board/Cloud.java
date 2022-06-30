@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.board;
 
-import it.polimi.ingsw.controller.mvc.Listenable;
+import it.polimi.ingsw.mvc.Listenable;
 
 import java.util.HashMap;
 import java.util.Map;

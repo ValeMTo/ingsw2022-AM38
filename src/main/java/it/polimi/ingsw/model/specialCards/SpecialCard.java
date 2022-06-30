@@ -1,12 +1,10 @@
 package it.polimi.ingsw.model.specialCards;
 
-import it.polimi.ingsw.controller.mvc.Listenable;
-import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.mvc.Listenable;
+import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.Island;
-import it.polimi.ingsw.model.player.PlayerBoard;
 import it.polimi.ingsw.server.ClientHandler;
 
 import java.util.ArrayList;

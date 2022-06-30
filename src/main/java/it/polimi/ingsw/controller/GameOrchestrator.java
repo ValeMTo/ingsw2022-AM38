@@ -1,8 +1,8 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.controller.mvc.Listenable;
-import it.polimi.ingsw.controller.mvc.Listener;
-import it.polimi.ingsw.controller.mvc.ModelListener;
+import it.polimi.ingsw.mvc.Listenable;
+import it.polimi.ingsw.mvc.Listener;
+import it.polimi.ingsw.mvc.ModelListener;
 import it.polimi.ingsw.exceptions.*;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.*;
@@ -278,16 +278,6 @@ public abstract class GameOrchestrator extends Listenable {
             notifyPhaseAndCurrentPlayer();
             return false;
         }
-    }
-
-    //TODO: maybe remove
-    private ClientHandler findClient(List<ClientHandler> clients, String nickname) {
-        for (ClientHandler client : clients) {
-            if (client.getNickName().equals(nickname)) {
-                return client;
-            }
-        }
-        return null;
     }
 
     /**

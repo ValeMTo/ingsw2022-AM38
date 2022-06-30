@@ -2,8 +2,6 @@ package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polimi.ingsw.controller.Lobby;
-import it.polimi.ingsw.controller.MessageParser;
 import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 
 import java.io.FileReader;
