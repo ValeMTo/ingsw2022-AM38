@@ -154,10 +154,12 @@ public class ViewMessageParser {
                 }
                 if (!view.isCli()) {
                     Platform.runLater(() -> {
+                        if(json.get)
                         view.getAwaitingGUI().refreshGameStatus();
                         view.getAwaitingGUI().refreshWholeBoard();  // added after  refreshGameStatus()
                     });
                 }
+
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()) {
                 Map<String, Number> students = gson.fromJson(json.get("SchoolEntranceMap"), HashMap.class);
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));

@@ -332,11 +332,14 @@ public class SpecialCardsMenuController extends GUIController {
             noEntryImg.setVisible(true);
             noEntryImg.setDisable(false);
             numEntryTiles.setVisible(true);
+            islandBox.setDisable(false);
+            islandBox.setVisible(true);
 
             Integer numTiles = gui.getViewState().getHerbalistTiles();
             numEntryTiles.setText(numTiles.toString());
 
-            // TODO: Interaction with herbalist
+            chooseIsland();
+
 
         }
         else if(cardName.equals(SpecialCardName.PRIEST) || cardName.equals(SpecialCardName.JUGGLER) || cardName.equals(SpecialCardName.PRINCESS) ) {
@@ -401,6 +404,13 @@ public class SpecialCardsMenuController extends GUIController {
 
     }
 
+    public void chooseIsland(){
+        Integer chosenIsland = null;
+        while(chosenIsland==null)
+            chosenIsland = Integer.parseInt(islandBox.getValue().toString());
+
+        gui.getConnectionSocket().chooseIsland(chosenIsland);
+    }
 
     /**
      * Update status message is called by MainGUI after receiving an update from ViewMessageParser
