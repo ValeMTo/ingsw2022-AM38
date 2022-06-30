@@ -56,7 +56,6 @@ public class LoginMenuController extends GUIController {
             ipAndPort.setVisible(false);
         }
 
-
     }
 
     public void confirmNickname(){

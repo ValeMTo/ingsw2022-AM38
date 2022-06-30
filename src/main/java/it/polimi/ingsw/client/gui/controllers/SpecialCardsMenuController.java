@@ -2,19 +2,27 @@ package it.polimi.ingsw.client.gui.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.client.view.IslandView;
+import it.polimi.ingsw.client.view.SubPhaseEnum;
 import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
+import it.polimi.ingsw.model.board.Color;
+import it.polimi.ingsw.model.board.Island;
+import it.polimi.ingsw.model.specialCards.SpecialCard;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextAlignment;
 
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +30,10 @@ import java.util.Map;
 public class SpecialCardsMenuController extends GUIController {
 
 
+
+
+    private final List<Label> showContentLabels = new ArrayList<Label>();
+    private final List<ImageView> showContentStudIcons = new ArrayList<ImageView>();
 
 
     @FXML
@@ -32,6 +44,11 @@ public class SpecialCardsMenuController extends GUIController {
     private Label chooseIslandLabel;
     @FXML
     private Label showContentLabel;
+
+    @FXML
+    private ChoiceBox colorBox;
+    @FXML
+    private ChoiceBox islandBox;
 
     @FXML
     private ImageView noEntryImg;
@@ -131,13 +148,33 @@ public class SpecialCardsMenuController extends GUIController {
         use1.setOnAction(this::useSpecialCard1);
         use2.setOnAction(this::useSpecialCard2);
         use3.setOnAction(this::useSpecialCard3);
+
+        createArrays();  // create arrays of showContentArea and set visible/disable its elements
+
+        showContentArea.setDisable(true);
+        showContentArea.setVisible(false);
+
+        noEntryImg.setVisible(false);
+        noEntryImg.setDisable(true);
+        numEntryTiles.setVisible(false);
+        chooseColorLabel.setVisible(false);
+        chooseIslandLabel.setVisible(false);
+        colorBox.setVisible(false);
+        colorBox.setDisable(true);
+        islandBox.setVisible(false);
+        islandBox.setDisable(true);
+
+
+
     }
 
     @Override
     public void loadContent(){
         try {
+
             Map<SpecialCardName, Integer> specialCards = gui.getViewState().getUsableSpecialCards();// prezzo della specialCard viene correttamente aggiornato
 
+            usageMessage.setText("Click on a card to display its content, if available.");
 
             System.out.println("The active specialCards are : " + specialCards);
 
@@ -149,8 +186,8 @@ public class SpecialCardsMenuController extends GUIController {
             displayCardsCoin(cardsList, specialCards);   // displays a coin if the cost of the card has been incremented
 
 
-            //TODO :  inizializzare le StudentsMap delle carte (se presenti)
 
+            // Display "use" button if there are enough coins
 
             if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
                 if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower()) && !gui.getViewState().getSpecialCardUsage()) {
@@ -187,16 +224,25 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     public void useSpecialCard1(ActionEvent event){
         gui.getConnectionSocket().chooseSpecialCard(cardsList.get(0).name());
+        Button clickedButton = (Button)event.getSource();
+        Integer cardId = Integer.parseInt(clickedButton.getId().replace("use",""));
+        updateCardContent(cardId);
     }
 
     @FXML
     public void useSpecialCard2(ActionEvent event){
         gui.getConnectionSocket().chooseSpecialCard(cardsList.get(1).name());
+        Button clickedButton = (Button)event.getSource();
+        Integer cardId = Integer.parseInt(clickedButton.getId().replace("use",""));
+        updateCardContent(cardId);
     }
 
     @FXML
     public void useSpecialCard3(ActionEvent event){
         gui.getConnectionSocket().chooseSpecialCard(cardsList.get(2).name());
+        Button clickedButton = (Button)event.getSource();
+        Integer cardId = Integer.parseInt(clickedButton.getId().replace("use",""));
+        updateCardContent(cardId);
     }
 
     private String loadCorrectDescription(SpecialCardName card){
@@ -244,6 +290,9 @@ public class SpecialCardsMenuController extends GUIController {
         } else if(card.equals(SpecialCardName.PRINCESS)){
             image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/princess.jpg")));
         }
+
+        image.setOnMouseClicked(this::showContent);
+
     }
 
 
@@ -271,15 +320,146 @@ public class SpecialCardsMenuController extends GUIController {
         }
     }
 
+    // Receives the card img id  as an integer. cardId is 1 for the specialCardImage1 ,  2 for the specialCardImage2, etc.
+    public void updateCardContent(Integer cardId) {
 
-    /*
-    public void displayCardsCoin(Map<SpecialCardName, Integer>  specialCards) {
-        for(SpecialCardName card : specialCards.keySet() ) {
-            if(SpecialCard)
+        resetShowContent();
+
+        SpecialCardName cardName = cardsList.get(cardId-1);
+        showContentLabel.setText(cardName.toString());
+
+        if(cardName.equals(SpecialCardName.HERBALIST)) {
+            noEntryImg.setVisible(true);
+            noEntryImg.setDisable(false);
+            numEntryTiles.setVisible(true);
+
+            Integer numTiles = gui.getViewState().getHerbalistTiles();
+            numEntryTiles.setText(numTiles.toString());
+
+            // TODO: Interaction with herbalist
+
+        }
+        else if(cardName.equals(SpecialCardName.PRIEST) || cardName.equals(SpecialCardName.JUGGLER) || cardName.equals(SpecialCardName.PRINCESS) ) {
+
+            for(ImageView icon : showContentStudIcons){
+                icon.setOnMouseClicked(this::pickStudent);
+                icon.setVisible(true);
+                icon.setDisable(false);
+            }
+
+            Map<Color,Integer> studentsMap = gui.getViewState().getSpecialCardStudents(cardName);
+
+            System.out.println("Current card studentsMap is : " + studentsMap);
+
+            for(Label label : showContentLabels){
+                label.setVisible(true);
+                String str = label.getId().replace("num_content","");
+                Color color = Color.toColor(str);
+                if(studentsMap.get(color)!=null)
+                    label.setText("x " + studentsMap.get(color).toString());
+            }
+            // TODO: specific IFs with PRIEST, JUGGLER, PRINCESS
+        }
+        else if(cardName.equals(SpecialCardName.HERALD)){
+            islandBox.setVisible(true);
+            islandBox.setDisable(false);
+            List<IslandView> islands = gui.getViewState().getIslands();
+
+            for(IslandView island : islands) {
+                islandBox.getItems().add(island.getPosition());
+            }
+            // TODO: interaction with Herald
+        }
+        else if(cardName.equals(SpecialCardName.COOKER) || cardName.equals(SpecialCardName.GAMBLER)) {
+            colorBox.setVisible(true);
+            colorBox.setDisable(false);
+            colorBox.getItems().addAll(Color.values());
+
+            //TODO: interaction with COOKER  and GAMBLER
+        }
+
+        else if(cardName.equals(SpecialCardName.POSTMAN)) {
+            usageMessage.setText("You are allowed to move MotherNature up to 2 additional islands than the steps allowed by the AssistantCard you chose. Please return to the board and complete the movement.");
+        }
+        else if(cardName.equals(SpecialCardName.BARD)) {
+            usageMessage.setText("Return to the board to choose which students to swap between Entrance and DiningRoom");
         }
     }
 
+
+    @FXML
+    public void showContent(MouseEvent event) {
+
+        ImageView clickedImg = (ImageView) event.getSource();
+        Integer imgId = Integer.parseInt(clickedImg.getId().replace("specialCardImage",""));
+        updateCardContent(imgId);
+
+    }
+
+    @FXML
+    public void pickStudent(MouseEvent event) {
+
+    }
+
+
+    /**
+     * Update status message is called by MainGUI after receiving an update from ViewMessageParser
      */
+    public void updateStatusMessage() {
+        PhaseEnum currentPhase = gui.getViewState().getCurrentPhase();
+        SubPhaseEnum currentSubPhase = gui.getViewState().getSubPhaseEnum();
+
+    }
+
+
+    private void createArrays() {
+        showContentLabels.add(num_contentBlue);
+        showContentLabels.add(num_contentGreen);
+        showContentLabels.add(num_contentYellow);
+        showContentLabels.add(num_contentRed);
+        showContentLabels.add(num_contentPink);
+
+        for (Label l : showContentLabels) {
+            l.setVisible(false);
+        }
+
+        showContentStudIcons.add(contentRed);
+        showContentStudIcons.add(contentYellow);
+        showContentStudIcons.add(contentGreen);
+        showContentStudIcons.add(contentBlue);
+        showContentStudIcons.add(contentPink);
+
+        for (ImageView icon : showContentStudIcons) {
+            icon.setOnMouseClicked(this::pickStudent);
+            icon.setVisible(false);
+            icon.setDisable(true);
+        }
+    }
+
+
+    public void resetShowContent() {
+        usageMessage.setText("");           // resets the usageMessage
+        showContentArea.setDisable(false);
+        showContentArea.setVisible(true);
+
+        noEntryImg.setVisible(false);
+        noEntryImg.setDisable(true);
+        numEntryTiles.setVisible(false);
+
+        colorBox.setDisable(true);
+        colorBox.setVisible(false);
+        islandBox.setDisable(true);
+        islandBox.setVisible(false);
+
+        for(Label l : showContentLabels){
+            l.setVisible(false);
+        }
+        for(ImageView icon : showContentStudIcons){
+            icon.setOnMouseClicked(this::pickStudent);
+            icon.setVisible(false);
+            icon.setDisable(true);
+        }
+    }
 
 
 }

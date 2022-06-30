@@ -179,6 +179,7 @@ public class MainGUI extends Application {
     public void refreshGameStatus() {
         MyBoardGuiController controller = (MyBoardGuiController) getController("myBoardScene.fxml");
         controller.updateGameStatus();
+
     }
 
     public void setEndingScene(){
