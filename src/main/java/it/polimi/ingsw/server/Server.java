@@ -6,6 +6,7 @@ import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,22 +25,14 @@ public class Server {
     private static Map<String, ClientHandler> allPlayers;
     protected static ArrayList<ClientHandler> allClients = new ArrayList<>();
 
+
     public static int getPort(String[] args) {
         if (args != null && args.length > 1) {
             port = Integer.parseInt(args[1]);
         } else {
-            try {
-                JsonObject json = new Gson().fromJson(new FileReader("src/main/resources/json/ConnectionConfiguration.json"), JsonObject.class);
-                if (json != null) {
-                    port = json.get("port").getAsInt();
-                    System.out.println("Error reading configuration");
-                } else port = 1234;
-                System.out.println("Get from config file port " + port);
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                port = 1234;
+           port = 1234;
+                System.out.println("Port is "+port);
             }
-        }
         return port;
     }
 
