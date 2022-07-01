@@ -61,12 +61,12 @@ public class KeyboardInputReader implements Runnable {
         {
             connectionSocket.sendTerminationSpecialCard();
         }
-        else if(input.equalsIgnoreCase("V")||input.equalsIgnoreCase("S"))
-            specialCardInputDecision();
         else if(viewState.getAcceptedUseSpecialCard())
         {
             specialCardActivation();
         }
+        else if(input.equalsIgnoreCase("V")||input.equalsIgnoreCase("S"))
+            specialCardInputDecision();
         else if (viewState.getCurrentPhase().equals(PhaseEnum.PLANNING)) getFromInputCardPriorityAndSendMessage();
         else if (viewState.getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
             if (viewState.getSubPhaseEnum().equals(SubPhaseEnum.NO_SUB_PHASE) || (viewState.getSubPhaseEnum().equals(SubPhaseEnum.CHOOSE_COLOR)))
