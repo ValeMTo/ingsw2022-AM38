@@ -25,13 +25,7 @@ public class HomeMenuController extends GUIController  {
      *
      **/
     public void startPlay() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Start a game");
-        alert.setHeaderText("Do you want to start a new game ?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            gui.setNextStage("loginMenu.fxml");
-        }
+        gui.setNextStage("loginMenu.fxml");
     }
 
     public void showCredits(MouseEvent event) {

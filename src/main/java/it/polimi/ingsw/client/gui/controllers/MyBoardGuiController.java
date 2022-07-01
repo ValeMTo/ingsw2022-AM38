@@ -483,20 +483,53 @@ public class MyBoardGuiController extends GUIController {
             }
 
         } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
-            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
-                destinationIsland = archipelagoIslands.get(gui.getViewState().getMotherNature()-1);
-                destinationIsland.setEffect(null);
+            if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower()) ){
+                // Fixing from here 01-07.  Getting islands from viewState instead of using local array archipelagoIsland
+
+                List<IslandView> islandsList = gui.getViewState().getIslands();
+                List<Integer> availablePositions = new ArrayList<Integer>();
+
+                for(IslandView i : islandsList)
+                    availablePositions.add(i.getPosition());
+
+                int increasedSteps = gui.getViewState().getIncreasedMotherNatureMovement();
                 int cardPriority = gui.getViewState().getLastUsedCard(gui.getViewState().getPlayerTower());
+                int motherNaturePos = gui.getViewState().getMotherNature();
+
+                int maximumDestination = motherNaturePos + cardPriority/2 + cardPriority%2 + increasedSteps;
+
+                System.out.println("Mother nature init pos :" + motherNaturePos);
+                System.out.println("cardpriority = " + cardPriority);
+                System.out.println("increased steps = " + increasedSteps );
+                System.out.println("Maximum destination = "+ maximumDestination);
+
+                for(ImageView img : archipelagoIslands) {
+                    if(motherNaturePos == Integer.parseInt(img.getId().replace("island","")))
+                        img.setEffect(null);
+                }
+                //destinationIsland.setEffect(null);
+
+                // showing available "islands" for motherNature movement :
+
+                System.out.println("available destination islands: ");
+
                 for (ImageView image : archipelagoIslands){
-                    if ((archipelagoIslands.indexOf(image) < (gui.getViewState().getMotherNature() + cardPriority/2 + cardPriority%2 + gui.getViewState().getIncreasedMotherNatureMovement()))
-                            && archipelagoIslands.indexOf(image) >= gui.getViewState().getMotherNature()){
-                        image.setDisable(false);
-                    }else {
-                        image.setDisable(true);
-                        image.setEffect(createShadow());
+                    int imgPosition = Integer.parseInt(image.getId().replace("island",""));
+
+                    if(availablePositions.contains(imgPosition)){
+                        if ( (imgPosition <= maximumDestination)  &&  imgPosition >= motherNaturePos){
+                            image.setDisable(false);
+                            System.out.println(imgPosition + ": available");
+                        }else {
+                            image.setDisable(true);
+                            image.setEffect(createShadow());
+                            System.out.println(imgPosition + ": not available");
+                        }
                     }
                 }
             }
+
+
         } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)){
             if (gui.getViewState().getActivePlayer().equals(gui.getViewState().getPlayerTower())){
                 for (ImageView cloud : cloudsImgArray){
@@ -580,7 +613,7 @@ public class MyBoardGuiController extends GUIController {
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_CHOOSE_CLOUD)) {
             ImageView imagePicked = (ImageView) event.getSource();
             gui.getConnectionSocket().chooseCloud(getPositionFromImage(imagePicked, "cloud"));
-            removeEffect(cloudsImgArray);
+            //removeEffect(cloudsImgArray);   removed this on 01-07 because it caused bug in displaying clouds in the Planning phase
         }
     }
 
@@ -599,7 +632,7 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     public void chooseIsland(ActionEvent event){
-        removeEffect(archipelagoIslands);
+        removeEffect(archipelagoIslands);         // maybe this causes problems ??
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
             removeEffect(entranceStudImages);
             gui.getConnectionSocket().moveStudentToIsland(fromStudent, getPositionFromImage(destinationIsland, "island"));
@@ -634,8 +667,8 @@ public class MyBoardGuiController extends GUIController {
                 moveIslandButton.setDisable(false);
             }
         } else if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_MOTHER_NATURE)){
-            destinationIsland.setEffect(null);
-            destinationIsland = (ImageView) event.getSource();
+            //destinationIsland.setEffect(null);   modified 01-07
+            destinationIsland = (ImageView) event.getSource();     // destinationIsland is the clicked island.  It will then be sent to the connection socket by the method chooseIsland()
             destinationIsland.setEffect(new Glow());
             moveIslandButton.setVisible(true);
             moveIslandButton.setDisable(false);
@@ -789,6 +822,11 @@ public class MyBoardGuiController extends GUIController {
      */
     @FXML
     public void showContent(MouseEvent event) {
+        // Initial updates before showing content
+        updateMyPlayerBoard();
+        updateArchipelago();
+        updateClouds();
+
         ImageView clickedImg = (ImageView) event.getSource();
         String src = clickedImg.getId();
         showContentArea.setVisible(true);
@@ -850,10 +888,29 @@ public class MyBoardGuiController extends GUIController {
 
     public void updateArchipelago() {
 
+        // Bug fix 01-07
+
         System.out.println("executing updateArchipelago() ");
 
-        List<IslandView> islands = gui.getViewState().getIslands();
+        List<IslandView> islands = gui.getViewState().getIslands();   // getting current islands from viewState
 
+        // At first disables all the islands,  then checks which ones are present and enables+displays them
+        for(ImageView i : archipelagoIslands) {
+            i.setVisible(false);
+            i.setDisable(true);
+        }
+
+        // Checks which islands have to be enabled and displayed
+        for(ImageView islandImg : archipelagoIslands) {
+            Integer position = Integer.parseInt(islandImg.getId().replace("island", ""));
+            for (IslandView island : islands) {
+                if (island.getPosition() == position) {
+                        islandImg.setVisible(true);
+                        islandImg.setDisable(false);
+                    }
+                }
+            }
+            /*  OLD Version  with remove :  discarded
         int num = archipelagoIslands.size();
         for (int i= islands.size(); i< num; i++){
             archipelagoIslands.get(i).setDisable(true);
@@ -863,6 +920,7 @@ public class MyBoardGuiController extends GUIController {
             motherNatureOnIslands.remove(i);
             towersOnIslands.remove(i);
         }
+        */
 
         // Shows a noEntryTile on the islands where it is present
         for(ImageView img : noEntryTilesArray) {
