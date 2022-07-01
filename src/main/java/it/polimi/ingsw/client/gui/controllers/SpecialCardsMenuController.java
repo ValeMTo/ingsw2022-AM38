@@ -290,7 +290,7 @@ public class SpecialCardsMenuController extends GUIController {
         image.setOnMouseEntered(this::showContent);
         colorBox.setOnAction(this::chooseColor);
         islandBox.setOnAction(this::chooseIsland);
-        showContentArea.setOnMouseEntered(this::updateUsageMessage);
+        //showContentArea.setOnMouseEntered(this::updateUsageMessage);
 
         islandSend.setOnAction(this::sendIsland);  //button
         colorSend.setOnAction(this::sendColor);    // button
@@ -334,6 +334,7 @@ public class SpecialCardsMenuController extends GUIController {
         chooseColorBox.setVisible(false);
         chooseIslandBox.setVisible(false);
 
+        updateUsageMessage();
 
         // resetting the studentsMap:
         for(Label l : showContentLabels) {
@@ -378,6 +379,7 @@ public class SpecialCardsMenuController extends GUIController {
 
 
         } else if (cardName.equals(SpecialCardName.PRINCESS)) {
+            studentsArea.setVisible(true);
             //studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.PRINCESS);
             /*
             chooseColorBox.setVisible(true);
@@ -566,8 +568,8 @@ public class SpecialCardsMenuController extends GUIController {
 
     }
 
-    @FXML
-    public void updateUsageMessage(MouseEvent event) {
+
+    public void updateUsageMessage() {
         usageMessage.setText("");   //initialization before setting the actual message
         if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE) && gui.getViewState().getPlayerTower().equals(gui.getViewState().getActivePlayer()) && gui.getViewState().getSpecialPhase() != null) {
             String message = gui.getViewState().getSpecialPhase().toString();
