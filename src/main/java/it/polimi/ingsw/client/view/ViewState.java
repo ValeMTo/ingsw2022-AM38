@@ -940,6 +940,7 @@ public class ViewState {
             awaitingCLI.cleaner();
             if (this.currentPhase.equals(PhaseEnum.END)) {
                 awaitingCLI.printEndOfMatch();
+                System.exit(0);
             } else if (!this.activeView) {
                 awaitingCLI.showNotYourTurnView();
             } else {
