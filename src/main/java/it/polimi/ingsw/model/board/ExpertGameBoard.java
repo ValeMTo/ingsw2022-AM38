@@ -40,11 +40,11 @@ public class ExpertGameBoard extends GameBoard {
         while (i < specialCardsNum) {
             cardNum = random.nextInt(12);
             if (i==0){
-                cardNum=2;
+                cardNum=0;
             }else if (i==1){
-                cardNum=5;
+                cardNum=9;
             }else{
-                cardNum=8;
+                cardNum=10;
             }
             //
             //int final int card = cardNum;

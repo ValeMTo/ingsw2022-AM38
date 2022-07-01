@@ -315,8 +315,8 @@ public class SpecialCardsMenuController extends GUIController {
         Map<SpecialCardName, Integer> initialCosts = gui.getViewState().getInitialCosts();
         System.out.println("Initial costs : " + initialCosts);
         System.out.println("updated costs : " + updatedSpecialCards);
-        for (SpecialCardName card : list) {
-            if (updatedSpecialCards.get(card) > initialCosts.get(card)) {
+        for (SpecialCardName card : updatedSpecialCards.keySet()) {
+            if (initialCosts.containsKey(card)&&updatedSpecialCards.get(card) > initialCosts.get(card)) {
                 int cardNum = list.indexOf(card) + 1;
                 switch (cardNum) {
                     case 1:
