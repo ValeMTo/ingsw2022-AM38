@@ -126,6 +126,8 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     private Button islandSend;
 
+    @FXML
+    private AnchorPane mainAnchor;
 
     SpecialCardName cardUsed;
     boolean first;
@@ -158,6 +160,9 @@ public class SpecialCardsMenuController extends GUIController {
         choiceBoxMenu.setVisible(false);
         studentsArea.setVisible(false);
         noEntryBox.setVisible(false);
+
+        showContentArea.setOnMouseEntered(this::updateUsageMessage);
+
 
     }
 
@@ -287,7 +292,7 @@ public class SpecialCardsMenuController extends GUIController {
             image.setImage(new Image(getClass().getResourceAsStream("/graphics/specialCards/princess.jpg")));
         }
 
-        image.setOnMouseEntered(this::showContent);
+        image.setOnMouseClicked(this::showContent);
         colorBox.setOnAction(this::chooseColor);
         islandBox.setOnAction(this::chooseIsland);
         //showContentArea.setOnMouseEntered(this::updateUsageMessage);
@@ -334,7 +339,6 @@ public class SpecialCardsMenuController extends GUIController {
         chooseColorBox.setVisible(false);
         chooseIslandBox.setVisible(false);
 
-        updateUsageMessage();
 
         // resetting the studentsMap:
         for(Label l : showContentLabels) {
@@ -512,11 +516,13 @@ public class SpecialCardsMenuController extends GUIController {
         if(colorBox.getValue() != null)
             colorToSend = Color.toColor(colorBox.getValue().toString());
 
+        /*
         try {
             colorBox.setValue(null);
         }catch (NullPointerException e){
             System.out.println("zero value");
         }
+        */
         updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
 
     }
@@ -529,11 +535,14 @@ public class SpecialCardsMenuController extends GUIController {
             Integer pos = Integer.parseInt(islandBox.getValue().toString());
             islandToSend = pos;
         }
+        /*
         try {
             islandBox.setValue(null);
         }catch (NullPointerException e){
             System.out.println("zero value");
         }
+
+         */
         updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
     }
 
@@ -568,8 +577,8 @@ public class SpecialCardsMenuController extends GUIController {
 
     }
 
-
-    public void updateUsageMessage() {
+    //Called every time the mouse hovers on the main AnchorPane
+    public void updateUsageMessage(MouseEvent event) {
         usageMessage.setText("");   //initialization before setting the actual message
         if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE) && gui.getViewState().getPlayerTower().equals(gui.getViewState().getActivePlayer()) && gui.getViewState().getSpecialPhase() != null) {
             String message = gui.getViewState().getSpecialPhase().toString();
