@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.InputMethodEvent;
@@ -281,6 +282,7 @@ public class SpecialCardsMenuController extends GUIController {
         image.setOnMouseEntered(this::showContent);
         colorBox.setOnAction(this::chooseColor);
         islandBox.setOnAction(this::chooseIsland);
+        showContentArea.setOnMouseEntered(this::updateUsageMessage);
     }
 
     public void displayCardsCoin(List<SpecialCardName> list, Map<SpecialCardName, Integer> updatedSpecialCards) {
@@ -306,8 +308,14 @@ public class SpecialCardsMenuController extends GUIController {
     }
 
     public void initialiseVisibleAndDisableSetting(SpecialCardName cardName) {
+
+
         Map<Color, Integer> studentsMap;
         List<Color> color = new ArrayList<>();
+
+        for(ImageView icon : showContentStudIcons)
+            icon.setEffect(null);
+
         showContentArea.setVisible(true);
         studentsArea.setVisible(false);
         noEntryBox.setVisible(false);
@@ -351,14 +359,17 @@ public class SpecialCardsMenuController extends GUIController {
 
 
         } else if (cardName.equals(SpecialCardName.PRINCESS)) {
-            chooseColorBox.setVisible(true);
             studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.PRINCESS);
+            /*
+            chooseColorBox.setVisible(true);
+
             for (Color item : studentsMap.keySet()){
                 if (studentsMap.get(item) >0) {
                     color.add(item);
                 }
             }
             colorBox.getItems().addAll(color);
+            */
         } else if (cardName.equals(SpecialCardName.HERALD)) {
             chooseIslandBox.setVisible(true);
         } else if (cardName.equals(SpecialCardName.COOKER)) {
@@ -371,7 +382,7 @@ public class SpecialCardsMenuController extends GUIController {
             chooseColorBox.setVisible(true);
             colorBox.getItems().clear();
             System.out.println(colorBox);
-            if (first){
+            if (first){                      // TODO: load also DiningRoom colors
                 studentsMap = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
                 for (Color item : studentsMap.keySet()){
                     if (studentsMap.get(item) >0) {
@@ -403,6 +414,7 @@ public class SpecialCardsMenuController extends GUIController {
         SpecialCardName cardName = cardsList.get(cardId - 1);
         cardUsed = cardName;
         showContentLabel.setText(cardName.toString());
+        usageMessage.setText("");
 
         initialiseVisibleAndDisableSetting(cardName);
 
@@ -436,11 +448,12 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     private void chooseColor(Event event) {
         System.out.println("Choose color method");
+
         if (cardUsed.equals(SpecialCardName.PRIEST)) {
             chooseColorBox.setVisible(false);
             chooseIslandBox.setVisible(true);
         } else if (cardUsed.equals(SpecialCardName.JUGGLER)){
-            if (!first){
+            if (!first){     // because the first time the juggler is used, its studentsmap has already been initialized by the ShowStudentMap
                 colorBox.getItems().clear();
                 Map<Color, Integer> studentsMap = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
                 List<Color> color = new ArrayList<>();
@@ -470,6 +483,7 @@ public class SpecialCardsMenuController extends GUIController {
                 first=false;
             }
         }
+
         if(colorBox.getValue() != null)
             gui.getConnectionSocket().chooseColor(Color.toColor(colorBox.getValue().toString()));
 
@@ -478,6 +492,8 @@ public class SpecialCardsMenuController extends GUIController {
         }catch (NullPointerException e){
             System.out.println("zero value");
         }
+        updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
+
     }
 
     @FXML
@@ -493,6 +509,16 @@ public class SpecialCardsMenuController extends GUIController {
         }catch (NullPointerException e){
             System.out.println("zero value");
         }
+        updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
+    }
+
+    @FXML
+    private void chooseStudFromCard(MouseEvent event) {
+        ImageView clickedIcon = (ImageView) event.getSource();
+        clickedIcon.setEffect(new Glow());
+        Color colorToSend = Color.toColor(clickedIcon.getId().replace("content",""));
+        gui.getConnectionSocket().chooseColor(colorToSend);
+        updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
     }
 
 
@@ -503,6 +529,15 @@ public class SpecialCardsMenuController extends GUIController {
         Integer imgId = Integer.parseInt(clickedImg.getId().replace("specialCardImage", ""));
         updateCardContent(imgId);
 
+    }
+
+    @FXML
+    public void updateUsageMessage(MouseEvent event) {
+        usageMessage.setText("");   //initialization before setting the actual message
+        if(gui.getViewState().getPlayerTower().equals(gui.getViewState().getActivePlayer()) && gui.getViewState().getSpecialPhase() != null) {
+            String message = gui.getViewState().getSpecialPhase().toString();
+            usageMessage.setText(message);
+        }
     }
 
     /**
@@ -533,6 +568,7 @@ public class SpecialCardsMenuController extends GUIController {
 
         for (ImageView icon : showContentStudIcons) {
             icon.setVisible(true);
+            icon.setOnMouseClicked(this::chooseStudFromCard);
         }
     }
 

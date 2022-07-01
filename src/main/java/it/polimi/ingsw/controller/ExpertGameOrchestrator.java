@@ -288,7 +288,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             // Add the removed student from the card to the schoolEntrance
                             gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, pendingColor);
                             // Add the removed student from the schoolEntrance to the card
-                            gameBoard.addStudent(StudentCounter.CARD, pendingColor, position);
+                            gameBoard.addStudent(StudentCounter.CARD, color, position);
                             numberOfUsedInteractions++;
                             // The maximum interactions for this card have been finished, no more swaps allowed.
                             if (numberOfUsedInteractions >= 3) {

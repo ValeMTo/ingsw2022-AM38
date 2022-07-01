@@ -42,9 +42,9 @@ public class ExpertGameBoard extends GameBoard {
             if (i==0){
                 cardNum=5;
             }else if (i==1){
-                cardNum=4;
-            }else{
                 cardNum=8;
+            }else{
+                cardNum=9;
             }
             //
             //int final int card = cardNum;
