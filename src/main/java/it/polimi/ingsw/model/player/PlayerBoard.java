@@ -1,12 +1,11 @@
 package it.polimi.ingsw.model.player;
 
-import it.polimi.ingsw.controller.mvc.Listenable;
-import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.mvc.Listenable;
+import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.NotLastCardUsedException;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.model.board.Color;
-import it.polimi.ingsw.model.board.Island;
 import it.polimi.ingsw.model.board.Tower;
 import it.polimi.ingsw.server.ClientHandler;
 

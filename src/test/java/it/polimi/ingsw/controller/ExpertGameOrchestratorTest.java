@@ -97,7 +97,8 @@ public class ExpertGameOrchestratorTest {
                     new GameOrchestratorTest().doAMoveMotherNature(game);
                     System.out.println("Round "+game.gameBoard.getNumRound()+" active player "+game.gameBoard.getCurrentPlayer()+" CHOOSING CLOUD "+counter);
                     System.out.println("Round "+game.gameBoard.getNumRound()+" active player "+game.gameBoard.getCurrentPlayer()+"From usable clouds "+game.gameBoard.getUsableClouds());
-                    game.chooseCloud(counter);
+                    if(game.currentPhase==PhaseEnum.ACTION_CHOOSE_CLOUD)
+                        game.chooseCloud(counter);
                     counter++;
                 }
             } catch (Exception e) {

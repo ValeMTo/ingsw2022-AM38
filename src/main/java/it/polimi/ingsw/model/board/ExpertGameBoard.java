@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.board;
 
-import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IslandOutOfBoundException;
 import it.polimi.ingsw.exceptions.LocationNotAllowedException;

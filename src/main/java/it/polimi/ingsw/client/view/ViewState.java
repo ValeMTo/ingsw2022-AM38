@@ -50,9 +50,11 @@ public class ViewState {
     private boolean isFirstSetup = true;
     private final Map<SpecialCardName,Integer> initialCosts = new HashMap<SpecialCardName,Integer>();
     private int increasedMotherNatureMovement=0;
+    private SpecialCardName specialCardUse;
 
     private boolean optionalSpecialEffectUsage = false;
     public ViewState(boolean isCli) {
+        this.specialCardUse = null;
         this.onlinePlayers = new ArrayList<>();
         this.isCli = isCli;
         this.turnShown = false;
@@ -96,6 +98,13 @@ public class ViewState {
         return onlinePlayers.size();
     }
 
+    public void setSpecialCardInUse(SpecialCardName cardName){
+        this.specialCardUse = cardName;
+    }
+
+    public SpecialCardName getSpecialCardinUse(){
+        return this.specialCardUse;
+    }
 
     /**
      * Sets the CLI to be notify from wait

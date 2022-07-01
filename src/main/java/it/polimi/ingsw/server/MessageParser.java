@@ -1,7 +1,9 @@
-package it.polimi.ingsw.controller;
+package it.polimi.ingsw.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.polimi.ingsw.controller.GameOrchestrator;
+import it.polimi.ingsw.controller.PhaseEnum;
 import it.polimi.ingsw.exceptions.AlreadyUsedException;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.exceptions.IncorrectPhaseException;

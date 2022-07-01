@@ -3,7 +3,10 @@ package it.polimi.ingsw.model.specialCards;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import org.junit.Before;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -203,6 +206,16 @@ public class SpecialCardWithStudentTest {
             assertEquals(3, juggler.getGuestsChangeLimit());
         } catch (FunctionNotImplementedException e) {
             e.printStackTrace();
+        }
+    }
+
+    @DisplayName("Special cards with students method SpecialCardName")
+    @ParameterizedTest
+    @EnumSource(SpecialCardName.class)
+    public void testSpecialCardsWithStudents(SpecialCardName specialCardName){
+        switch (specialCardName){
+            case PRINCESS, PRIEST, JUGGLER: assertTrue(SpecialCardName.getSpecialCardsWithStudents().contains(specialCardName)); break;
+            default: assertFalse(SpecialCardName.getSpecialCardsWithStudents().contains(specialCardName));
         }
     }
 }

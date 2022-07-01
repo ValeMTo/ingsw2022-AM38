@@ -82,7 +82,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                 if(getCurrentPhase()!=PhaseEnum.SPECIAL_CARD_USAGE)
                     this.oldPhase = getCurrentPhase();
                 this.currentPhase = PhaseEnum.SPECIAL_CARD_USAGE;
-                notifyPhaseAndCurrentPlayer();
+                System.out.println("EXPERT GAME ORCHESTRATOR NOTIFY - setCurrentPhase - ActivePlayerWithTower " + gameBoard.getPlayerTower(actionOrder[activePlayer]) + " phase " + this.getCurrentPhase()+" used special card "+activatedSpecialCard);
+                notify(modelListener, MessageGenerator.currentPlayerAndPhaseUpdateMessage(gameBoard.getPlayerTower(actionOrder[activePlayer]), this.getCurrentPhase(),activatedSpecialCard), clients);
             } else super.setCurrentPhase(updatePhase);
         }
     }
@@ -169,8 +170,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                     }
                 }
                 optionalMove = false;
-                setCurrentPhase(PhaseEnum.SPECIAL_CARD_USAGE);
                 this.activatedSpecialCard = convertedName;
+                setCurrentPhase(PhaseEnum.SPECIAL_CARD_USAGE);
                 switch (convertedName) {
                     case PRIEST, PRINCESS:
                         this.specialCardAlreadyUsed = true;
@@ -287,7 +288,7 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
                             // Add the removed student from the card to the schoolEntrance
                             gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, pendingColor);
                             // Add the removed student from the schoolEntrance to the card
-                            gameBoard.addStudent(StudentCounter.CARD, pendingColor, position);
+                            gameBoard.addStudent(StudentCounter.CARD, color, position);
                             numberOfUsedInteractions++;
                             // The maximum interactions for this card have been finished, no more swaps allowed.
                             if (numberOfUsedInteractions >= 3) {

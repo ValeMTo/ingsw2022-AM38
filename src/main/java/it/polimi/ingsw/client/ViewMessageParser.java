@@ -155,13 +155,20 @@ public class ViewMessageParser {
             else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal()) {
                 synchronized (view) {
                     view.setActivePlayerAndPhase(Tower.toTower(json.get("CurrentPlayer").getAsString()), PhaseEnum.values()[json.get("CurrentPhase").getAsInt()]);
+                    if (json.has("SpecialCardInUse")){
+                        view.setSpecialCardInUse(SpecialCardName.convertFromStringToEnum(json.get("SpecialCardInUse").toString()));
+                    }else {
+                        view.setSpecialCardInUse(null);
+                    }
                 }
                 if (!view.isCli()) {
                     Platform.runLater(() -> {
+                    // check special card
                         view.getAwaitingGUI().refreshGameStatus();
                         view.getAwaitingGUI().refreshWholeBoard();  // added after  refreshGameStatus()
                     });
                 }
+
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.SCHOOL_BOARD_UPDATE.ordinal()) {
                 Map<String, Number> students = gson.fromJson(json.get("SchoolEntranceMap"), HashMap.class);
                 view.setSchoolEntranceOccupancy(Tower.values()[json.get("TowerColor").getAsInt()], getStudentMapFromStringAndNumberMap(students));

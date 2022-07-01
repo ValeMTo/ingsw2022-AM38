@@ -1,4 +1,4 @@
-package it.polimi.ingsw.controller.mvc;
+package it.polimi.ingsw.mvc;
 
 import it.polimi.ingsw.server.ClientHandler;
 

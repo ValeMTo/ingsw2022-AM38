@@ -822,6 +822,23 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the CurrentPlayerAndPhaseUpdate message, used to notify the new current player and the phase at the same time.
+     * Also communicate the used special card
+     *
+     * @param nickname : the nickname of the current active player.
+     * @return : json string of the CurrentPlayerUpdate message
+     */
+    public static String currentPlayerAndPhaseUpdateMessage(Tower nickname, PhaseEnum phase,SpecialCardName specialCardName) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.PHASE_AND_CURRENT_PLAYER_UPDATE.ordinal());
+        json.put("CurrentPlayer", nickname);
+        json.put("CurrentPhase",phase.ordinal());
+        json.put("SpecialCardInUse",specialCardName.name());
+        return json + "\n";
+    }
+
+    /**
      * Generates the specialCardPhaseMessage message, used to notify the new current special card requirement phase and the phase at the same time.
      *
      * @return : json string of the CurrentPlayerUpdate message

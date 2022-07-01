@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.specialCards;
 
-import it.polimi.ingsw.controller.mvc.Listener;
+import it.polimi.ingsw.mvc.Listener;
 import it.polimi.ingsw.messages.MessageGenerator;
 import it.polimi.ingsw.server.ClientHandler;
 
