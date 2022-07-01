@@ -946,7 +946,8 @@ public class ClientCLI {
         try{Thread.sleep(200);}
         catch (InterruptedException exc){}
         int stand = 1;
-        Set<String> standingNicknames = standing.keySet();
+        Set<String> standingNicknames = new HashSet<>();
+        standingNicknames.addAll(standing.keySet());
         while(!standing.isEmpty()){
             for(String s: standingNicknames)
                 if(standing.containsKey(s))
