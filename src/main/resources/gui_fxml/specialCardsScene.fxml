@@ -220,6 +220,7 @@
                   </AnchorPane>
                </children>
             </AnchorPane>
+            <Button fx:id="endEffect" layoutX="112.0" layoutY="12.0" mnemonicParsing="false" text="EndEffect" />
          </children>
       </AnchorPane>
    </children>
