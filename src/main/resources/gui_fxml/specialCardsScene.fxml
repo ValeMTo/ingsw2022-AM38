@@ -193,27 +193,29 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="choiceBoxMenu" layoutX="357.0" layoutY="12.0">
+            <AnchorPane fx:id="choiceBoxMenu" layoutX="354.0" layoutY="12.0" prefHeight="90.0" prefWidth="300.0">
                <children>
                   <AnchorPane fx:id="secondColorBox" layoutX="101.0" layoutY="63.0" />
-                  <AnchorPane fx:id="chooseIslandBox" layoutX="102.0" layoutY="31.0">
+                  <AnchorPane fx:id="chooseIslandBox" layoutX="78.0" layoutY="56.0" prefHeight="25.0" prefWidth="207.0">
                      <children>
                         <Label fx:id="chooseIslandLabel" layoutY="3.0" text="Choose Island">
                            <font>
                               <Font size="13.0" />
                            </font>
                         </Label>
-                        <ComboBox fx:id="islandBox" layoutX="112.0" prefHeight="25.0" prefWidth="76.0" />
+                        <ComboBox fx:id="islandBox" layoutX="92.0" prefHeight="25.0" prefWidth="41.0" />
+                        <Button fx:id="islandSend" layoutX="156.0" mnemonicParsing="false" text="send" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="chooseColorBox" layoutX="101.0">
+                  <AnchorPane fx:id="chooseColorBox" layoutX="-5.0" layoutY="1.0" prefHeight="25.0" prefWidth="301.0">
                      <children>
-                        <ComboBox fx:id="colorBox" layoutX="112.0" prefHeight="25.0" prefWidth="76.0" />
-                        <Label fx:id="chooseColorLabel" layoutY="3.0" text="Choose color">
+                        <ComboBox fx:id="colorBox" layoutX="169.0" prefHeight="25.0" prefWidth="76.0" />
+                        <Label fx:id="chooseColorLabel" layoutY="3.0" text="Choose color Schoolboard">
                            <font>
                               <Font size="13.0" />
                            </font>
                         </Label>
+                        <Button fx:id="colorSend" layoutX="259.0" mnemonicParsing="false" text="send" />
                      </children>
                   </AnchorPane>
                </children>

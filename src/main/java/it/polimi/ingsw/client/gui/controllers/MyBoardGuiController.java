@@ -517,17 +517,20 @@ public class MyBoardGuiController extends GUIController {
                     int imgPosition = Integer.parseInt(image.getId().replace("island",""));
 
                     if(availablePositions.contains(imgPosition)){   // the OR in the if condition is the case when motherNature can go past the last island
-                        if ( ((imgPosition <= maximumDestination)  &&  imgPosition >= motherNaturePos) || (imgPosition <= maximumDestination % islandsList.size()) ) {
+                        if ( ((imgPosition <= maximumDestination)  &&  imgPosition >= motherNaturePos) ) {
                             image.setDisable(false);
                             System.out.println(imgPosition + ": available");
-                        }else {
+                        }
+                        else if((maximumDestination > islandsList.size()) && (imgPosition <= maximumDestination % islandsList.size())) {
+                            image.setDisable(false);
+                            System.out.println(imgPosition + ": available");
+                        }
+                        else {
                             image.setDisable(true);
                             image.setEffect(createShadow());
                             System.out.println(imgPosition + ": not available");
                         }
-                        if(maximumDestination > islandsList.size()) {
 
-                        }
                     }
                 }
             }

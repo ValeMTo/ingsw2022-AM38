@@ -121,8 +121,16 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     private Label availability3;
 
+    @FXML
+    private Button colorSend;
+    @FXML
+    private Button islandSend;
+
+
     SpecialCardName cardUsed;
     boolean first;
+    int islandToSend;
+    Color colorToSend;
 
     public void initialize() {
 
@@ -283,6 +291,10 @@ public class SpecialCardsMenuController extends GUIController {
         colorBox.setOnAction(this::chooseColor);
         islandBox.setOnAction(this::chooseIsland);
         showContentArea.setOnMouseEntered(this::updateUsageMessage);
+
+        islandSend.setOnAction(this::sendIsland);  //button
+        colorSend.setOnAction(this::sendColor);    // button
+
     }
 
     public void displayCardsCoin(List<SpecialCardName> list, Map<SpecialCardName, Integer> updatedSpecialCards) {
@@ -322,6 +334,12 @@ public class SpecialCardsMenuController extends GUIController {
         chooseColorBox.setVisible(false);
         chooseIslandBox.setVisible(false);
 
+
+        // resetting the studentsMap:
+        for(Label l : showContentLabels) {
+            l.setText("x 0");
+        }
+
         colorBox.getItems().clear();
         colorBox.getItems().addAll(Color.values());
         islandBox.getItems().clear();
@@ -334,13 +352,14 @@ public class SpecialCardsMenuController extends GUIController {
             choiceBoxMenu.setVisible(false);
         }
         System.out.println("Card name:" + cardName.name());
-        if (cardName.equals(SpecialCardName.HERBALIST)) {
+        if (cardName.equals(SpecialCardName.HERBALIST)) {     // herbalist requires an island choice
             noEntryBox.setVisible(true);
             chooseIslandBox.setVisible(true);
 
         } else if (cardName.equals(SpecialCardName.PRIEST)) {
             studentsArea.setVisible(true);
-            chooseColorBox.setVisible(true);
+            chooseColorBox.setVisible(false);
+            chooseIslandBox.setVisible(true);
 
         } else if (cardName.equals(SpecialCardName.JUGGLER)) {
             colorBox.getItems().clear();
@@ -359,7 +378,7 @@ public class SpecialCardsMenuController extends GUIController {
 
 
         } else if (cardName.equals(SpecialCardName.PRINCESS)) {
-            studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.PRINCESS);
+            //studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.PRINCESS);
             /*
             chooseColorBox.setVisible(true);
 
@@ -401,10 +420,14 @@ public class SpecialCardsMenuController extends GUIController {
         System.out.println("Current card studentsMap is : " + studentsMap);
 
         for (Label label : showContentLabels) {
+            label.setDisable(false);
             label.setVisible(true);
             String str = label.getId().replace("num_content", "");
             Color color = Color.toColor(str);
-            if (studentsMap.get(color) != null) label.setText("x " + studentsMap.get(color).toString());
+            if (studentsMap.get(color) != null) {
+                label.setText("x " + studentsMap.get(color).toString());
+                System.out.println("label : x  " + studentsMap.get(color).toString());
+            }
         }
     }
 
@@ -485,7 +508,7 @@ public class SpecialCardsMenuController extends GUIController {
         }
 
         if(colorBox.getValue() != null)
-            gui.getConnectionSocket().chooseColor(Color.toColor(colorBox.getValue().toString()));
+            colorToSend = Color.toColor(colorBox.getValue().toString());
 
         try {
             colorBox.setValue(null);
@@ -502,7 +525,7 @@ public class SpecialCardsMenuController extends GUIController {
 
         if (islandBox.getValue()!=null) {
             Integer pos = Integer.parseInt(islandBox.getValue().toString());
-            gui.getConnectionSocket().chooseIsland(pos);
+            islandToSend = pos;
         }
         try {
             islandBox.setValue(null);
@@ -516,11 +539,23 @@ public class SpecialCardsMenuController extends GUIController {
     private void chooseStudFromCard(MouseEvent event) {
         ImageView clickedIcon = (ImageView) event.getSource();
         clickedIcon.setEffect(new Glow());
-        Color colorToSend = Color.toColor(clickedIcon.getId().replace("content",""));
+        colorToSend = Color.toColor(clickedIcon.getId().replace("content",""));
         gui.getConnectionSocket().chooseColor(colorToSend);
         updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
     }
 
+
+    @FXML
+    public void sendColor(ActionEvent event) {
+        System.out.println("Sending color # " + colorToSend.toString());
+        gui.getConnectionSocket().chooseColor(colorToSend);
+    }
+
+    @FXML
+    public void sendIsland(ActionEvent event) {
+        System.out.println("Sending island # " + islandToSend);
+        gui.getConnectionSocket().chooseIsland(islandToSend);
+    }
 
     @FXML
     public void showContent(MouseEvent event) {
@@ -534,7 +569,7 @@ public class SpecialCardsMenuController extends GUIController {
     @FXML
     public void updateUsageMessage(MouseEvent event) {
         usageMessage.setText("");   //initialization before setting the actual message
-        if(gui.getViewState().getPlayerTower().equals(gui.getViewState().getActivePlayer()) && gui.getViewState().getSpecialPhase() != null) {
+        if(gui.getViewState().getCurrentPhase().equals(PhaseEnum.SPECIAL_CARD_USAGE) && gui.getViewState().getPlayerTower().equals(gui.getViewState().getActivePlayer()) && gui.getViewState().getSpecialPhase() != null) {
             String message = gui.getViewState().getSpecialPhase().toString();
             usageMessage.setText(message);
         }
