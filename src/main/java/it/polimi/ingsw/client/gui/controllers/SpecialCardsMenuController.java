@@ -459,7 +459,9 @@ public class SpecialCardsMenuController extends GUIController {
         SpecialCardName cardName = cardsList.get(cardId - 1);
         cardUsed = cardName;
         showContentLabel.setText(cardName.toString());
-        usageMessage.setText("");
+        //usageMessage.setText("");
+
+        chooseColorBox.setOnMouseEntered(this::chooseColor);   // New line
 
         initialiseVisibleAndDisableSetting(cardName);
 
@@ -486,7 +488,7 @@ public class SpecialCardsMenuController extends GUIController {
         } else if (cardName.equals(SpecialCardName.POSTMAN)) {
             usageMessage.setText("You are allowed to move MotherNature up to 2 additional islands than the steps allowed by the AssistantCard you chose. Please return to the board and complete the movement.");
         } else if (cardName.equals(SpecialCardName.BARD)) {
-            usageMessage.setText("Choose which students to swap between Entrance and DiningRoom");
+
         }
     }
 
@@ -647,7 +649,7 @@ public class SpecialCardsMenuController extends GUIController {
             String message = gui.getViewState().getSpecialPhase().toString();
             usageMessage.setText(message);
         }
-        updateCardContent(cardsList.indexOf(cardUsed)+1);
+
     }
 
     /**
