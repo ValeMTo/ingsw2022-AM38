@@ -39,6 +39,13 @@ public class ExpertGameBoard extends GameBoard {
         Set<Integer> alreadyUsedCardNum = new TreeSet<Integer>();
         while (i < specialCardsNum) {
             cardNum = random.nextInt(12);
+            if (i==0){
+                cardNum=2;
+            }else if (i==1){
+                cardNum=5;
+            }else{
+                cardNum=8;
+            }
             //
             //int final int card = cardNum;
             //SpecialCard s = SpecialCardName.values().stream.filter((x)->x.ordinal()==card);

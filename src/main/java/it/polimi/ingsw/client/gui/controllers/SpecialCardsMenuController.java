@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import it.polimi.ingsw.client.view.IslandView;
 import it.polimi.ingsw.client.view.SubPhaseEnum;
 import it.polimi.ingsw.controller.PhaseEnum;
+import it.polimi.ingsw.controller.SpecialCardRequiredAction;
 import it.polimi.ingsw.exceptions.FunctionNotImplementedException;
 import it.polimi.ingsw.model.board.Color;
 import it.polimi.ingsw.model.specialCards.SpecialCardName;
@@ -23,6 +24,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextAlignment;
 
+import javax.swing.*;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,6 +129,10 @@ public class SpecialCardsMenuController extends GUIController {
     private Button islandSend;
 
     @FXML
+    private Button endEffect;
+
+
+    @FXML
     private AnchorPane mainAnchor;
 
     SpecialCardName cardUsed;
@@ -161,6 +167,9 @@ public class SpecialCardsMenuController extends GUIController {
         studentsArea.setVisible(false);
         noEntryBox.setVisible(false);
 
+        endEffect.setVisible(false);
+        endEffect.setDisable(true);
+        endEffect.setOnAction(this::terminateEffect);
         showContentArea.setOnMouseEntered(this::updateUsageMessage);
 
 
@@ -326,6 +335,10 @@ public class SpecialCardsMenuController extends GUIController {
 
     public void initialiseVisibleAndDisableSetting(SpecialCardName cardName) {
 
+        if(gui.getViewState().isOptionalSpecialEffectUsage()){
+            endEffect.setVisible(true);
+            endEffect.setDisable(false);
+        }
 
         Map<Color, Integer> studentsMap;
         List<Color> color = new ArrayList<>();
@@ -407,15 +420,18 @@ public class SpecialCardsMenuController extends GUIController {
             chooseColorBox.setVisible(true);
             colorBox.getItems().clear();
             System.out.println(colorBox);
-            if (first){                      // TODO: load also DiningRoom colors
-                studentsMap = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
-                for (Color item : studentsMap.keySet()){
-                    if (studentsMap.get(item) >0) {
-                        color.add(item);
-                    }
+                             // TODO: load also DiningRoom colors
+            Map<Color,Integer> studMapEntrance = new HashMap<Color,Integer>();
+            studMapEntrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+            Map<Color,Integer> studMapDining = new HashMap<Color,Integer>();
+            studMapDining = gui.getViewState().getDiningRoomOccupancy(gui.getViewState().getPlayerTower());
+            for (Color item : studMapEntrance.keySet()){
+                if (studMapEntrance.get(item) >0) {
+                    color.add(item);
                 }
-                colorBox.getItems().addAll(color);
             }
+            colorBox.getItems().addAll(color);
+
         }
 
 
@@ -481,7 +497,26 @@ public class SpecialCardsMenuController extends GUIController {
         if (cardUsed.equals(SpecialCardName.PRIEST)) {
             chooseColorBox.setVisible(false);
             chooseIslandBox.setVisible(true);
+
+
         } else if (cardUsed.equals(SpecialCardName.JUGGLER)){
+
+            if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)) {
+                colorBox.getItems().clear();
+                Map<Color, Integer> studentsMapEntrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+                List<Color> color = new ArrayList<>();
+                for (Color item : studentsMapEntrance.keySet()){
+                    if (studentsMapEntrance.get(item) >0) {
+                        color.add(item);
+                    }
+                }
+                colorBox.getItems().addAll(color);
+            }
+            else if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD)) {
+                colorBox.getItems().clear();
+            }
+
+            /*
             if (!first){     // because the first time the juggler is used, its studentsmap has already been initialized by the ShowStudentMap
                 colorBox.getItems().clear();
                 Map<Color, Integer> studentsMap = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
@@ -496,13 +531,40 @@ public class SpecialCardsMenuController extends GUIController {
             }else{
                 first=false;
             }
-        } else if (cardUsed.equals(SpecialCardName.BARD)){
+            */
+
+        } else if (cardUsed.equals(SpecialCardName.BARD)){   // modified:  checks required action
+
+            if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)) {
+                colorBox.getItems().clear();
+                Map<Color, Integer> studentsMapEntrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+                List<Color> color = new ArrayList<>();
+                for (Color item : studentsMapEntrance.keySet()){
+                    if (studentsMapEntrance.get(item) >0) {
+                        color.add(item);
+                    }
+                }
+                colorBox.getItems().addAll(color);
+            }
+
+            else if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM)) {
+                colorBox.getItems().clear();
+                Map<Color, Integer> studentsMapDining = gui.getViewState().getDiningRoomOccupancy(gui.getViewState().getPlayerTower());
+                List<Color> color = new ArrayList<>();
+                for (Color item : studentsMapDining.keySet()){
+                    if (studentsMapDining.get(item) >0) {
+                        color.add(item);
+                    }
+                }
+                colorBox.getItems().addAll(color);
+            }
+            /*
             if (!first){
                 colorBox.getItems().clear();
-                Map<Color, Integer> studentsMap = gui.getViewState().getDiningRoomOccupancy(gui.getViewState().getPlayerTower());
+                Map<Color, Integer> studentsMapDining = gui.getViewState().getDiningRoomOccupancy(gui.getViewState().getPlayerTower());
                 List<Color> color = new ArrayList<>();
-                for (Color item : studentsMap.keySet()){
-                    if (studentsMap.get(item) >0) {
+                for (Color item : studentsMapDining.keySet()){
+                    if (studentsMapDining.get(item) >0) {
                         color.add(item);
                     }
                 }
@@ -511,6 +573,7 @@ public class SpecialCardsMenuController extends GUIController {
             }else {
                 first=false;
             }
+            */
         }
 
         if(colorBox.getValue() != null)
@@ -584,6 +647,7 @@ public class SpecialCardsMenuController extends GUIController {
             String message = gui.getViewState().getSpecialPhase().toString();
             usageMessage.setText(message);
         }
+        updateCardContent(cardsList.indexOf(cardUsed)+1);
     }
 
     /**
@@ -593,6 +657,13 @@ public class SpecialCardsMenuController extends GUIController {
         PhaseEnum currentPhase = gui.getViewState().getCurrentPhase();
         SubPhaseEnum currentSubPhase = gui.getViewState().getSubPhaseEnum();
 
+    }
+
+    @FXML
+    public void terminateEffect(ActionEvent event) {
+        gui.getConnectionSocket().sendTerminationSpecialCard();
+        endEffect.setVisible(false);
+        endEffect.setDisable(true);
     }
 
     private void createArrays() {
