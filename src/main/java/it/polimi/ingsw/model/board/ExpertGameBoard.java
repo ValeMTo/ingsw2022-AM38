@@ -205,6 +205,16 @@ public class ExpertGameBoard extends GameBoard {
         // If the Island we want to compute the influence is disabled, we re-enable it and do not compute influence, just return the old TowerColor
         if (!this.islands[island - 1].isInfluenceEnabled()) {
             islands[island - 1].enableInfluence();
+            for(SpecialCard specialCard:specialCards)
+                if(specialCard.getName().equals(SpecialCardName.HERBALIST)){
+                    try{
+                        specialCard.returnTile();
+                    }
+                    catch (FunctionNotImplementedException exc)
+                    {
+                        System.out.println("ERROR - Herbalist does not take entry tile - function not implemented");
+                    }
+                }
             return islandTower;
         }
 
