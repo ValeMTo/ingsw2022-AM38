@@ -139,6 +139,7 @@ public class SpecialCardsMenuController extends GUIController {
     boolean first;
     int islandToSend;
     Color colorToSend;
+    Integer cardId;
 
     public void initialize() {
 
@@ -226,7 +227,7 @@ public class SpecialCardsMenuController extends GUIController {
     public void useSpecialCard1(ActionEvent event) {
         gui.getConnectionSocket().chooseSpecialCard(cardsList.get(0).name());
         Button clickedButton = (Button) event.getSource();
-        Integer cardId = Integer.parseInt(clickedButton.getId().replace("use", ""));
+        cardId = Integer.parseInt(clickedButton.getId().replace("use", ""));
         updateCardContent(cardId);
         use1.setVisible(false);
         use2.setVisible(false);
@@ -237,7 +238,7 @@ public class SpecialCardsMenuController extends GUIController {
     public void useSpecialCard2(ActionEvent event) {
         gui.getConnectionSocket().chooseSpecialCard(cardsList.get(1).name());
         Button clickedButton = (Button) event.getSource();
-        Integer cardId = Integer.parseInt(clickedButton.getId().replace("use", ""));
+        cardId = Integer.parseInt(clickedButton.getId().replace("use", ""));
         updateCardContent(cardId);
         use1.setVisible(false);
         use2.setVisible(false);
@@ -248,7 +249,8 @@ public class SpecialCardsMenuController extends GUIController {
     public void useSpecialCard3(ActionEvent event) {
         gui.getConnectionSocket().chooseSpecialCard(cardsList.get(2).name());
         Button clickedButton = (Button) event.getSource();
-        Integer cardId = Integer.parseInt(clickedButton.getId().replace("use", ""));
+        cardId = Integer.parseInt(clickedButton.getId().replace("use", ""));
+
         updateCardContent(cardId);
         use3.setVisible(false);
         use2.setVisible(false);
@@ -333,6 +335,15 @@ public class SpecialCardsMenuController extends GUIController {
         }
     }
 
+    public void showStudentArea(){
+        for(ImageView icon : showContentStudIcons){
+            icon.setVisible(true);
+        }
+        for(Label label : showContentLabels){
+            label.setVisible(true);
+        }
+    }
+
     public void initialiseVisibleAndDisableSetting(SpecialCardName cardName) {
 
         if(gui.getViewState().isOptionalSpecialEffectUsage()){
@@ -351,7 +362,6 @@ public class SpecialCardsMenuController extends GUIController {
         noEntryBox.setVisible(false);
         chooseColorBox.setVisible(false);
         chooseIslandBox.setVisible(false);
-
 
         // resetting the studentsMap:
         for(Label l : showContentLabels) {
@@ -375,27 +385,35 @@ public class SpecialCardsMenuController extends GUIController {
             chooseIslandBox.setVisible(true);
 
         } else if (cardName.equals(SpecialCardName.PRIEST)) {
+            showStudentArea();
             studentsArea.setVisible(true);
             chooseColorBox.setVisible(false);
             chooseIslandBox.setVisible(true);
 
         } else if (cardName.equals(SpecialCardName.JUGGLER)) {
+            showStudentArea();
             colorBox.getItems().clear();
-            System.out.println(colorBox);
-            if (first){
-                studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.JUGGLER);
-                for (Color item : studentsMap.keySet()){
-                    if (studentsMap.get(item) >0) {
-                        color.add(item);
-                    }
+            studentsMap = gui.getViewState().getSpecialCardStudents(cardName);
+            System.out.println("STUDENTI");
+            System.out.println(studentsMap);
+
+            for(ImageView icon : showContentStudIcons){
+                Color col = Color.toColor(icon.getId().replace("content",""));
+                if (!studentsMap.containsKey(col) || studentsMap.get(col)<=0){
+                    icon.setVisible(false);
                 }
-                colorBox.getItems().addAll(color);
+            }
+
+            for(Label label : showContentLabels){
+                Color col = Color.toColor(label.getId().replace("num_content",""));
+                if (!studentsMap.containsKey(col) || studentsMap.get(col)<=0){
+                    label.setVisible(false);
+                }
             }
             studentsArea.setVisible(true);
-            chooseColorBox.setVisible(true);
-
 
         } else if (cardName.equals(SpecialCardName.PRINCESS)) {
+            showStudentArea();
             studentsArea.setVisible(true);
             //studentsMap = gui.getViewState().getSpecialCardStudents(SpecialCardName.PRINCESS);
             /*
@@ -500,41 +518,6 @@ public class SpecialCardsMenuController extends GUIController {
             chooseColorBox.setVisible(false);
             chooseIslandBox.setVisible(true);
 
-
-        } else if (cardUsed.equals(SpecialCardName.JUGGLER)){
-
-            if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)) {
-                colorBox.getItems().clear();
-                Map<Color, Integer> studentsMapEntrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
-                List<Color> color = new ArrayList<>();
-                for (Color item : studentsMapEntrance.keySet()){
-                    if (studentsMapEntrance.get(item) >0) {
-                        color.add(item);
-                    }
-                }
-                colorBox.getItems().addAll(color);
-            }
-            else if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD)) {
-                colorBox.getItems().clear();
-            }
-
-            /*
-            if (!first){     // because the first time the juggler is used, its studentsmap has already been initialized by the ShowStudentMap
-                colorBox.getItems().clear();
-                Map<Color, Integer> studentsMap = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
-                List<Color> color = new ArrayList<>();
-                for (Color item : studentsMap.keySet()){
-                    if (studentsMap.get(item) >0) {
-                        color.add(item);
-                    }
-                }
-                colorBox.getItems().addAll(color);
-                first = true;
-            }else{
-                first=false;
-            }
-            */
-
         } else if (cardUsed.equals(SpecialCardName.BARD)){   // modified:  checks required action
 
             if(gui.getViewState().getSpecialPhase().equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE)) {
@@ -613,11 +596,24 @@ public class SpecialCardsMenuController extends GUIController {
 
     @FXML
     private void chooseStudFromCard(MouseEvent event) {
+        if (cardUsed.equals(SpecialCardName.JUGGLER)){
+            studentsArea.setVisible(false);
+            colorBox.getItems().clear();
+            chooseColorBox.setVisible(true);
+            Map<Color, Integer> studentsMapEntrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
+            List<Color> color = new ArrayList<>();
+            for (Color item : studentsMapEntrance.keySet()){
+                if (studentsMapEntrance.get(item) >0) {
+                    color.add(item);
+                }
+            }
+            colorBox.getItems().addAll(color);
+        }
+
         ImageView clickedIcon = (ImageView) event.getSource();
-        clickedIcon.setEffect(new Glow());
         colorToSend = Color.toColor(clickedIcon.getId().replace("content",""));
         gui.getConnectionSocket().chooseColor(colorToSend);
-        updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
+        showStudentMap(cardUsed);
     }
 
 
@@ -625,6 +621,10 @@ public class SpecialCardsMenuController extends GUIController {
     public void sendColor(ActionEvent event) {
         System.out.println("Sending color # " + colorToSend.toString());
         gui.getConnectionSocket().chooseColor(colorToSend);
+
+        if (cardUsed.equals(SpecialCardName.JUGGLER)){
+            updateCardContent(cardId);
+        }
     }
 
     @FXML
