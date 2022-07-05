@@ -1071,18 +1071,15 @@ public class MyBoardGuiController extends GUIController {
     public void setupClouds(){
         cloudsImgArray.add(cloud1);
         cloudsImgArray.add(cloud2);
-        cloudsImgArray.add(cloud3);
+
+        if(gui.getViewState().getGameSettings().getNumPlayers() == 3) {
+            cloudsImgArray.add(cloud3);
+        }
 
         for(ImageView cloud : cloudsImgArray) {
             cloud.setOnMouseEntered(this::showContent);
             cloud.setOnMouseClicked(this::pickCloud);
             cloud.setDisable(true);
-        }
-
-        if(gui.getViewState().getTowers().size() == 2) {
-            cloud3.setVisible(false);
-            cloud3.setDisable(true);
-            cloudsImgArray.remove(2);
         }
 
 
