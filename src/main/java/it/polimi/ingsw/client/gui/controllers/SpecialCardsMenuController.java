@@ -420,7 +420,7 @@ public class SpecialCardsMenuController extends GUIController {
             chooseColorBox.setVisible(true);
             colorBox.getItems().clear();
             System.out.println(colorBox);
-                             // TODO: load also DiningRoom colors
+
             Map<Color,Integer> studMapEntrance = new HashMap<Color,Integer>();
             studMapEntrance = gui.getViewState().getSchoolEntranceOccupancy(gui.getViewState().getPlayerTower());
             Map<Color,Integer> studMapDining = new HashMap<Color,Integer>();
@@ -588,7 +588,7 @@ public class SpecialCardsMenuController extends GUIController {
             System.out.println("zero value");
         }
         */
-        updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
+        //updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
 
     }
 
@@ -608,7 +608,7 @@ public class SpecialCardsMenuController extends GUIController {
         }
 
          */
-        updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
+        //updateCardContent(cardsList.indexOf(cardUsed)+1);     // update card content area  after interaction
     }
 
     @FXML
