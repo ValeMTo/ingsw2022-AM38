@@ -30,7 +30,7 @@ public class Server {
         if (args != null && args.length > 1) {
             port = Integer.parseInt(args[1]);
         } else {
-           port = 1234;
+           port = 12345;
                 System.out.println("Port is "+port);
             }
         return port;

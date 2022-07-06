@@ -2,6 +2,7 @@ package it.polimi.ingsw.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import it.polimi.ingsw.client.CLI.ClientCLI;
 import it.polimi.ingsw.client.gui.controllers.LobbyMenuController;
 import it.polimi.ingsw.client.view.IslandView;
@@ -42,7 +43,8 @@ public class ViewMessageParser {
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
-        //System.out.println("viewMessageParser receive..." + jsonFromServer);
+        System.out.println("viewMessageParser receive..." + jsonFromServer);
+        try{
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
 
@@ -269,6 +271,11 @@ public class ViewMessageParser {
                 if(json.has("Optional"))
                     view.setOptionalSpecialEffectUsage(json.get("Optional").getAsBoolean());
         }
+        }
     }
+        catch(JsonSyntaxException jsonError){
+            System.out.println("ERROR - json malformed "+jsonFromServer);
+
+        }
     }
 }
