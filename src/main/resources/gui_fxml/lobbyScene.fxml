@@ -26,12 +26,12 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="gameMode" layoutX="582.0" layoutY="267.0" prefHeight="27.0" prefWidth="185.0" text="&gt; GameMode : " textFill="#46b9e7">
+      <Label fx:id="gameMode" layoutX="582.0" layoutY="267.0" prefHeight="27.0" prefWidth="470.0" text="&gt; GameMode : " textFill="#46b9e7">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="expectedPlayers" layoutX="582.0" layoutY="304.0" prefHeight="27.0" prefWidth="185.0" text="&gt; Expected players :" textFill="#46b9e7">
+      <Label fx:id="expectedPlayers" layoutX="582.0" layoutY="304.0" prefHeight="27.0" prefWidth="470.0" text="&gt; Expected players :" textFill="#46b9e7">
          <font>
             <Font size="18.0" />
          </font>
