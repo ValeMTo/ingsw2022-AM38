@@ -43,7 +43,7 @@ public class ViewMessageParser {
         return studentsWithColors;
     }
     public void parse(String jsonFromServer) {
-        System.out.println("viewMessageParser receive..." + jsonFromServer);
+        //System.out.println("viewMessageParser receive..." + jsonFromServer);
         try{
         if (jsonFromServer != null) {
             //System.out.println("VIEW MESSAGE PARSER - Got message " + jsonFromServer);
