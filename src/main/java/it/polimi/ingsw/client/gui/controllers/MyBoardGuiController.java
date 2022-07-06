@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 import java.sql.Time;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static it.polimi.ingsw.model.board.Color.toColor;
 
@@ -378,8 +379,13 @@ public class MyBoardGuiController extends GUIController {
             updateArchipelago();
             updateProfessors();
             updateClouds();
-
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             updatePhaseAction();
+
 
         }
     }
@@ -1014,6 +1020,7 @@ public class MyBoardGuiController extends GUIController {
      * Updates the clouds available. If a cloud has already been chosen, it will not be displayed on the board.
      */
     public void updateClouds() {
+        System.out.println("executing updateClouds()...");
         List<Integer> availableClouds = gui.getViewState().getUsableClouds();
         for(ImageView img : cloudsImgArray) {
             int cloudNum = Integer.parseInt(img.getId().replace("cloud",""));
