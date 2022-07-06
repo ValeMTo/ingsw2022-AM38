@@ -29,7 +29,7 @@ public class Eriantys {
             }
 
             switch (actionCode){
-                case 0 -> Server.main(null);
+                case 0 -> Server.main(args);
                 case 1 -> ClientCLI.main(null);
                 case 2 -> MainGUI.main(null);
                 //case 2-> ClientGUI.main(null);

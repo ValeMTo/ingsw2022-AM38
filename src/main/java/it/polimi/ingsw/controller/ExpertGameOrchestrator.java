@@ -254,6 +254,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
     @Override
     public String chooseColor(Color color) {
         synchronized (actionBlocker) {
+            if(this.currentPhase!=PhaseEnum.SPECIAL_CARD_USAGE)
+                return MessageGenerator.errorWrongPhase(this.currentPhase);
             if (!expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_COLOR) && !expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_COLOR_SCHOOL_ENTRANCE) && !expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_COLOR_CARD) && !expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_COLOR_DINING_ROOM)) {
                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose color");
             }
@@ -383,6 +385,8 @@ public class ExpertGameOrchestrator extends GameOrchestrator {
         System.out.println("EXPERT GAME ORCHESTRATOR - chooseIsland - CHOOSING ISLAND for special card usage");
         System.out.flush();
         synchronized (phaseBlocker) {
+            if(this.currentPhase!=PhaseEnum.SPECIAL_CARD_USAGE)
+                return MessageGenerator.errorWrongPhase(this.currentPhase);
             if (!expectingPhase.equals(SpecialCardRequiredAction.CHOOSE_ISLAND)) {
                 return MessageGenerator.errorWithStringMessage(ErrorTypeEnum.WRONG_PHASE_ACTION, "ERROR - It is not needed a choose island");
             }
