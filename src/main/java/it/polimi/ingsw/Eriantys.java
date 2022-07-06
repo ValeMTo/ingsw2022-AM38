@@ -11,6 +11,9 @@ public class Eriantys {
 
     public static void main(String[] args) {
 
+        if (args != null && args.length > 1)
+            Server.main(args);
+
         System.out.println("Welcome in Eriantys!");
         System.out.println("Options:");
         System.out.println("0 Server");
@@ -27,7 +30,6 @@ public class Eriantys {
                 System.out.println("Digit only numbers");
                 System.exit(-1);
             }
-
             switch (actionCode){
                 case 0 -> Server.main(args);
                 case 1 -> ClientCLI.main(null);
