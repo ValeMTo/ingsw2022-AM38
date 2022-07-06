@@ -16,19 +16,19 @@
             </font>
         </Label>
 
-        <AnchorPane layoutX="357.0" layoutY="134.0" prefHeight="199.0" prefWidth="466.0" style="-fx-background-color: black; " VBox.vgrow="ALWAYS">
-            <ToggleButton fx:id="expertToggle" layoutX="344.0" layoutY="100.0" mnemonicParsing="false" onAction="#setExpertMode" style="-fx-background-color: GRAY;" text="Expert mode" />
-            <Label layoutX="57.0" layoutY="102.0" prefHeight="27.0" prefWidth="245.0" text="Enable / disable Expert mode :" textFill="#46b9e7">
+        <AnchorPane layoutX="357.0" layoutY="134.0" prefHeight="199.0" prefWidth="691.0" style="-fx-background-color: black; " VBox.vgrow="ALWAYS">
+            <ToggleButton fx:id="expertToggle" layoutX="450.0" layoutY="103.0" mnemonicParsing="false" onAction="#setExpertMode" style="-fx-background-color: GRAY;" text="Expert mode" />
+            <Label layoutX="57.0" layoutY="102.0" prefHeight="27.0" prefWidth="346.0" text="Enable / disable Expert mode :" textFill="#46b9e7">
                 <font>
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label layoutX="57.0" layoutY="150.0" text="Click to change number of players :" textFill="#46b9e7">
+            <Label layoutX="57.0" layoutY="150.0" prefHeight="27.0" prefWidth="346.0" text="Click to change number of players :" textFill="#46b9e7">
                 <font>
                     <Font size="18.0" />
                 </font>
             </Label>
-            <ToggleButton fx:id="numPlayersToggle" layoutX="362.0" layoutY="148.0" mnemonicParsing="false" onAction="#changeNumPlayers" style="-fx-text-fill: WHITE; -fx-background-color: #787aef;" text="2" textFill="WHITE">
+            <ToggleButton fx:id="numPlayersToggle" layoutX="450.0" layoutY="149.0" mnemonicParsing="false" onAction="#changeNumPlayers" style="-fx-text-fill: WHITE; -fx-background-color: #787aef;" text="2" textFill="WHITE">
                 <font>
                     <Font size="14.0" />
                 </font>
