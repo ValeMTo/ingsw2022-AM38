@@ -15,3 +15,4 @@ public enum MessageTypeEnum {
     ANSWER,                 //11
 
 }
+

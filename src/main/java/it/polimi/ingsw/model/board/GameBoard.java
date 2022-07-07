@@ -315,7 +315,7 @@ public abstract class GameBoard extends Listenable {
         if (destinationIsland < 1 || destinationIsland > islands[islands.length - 1].getPosition())
             throw new IslandOutOfBoundException(1, islands.length);
 
-        //TODO: fix problem 1 not reachable... also motherNature MUST move from its position!
+
         if ((motherNature < destinationIsland && destinationIsland - motherNature <= cardSteps) || (motherNature > destinationIsland && islands.length - motherNature + destinationIsland <= cardSteps)) {
             motherNature = destinationIsland;
             System.out.println("GAME BOARD - moveMotherNature - motherNature correctly moved to "+destinationIsland+" notifying the clients");

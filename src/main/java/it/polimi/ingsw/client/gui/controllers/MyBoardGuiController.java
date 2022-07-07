@@ -379,7 +379,7 @@ public class MyBoardGuiController extends GUIController {
             updateArchipelago();
             updateProfessors();
             updateClouds();
-            
+
             updatePhaseAction();
 
 
@@ -640,7 +640,7 @@ public class MyBoardGuiController extends GUIController {
 
     @FXML
     public void chooseIsland(ActionEvent event){
-        removeEffect(archipelagoIslands);         // maybe this causes problems ??
+        removeEffect(archipelagoIslands);
         if (gui.getViewState().getCurrentPhase().equals(PhaseEnum.ACTION_MOVE_STUDENTS)) {
             removeEffect(entranceStudImages);
             gui.getConnectionSocket().moveStudentToIsland(fromStudent, getPositionFromImage(destinationIsland, "island"));
