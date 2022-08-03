@@ -6,13 +6,12 @@ import it.polimi.ingsw.exceptions.NicknameAlreadyTakenException;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,17 +51,45 @@ public class Server {
         }
     }
 
-
+    /**
+     * Creates the ServerSocket asking the port number to the user. Also terminates the app if the user uses END as input
+     * @return the originated server socket
+     */
+    private static ServerSocket createServerSocketFromInput(){
+        boolean socketActive = false;
+        ServerSocket socket = null;
+        String input;
+        Scanner scanner = new Scanner(System.in);
+        while(!socketActive){
+            System.out.println("Enter the port for the Server Socket or digit END to terminate the server");
+            input = scanner.nextLine();
+            try{
+                if(input.equalsIgnoreCase("END"))
+                    System.exit(0);
+                int port = Integer.parseInt(input);
+                socket = new ServerSocket(port);
+                socketActive = true;
+            }
+            catch (IOException exc){
+                System.out.println("Server socket error, try with another port or end with END command");
+            }
+            catch (NumberFormatException exc){
+                System.out.println("Only number or END input are allowed.");
+            }
+        }
+        return socket;
+    }
     private static ServerSocket createServerSocket(String[] args) {
         port = getPort(args);
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server created at port " + port);
+            return serverSocket;
         } catch (IOException exc) {
-            exc.printStackTrace();
+            System.out.println("Server port " + port + " is unable, problem creating the socket, port occupied, shutting down.");
+            return createServerSocketFromInput();
         }
-        return serverSocket;
     }
 
     public static boolean blockPlayerName(String nickname) throws NicknameAlreadyTakenException {
