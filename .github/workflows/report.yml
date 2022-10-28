@@ -3,9 +3,6 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: '00 02,18 * * *'
-    - cron: '00 10 * * 2'
 
 jobs:
   build:
