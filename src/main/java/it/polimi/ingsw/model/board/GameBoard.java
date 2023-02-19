@@ -26,6 +26,8 @@ public abstract class GameBoard extends Listenable {
     protected int numRound;
     protected int motherNature;
     protected Map<String, Integer> standing = new HashMap<>();
+    private Map<Cloud, Integer> cloudMessageCounter;
+    private final int maxCounter = 2056;
 
 
     public GameBoard(int playerNumber, List<String> playersNicknames) {
@@ -52,16 +54,27 @@ public abstract class GameBoard extends Listenable {
         for (int i = 0; i < initialIslandNumber; i++)
             islands[i] = new Island(i + 1);
         clouds = new Cloud[playerNumber];
-        for (int i = 0; i < playerNumber; i++)
+        cloudMessageCounter = new HashMap<>();
+        for (int i = 0; i < playerNumber; i++) {
             clouds[i] = new Cloud(cloudStudentsLimit);
+            cloudMessageCounter.put(clouds[i], 0);
+        }
         numRound = 1;
         motherNature = 1;
     }
 
     private void notifyClouds(){
         if(this.clients!=null && this.modelListener!=null){
-            for(int i=0;i<clouds.length;i++)
-                notify(modelListener,MessageGenerator.cloudViewUpdateMessage(i+1,clouds[i].getLimit(),clouds[i].getStudents()),clients);
+            for(int i=0;i<clouds.length;i++) {
+                System.out.println("STATUS CLOUDS: cloud "+i+" has map "+clouds[i].getStudents());
+                notify(modelListener, MessageGenerator.cloudViewUpdateMessageWithCounter(i + 1, clouds[i].getLimit(), clouds[i].getStudents(),cloudMessageCounter.get(clouds[i])), clients);
+                int actualCounter = cloudMessageCounter.get(clouds[i]);
+                if(actualCounter<maxCounter)
+                    actualCounter++;
+                else
+                    actualCounter=0;
+                cloudMessageCounter.put(clouds[i], actualCounter);
+            }
         }
     }
 
@@ -482,7 +495,15 @@ public abstract class GameBoard extends Listenable {
                 throw new IndexOutOfBoundsException("Player Position is from " + 0 + " to " + (players.length - 1));
 
             case CLOUD:
-                if (position <= clouds.length && position >= 1) return clouds[position - 1].removeStudent(student);
+                if (position <= clouds.length && position >= 1) {
+                    boolean retValue = clouds[position - 1].removeStudent(student);
+                    // in case a cloud is now empty due to removal of students, we notify with a message the status of the clouds
+                    if(clouds[position - 1].isEmpty())
+                    {
+                        notifyClouds();
+                    }
+                    return retValue;
+                }
                 throw new IndexOutOfBoundsException("Cloud Position is from " + 1 + " to " + (clouds.length));
             case CARD:
                 throw new FunctionNotImplementedException("Special card value is not allowed in addStudent since the add for special cards is for expert mode only");

@@ -152,11 +152,7 @@
          <children>
 
 
-            <ImageView fitHeight="123.0" fitWidth="103.0" pickOnBounds="true" preserveRatio="true" styleClass="deck">
-               <image>
-                  <Image url="@../graphics/assistantCards/Assistente_1.png" />
-               </image>
-            </ImageView>
+ 
             <ImageView fx:id="assistant2" fitHeight="123.0" fitWidth="103.0" layoutX="113.0" pickOnBounds="true" preserveRatio="true" styleClass="deck">
                <image>
                   <Image url="@../graphics/assistantCards/Assistente_2.png" />

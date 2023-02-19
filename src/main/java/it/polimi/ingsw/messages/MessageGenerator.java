@@ -584,6 +584,27 @@ public class MessageGenerator {
     }
 
     /**
+     * Generates the CloudViewUpdate with counter message, used to notify the updated status of a given cloud.
+     *
+     * @param position:   the index of the specific cloud where the change has occurred.
+     * @param studentsMap : the hashmap with the updated amounts of students for each color
+     * @param limit       : the maximum limit of students on the cloud
+     * @param counter     : the counter of the message
+     * @return : json string of the CloudViewUpdate message
+     */
+    public static String cloudViewUpdateMessageWithCounter(int position, int limit, Map<Color, Integer> studentsMap, int counter) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.CLOUD_VIEW_UPDATE.ordinal());
+        json.put("position", position);
+        json.put("StudentsLimit", limit);
+        json.put("StudentsMap", studentsMap);
+        json.put("Counter", counter);
+
+        return json + "\n";
+    }
+
+    /**
      * Generates the IslandViewUpdate message, used to notify the updated status of a given Island.
      *
      * @param position:   the index of the specific island where the change has occurred.
@@ -607,6 +628,32 @@ public class MessageGenerator {
         json.put("IsDisabled", !isEnabled);
         return json + "\n";
     }
+    /**
+     * Generates the IslandViewUpdate message, used to notify the updated status of a given Island.
+     *
+     * @param position:   the index of the specific island where the change has occurred.
+     * @param studentsMap : the hashmap with the updated amounts of students for each color
+     * @param towerColor  : the tower color of the player who has dominance on the given island
+     * @param numTower    : the amount of towers on the island
+     * @param isEnabled: states whether the dominance computation on that island is disabled (true) or enabled (false)
+     * @return : json string of the IslandViewUpdate message
+     */
+    public static String islandViewUpdateMessageWithCounter(int position, Map<Color, Integer> studentsMap, Tower towerColor, int numTower, boolean isEnabled, int counter) {
+        JSONObject json = new JSONObject();
+        json.put("MessageType", MessageTypeEnum.UPDATE.ordinal());
+        json.put("UpdateType", UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal());
+        json.put("position", position);
+        json.put("StudentsMap", studentsMap);
+        if(towerColor!=null)
+            json.put("TowerColor", towerColor.ordinal());
+        else
+            json.put("TowerColor","null");
+        json.put("NumOfTowers", numTower);
+        json.put("IsDisabled", !isEnabled);
+        json.put("Counter", counter);
+        return json + "\n";
+    }
+
 
     /**
      * Generates the ArchipelagoViewUpdate message, used to notify the updated status of an Archipelago of Islands.

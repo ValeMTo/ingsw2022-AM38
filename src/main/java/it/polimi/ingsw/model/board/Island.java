@@ -18,6 +18,8 @@ public class Island extends Listenable {
     protected boolean influenceIsEnabled = true;
     protected Tower towerColor = null;
     protected int towerNumber = 0;
+    private Integer counter = 0;
+    private final Integer maxCounter = 2056;
 
     /**
      * Constructor that initializes the HashMap and position
@@ -43,7 +45,12 @@ public class Island extends Listenable {
             System.out.println("ISLAND "+this.position+" - notify my existence!");
             Map<Color,Integer> returnMap = new HashMap<>();
             returnMap.putAll(this.influence);
-            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessageWithCounter(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled(), counter),clients);
+            // The counter after the maximum, returns to 0
+            if(counter<maxCounter)
+                counter++;
+            else
+                counter = 0;
         }
     }
 
@@ -52,7 +59,12 @@ public class Island extends Listenable {
             System.out.println("ISLAND "+this.position+" - notify a change!");
             Map<Color,Integer> returnMap = new HashMap<>();
             returnMap.putAll(this.influence);
-            notify(modelListener,MessageGenerator.islandViewUpdateMessage(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled()),clients);
+            notify(modelListener,MessageGenerator.islandViewUpdateMessageWithCounter(this.position,returnMap,this.towerColor,this.towerNumber,this.isInfluenceEnabled(), counter),clients);
+            // The counter after the maximum, returns to 0
+            if(counter<maxCounter)
+                counter++;
+            else
+                counter = 0;
         }
     }
 

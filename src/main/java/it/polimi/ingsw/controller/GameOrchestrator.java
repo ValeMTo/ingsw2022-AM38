@@ -86,12 +86,11 @@ public abstract class GameOrchestrator extends Listenable {
                     gameBoard.addStudent(StudentCounter.SCHOOLENTRANCE, gameBoard.drawFromBag(), j);
                 }
             }
+            gameBoard.fillClouds();
             gameBoard.setListenerAndClients(modelListener,clients);
         } catch (Exception exc) {
             exc.printStackTrace();
         }
-
-        gameBoard.fillClouds();
         if(clients!=null&&modelListener!=null) {
             currentPhase = PLANNING;
             System.out.println("GAME ORCHESTRATOR NOTIFY: ACTIVE PLAYER WITH TOWER " + gameBoard.getPlayerTower(planningOrder[activePlayer]));
@@ -332,8 +331,10 @@ public abstract class GameOrchestrator extends Listenable {
                 exc.printStackTrace();
                 return false;
             }
-            if (clients != null)
-                notify(modelListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
+            // Redundant, if cloud removes all student, then will notify
+            //if (clients != null) {
+            //    notify(modelListener, MessageGenerator.cloudViewUpdateMessage(cloudPosition, gameBoard.getCloudLimit(), null), clients);
+            //}
             nextStep();
             return true;
         }

@@ -28,6 +28,9 @@ import java.util.Map;
 public class ViewMessageParser {
     Gson gson = new Gson();
     ViewState view;
+    private Map<Integer, Integer> islandMessageCounter = new HashMap<>();
+    private Map<Integer, Integer> cloudMessageCounter = new HashMap<>();
+    private final Integer maxCounter = 2056;
 
     public ViewMessageParser(ViewState view) {
         this.view = view;
@@ -127,25 +130,42 @@ public class ViewMessageParser {
                     });
                 }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ISLAND_VIEW_UPDATE.ordinal()) {
-                IslandView islandToAdd = new IslandView(json.get("position").getAsInt());
-                if(json.get("TowerColor").getAsString()!=null&&!json.get("TowerColor").getAsString().equalsIgnoreCase("null"))
-                    islandToAdd.setTower(Tower.values()[json.get("TowerColor").getAsInt()]);
-                islandToAdd.setTowerNumber(json.get("NumOfTowers").getAsInt());
-                Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
-                if(json.get("IsDisabled").getAsBoolean())
-                    islandToAdd.disableInfluence();
-                else
-                    islandToAdd.enableInfluence();
-                islandToAdd.setStudentMap(getStudentMapFromStringAndNumberMap(students));
-                List<IslandView> islands = view.getIslands();
-                List<IslandView> transformedIslands = new ArrayList<>();
-                transformedIslands.addAll(islands);
-                for (IslandView island : islands)
-                    if (island.getPosition() == islandToAdd.getPosition()) {
-                        transformedIslands.remove(island);
-                    }
-                transformedIslands.add(islandToAdd);
-                view.setIslands(transformedIslands);
+                Integer counter = islandMessageCounter.get(json.get("position").getAsInt());
+                boolean changeIsland = false;
+                // Case island number not registered or the counter is greater than the one received so far,
+                // but not big enough to be a late message after reset counter to low values
+                if(counter == null||(json.get("Counter").getAsInt()>counter&&json.get("Counter").getAsInt()-counter<maxCounter/2))
+                {
+                    islandMessageCounter.put(json.get("position").getAsInt(), json.get("Counter").getAsInt());
+                    changeIsland = true;
+                }
+                // probable case the counter reset to 0 or close to 0. Reset the counter to continue
+                // The old counter is very high and the message has very low counter, probably restarted counter
+                else if (counter-json.get("Counter").getAsInt() > maxCounter/2) {
+                    islandMessageCounter.put(json.get("position").getAsInt(), json.get("Counter").getAsInt());
+                }
+                // We change the island only in case that the update is recent and not deprecated
+                if(changeIsland) {
+                    IslandView islandToAdd = new IslandView(json.get("position").getAsInt());
+                    if (json.get("TowerColor").getAsString() != null && !json.get("TowerColor").getAsString().equalsIgnoreCase("null"))
+                        islandToAdd.setTower(Tower.values()[json.get("TowerColor").getAsInt()]);
+                    islandToAdd.setTowerNumber(json.get("NumOfTowers").getAsInt());
+                    Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
+                    if (json.get("IsDisabled").getAsBoolean())
+                        islandToAdd.disableInfluence();
+                    else
+                        islandToAdd.enableInfluence();
+                    islandToAdd.setStudentMap(getStudentMapFromStringAndNumberMap(students));
+                    List<IslandView> islands = view.getIslands();
+                    List<IslandView> transformedIslands = new ArrayList<>();
+                    transformedIslands.addAll(islands);
+                    for (IslandView island : islands)
+                        if (island.getPosition() == islandToAdd.getPosition()) {
+                            transformedIslands.remove(island);
+                        }
+                    transformedIslands.add(islandToAdd);
+                    view.setIslands(transformedIslands);
+                }
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.ARCHIPELAGO_VIEW_UPDATE.ordinal()) {
                 view.setMotherNature(json.get("MotherNaturePosition").getAsInt());
                 view.setIslandNumber(json.get("NumOfIslands").getAsInt());
@@ -192,13 +212,29 @@ public class ViewMessageParser {
                 Cloud cloudToAdd = new Cloud(json.get("StudentsLimit").getAsInt());
                 Map<String, Number> students = gson.fromJson(json.get("StudentsMap"), HashMap.class);
                 cloudToAdd.setStudents(getStudentMapFromStringAndNumberMap(students));
+                Integer counter = cloudMessageCounter.get(json.get("position").getAsInt());
+                boolean changeCloud = false;
+                // Case cloud number not registered or the counter is greater than the one received so far
+                // but not big enough to be a late message
+                if(counter == null||(json.get("Counter").getAsInt()>counter&&json.get("Counter").getAsInt()-counter<maxCounter/2))
+                {
+                    cloudMessageCounter.put(json.get("position").getAsInt(), json.get("Counter").getAsInt());
+                    changeCloud = true;
+                }
+                // probable case the counter reset to 0 or close to 0. Reset the counter to continue.
+                // The old counter is very high and the message has very low counter, probably restarted counter
+                else if (counter - json.get("Counter").getAsInt() > maxCounter/2) {
+                    cloudMessageCounter.put(json.get("position").getAsInt(), json.get("Counter").getAsInt());
+                }
+                // We change the cloud only in case that the update is recent and not deprecated
+                if(changeCloud){
                 for (Cloud cloud : clouds.keySet()) {
                     if (clouds.get(cloud) == json.get("position").getAsInt()) {
                         modifiedClouds.remove(cloud);
                     }
                 }
                 modifiedClouds.put(cloudToAdd, json.get("position").getAsInt());
-                view.setCloud(modifiedClouds);
+                view.setCloud(modifiedClouds);}
             } else if (json.get("UpdateType").getAsInt() == UpdateTypeEnum.PROFESSORS_UPDATE.ordinal()) {
              Map<String, String> professorStringMap = gson.fromJson(json.get("ProfessorsMap"),HashMap.class);
              Map<Color,Tower> professors = new HashMap<>();
@@ -241,7 +277,7 @@ public class ViewMessageParser {
                     view.setIncreasedMovement(json.get("IsMovementIncreased").getAsBoolean(),json.get("IncreasedMovement").getAsInt());
                 }
             }
-            if(!view.isCli()){                 // updates the board after receiving any kind of UPDATE message. Beware: don't refresh game status at this point or it will cause error
+            if(!view.isCli()){                 // updates the board after receiving any kind of UPDATE message. Beware: don't refresh game status at this point, or it will cause error
                 Platform.runLater(() -> {
                     view.getAwaitingGUI().refreshWholeBoard();
                 });
