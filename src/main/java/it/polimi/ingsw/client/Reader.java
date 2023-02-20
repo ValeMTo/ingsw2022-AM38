@@ -69,8 +69,8 @@ public class Reader implements Runnable {
         TimerTask pingPongtask = new PingPongTimer(this, connectionSocket);
         Timer disconnectionTimer = new Timer("Disconnection timer");
         TimerTask disconnectionTask = new DisconnectionTimer(this);
-        pingPongTimer.scheduleAtFixedRate(pingPongtask,5000,5000);
-        disconnectionTimer.scheduleAtFixedRate(disconnectionTask,30000,30000);
+        pingPongTimer.scheduleAtFixedRate(pingPongtask,2000,2000);
+        disconnectionTimer.scheduleAtFixedRate(disconnectionTask,8000,8000);
         JsonObject json;
         Gson gson = new Gson();
         while (true) {

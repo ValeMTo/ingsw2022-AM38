@@ -216,7 +216,7 @@ public class ViewMessageParser {
                 boolean changeCloud = false;
                 // Case cloud number not registered or the counter is greater than the one received so far
                 // but not big enough to be a late message
-                if(counter == null||(json.get("Counter").getAsInt()>counter&&json.get("Counter").getAsInt()-counter<maxCounter/2))
+                if(json.get("Counter")!=null && (counter == null||(json.get("Counter").getAsInt()>counter&&json.get("Counter").getAsInt()-counter<maxCounter/2)))
                 {
                     cloudMessageCounter.put(json.get("position").getAsInt(), json.get("Counter").getAsInt());
                     changeCloud = true;
